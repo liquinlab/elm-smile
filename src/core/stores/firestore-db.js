@@ -63,7 +63,7 @@ export const loadDoc = async (docid) => {
   return undefined
 }
 
-export const createDoc = async (data, seedid, partnum) => {
+export const createDoc = async (data) => {
   console.log('trying to create document')
   try {
     const expRef = doc(db, mode, appconfig.project_ref)
@@ -80,51 +80,38 @@ export const createDoc = async (data, seedid, partnum) => {
     console.log('Document written with ID: ', `${mode}/${appconfig.project_ref}`)
 
     // Add a new document with a generated id.
-    // const docRef = await addDoc(
-    //   collection(db, `${mode}/${appconfig.project_ref}/data`),
-    //   data
-    // )
-
-    // Append the participnt number to the end of the docID -- this should ALWAYS make a unique record
-    const fulldocid = `${seedid}-p${partnum}`
-    const docRef = doc(db, `${mode}/${appconfig.project_ref}/data`, fulldocid)
-    const docSnap = await getDoc(docRef)
-
-    // however, we'll still check to make sure the record doesn't already exist. If it does, we append override, but any additional overrides with same id and participant will overwrite the data
-    if (docSnap.exists()) {
-      await setDoc(doc(db, `${mode}/${appconfig.project_ref}/data`, `${fulldocid}-override`), data)
-      console.log('Document written with ID: ', `${fulldocid}-override`)
-      return `${fulldocid}-override`
+    const docRef = await addDoc(
+      collection(db, `${mode}/${appconfig.project_ref}/data`),
+      data
+      )
+    console.log('Document written with ID: ', docRef.id)
+    return docRef.id
+    } catch (e) {
+      console.error('Error adding document: ', e)
+      return null
     }
-    // otherwise, we create a document with the specified docID
-    await setDoc(doc(db, `${mode}/${appconfig.project_ref}/data`, fulldocid), data)
-    console.log('Document written with ID: ', fulldocid)
-    return fulldocid
-  } catch (e) {
-    console.error('Error adding document: ', e)
-    return null
   }
-}
 
 export const updateExperimentCounter = async (counter) => {
   const docRef = doc(db, `${mode}/${appconfig.project_ref}/counters/`, counter)
-
-  let newCounter = null
   try {
-    await runTransaction(db, async (transaction) => {
+    const newCounter = await runTransaction(db, async (transaction) => {
       const docSnap = await transaction.get(docRef)
+      let newCounterTemp
       if (!docSnap.exists()) {
-        newCounter = 0
+        newCounterTemp = 0
       } else {
-        newCounter = docSnap.data().n + 1
+        newCounterTemp = docSnap.data().n + 1
       }
-      transaction.set(docRef, { n: newCounter }, { merge: true })
+      transaction.set(docRef, { n: newCounterTemp }, { merge: true })
+      return newCounterTemp
     })
     console.log('New participant number is: ', newCounter)
+    return newCounter
   } catch (e) {
     console.log('Transaction failed: ', e)
   }
-  return newCounter
+  return null
 }
 
 export const balancedAssignConditions = async (conditionDict, currentConditions) => {
