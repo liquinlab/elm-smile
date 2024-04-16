@@ -249,7 +249,7 @@ export default defineStore('smilestore', {
         language,
         webdriver,
       }
-      log.log('Browser fingerprint: ' + this.data.browser_fingerprint)
+      log.log('Browser fingerprint: ' + JSON.stringify(this.data.browser_fingerprint))
     },
     setPageAutofill(fn) {
       this.dev.page_provides_autofill = fn
