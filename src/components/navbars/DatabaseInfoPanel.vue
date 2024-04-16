@@ -135,12 +135,6 @@ onMounted(() => {
               <td class="has-text-left is-family-code is-size-7">{{ api.config.firebaseConfig.projectId }}</td>
             </tr>
             <tr>
-              <td class="has-text-left"><b>PartNum:</b></td>
-              <td class="has-text-left is-family-code is-size-7">
-                {{ api.local.partNum }}
-              </td>
-            </tr>
-            <tr>
               <td class="has-text-left"><b>DocRef:</b></td>
               <td class="has-text-left is-family-code is-size-7">
                 {{ api.local.docRef }}&nbsp;&nbsp;<a

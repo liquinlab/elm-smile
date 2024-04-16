@@ -6,7 +6,6 @@ import appconfig from '@/core/config'
 import {
   createDoc,
   updateSubjectDataRecord,
-  updateExperimentCounter,
   balancedAssignConditions,
   loadDoc,
   fsnow,
@@ -35,7 +34,6 @@ export default defineStore('smilestore', {
         knownUser: false,
         lastRoute: initLastRoute(appconfig.mode),
         docRef: null,
-        partNum: null,
         completionCode: null,
         done: false,
         totalWrites: 0,
@@ -91,7 +89,6 @@ export default defineStore('smilestore', {
     data: {
       // syncs with firestore
       seedID: '',
-      partNum: null,
       trial_num: 0, // not being updated correctly
       consented: false,
       verified_visibility: false,
@@ -286,9 +283,7 @@ export default defineStore('smilestore', {
       // TODD: this need to have an exception handler wrapping around it
       // because things go wrong
       this.local.knownUser = true
-      this.local.partNum = await updateExperimentCounter('participants')
       this.data.seedID = this.local.seedID
-      this.data.partNum = this.local.partNum
       this.local.docRef = await createDoc(this.data)
       // if possible conditions are not empty, assign conditions
       if (this.local.possibleConditions) {
