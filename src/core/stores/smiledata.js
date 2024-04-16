@@ -158,6 +158,7 @@ export default defineStore('smilestore', {
     },
     setSeedID(seed) {
       this.local.seedID = seed
+      this.data.seedID = seed
       this.local.seedSet = true
     },
     registerPageTracker(page) {
