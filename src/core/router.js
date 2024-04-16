@@ -39,7 +39,7 @@ function addGuards(r) {
       smilestore.loadData()
     }
 
-    //if withdrew
+    // if withdrew
     // this is leading to infinite redirects.
     // if (smilestore.data.withdraw && !smilestore.dev.allowJumps) {
     //   console.log("withdraw so can't go anywhere")

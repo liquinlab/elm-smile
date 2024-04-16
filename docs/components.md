@@ -104,18 +104,43 @@ One very useful tool for learning about components is the [Vue Single File Compo
 
 
 ## Preloading images
-By default, <SmileText/> preloads all images in the `assets` directory using the glob `'@/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}'` after the particpant consents to participate in the experiment by calling `api.preloadAllImages()` as part of `api.completeConsent()`. This should enable them to be loaded instantaneously from the local cache during the experiment, rather than being fetched from the server upon first use. If you find yourself wanting to preload some subset of images later in the experiment, paste the snippet below in the appropriate location and change the glob to match the images you want to preload.
+<SmileText/> offers two ways to preload images:
 
+If your experiment is simple enough such that most or all images included in the project will likely be used, you can set the optional flag `preloadImages` in `api.completeConsent` to true (`api.completeConsent(true)`). This will load all images in the background once a participant has consented to participate in the experiment.
+
+Alternatively, suppose you want to preload some images before entering a particular component. We implement an example of this behavior in the `DemographicsSurveyPage.vue` component. First, add a `<script>...</script>` section to the component file, and adapt the following code snippet to your requirements (probably limiting the glob in some way):
+```
+<script>
+// eslint-disable-next-line import/prefer-default-export
+export function preloadAllImages() {
+  setTimeout(() => {
+      Object.values(import.meta.glob('@/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', { eager: true, as: 'url' })).forEach((url) => {
+        const image = new Image();
+        image.src = url;
+      });
+    }, 1);
+}
+</script>
+```
+Then, im `app_timeline.js`, import it in addition to the module itself.
 ```javascript
-setTimeout(() => {
-  Object.values(import.meta.glob('@/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', { eager: true, as: 'url' })).forEach((url) => {
-    const image = new Image();
-    image.src = url;
-  });
-}, 0);
+// Before:
+import DemographicSurvey from '@/components/surveys/DemographicSurveyPage.vue'
+// After:
+import { default as DemographicSurvey, preloadAllImages } from '@/components/surveys/DemographicSurveyPage.vue'
+```
+Finally, add it as a `beforeEnter` in the route definition:
+```javascript
+// demographic survery
+timeline.pushSeqRoute({
+  path: '/demograph',
+  name: 'demograph',
+  component: DemographicSurvey,
+  beforeEnter: preloadAllImages,  // add this line
+})
 ```
 
-_Note_: you cannot dynamically specify the glob (that is, read it from a variable). For this to work, the glob needs to be hard-coded in the call to `import.meta.glob`, as this allows [Vite](https://vitejs.dev) to resolve it appropriately when the experiment is built and deployed. 
+_Note_: you cannot dynamically specify the glob (that is, read it from a variable). For this to work, the glob needs to be hard-coded in the call to `import.meta.glob`, as this allows [Vite](https://vitejs.dev) to resolve it appropriately when the experiment is built and deployed. See the restrictions here: https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations .
 
 
 ## Component organization in Smile

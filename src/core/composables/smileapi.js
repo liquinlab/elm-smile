@@ -127,7 +127,7 @@ export default function useSmileAPI() {
         });
       }, 1);
     },
-    completeConsent: (preloadImages = true) => {
+    completeConsent: (preloadImages = false) => {
       if (preloadImages) {
         api.preloadAllImages();
       }
