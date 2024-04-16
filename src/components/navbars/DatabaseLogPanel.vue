@@ -6,7 +6,7 @@ const api = SmileAPI()
 import useLog from '@/core/stores/log'
 const log = useLog()
 
-const height_pct = computed(() => `${api.dev.data_bar_height - 32}px`)
+const height_pct = computed(() => `${api.dev.data_bar_height - 70}px`)
 
 function getBgClass(msg) {
   switch (msg.type) {
