@@ -121,7 +121,7 @@ export default function useSmileAPI() {
     },
     preloadAllImages: () => {
       setTimeout(() => {
-        Object.values(import.meta.glob('@/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', { eager: true, as: 'url' })).forEach((url) => {
+        Object.values(import.meta.glob('@/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', { eager: true, query: '?url', import: 'default' })).forEach((url) => {
           const image = new Image();
           image.src = url;
         });

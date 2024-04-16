@@ -160,6 +160,23 @@ router.beforeResolve((to) => {
   log.log('Router navigated to /' + to.name)
 })
 
+// Check if the next route has a preload function, and if so, run it asynchronously
+router.afterEach((to) => {
+  if (
+    to.meta !== undefined &&
+    to.meta.next !== undefined
+  ) {
+    const fullTo = router.resolve({ name: to.meta.next });
+    if (
+      fullTo.meta !== undefined &&
+      fullTo.meta.preload !== undefined
+    ) {
+      setTimeout(fullTo.meta.preload, 1);
+    }
+    
+  }
+});
+
 // they are defined in a function like this for the testing harness
 export { routes, addGuards }
 

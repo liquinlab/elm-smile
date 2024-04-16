@@ -108,18 +108,23 @@ One very useful tool for learning about components is the [Vue Single File Compo
 
 If your experiment is simple enough such that most or all images included in the project will likely be used, you can set the optional flag `preloadImages` in `api.completeConsent` to true (`api.completeConsent(true)`). This will load all images in the background once a participant has consented to participate in the experiment.
 
-Alternatively, suppose you want to preload some images before entering a particular component. We implement an example of this behavior in the `DemographicsSurveyPage.vue` component. First, add a `<script>...</script>` section to the component file, and adapt the following code snippet to your requirements (probably limiting the glob in some way):
+Alternatively, suppose you want to preload some images before entering a particular component. The approach we suggest currently only works with deterministic timelines -- if you need to preload images before a randomized timeline route, you'll have to adapt this or contact us for assistance. 
+
+We arbitrarily demonstrate this for the `DemographicSurvey`. First, add a `<script>...</script>` section to the component file, and adapt the following code snippet to your requirements (probably limiting the glob in some way):
 ```
+<script>
 <script>
 // eslint-disable-next-line import/prefer-default-export
 export function preloadAllImages() {
   setTimeout(() => {
-      Object.values(import.meta.glob('@/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', { eager: true, as: 'url' })).forEach((url) => {
+      Object.values(import.meta.glob('@/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', { eager: true, query: '?url', import: 'default' })).forEach((url) => {
         const image = new Image();
         image.src = url;
       });
     }, 1);
 }
+</script>
+
 </script>
 ```
 Then, im `app_timeline.js`, import it in addition to the module itself.
@@ -129,14 +134,15 @@ import DemographicSurvey from '@/components/surveys/DemographicSurveyPage.vue'
 // After:
 import { default as DemographicSurvey, preloadAllImages } from '@/components/surveys/DemographicSurveyPage.vue'
 ```
-Finally, add it as a `beforeEnter` in the route definition:
+Finally, add it as to `meta` under the `preload` key in the route definition. Being the scenes, <SmileText/> makes sure that when entering the _previous_ component, the preload for the specified component is called, so that preloading happens before the images are necessary. 
 ```javascript
-// demographic survery
 timeline.pushSeqRoute({
   path: '/demograph',
   name: 'demograph',
   component: DemographicSurvey,
-  beforeEnter: preloadAllImages,  // add this line
+  meta: {
+    preload: preloadAllImages, // add this line, and the entire meta object if doesn't already exist
+  }
 })
 ```
 

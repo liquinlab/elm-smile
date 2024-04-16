@@ -7,7 +7,7 @@ import PresentationModeHomePage from '@/components/presentation_mode/Presentatio
 import MTurk from '@/components/recruitment/MTurkRecruitPage.vue'
 import Advertisement from '@/components/recruitment/AdvertisementPage.vue'
 import Consent from '@/components/consent/ConsentPage.vue'
-import { default as DemographicSurvey, preloadAllImages } from '@/components/surveys/DemographicSurveyPage.vue'
+import DemographicSurvey from '@/components/surveys/DemographicSurveyPage.vue'
 import Captcha from '@/components/captcha/CaptchaPage.vue'
 import Instructions from '@/components/instructions/InstructionsPage.vue'
 import Exp from '@/components/tasks/ExpPage.vue'
@@ -90,12 +90,11 @@ timeline.pushSeqRoute({
   component: Consent,
 })
 
-// demographic survery
+// demographic survey
 timeline.pushSeqRoute({
   path: '/demograph',
   name: 'demograph',
   component: DemographicSurvey,
-  // beforeEnter: preloadAllImages,
 })
 
 // windowsizer
