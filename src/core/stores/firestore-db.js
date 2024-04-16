@@ -97,60 +97,6 @@ export const createDoc = async (data) => {
     }
   }
 
-export const updateExperimentCounter = async (counter) => {
-  const num_shards = 20
-  const docRef = doc(db, `${mode}/${appconfig.project_ref}/counters/`, counter) 
-
-  // if doc doesn't exist, create it with shards
-  // do this in a transaction so we don't accidentally overwrite
-  try {
-    await runTransaction(db, async (transaction) => {
-      const docSnap = await transaction.get(docRef);
-      if (!docSnap.exists()) {
-        // Initialize the counter document
-        transaction.set(docRef, { num_shards: num_shards });
-
-        // Initialize each shard with count=0
-        for (let i = 0; i < num_shards; i++) {
-            const shardRef = doc(db, `${mode}/${appconfig.project_ref}/counters/${counter}/shards/`, i.toString());
-            transaction.set(shardRef, { count: 0 });
-        }
-      }
-    });
-  }
-  catch (e) {
-    console.error('Error creating counter: ', e)
-  }
-
-
-    // increment the counter
-    // Select a shard of the counter at random
-    const shard_id = Math.floor(Math.random() * num_shards).toString();
-    const shard_ref = doc(db, `${mode}/${appconfig.project_ref}/counters/${counter}/shards/`, shard_id)
-    // Update count in a transaction
-    try {
-      await runTransaction(db, async (transaction) => {
-        const shard_doc = await transaction.get(shard_ref);
-        // increment the count
-        const new_count = shard_doc.data().count + 1;
-        transaction.update(shard_ref, { count: new_count });
-      });
-    }
-    catch (e) {
-      console.error('Error updating counter: ', e)
-    }
-
-  
-    // get the total count
-    const querySnapshot = await getDocs(collection(db, `${mode}/${appconfig.project_ref}/counters/${counter}/shards/`));
-    let total_count = 0;
-    querySnapshot.forEach((doc) => {
-        total_count += doc.data().count;
-    });
-    console.log('participant number is roughly:', total_count);
-
-    return total_count
-}
 
 export const balancedAssignConditions = async (conditionDict, currentConditions) => {
   
