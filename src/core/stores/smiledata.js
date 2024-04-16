@@ -347,7 +347,7 @@ export default defineStore('smilestore', {
         this.local.lastWrite = Date.now()
         //this.global.snapshot = { ...smilestore.$state.data }
         this.global.db_changes = false // reset the changes flag
-        log.log('saveData() Request to firebase successful (force = ' + force + ')')
+        log.success('saveData() Request to firebase successful (force = ' + force + ')')
       } else {
         log.error("SMILESTORE: can't save data, not connected to firebase")
       }

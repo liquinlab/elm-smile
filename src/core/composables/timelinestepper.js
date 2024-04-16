@@ -2,11 +2,14 @@ import { useRoute, useRouter } from 'vue-router'
 import _ from 'lodash'
 import { RandomizeSubTimeline } from '@/core/subtimeline'
 import useSmileStore from '@/core/stores/smiledata'
+import useLog from '@/core/stores/log'
+
 
 export default function useTimelineStepper() {
   const smilestore = useSmileStore()
   const route = useRoute()
   const router = useRouter()
+  const log = useLog()
 
   const nextRoute = () => {
     // HANDLE RANDOMIZATION OF SUBTIMELINES
@@ -36,7 +39,7 @@ export default function useTimelineStepper() {
 
   const navigateTo = (goto) => {
     if (smilestore.config.auto_save) {
-      console.warn('Auto saving on navigateTo() navigation')
+      log.warn('Attempting auto saving on navigateTo() navigation')
       smilestore.saveData() // automatically saves data
     }
     if (goto) router.push(goto)

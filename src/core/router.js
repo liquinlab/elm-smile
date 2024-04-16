@@ -60,6 +60,7 @@ function addGuards(r) {
 
     // if you're trying to go to the welcome screen and you're not a known user, allow it
     if (to.name === 'welcome_anonymous' && from.name === undefined && !smilestore.isKnownUser) {
+      log.log('ROUTER GUARD: We let anyone see ' + to.name + ' because the users is not known.')
       smilestore.setLastRoute(to.name)
       smilestore.recordRoute(to.name)
       return true
@@ -67,6 +68,9 @@ function addGuards(r) {
 
     // if you're trying to go to the next route
     if (from.meta !== undefined && from.meta.next === to.name) {
+      log.log(
+        'ROUTER GUARD: You are trying to go to the next route from ' + from.name + ' to ' + to.name + ' so allowing it.'
+      )
       smilestore.setLastRoute(to.name)
       smilestore.recordRoute(to.name)
       return true
@@ -80,6 +84,9 @@ function addGuards(r) {
       from.meta.next.type === 'randomized_sub_timeline' &&
       to.meta.subroute
     ) {
+      log.log(
+        "ROUTER GUARD: if the next route is a subtimeline and you're trying to go to a subtimeline route, allow it"
+      )
       smilestore.setLastRoute(to.name)
       smilestore.recordRoute(to.name)
       return true
@@ -104,16 +111,26 @@ function addGuards(r) {
 
     // if you're trying to go to the same route you're already on, allow it
     if (smilestore.lastRoute === to.name) {
+      log.log(
+        "ROUTER GUARD: You're trying to go to the same route as lastRoute (" +
+          smilestore.lastRoute +
+          '), so allowing it.'
+      )
       return true
     }
     // if you're a known user (and not trying to go to the next or same route), send back to most recent route
     if (smilestore.isKnownUser) {
+      log.error(
+        "ROUTER GUARD: You are known and trying to access a route you can't see yet.  lastRoute: " +
+          smilestore.lastRoute
+      )
       return {
         name: smilestore.lastRoute,
         replace: true,
       }
     }
     if (!smilestore.isKnownUser && to.name === 'landing') {
+      log.error('Unknown user trying to go to landing page')
       return {
         name: 'welcome_anonymous',
         replace: true,
@@ -121,6 +138,7 @@ function addGuards(r) {
     }
     if (to.name !== 'welcome_anonymous') {
       // otherwise (for an unknown user who's not trying to go to next/same route), just send to welcome anonymous screen
+      log.error('Unknown user blocked trying to go to ' + to.name)
       return {
         name: 'welcome_anonymous',
         replace: true,
