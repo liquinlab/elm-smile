@@ -51,15 +51,6 @@ class Timeline {
     this.seqtimeline.push(route)
   }
 
-  pushRootSeqRoute(routeConfig) {
-    // we should be able to infer this the problem is the current route
-    // is unknown
-    const newroute = _.cloneDeep(routeConfig)
-    newroute.meta.prev = undefined
-    newroute.meta.root = true
-    newroute.meta.type = this.pushSeqRoute(newroute)
-  }
-
   pushSeqRoute(routeConfig) {
     const newroute = _.cloneDeep(routeConfig)
     if (!newroute.meta) {
