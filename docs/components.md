@@ -110,9 +110,8 @@ If your experiment is simple enough such that most or all images included in the
 
 Alternatively, suppose you want to preload some images before entering a particular component. The approach we suggest currently only works with deterministic timelines -- if you need to preload images before a randomized timeline route, you'll have to adapt this or contact us for assistance. 
 
-We arbitrarily demonstrate this for the `DemographicSurvey`. First, add a `<script>...</script>` section to the component file, and adapt the following code snippet to your requirements (probably limiting the glob in some way):
+We arbitrarily demonstrate this for the `StroopExp`. First, add a `<script>...</script>` section to the component file, and adapt the following code snippet to your requirements (probably limiting the glob in some way):
 ```
-<script>
 <script>
 // eslint-disable-next-line import/prefer-default-export
 export function preloadAllImages() {
@@ -124,22 +123,21 @@ export function preloadAllImages() {
     }, 1);
 }
 </script>
-
-</script>
 ```
 Then, im `app_timeline.js`, import it in addition to the module itself.
 ```javascript
 // Before:
-import DemographicSurvey from '@/components/surveys/DemographicSurveyPage.vue'
+import StroopExp from '@/components/tasks/StroopExp.vue'
 // After:
-import { default as DemographicSurvey, preloadAllImages } from '@/components/surveys/DemographicSurveyPage.vue'
+import { default as StroopExp, preloadAllImages } from '@/components/tasks/StroopExp.vue'
 ```
 Finally, add it as to `meta` under the `preload` key in the route definition. Being the scenes, <SmileText/> makes sure that when entering the _previous_ component, the preload for the specified component is called, so that preloading happens before the images are necessary. 
 ```javascript
+// stroop exp
 timeline.pushSeqRoute({
-  path: '/demograph',
-  name: 'demograph',
-  component: DemographicSurvey,
+  path: '/stroop',
+  name: 'stroop',
+  component: StroopExp,
   meta: {
     preload: preloadAllImages, // add this line, and the entire meta object if doesn't already exist
   }

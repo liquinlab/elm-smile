@@ -1,3 +1,15 @@
+<!-- <script>
+// eslint-disable-next-line import/prefer-default-export
+export function preloadAllImages() {
+  setTimeout(() => {
+      Object.values(import.meta.glob('@/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', { eager: true, query: '?url', import: 'default' })).forEach((url) => {
+        const image = new Image();
+        image.src = url;
+      });
+    }, 1);
+}
+</script> -->
+
 <script setup>
 // A Basic Stroop Experiment
 
