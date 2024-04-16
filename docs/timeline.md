@@ -345,7 +345,7 @@ One important feature of the stepper is that it calls `saveData()` on the global
 
 ### Custom navigation logic
 
-In some cases, you might want to navigate to something other than `next()` or `prev()` as returned by the timeline stepper. One common use case is in an instruction understanding quiz module, where you might want to navigate back to an instructions page if the participant fails the quiz, and only navigate forward if the participant succeeds. Your timeline setup code (in `router.js`) might look like this (note the `meta: {allowDirectEntry: true}` on the instructions route, to allow to return to it from any place in the timeline):
+In some cases, you might want to navigate to something other than `next()` or `prev()` as returned by the timeline stepper. One common use case is in an instruction understanding quiz module, where you might want to navigate back to an instructions page if the participant fails the quiz, and only navigate forward if the participant succeeds. Your timeline setup code (in `router.js`) might look like this (note the `meta: {allowAlways: true}` on the instructions route, to allow to return to it from any place in the timeline):
 
 ```js
 import { Timeline } from '@/timeline'  // @ resolves to /src in Smile
@@ -360,10 +360,10 @@ timeline.pushSeqRoute({
 // Consent form, etc., ... 
 
 timeline.pushSeqRoute({
-    path: '/instructions',
-    name: 'instructions',
-    component: InstructionsComponent,
-    meta: {allowDirectEntry: true} // allow direct navigation to this route
+  path: '/instructions',
+  name: 'instructions',
+  component: InstructionsComponent,
+  meta: { allowAlways: true }, // allow direct navigation to this route
 })
 
 // ...

@@ -77,6 +77,13 @@ class Timeline {
     }
     newroute.meta.type = 'route'
     newroute.meta.sequential = true
+    if (!newroute.meta.requiresConsent) {
+      newroute.meta.requiresConsent = true // default to require consent
+    }
+
+    if (!newroute.meta.requiresDone) {
+      newroute.meta.requiresDone = false // default to not require done
+    }
 
     try {
       this.pushToRoutes(newroute)
@@ -102,6 +109,13 @@ class Timeline {
       throw new Error(`NonSequentialRouteError: Can't have meta.next or meta.prev defined for non-sequential route`)
     }
     newroute.meta.sequential = false
+    if (!newroute.meta.requiresConsent) {
+      newroute.meta.requiresConsent = true // default to require consent
+    }
+
+    if (!newroute.meta.requiresDone) {
+      newroute.meta.requiresDone = false // default to not require done
+    }
     try {
       this.pushToRoutes(newroute)
     } catch (err) {

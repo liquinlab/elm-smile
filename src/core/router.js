@@ -29,7 +29,7 @@ function addGuards(r) {
     // console.log('query params', to.query)
     // console.log('loading', to.name)
     // console.log('from', from.name)
-    // console.log('allowDirectEntry', to.meta.allowDirectEntry)
+    // console.log('allowAlways', to.meta.allowAlways)
 
     const smilestore = useSmileStore()
     // on startup set the page to not autofill by default
@@ -51,7 +51,8 @@ function addGuards(r) {
     // }
 
     // if you're going to an always-allowed route, allow it
-    if (to.meta.allowDirectEntry) {
+    if (to.meta.allowAlways) {
+      log.log('ROUTER GUARD: This route (' + to.name + ') is always allowed, so allowing navigation.')
       smilestore.setLastRoute(to.name)
       smilestore.recordRoute(to.name)
       return true
@@ -93,7 +94,7 @@ function addGuards(r) {
       log.warn(
         'allowing direct, out-of-order navigation to /' +
           to.name +
-          //to.meta.allowDirectEntry,
+          //to.meta.allowAlways +,
           '.  This is allowed in development/presentation mode but not in production.'
       )
       //smilestore.setLastRoute(to.name)  - TODD SUGGESTING NOT OVERWRITING THIS

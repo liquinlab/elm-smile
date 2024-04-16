@@ -33,20 +33,23 @@ const timeline = new Timeline()
 // but for most experiment they go in sequence from begining
 // to the end of this list
 
+// by default routes have meta.requiresConsent = true (so you need to manually override it)
+// by default routes have meta.requiresDone = false (so you need to manually override it)
+
 // add the recruitment chooser if in development mode
 if (api.config.mode === 'development') {
   timeline.pushRoute({
     path: '/',
     name: 'recruit',
     component: RecruitmentChooser,
-    meta: { allowDirectEntry: true },
+    meta: { allowAlways: true, requiresConsent: false },
   })
 } else if (api.config.mode === 'presentation') {
   timeline.pushRoute({
     path: '/',
     name: 'presentation_home',
     component: PresentationModeHomePage,
-    meta: { allowDirectEntry: true },
+    meta: { allowAlways: true, requiresConsent: false },
   })
 } else {
   // auto refer to the anonymous welcome page
@@ -56,27 +59,28 @@ if (api.config.mode === 'development') {
     redirect: {
       name: 'welcome_anonymous',
     },
-    meta: { allowDirectEntry: true },
+    meta: { allowAlways: true, requiresConsent: false },
   })
 }
 
 // welcome screen for non-referral
-timeline.pushRootSeqRoute({
+timeline.pushSeqRoute({
   path: '/welcome',
   name: 'welcome_anonymous',
   component: Advertisement,
-  meta: { prev: undefined, next: 'consent' }, // override what is next
+  meta: { prev: undefined, next: 'consent', requiresConsent: false }, // override what is next
 })
 
 // welcome screen for referral
-timeline.pushRootSeqRoute({
+timeline.pushSeqRoute({
   path: '/welcome/:service',
   name: 'welcome_referred',
   component: Advertisement,
   meta: {
     prev: undefined,
     next: 'consent',
-    allowDirectEntry: true,
+    allowAlways: true,
+    requiresConsent: false,
   }, // override what is next
   beforeEnter: (to) => {
     processQuery(to.query, to.params.service)
@@ -88,6 +92,7 @@ timeline.pushSeqRoute({
   path: '/consent',
   name: 'consent',
   component: Consent,
+  meta: { requiresConsent: false },
 })
 
 // demographic survey
@@ -166,6 +171,7 @@ timeline.pushSeqRoute({
   path: '/thanks',
   name: 'thanks',
   component: Thanks,
+  meta: { requiresDone: true },
 })
 
 // this is a special page that is for a withdraw
