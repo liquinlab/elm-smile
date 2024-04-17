@@ -18,13 +18,13 @@ const api = useSmileAPI()
 // possibly altered so that there is lots of substructure to it
 
 const pages = [
-  {component: CaptchaInstructionsText_01, props: {adjective: "wonderful"}, data: []},
-  {component: CaptchaTrialTextComprehension, props: {}, data: []},
-  {component: CaptchaInstructionsText_02, props: {}, data: []},
-  {component: CaptchaTrialImageCategorization, props: {}, data: []},
-  {component: CaptchaTrialMotorControl, props: {}, data: []},
-  {component: CaptchaRotateImage, props: {}, data: []},
-  {component: CaptchaTrialMotorControl, props: {}, data: []},
+  { component: CaptchaInstructionsText_01, props: { adjective: 'wonderful' }, data: [] },
+  { component: CaptchaTrialTextComprehension, props: {}, data: [] },
+  { component: CaptchaInstructionsText_02, props: {}, data: [] },
+  { component: CaptchaTrialImageCategorization, props: {}, data: [] },
+  { component: CaptchaTrialMotorControl, props: {}, data: [] },
+  { component: CaptchaRotateImage, props: {}, data: [] },
+  { component: CaptchaTrialMotorControl, props: {}, data: [] },
 ]
 
 const currentTab = computed(() => {
@@ -43,12 +43,22 @@ const currentTab = computed(() => {
 // 5 - human brain should show stroop interference
 // 6 -
 
+const { nextTrial } = api.useTrialStepper(pages, api.currentRouteName(), () => {
+  finalize()
+})
+
+function finalize() {
+  // sort out what data you are putting in the smile store here?
+  console.log('finished, so will save data and stuff')
+}
+
 function next_trial() {
   if (api.getCurrentTrial() >= pages.length - 1) {
     //api.resetPageTracker() // you coudl reset when you leavr but why?
     finish()
   } else {
-    api.incrementTrial()
+    ///api.incrementTrial()
+    nextTrial()
   }
 }
 
@@ -77,7 +87,8 @@ function finish() {
     </div>
 
     <!-- Component changes when currentTab changes -->
-    <component :is="currentTab.component" v-bind="currentTab.props" @next-page-captcha="next_trial()" v-else> </component>
+    <component :is="currentTab.component" v-bind="currentTab.props" @next-page-captcha="next_trial()" v-else>
+    </component>
   </div>
 </template>
 
