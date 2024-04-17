@@ -1,6 +1,6 @@
 <script setup>
 const props = defineProps(['seed', 'tooltip'])
-const emit = defineEmits(['nextPageCaptcha'])
+const emit = defineEmits(['action'])
 </script>
 <template>
   <div class="textinput">
@@ -10,7 +10,7 @@ const emit = defineEmits(['nextPageCaptcha'])
       :data-tooltip="tooltip"
       @click="$emit('action')"
     >
-      <FAIcon icon="fa-solid fa-arrow-rotate-left" />
+      <FAIcon icon="fa-solid fa-arrow-right" />
     </button>
   </div>
 </template>

@@ -6,10 +6,15 @@ import {
   doc,
   addDoc,
   setDoc,
+  updateDoc,
   getDoc,
   Timestamp,
   runTransaction,
   connectFirestoreEmulator,
+  getAggregateFromServer,
+  writeBatch,
+  increment,
+  sum,
 } from 'firebase/firestore'
 import { split } from 'lodash'
 import appconfig from '@/core/config'
@@ -92,31 +97,13 @@ export const createDoc = async (data) => {
     }
   }
 
-export const updateExperimentCounter = async (counter) => {
-  const docRef = doc(db, `${mode}/${appconfig.project_ref}/counters/`, counter)
-  try {
-    const newCounter = await runTransaction(db, async (transaction) => {
-      const docSnap = await transaction.get(docRef)
-      let newCounterTemp
-      if (!docSnap.exists()) {
-        newCounterTemp = 0
-      } else {
-        newCounterTemp = docSnap.data().n + 1
-      }
-      transaction.set(docRef, { n: newCounterTemp }, { merge: true })
-      return newCounterTemp
-    })
-    console.log('New participant number is: ', newCounter)
-    return newCounter
-  } catch (e) {
-    console.log('Transaction failed: ', e)
-  }
-  return null
-}
 
 export const balancedAssignConditions = async (conditionDict, currentConditions) => {
-  if (currentConditions.length === 0 && appconfig.mode === 'development') {
-    // if there are current conditions and we're in developer mode, we won't assign new ones
+  
+  const num_shards = 20
+
+  // if there are current conditions and we're in developer mode, we won't assign new ones
+  if (Object.keys(currentConditions).length !== 0 && appconfig.mode === 'development') {
     console.log('conditions already set, not assigning new ones in dev mode')
     return currentConditions
   }
@@ -130,7 +117,7 @@ export const balancedAssignConditions = async (conditionDict, currentConditions)
   // function for all possible combinations of N arrays (from https://stackoverflow.com/questions/8936610/how-can-i-create-every-combination-possible-for-the-contents-of-two-arrays)
   const combine = ([head, ...[headTail, ...tailTail]]) => {
     if (!headTail) return head
-    const combined = headTail.reduce((acc, x) => acc.concat(head.map((h) => `${h}~${x}`)), [])
+    const combined = headTail.reduce((acc, x) => acc.concat(head.map((h) => `${h}--${x}`)), [])
     return combine([combined, ...tailTail])
   }
 
@@ -140,87 +127,98 @@ export const balancedAssignConditions = async (conditionDict, currentConditions)
   // get a docRef for the conditions counter
   const docRef = doc(db, `${mode}/${appconfig.project_ref}/counters/conditions`)
 
-  // make a list of docRefs for each key in keys
-  // const docRefs = keys.map((keyCond) => doc(db, `${mode}/${appconfig.project_ref}/counters/`, keyCond))
-
+  // if doc doesn't exist, create it with shards
+  // do this in a transaction so we don't accidentally overwrite
   try {
-    const selectedConditions = await runTransaction(db, async (transaction) => {
-      // for docRef, get the data
-      const docSnap = await transaction.get(docRef)
-      // const docSnaps = await Promise.all(docRefs.map((docRef) => transaction.get(docRef)))
-
-      // see if it exists.
-      // If it doesn't, choose a random condition from the list of conditions for that key
-      let output
-
+    await runTransaction(db, async (transaction) => {
+      const docSnap = await transaction.get(docRef);
       if (!docSnap.exists()) {
-        const newCondCounter = {}
-        const conditions = conditionCombos
-        const randomIndex = Math.floor(Math.random() * conditions.length)
-        const minCondition = conditions[randomIndex]
-        // make incremented counter
-        conditions.forEach((condition) => {
-          newCondCounter[condition] = 0
-        })
-        newCondCounter[minCondition] += 1
-        // return selected condition and new incremented counter
-        output = { condName: docSnap.id, selectedCond: minCondition, newCounter: newCondCounter }
-      } else {
-        //  otherwise, choose the condition with the lowest count
-        const conditions = conditionCombos
-        const oldCondCounter = docSnap.data()
+        // Initialize the counter document
+        transaction.set(docRef, { num_shards: num_shards });
 
-        // check if the current counter data has all the conditions
-        // if there are any missing, we're going to start over everything at zero and choose at random
-        const missingConditions = conditions.filter((cond) => !Object.keys(oldCondCounter).includes(cond))
-        if (missingConditions.length > 0) {
-          const newCondCounter = {}
-          const randomIndex = Math.floor(Math.random() * conditions.length)
-          const minCondition = conditions[randomIndex]
-          // make incremented counter
-          conditions.forEach((condition) => {
-            newCondCounter[condition] = 0
-          })
-          newCondCounter[minCondition] += 1
-          // return selected condition and new incremented counter
-          output = { condName: docSnap.id, selectedCond: minCondition, newCounter: newCondCounter }
+        // Initialize each shard with count=0
+        for (let i = 0; i < num_shards; i++) {
+            const shardRef = doc(db, `${mode}/${appconfig.project_ref}/counters/conditions/shards/`, i.toString());
+            const newCondCounter = {}
+            conditionCombos.forEach((condition) => {
+              newCondCounter[condition] = 0
+            })
+            transaction.set(shardRef, newCondCounter);
         }
-
-        // otherwise, we'll just choose the condition with the lowest count
-        else {
-          const counts = conditions.map((cond) => oldCondCounter[cond])
-          const min = Math.min(...Object.values(counts))
-          const matchMinConds = Object.keys(oldCondCounter).filter((key) => oldCondCounter[key] === min)
-          // (if there are more than one, pick one at random)
-          const minCondition = matchMinConds[Math.floor(Math.random() * matchMinConds.length)]
-          oldCondCounter[minCondition] += 1
-          output = { condName: docSnap.id, selectedCond: minCondition, newCounter: oldCondCounter }
+      } else{
+        // if doc does exist, get shard 0 and check if it has all the conditions
+        const shardRef = doc(db, `${mode}/${appconfig.project_ref}/counters/conditions/shards/`, '0');
+        const shardSnap = await transaction.get(shardRef);
+        const shardData = shardSnap.data()
+        const shardConditions = Object.keys(shardData)
+        const missingConditions = conditionCombos.filter((cond) => !shardConditions.includes(cond))
+        if (missingConditions.length > 0) {
+          // if there are any missing conditions, we're going to start over everything at zero and choose at random
+          for (let i = 0; i < num_shards; i++) {
+            const shardRef = doc(db, `${mode}/${appconfig.project_ref}/counters/conditions/shards/`, i.toString());
+            const newCondCounter = {}
+            conditionCombos.forEach((condition) => {
+              newCondCounter[condition] = 0
+            })
+            transaction.set(shardRef, newCondCounter);
+          }
         }
       }
+    });
+  }
+  catch (e) {
+    console.error('Error creating counter: ', e)
+  }
 
-      // for each entry in output, update firestore with the newCounter and add selected cond to output dict
-      const transactionOut = {}
-      // no merge, because if any of the conditions change we just want to reset everything
-      transaction.set(doc(db, `${mode}/${appconfig.project_ref}/counters/`, output.condName), output.newCounter)
-      transactionOut[output.condName] = output.selectedCond
+  // collection where the shards are
+  const conditionCollection = collection(db, `${mode}/${appconfig.project_ref}/counters/conditions/shards/`)
 
-      return transactionOut
-    })
+  // get the current condition counts across all shards
+  const querySnapshot = await getDocs(conditionCollection)
+  let oldCondCounter = {};
+  querySnapshot.forEach((doc) => {
+      Object.keys(doc.data()).forEach((key) => {
+        if (oldCondCounter[key]) {
+          oldCondCounter[key] += doc.data()[key]
+        } else {
+          oldCondCounter[key] = doc.data()[key]
+        }
+      })
+  });
+
+  // choose a condition based on these counts
+  // randomly select from among the minima
+  const counts = conditionCombos.map((cond) => oldCondCounter[cond])
+  const min = Math.min(...Object.values(counts))
+  const matchMinConds = conditionCombos.filter((cond) => oldCondCounter[cond] === min)
+  const selectedCondition = matchMinConds[Math.floor(Math.random() * matchMinConds.length)]
+
+  // increment the count for that condition from a random shard, in a transaction
+  const shard_id = Math.floor(Math.random() * num_shards).toString();
+  const shard_ref = doc(db, `${mode}/${appconfig.project_ref}/counters/conditions/shards/`, shard_id)
+  try {
+    await runTransaction(db, async (transaction) => {
+      const shard_doc = await transaction.get(shard_ref);
+      // increment the count
+      const new_count = shard_doc.data()[selectedCondition] + 1;
+      transaction.update(shard_ref, { [selectedCondition]: new_count });
+    });
+  }
+  catch (e) {
+    console.error('Error updating counter: ', e)
+  }
+
     // Split back up into dictionary
     // get keys from conditionDict
     const keys = Object.keys(conditionDict)
     // split condition string based on dash
-    const splitConditions = selectedConditions.conditions.split('~')
+    const splitConditions = selectedCondition.split('--')
     // zip keys and splitConditions
     const selectedConditionsDict = Object.fromEntries(keys.map((key, i) => [key, splitConditions[i]]))
 
     console.log('Conditions set to ', selectedConditionsDict)
 
     return selectedConditionsDict
-  } catch (e) {
-    console.error(e)
-  }
-  return null
 }
 
 // export default createDoc

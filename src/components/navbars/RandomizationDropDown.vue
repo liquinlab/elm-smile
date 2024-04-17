@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import useSmileAPI from '@/core/composables/smileapi'
 const api = useSmileAPI()
 import useSmileStore from '@/core/stores/smiledata'
@@ -22,10 +22,39 @@ function onDragCallback(x, y) {
 }
 
 function randomize_seed() {
-  console.log('randomize_seed') // emily help
-  seed.value = uuidv4()
+  // seed.value = uuidv4()
   //seed = smilestore.randomizeSeed()
+  console.log("setting seed to ", seed.value)
+  smilestore.setSeedID(seed.value)
 }
+
+// define selected from current conditions
+const selected = smilestore.getConditions
+
+// when toolbar conditions are changed, update the store
+watch(
+  () => selected,
+  async (newConds) => {
+    // for each key in newConds, update that entry in conditions
+    Object.keys(newConds).forEach((key) => {
+      smilestore.setCondition(key, newConds[key])
+    })
+  }
+)
+
+// when condition is set in the store, update the toolbar conditions
+watch(
+  () => smilestore.data.conditions,
+  async (newConds) => {
+    // for each key in newConds, update that entry in conditions
+    Object.keys(newConds).forEach((key) => {
+      selected[key] = newConds[key]
+    })
+  }
+)
+
+
+
 </script>
 <template>
   <div class="dropdown is-hoverable is-right" :class="{ 'is-active': api.dev.randomization_panel.visible }">
@@ -81,11 +110,22 @@ function randomize_seed() {
               <tr>
                 <td class="has-text-left"><b>Seed</b>:</td>
                 <td class="has-text-left is-family-code is-size-7">
-                  <TextInputWithButton
+                  <div class="textinput">
+                    <input class="input is-small" type="text" placeholder="Current seed" size="15" width="10" v-model="seed" />
+                    <button
+                      class="button is-small is-light removeedge has-tooltip-arrow has-tooltip-top"
+                      data-tooltip="Set new seed"
+                      @click="randomize_seed()"
+                    >
+                      <FAIcon icon="fa-solid fa-arrow-right" />
+                    </button>
+                  </div>
+
+                  <!-- <TextInputWithButton :v-model="seed"
                     :seed="seed"
-                    tooltip="Regenerate randomly"
+                    tooltip="Set new seed"
                     @action="randomize_seed()"
-                  ></TextInputWithButton>
+                  ></TextInputWithButton> -->
                 </td>
               </tr>
             </table>
@@ -105,7 +145,8 @@ function randomize_seed() {
                   </td>
                   <td>
                     <div class="select is-small">
-                      <select>
+                      <select v-model="selected[key]">
+                        <option disabled value="">[not selected]</option>
                         <option v-for="cond in value" :key="cond">
                           {{ cond }}
                         </option>
@@ -153,5 +194,32 @@ function randomize_seed() {
 
 .randomization a {
   color: #0b8a9b;
+}
+
+.textinput {
+  border: 0.1em solid #d2d2d2;
+  border-radius: var(--bulma-radius-small);
+  width: 100%;
+  display: inline-block;
+  position: relative;
+  padding-left: 2px;
+}
+.textinput input {
+  border: none;
+  padding-right: 30px;
+  font-family: var(--bulma-code);
+  font-size: 0.85em;
+  min-height: 30px;
+}
+.textinput button {
+  position: absolute;
+  right: 2px;
+  top: 3px;
+  padding: 7px;
+  margin-right: 0px;
+  margin-left: auto;
+  border: none;
+  box-shadow: none;
+  background: #fff;
 }
 </style>
