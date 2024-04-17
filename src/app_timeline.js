@@ -68,7 +68,7 @@ timeline.pushSeqRoute({
   path: '/welcome',
   name: 'welcome_anonymous',
   component: Advertisement,
-  meta: { prev: undefined, next: 'consent', requiresConsent: false }, // override what is next
+  meta: { prev: undefined, next: 'consent', allowAlways: true, requiresConsent: false }, // override what is next
 })
 
 // welcome screen for referral
@@ -186,6 +186,7 @@ timeline.pushRoute({
   path: '/mturk',
   name: 'mturk',
   component: MTurk,
+  meta: { requiresConsent: false },
   beforeEnter: (to) => {
     processQuery(to.query, 'mturk')
   },

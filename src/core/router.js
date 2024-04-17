@@ -52,19 +52,59 @@ function addGuards(r) {
 
     // if you're going to an always-allowed route, allow it
     if (to.meta.allowAlways) {
-      log.log('ROUTER GUARD: This route (' + to.name + ') is always allowed, so allowing navigation.')
+      log.log(`ROUTER GUARD: Requested navigation (${to.name}) is always allowed, so allowing it.`)
       smilestore.setLastRoute(to.name)
       smilestore.recordRoute(to.name)
       return true
     }
 
-    // if you're trying to go to the welcome screen and you're not a known user, allow it
-    if (to.name === 'welcome_anonymous' && from.name === undefined && !smilestore.isKnownUser) {
-      log.log('ROUTER GUARD: We let anyone see ' + to.name + ' because the users is not known.')
-      smilestore.setLastRoute(to.name)
-      smilestore.recordRoute(to.name)
+    // if you're in jumping mode
+    // or you're in presentation mode allow the new route
+    if (
+      (smilestore.config.mode === 'development' && smilestore.dev.allowJumps) ||
+      smilestore.config.mode === 'presentation'
+    ) {
+      log.warn(
+        'ROUTER GUARD: Allowing direct, out-of-order navigation to /' +
+          to.name +
+          //to.meta.allowAlways +,
+          '.  This is allowed in development/presentation mode but not in production.'
+      )
+      //smilestore.setLastRoute(to.name)  - TODD SUGGESTING NOT OVERWRITING THIS
+      //smilestore.recordRoute(to.name)
       return true
     }
+
+    // if the route requires consent and the user hasn't consented
+    if (to.meta.requiresConsent && !smilestore.isConsented) {
+      log.warn(
+        `ROUTER GUARD: This route (${to.name}) requires consent, but the user has not consented.\
+         Redirecting to the last route visited. (${smilestore.lastRoute})`
+      )
+      return {
+        name: smilestore.lastRoute,
+        replace: true,
+      }
+    }
+
+    if (to.meta.requiresDone && !smilestore.isDone) {
+      log.warn(
+        `ROUTER GUARD: This route (${to.name}) requires being marked as done, but the user is not done.\
+        Redirecting to the last route visited. (${smilestore.lastRoute})`
+      )
+      return {
+        name: smilestore.lastRoute,
+        replace: true,
+      }
+    }
+
+    // if you're trying to go to the welcome screen and you're not a known user, allow it
+    // if (to.name === 'welcome_anonymous' && from.name === undefined && !smilestore.isKnownUser) {
+    //   log.log('ROUTER GUARD: We let anyone see ' + to.name + ' because the users is not known.')
+    //   smilestore.setLastRoute(to.name)
+    //   smilestore.recordRoute(to.name)
+    //   return true
+    // }
 
     // if you're trying to go to the next route
     if (from.meta !== undefined && from.meta.next === to.name) {
@@ -92,23 +132,6 @@ function addGuards(r) {
       return true
     }
 
-    // if you're in jumping mode
-    // or you're in presentation mode allow the new route
-    if (
-      (smilestore.config.mode === 'development' && smilestore.dev.allowJumps) ||
-      smilestore.config.mode === 'presentation'
-    ) {
-      log.warn(
-        'allowing direct, out-of-order navigation to /' +
-          to.name +
-          //to.meta.allowAlways +,
-          '.  This is allowed in development/presentation mode but not in production.'
-      )
-      //smilestore.setLastRoute(to.name)  - TODD SUGGESTING NOT OVERWRITING THIS
-      //smilestore.recordRoute(to.name)
-      return true
-    }
-
     // if you're trying to go to the same route you're already on, allow it
     if (smilestore.lastRoute === to.name) {
       log.log(
@@ -118,6 +141,19 @@ function addGuards(r) {
       )
       return true
     }
+
+    // if you're a known user (and not trying to go to the next or same route), send back to most recent route
+    if (from.meta !== undefined && from.meta.next !== to.name && smilestore.isKnownUser) {
+      log.error(
+        `ROUTER GUARD: You are known and trying to access a route (${to.name}) which is not 'next' \
+        on the timeline.  Returning you to the last route you were on (${smilestore.lastRoute}).`
+      )
+      return {
+        name: smilestore.lastRoute,
+        replace: true,
+      }
+    }
+
     // if you're a known user (and not trying to go to the next or same route), send back to most recent route
     if (smilestore.isKnownUser) {
       log.error(
@@ -129,8 +165,9 @@ function addGuards(r) {
         replace: true,
       }
     }
+
     if (!smilestore.isKnownUser && to.name === 'landing') {
-      log.error('Unknown user trying to go to landing page')
+      log.error('ROUTER GUARD: Unknown user trying to go to landing page')
       return {
         name: 'welcome_anonymous',
         replace: true,
@@ -138,7 +175,7 @@ function addGuards(r) {
     }
     if (to.name !== 'welcome_anonymous') {
       // otherwise (for an unknown user who's not trying to go to next/same route), just send to welcome anonymous screen
-      log.error('Unknown user blocked trying to go to ' + to.name)
+      log.error('ROUTER GUARD: Unknown user blocked trying to go to ' + to.name)
       return {
         name: 'welcome_anonymous',
         replace: true,
@@ -182,20 +219,13 @@ router.beforeResolve((to) => {
 
 // Check if the next route has a preload function, and if so, run it asynchronously
 router.afterEach((to) => {
-  if (
-    to.meta !== undefined &&
-    to.meta.next !== undefined
-  ) {
-    const fullTo = router.resolve({ name: to.meta.next });
-    if (
-      fullTo.meta !== undefined &&
-      fullTo.meta.preload !== undefined
-    ) {
-      setTimeout(fullTo.meta.preload, 1);
+  if (to.meta !== undefined && to.meta.next !== undefined) {
+    const fullTo = router.resolve({ name: to.meta.next })
+    if (fullTo.meta !== undefined && fullTo.meta.preload !== undefined) {
+      setTimeout(fullTo.meta.preload, 1)
     }
-    
   }
-});
+})
 
 // they are defined in a function like this for the testing harness
 export { routes, addGuards }

@@ -79,7 +79,10 @@ function navigate(route) {
       </div>
     </template>
     <hr />
-    <div class="note">Use ⌥ + click to force navigation.</div>
+    <div class="note">
+      If you click a route it will act as though a user attempted to navigate to that page. Use ⌥ + click to force
+      navigation artificially.
+    </div>
   </div>
 </template>
 
