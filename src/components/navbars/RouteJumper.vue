@@ -27,27 +27,8 @@ watch(route, async (newRoute, oldRoute) => {
   currentQuery.value = newRoute.query
 })
 
-function toggle_and_reset() {
-  api.dev.route_panel.visible = !api.dev.route_panel.visible
-  if (api.dev.route_panel.visible == false) {
-    api.dev.route_panel.x = -300
-    api.dev.route_panel.y = -3
-  }
-}
-
-function onDragCallback(x, y) {
-  api.dev.config_panel.x = x
-  api.dev.config_panel.y = y
-}
-
 function setHover(route) {
   hoverRoute.value = route
-}
-
-function setClicked(route) {
-  console.log('got the click event')
-  router.push({ name: route }) /// something something about passing queryparams
-  api.dev.route_panel.visible = false
 }
 
 watch(altKeyState, (value) => {
@@ -55,6 +36,11 @@ watch(altKeyState, (value) => {
 })
 
 function navigate(route) {
+  if (api.dev.allowJumps) {
+    log.warn(`DEV MODE: user requested to FORCE navigate to ${route}`)
+  } else {
+    log.warn(`DEV MODE: user requested to navigate to ${route}`)
+  }
   router.push({ name: route })
   // dismiss hover if open but not if panel is set to remain visible.
   //api.dev.route_panel.visible = false
