@@ -8,6 +8,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSwatchbook, faUserSecret } from '@fortawesome/free-solid-svg-icons'
 import { faGear } from '@fortawesome/free-solid-svg-icons'
 import { faBook } from '@fortawesome/free-solid-svg-icons'
+import { faClock } from '@fortawesome/free-solid-svg-icons'
 import { faArrowsTurnToDots } from '@fortawesome/free-solid-svg-icons'
 import { faArrowRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { faExplosion } from '@fortawesome/free-solid-svg-icons'
@@ -59,10 +60,13 @@ import { faHammer } from '@fortawesome/free-solid-svg-icons'
 import { faSquareCaretRight } from '@fortawesome/free-solid-svg-icons'
 import { faCodeBranch } from '@fortawesome/free-solid-svg-icons'
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons'
+import { faClock as farClock } from '@fortawesome/free-regular-svg-icons'
 
 /* add icons to the library */
 library.add(
   farCircle,
+  faClock,
+  farClock,
   faCodeBranch,
   faSquareCaretRight,
   faCheck,

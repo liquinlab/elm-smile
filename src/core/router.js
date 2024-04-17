@@ -214,7 +214,7 @@ router.beforeResolve((to) => {
       global: true,
     })
   }
-  log.log('Router navigated to /' + to.name)
+  log.log('ROUTER GUARD: Router navigated to /' + to.name)
 })
 
 // Check if the next route has a preload function, and if so, run it asynchronously

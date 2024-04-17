@@ -43,7 +43,7 @@ smilestore.$subscribe((mutation, newstate) => {
         newv = JSON.stringify(newstate.data[key])
       }
 
-      log.log(`smilestore.data value changed for ${key}: from ${oldv} to ${newv}`)
+      log.log(`SMILESTORE: smilestore.data value changed for ${key}: from ${oldv} to ${newv}`)
       smilestore.global.db_changes = true
     }
   })
@@ -77,7 +77,6 @@ onMounted(() => {
     api.recordWindowEvent('blur')
   })
 })
-
 </script>
 
 <template>

@@ -65,9 +65,13 @@ function getBgClass(msg) {
       <aside class="menu">
         <ul class="menu-list">
           <li v-for="msg in log.history" :class="getBgClass(msg)">
-            <FAIcon icon=" fa-solid fa-angle-right" /> {{ msg.time }} <b>{{ msg.message }}</b> <br />&nbsp;&nbsp;{{
-              msg.trace
-            }}
+            <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
+            <FAIcon icon="fa-solid fa-database" v-else-if="msg.message.includes('SMILESTORE')" />
+            <FAIcon icon="fa-solid fa-gear" v-else-if="msg.message.includes('DEV MODE')" />
+            <FAIcon icon="fa-solid fa-clock" v-else-if="msg.message.includes('TIMELINE STEPPER')" />
+            <FAIcon icon="fa-regular fa-clock" v-else-if="msg.message.includes('TRIAL STEPPER')" />
+            <FAIcon icon="fa-solid fa-angle-right" v-else />
+            &nbsp;{{ msg.time }} <b>{{ msg.message }}</b> <br />&nbsp;&nbsp;{{ msg.trace }}
           </li>
         </ul>
       </aside>

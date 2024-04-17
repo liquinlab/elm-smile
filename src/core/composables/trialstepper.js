@@ -1,14 +1,16 @@
 import { shuffle } from '@/core/randomization'
 import { ref } from 'vue'
 import useSmileStore from '@/core/stores/smiledata'
+import useLog from '@/core/stores/log'
 
 export function useTrialStepper(trials, page, finishedCallback) {
   const smilestore = useSmileStore()
+  const log = useLog()
   //const index = ref(0)
   const n_trials = trials.length
 
   function nextTrial() {
-    //console.log("i see index", smilestore.getPageTracker(route.name))
+    log.log('TRIAL STEPPER: Advancing to next trial')
     if (smilestore.getPageTracker(page) < n_trials - 1) {
       //index += 1
       smilestore.incrementPageTracker(page)
@@ -19,6 +21,7 @@ export function useTrialStepper(trials, page, finishedCallback) {
   }
 
   function prevTrial() {
+    log.warn('TRIAL STEPPER: Rewinding to prev trial')
     if (smilestore.getPageTracker(page) > 0) {
       //index -= 1
       smilestore.decrementPageTracker(page)
@@ -33,6 +36,7 @@ export function useStatelessTrialStepper(trials, index, finishedCallback) {
   const n_trials = trials.length
 
   function nextTrial() {
+    log.log('TRIAL STEPPER: Advancing to next trial')
     //console.log("i see index", smilestore.getPageTracker(route.name))
     if (index.value < n_trials - 1) {
       index.value += 1
@@ -43,6 +47,7 @@ export function useStatelessTrialStepper(trials, index, finishedCallback) {
   }
 
   function prevTrial() {
+    log.warn('TRIAL STEPPER: Rewinding to prev trial')
     if (index.value > 0) {
       index.value -= 1
     }

@@ -164,7 +164,7 @@ class Timeline {
   }
 
   buildDAG() {
-    log.log('building DAG')
+    log.log('DEV MODE: building DAG')
     this.g = new dagre.graphlib.Graph().setGraph({ nodesep: 80, ranksep: 40 }).setDefaultEdgeLabel(function () {
       return {}
     }) // Default to assigning a new object as a label for each new edge.
@@ -206,7 +206,7 @@ class Timeline {
 
   // buildGraph builds
   buildGraph() {
-    log.debug('building DAG for timeline')
+    log.debug('DEV MODE: building DAG for timeline')
     // keep track of which objects in sequential timeline are themselves timelines
     const timelineIndices = []
 

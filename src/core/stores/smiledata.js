@@ -226,7 +226,7 @@ export default defineStore('smilestore', {
           // check if ip field exists
           if (response.data.ip) {
             ip = response.data.ip
-            log.success('User IP address detected (using api.ipify.org): ' + ip)
+            log.success('SMILESTORE: User IP address detected (using api.ipify.org): ' + ip)
           }
         })
         .catch((error) => {
@@ -265,7 +265,7 @@ export default defineStore('smilestore', {
       if (this.dev.page_provides_autofill) {
         this.dev.page_provides_autofill()
         const log = useLog()
-        log.log('DEV MODE: Page was autofilled by a user-provided component function')
+        log.warn('DEV MODE: Page was autofilled by a user-provided component function')
       }
     },
     saveTrialData(data) {
@@ -347,7 +347,7 @@ export default defineStore('smilestore', {
         this.local.lastWrite = Date.now()
         //this.global.snapshot = { ...smilestore.$state.data }
         this.global.db_changes = false // reset the changes flag
-        log.success('saveData() Request to firebase successful (force = ' + force + ')')
+        log.success('SMILESTORE: saveData() Request to firebase successful (force = ' + force + ')')
       } else {
         log.error("SMILESTORE: can't save data, not connected to firebase")
       }

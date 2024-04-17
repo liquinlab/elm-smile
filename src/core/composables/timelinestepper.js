@@ -4,7 +4,6 @@ import { RandomizeSubTimeline } from '@/core/subtimeline'
 import useSmileStore from '@/core/stores/smiledata'
 import useLog from '@/core/stores/log'
 
-
 export default function useTimelineStepper() {
   const smilestore = useSmileStore()
   const route = useRoute()
@@ -39,7 +38,7 @@ export default function useTimelineStepper() {
 
   const navigateTo = (goto) => {
     if (smilestore.config.auto_save) {
-      log.warn('Attempting auto saving on navigateTo() navigation')
+      log.log('TIMELINE STEPPER: Attempting auto saving on navigateTo() navigation')
       smilestore.saveData() // automatically saves data
     }
     if (goto) router.push(goto)
