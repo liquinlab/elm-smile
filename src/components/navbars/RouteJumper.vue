@@ -14,6 +14,9 @@ import { routes } from '@/core/router'
 import { useRouter, useRoute } from 'vue-router'
 const smilestore = useSmileStore() // load the global store
 
+import useLog from '@/core/stores/log'
+const log = useLog()
+
 const hoverRoute = ref('')
 const router = useRouter() // this is needed in composition API because this.$router not availabel
 const route = useRoute()
@@ -59,7 +62,7 @@ function navigate(route) {
 </script>
 <template>
   <div class="dropdown-content has-text-left">
-    <template v-for="r in routes">
+    <template v-for="r in router.getRoutes()">
       <div
         class="routelabel"
         @mouseover="hoverRoute = r.name"

@@ -1,4 +1,5 @@
 <script setup>
+import { onMounted } from 'vue'
 // import and initalize smile API
 import useSmileAPI from '@/core/composables/smileapi'
 const api = useSmileAPI()
@@ -8,6 +9,10 @@ function finish() {
   // smilestore.saveData()
   api.stepNextRoute()
 }
+
+onMounted(() => {
+  api.getBrowserFingerprint()
+})
 </script>
 
 <template>

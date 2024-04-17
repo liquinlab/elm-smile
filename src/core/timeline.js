@@ -254,7 +254,4 @@ class Timeline {
   // }
 }
 
-export default function useTimeline() {
-  const timeline = new Timeline()
-  return timeline
-}
+export default Timeline

@@ -23,8 +23,8 @@ import WindowSizer from '@/components/screen_adjust/WindowSizerPage.vue'
 import useSmileAPI from '@/core/composables/smileapi'
 const api = useSmileAPI()
 
-import useTimeline from '@/core/composables/timeline'
-const timeline = useTimeline()
+import Timeline from '@/core/timeline'
+const timeline = new Timeline()
 
 // 2. Define some routes to the timeline
 // Each route should map to a component.

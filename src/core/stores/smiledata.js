@@ -90,6 +90,7 @@ export default defineStore('smilestore', {
         : undefined,
     data: {
       // syncs with firestore
+      seedID: '',
       trial_num: 0, // not being updated correctly
       consented: false,
       verified_visibility: false,
@@ -285,7 +286,8 @@ export default defineStore('smilestore', {
       // because things go wrong
       this.local.knownUser = true
       this.local.partNum = await updateExperimentCounter('participants')
-      this.local.docRef = await createDoc(this.data, this.local.seedID, this.local.partNum)
+      this.data.seedID = this.local.seedID
+      this.local.docRef = await createDoc(this.data)
       // if possible conditions are not empty, assign conditions
       if (this.local.possibleConditions) {
         this.data.conditions = await balancedAssignConditions(this.local.possibleConditions, this.data.conditions)

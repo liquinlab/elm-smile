@@ -1,10 +1,13 @@
 <script setup>
+const props = defineProps({
+  adjective: String
+})
 const emit = defineEmits(['nextPageCaptcha'])
 </script>
 
 <template>
   <div class="instructions prevent-select">
-    <h1 class="title">Lets play some games!</h1>
+    <h1 class="title">Lets play some {{ props.adjective }} games!</h1>
     <p class="is-size-5 has-text-left">
       Before we begin we'd like you to solve a couple quick problems for us, just to warm up your brain. They are common
       sense questions and tasks that should be easy and fun if you are a human and paying attention.

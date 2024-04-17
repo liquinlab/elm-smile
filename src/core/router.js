@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 import useSmileStore from '@/core/stores/smiledata' // get access to the global store
 import { getQueryParams } from '@/core/utils'
 import timeline from '@/app_timeline'
+
 import useLog from '@/core/stores/log'
 const log = useLog()
 // 3. add navigation guards

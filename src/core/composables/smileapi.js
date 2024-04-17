@@ -66,9 +66,10 @@ export default function useSmileAPI() {
     },
     isBrowserTooSmall: () => {
       let val = false
-      if(smilestore.config.windowsizer_aggressive && smilestore.verifiedVisibility) {
-        val = window.innerWidth < smilestore.config.windowsizer_request.width+40 || window.innerHeight < smilestore.config.windowsizer_request.height+40
-        
+      if (smilestore.config.windowsizer_aggressive && smilestore.verifiedVisibility) {
+        val =
+          window.innerWidth < smilestore.config.windowsizer_request.width + 40 ||
+          window.innerHeight < smilestore.config.windowsizer_request.height + 40
       }
       return val
     },
@@ -120,6 +121,7 @@ export default function useSmileAPI() {
       console.log('data ', smilestore.data.study_data)
     },
     preloadAllImages: () => {
+      console.log('Preloading images')
       setTimeout(() => {
         Object.values(import.meta.glob('@/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', { eager: true, query: '?url', import: 'default' })).forEach((url) => {
           const image = new Image();
@@ -127,17 +129,20 @@ export default function useSmileAPI() {
         });
       }, 1);
     },
-    completeConsent: (preloadImages = false) => {
+    completeConsent: (preloadImages = true) => {
+      // preload images after consent
+      // so that content loads faster
+      // will load in background while doing
+      // intro demographic surveys, etc...
       if (preloadImages) {
-        api.preloadAllImages();
+        api.preloadAllImages()
       }
-      
+
       if (!api.isKnownUser) {
-        // console.log('not known')
-        api.setKnown(); // set new user and add document, then assign conditions
+        api.setKnown() // set new user and add document, then assign conditions
       }
-      api.setConsented();
-    }
+      api.setConsented()
+    },
   }
 
   return api
