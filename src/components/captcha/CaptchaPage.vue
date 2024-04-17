@@ -18,22 +18,17 @@ const api = useSmileAPI()
 // possibly altered so that there is lots of substructure to it
 
 const pages = [
-  {component: CaptchaInstructionsText_01, params: {adjective: "wonderful"}, data: []},
-  {component: CaptchaTrialTextComprehension, params: {}, data: []},
-  {component: CaptchaInstructionsText_02, params: {}, data: []},
-  {component: CaptchaTrialImageCategorization, params: {}, data: []},
-  {component: CaptchaTrialMotorControl, params: {}, data: []},
-  {component: CaptchaRotateImage, params: {}, data: []},
-  {component: CaptchaTrialMotorControl, params: {}, data: []},
+  {component: CaptchaInstructionsText_01, props: {adjective: "wonderful"}, data: []},
+  {component: CaptchaTrialTextComprehension, props: {}, data: []},
+  {component: CaptchaInstructionsText_02, props: {}, data: []},
+  {component: CaptchaTrialImageCategorization, props: {}, data: []},
+  {component: CaptchaTrialMotorControl, props: {}, data: []},
+  {component: CaptchaRotateImage, props: {}, data: []},
+  {component: CaptchaTrialMotorControl, props: {}, data: []},
 ]
 
 const currentTab = computed(() => {
-  return {
-    component: pages[api.getCurrentTrial()].component,
-    props: {
-      params: pages[api.getCurrentTrial()].params
-    }
-  }
+  return pages[api.getCurrentTrial()]
 })
 // captcha steps
 
