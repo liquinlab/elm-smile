@@ -123,17 +123,11 @@ export default function useSmileAPI() {
     preloadAllImages: () => {
       console.log('Preloading images')
       setTimeout(() => {
-        Object.values(
-          import.meta.glob('@/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', {
-            eager: true,
-            query: '?url',
-            import: 'default',
-          })
-        ).forEach((url) => {
-          const image = new Image()
-          image.src = url
-        })
-      }, 1)
+        Object.values(import.meta.glob('@/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', { eager: true, query: '?url', import: 'default' })).forEach((url) => {
+          const image = new Image();
+          image.src = url;
+        });
+      }, 1);
     },
     completeConsent: (preloadImages = true) => {
       // preload images after consent

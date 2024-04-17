@@ -90,19 +90,11 @@ timeline.pushSeqRoute({
   component: Consent,
 })
 
-// demographic survery
+// demographic survey
 timeline.pushSeqRoute({
   path: '/demograph',
   name: 'demograph',
   component: DemographicSurvey,
-  // beforeEnter: (to, from) => {
-  //   // before loading this route, identify the user
-  //   const smilestore = useSmileStore()
-  //   if (!smilestore.isKnownUser) {
-  //     console.log('not known')
-  //     smilestore.setKnown() // set new user and add document
-  //   }
-  // },
 })
 
 // windowsizer
