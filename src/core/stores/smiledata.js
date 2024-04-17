@@ -6,7 +6,6 @@ import appconfig from '@/core/config'
 import {
   createDoc,
   updateSubjectDataRecord,
-  updateExperimentCounter,
   balancedAssignConditions,
   loadDoc,
   fsnow,
@@ -35,7 +34,6 @@ export default defineStore('smilestore', {
         knownUser: false,
         lastRoute: initLastRoute(appconfig.mode),
         docRef: null,
-        partNum: null,
         completionCode: null,
         current_page_done: false,
         consented: false,
@@ -164,6 +162,7 @@ export default defineStore('smilestore', {
     },
     setSeedID(seed) {
       this.local.seedID = seed
+      this.data.seedID = seed
       this.local.seedSet = true
     },
     registerPageTracker(page) {
@@ -289,7 +288,6 @@ export default defineStore('smilestore', {
       // TODD: this need to have an exception handler wrapping around it
       // because things go wrong
       this.local.knownUser = true
-      this.local.partNum = await updateExperimentCounter('participants')
       this.data.seedID = this.local.seedID
       this.local.docRef = await createDoc(this.data)
       // if possible conditions are not empty, assign conditions
@@ -352,6 +350,8 @@ export default defineStore('smilestore', {
         //this.global.snapshot = { ...smilestore.$state.data }
         this.global.db_changes = false // reset the changes flag
         log.success('SMILESTORE: saveData() Request to firebase successful (force = ' + force + ')')
+      } else if(!this.isKnownUser) {
+        this.setKnown() // if not a known user, try to connect again
       } else {
         log.error("SMILESTORE: can't save data, not connected to firebase")
       }
