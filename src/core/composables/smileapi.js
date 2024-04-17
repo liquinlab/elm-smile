@@ -9,11 +9,14 @@ import { shuffle } from '@/core/randomization'
 // a set of trials
 import { useTrialStepper } from '@/core/composables/trialstepper'
 
+import useLog from '@/core/stores/log'
+
 export default function useSmileAPI() {
   const { stepNextRoute, stepPrevRoute } = useTimelineStepper()
   const route = useRoute()
   const router = useRouter()
   const smilestore = useSmileStore()
+  const log = useLog()
   const api = {
     config: smilestore.config,
     data: smilestore.data,
@@ -74,8 +77,12 @@ export default function useSmileAPI() {
       return val
     },
     setPageAutofill: (autofill) => {
-      console.log('setting autofil')
+      log.debug('SMILEAPI: setting autofill')
       if (smilestore.config.mode === 'development') smilestore.setPageAutofill(autofill)
+    },
+    removePageAutofill: () => {
+      log.debug('SMILEAPI: resetting autofill')
+      if (smilestore.config.mode === 'development') smilestore.removePageAutofill()
     },
     setCompletionCode: (code) => {
       smilestore.setCompletionCode(code)
@@ -118,10 +125,10 @@ export default function useSmileAPI() {
     },
     saveTrialData: (data) => {
       smilestore.saveTrialData(data)
-      console.log('data ', smilestore.data.study_data)
+      log.debug('SMILE API: data ', smilestore.data.study_data)
     },
     preloadAllImages: () => {
-      console.log('Preloading images')
+      log.debug('Preloading images')
       setTimeout(() => {
         Object.values(
           import.meta.glob('@/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', {

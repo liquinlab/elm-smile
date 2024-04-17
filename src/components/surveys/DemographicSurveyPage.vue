@@ -1,6 +1,3 @@
-
-
-
 <script setup>
 import { ref, reactive, computed } from 'vue'
 
@@ -66,6 +63,7 @@ function autofill() {
 api.setPageAutofill(autofill)
 
 function finish() {
+  api.removePageAutofill() // you are responsible for removing the autofill
   api.saveDemographicForm(forminfo)
   api.stepNextRoute()
 }
