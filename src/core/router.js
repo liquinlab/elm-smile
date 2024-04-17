@@ -78,11 +78,11 @@ function addGuards(r) {
     // if the route requires consent and the user hasn't consented
     if (to.meta.requiresConsent && !smilestore.isConsented) {
       log.warn(
-        `ROUTER GUARD: This route (${to.name}) requires consent, but the user has not consented.\
+        `ROUTER GUARD: This route (${to.name}) requires consent, but the user has not consented (${smilestore.isConsented}).\
          Redirecting to the last route visited. (${smilestore.lastRoute})`
       )
       return {
-        name: smilestore.lastRoute,
+        name: smilestore.lastRoute, // this could be lastRoute too
         replace: true,
       }
     }
