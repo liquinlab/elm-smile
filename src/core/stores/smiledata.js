@@ -37,6 +37,7 @@ export default defineStore('smilestore', {
         docRef: null,
         partNum: null,
         completionCode: null,
+        current_page_done: false,
         consented: false,
         done: false,
         totalWrites: 0,

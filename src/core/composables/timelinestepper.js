@@ -13,6 +13,7 @@ export default function useTimelineStepper() {
   const nextRoute = () => {
     // HANDLE RANDOMIZATION OF SUBTIMELINES
     // if the next thing has a type field of randomized_sub_timeline, then we want to randomize the subtimeline
+
     if (route.meta.next.type === 'randomized_sub_timeline') {
       // get shuffled routes -- have to just give it the whole router or else there are problems
       const orderedRoutes = RandomizeSubTimeline(route.meta.next, router)
@@ -37,6 +38,9 @@ export default function useTimelineStepper() {
   }
 
   const navigateTo = (goto) => {
+    // sets the current page as done
+    smilestore.dev.current_page_done = true
+
     if (smilestore.config.auto_save) {
       log.log('TIMELINE STEPPER: Attempting auto saving on navigateTo() navigation')
       smilestore.saveData() // automatically saves data

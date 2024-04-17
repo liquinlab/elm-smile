@@ -107,15 +107,33 @@ function addGuards(r) {
     // }
 
     // if you're trying to go to the next route
-    if (from.meta !== undefined && from.meta.next === to.name) {
+    if (from.meta !== undefined && from.meta.next === to.name && smilestore.dev.current_page_done) {
       log.log(
-        'ROUTER GUARD: You are trying to go to the next route from ' + from.name + ' to ' + to.name + ' so allowing it.'
+        'ROUTER GUARD: You are trying to go to the next route from ' +
+          from.name +
+          ' to ' +
+          to.name +
+          ' and the current page is done so allowing it.'
       )
       smilestore.setLastRoute(to.name)
       smilestore.recordRoute(to.name)
       return true
     }
 
+    // if you're trying to go to the next route
+    if (from.meta !== undefined && from.meta.next === to.name && !smilestore.dev.current_page_done) {
+      log.error(
+        'ROUTER GUARD: You are trying to go to the next route from ' +
+          from.name +
+          ' to ' +
+          to.name +
+          ' but the current page is not marked as done, so returning you to the current page.'
+      )
+      return {
+        name: smilestore.lastRoute,
+        replace: true,
+      }
+    }
     // if the next route is a subtimeline and you're trying to go to a subtimeline route, allow it
     // this is necessary because from.meta.next won't immediately get the subroute as next when the subtimeline is randomized
     if (
@@ -214,6 +232,8 @@ router.beforeResolve((to) => {
       global: true,
     })
   }
+
+  smilestore.dev.current_page_done = false // set teh current page to done
   log.log('ROUTER GUARD: Router navigated to /' + to.name)
 })
 
