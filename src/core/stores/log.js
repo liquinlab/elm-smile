@@ -46,13 +46,17 @@ export default defineStore('log', {
       this.history.push(msg)
     },
     warn(message) {
-      console.warn(message)
       const msg = {
         type: 'warn',
         time: new Date().toLocaleTimeString('en-US', { timeZoneName: 'short' }),
         message: message,
         trace: getLogTrace(),
       }
+      if (appconfig.mode === 'development') {
+        console.log(message)
+        push.warning(message)
+      }
+      console.warn(message)
       this.history.push(msg)
     },
     error(message) {
