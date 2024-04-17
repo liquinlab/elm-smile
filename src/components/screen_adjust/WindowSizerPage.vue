@@ -26,7 +26,9 @@ function finish() {
         <span class="is-size-2">
           <FAIcon icon="fa-solid fa-arrows-up-down-left-right "></FAIcon>
         </span>
-        <h1 class="is-size-4">Please adjust the size of your browser window until <b>ALL</b> four edges of this box are visible.</h1>
+        <h1 class="is-size-4">
+          Please adjust the size of your browser window until <b>ALL</b> four edges of this box are visible.
+        </h1>
         <hr />
         <div class="is-8 is-size-7 has-text-left note">
           <b>Warning</b>: If you can't resize your window and see the entire box please click the red "withdraw" button
@@ -81,18 +83,34 @@ hr {
     linear-gradient(0deg, rgb(18, 53, 90) 50%, transparent 50%),
     linear-gradient(0deg, rgb(18, 53, 90) 50%, transparent 50%);
   background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
-  background-size: 15px 2px, 15px 2px, 2px 15px, 2px 15px;
-  background-position: left top, right bottom, left bottom, right top;
+  background-size:
+    15px 2px,
+    15px 2px,
+    2px 15px,
+    2px 15px;
+  background-position:
+    left top,
+    right bottom,
+    left bottom,
+    right top;
   animation: border-dance 0.5s infinite linear;
 }
 
 @keyframes border-dance {
   0% {
-    background-position: left top, right bottom, left bottom, right top;
+    background-position:
+      left top,
+      right bottom,
+      left bottom,
+      right top;
   }
 
   100% {
-    background-position: left 15px top, right 15px bottom, left bottom 15px, right top 15px;
+    background-position:
+      left 15px top,
+      right 15px bottom,
+      left bottom 15px,
+      right top 15px;
   }
 }
 </style>
