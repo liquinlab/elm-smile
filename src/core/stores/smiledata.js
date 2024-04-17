@@ -3,13 +3,7 @@ import { useStorage } from '@vueuse/core'
 import axios from 'axios'
 import appconfig from '@/core/config'
 
-import {
-  createDoc,
-  updateSubjectDataRecord,
-  balancedAssignConditions,
-  loadDoc,
-  fsnow,
-} from './firestore-db'
+import { createDoc, updateSubjectDataRecord, balancedAssignConditions, loadDoc, fsnow } from './firestore-db'
 import sizeof from 'firestore-size'
 
 import useLog from '@/core/stores/log'
@@ -74,7 +68,7 @@ export default defineStore('smilestore', {
             {
               // syncs with local storage
               page_provides_autofill: null,
-              allowJumps: false,
+              allowJumps: true,
               show_data_bar: false,
               data_bar_height: 370,
               data_bar_tab: 'database',
@@ -350,7 +344,7 @@ export default defineStore('smilestore', {
         //this.global.snapshot = { ...smilestore.$state.data }
         this.global.db_changes = false // reset the changes flag
         log.success('SMILESTORE: saveData() Request to firebase successful (force = ' + force + ')')
-      } else if(!this.isKnownUser) {
+      } else if (!this.isKnownUser) {
         this.setKnown() // if not a known user, try to connect again
       } else {
         log.error("SMILESTORE: can't save data, not connected to firebase")

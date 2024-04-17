@@ -32,7 +32,7 @@ function setHover(route) {
 }
 
 watch(altKeyState, (value) => {
-  api.dev.allowJumps = value
+  api.dev.allowJumps = !value
 })
 
 function navigate(route) {
@@ -65,10 +65,7 @@ function navigate(route) {
       </div>
     </template>
     <hr />
-    <div class="note">
-      If you click a route it will act as though a user attempted to navigate to that page. Use ⌥ + click to force
-      navigation artificially.
-    </div>
+    <div class="note">Use ⌥ + click to navigate as the user in real experiment would.</div>
   </div>
 </template>
 

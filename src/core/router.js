@@ -70,8 +70,8 @@ function addGuards(r) {
           //to.meta.allowAlways +,
           '.  This is allowed in development/presentation mode but not in production.'
       )
-      //smilestore.setLastRoute(to.name)  - TODD SUGGESTING NOT OVERWRITING THIS
-      //smilestore.recordRoute(to.name)
+      smilestore.setLastRoute(to.name)
+      smilestore.recordRoute(to.name)
       return true
     }
 
