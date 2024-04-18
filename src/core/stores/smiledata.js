@@ -352,8 +352,6 @@ export default defineStore('smilestore', {
         //this.global.snapshot = { ...smilestore.$state.data }
         this.global.db_changes = false // reset the changes flag
         log.success('SMILESTORE: saveData() Request to firebase successful (force = ' + force + ')')
-      } else if (!this.isKnownUser) {
-        this.setKnown() // if not a known user, try to connect again
       } else {
         log.error("SMILESTORE: can't save data, not connected to firebase")
       }
