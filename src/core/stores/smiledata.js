@@ -18,6 +18,11 @@ function initLastRoute(mode) {
   return 'landing'
 }
 
+function removeFirestore(config) {
+  const { firebaseConfig, ...rest } = config
+  return rest
+}
+
 export default defineStore('smilestore', {
   // arrow function recommended for full type inference
   state: () => ({
@@ -101,7 +106,7 @@ export default defineStore('smilestore', {
       withdraw_data: {}, // empty
       route_order: [],
       conditions: {},
-      smile_config: appconfig, //  adding config info to firebase document
+      smile_config: removeFirestore(appconfig), //  adding config info to firebase document
       study_data: [],
     },
     config: appconfig,
