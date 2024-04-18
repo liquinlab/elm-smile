@@ -23,6 +23,20 @@ function removeFirestore(config) {
   return rest
 }
 
+const init_dev = {
+  // syncs with local storage
+  page_provides_autofill: null,
+  allowJumps: true,
+  show_data_bar: false,
+  data_bar_height: 370,
+  data_bar_tab: 'database',
+  data_path: null,
+  config_panel: { type: 'local', visible: false, x: -280, y: 0 },
+  state_var_panel: { visible: false, x: -150, y: 0 },
+  randomization_panel: { visible: false, x: -130, y: 0 },
+  route_panel: { visible: false, x: -0, y: -3 },
+}
+
 export default defineStore('smilestore', {
   // arrow function recommended for full type inference
   state: () => ({
@@ -69,25 +83,8 @@ export default defineStore('smilestore', {
     },
     dev:
       appconfig.mode === 'development'
-        ? useStorage(
-            appconfig.dev_local_storage_key,
-            {
-              // syncs with local storage
-              page_provides_autofill: null,
-              allowJumps: true,
-              show_data_bar: false,
-              data_bar_height: 370,
-              data_bar_tab: 'database',
-              data_path: null,
-              config_panel: { type: 'local', visible: false, x: -280, y: 0 },
-              state_var_panel: { visible: false, x: -150, y: 0 },
-              randomization_panel: { visible: false, x: -130, y: 0 },
-              route_panel: { visible: false, x: -0, y: -3 },
-            },
-            localStorage,
-            { mergeDefaults: true }
-          )
-        : undefined,
+        ? useStorage(appconfig.dev_local_storage_key, init_dev, localStorage, { mergeDefaults: true })
+        : init_dev,
     data: {
       // syncs with firestore
       seedID: '',
