@@ -24,7 +24,7 @@ function onDragCallback(x, y) {
 function randomize_seed() {
   // seed.value = uuidv4()
   //seed = smilestore.randomizeSeed()
-  console.log("setting seed to ", seed.value)
+  api.debug('setting seed to ', seed.value)
   smilestore.setSeedID(seed.value)
 }
 
@@ -52,9 +52,6 @@ watch(
     })
   }
 )
-
-
-
 </script>
 <template>
   <div class="dropdown is-hoverable is-right" :class="{ 'is-active': api.dev.randomization_panel.visible }">
@@ -111,7 +108,14 @@ watch(
                 <td class="has-text-left"><b>Seed</b>:</td>
                 <td class="has-text-left is-family-code is-size-7">
                   <div class="textinput">
-                    <input class="input is-small" type="text" placeholder="Current seed" size="15" width="10" v-model="seed" />
+                    <input
+                      class="input is-small"
+                      type="text"
+                      placeholder="Current seed"
+                      size="15"
+                      width="10"
+                      v-model="seed"
+                    />
                     <button
                       class="button is-small is-light removeedge has-tooltip-arrow has-tooltip-top"
                       data-tooltip="Set new seed"

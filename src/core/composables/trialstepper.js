@@ -37,7 +37,7 @@ export function useStatelessTrialStepper(trials, index, finishedCallback) {
 
   function nextTrial() {
     log.log('TRIAL STEPPER: Advancing to next trial')
-    //console.log("i see index", smilestore.getPageTracker(route.name))
+    //log.log("i see index", smilestore.getPageTracker(route.name))
     if (index.value < n_trials - 1) {
       index.value += 1
     } else {
@@ -58,25 +58,25 @@ export function useStatelessTrialStepper(trials, index, finishedCallback) {
 
 /*
 export function useTrialStepper(trials, page, finishedCallback) {
-  console.log('using trial stepper')
+  log.log('using trial stepper')
   const smilestore = useSmileStore()
-  console.log(smilestore.local)
+  log.log(smilestore.local)
   const index = smilestore.getPage[page]
-  console.log(index)
-  console.log(smilestore.getLocal)
-  console.log(smilestore.getLocal.pageTracker)
+  log.log(index)
+  log.log(smilestore.getLocal)
+  log.log(smilestore.getLocal.pageTracker)
   const n_trials = trials.length
   const trial = ref(trials[index])
-  console.log(trial)
+  log.log(trial)
 
   function nextTrial() {
-    console.log('next trial please')
+    log.log('next trial please')
     if (index < n_trials - 1) {
       //smilestore.incrementPageTracker(page)
       index += 1
-      console.log(trial)
+      log.log(trial)
       trial.value = trials[index]
-      console.log(trial)
+      log.log(trial)
     } else {
       finishedCallback()
     }

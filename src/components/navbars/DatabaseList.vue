@@ -9,7 +9,7 @@ const emit = defineEmits(['selected'])
 const height_pct = computed(() => `${api.dev.data_bar_height - 100}px`)
 
 const header = computed(() => {
-  console.log('header', props.data)
+  api.debug('header', props.data)
   if (props.data === undefined || props.data === null) {
     return null
   } else {
@@ -21,10 +21,10 @@ const header = computed(() => {
 const data_field = computed(() => {
   if (props.data !== undefined && props.data !== null) {
     var pieces = props.data.split('.')
-    console.log('data_field', pieces)
+    api.debug('data_field', pieces)
     var view_data = api.data
     for (var i = 0; i < pieces.length; i++) {
-      console.log('pieces ', pieces[i])
+      api.debug('pieces ', pieces[i])
       if (view_data[pieces[i]]) {
         view_data = view_data[pieces[i]]
       }
@@ -35,11 +35,11 @@ const data_field = computed(() => {
   }
 })
 function option_selected(option) {
-  console.log('selected', option)
+  api.debug('selected', option)
   emit('selected', option)
 }
 
-console.log('full data', data_field)
+api.debug('full data', data_field)
 </script>
 
 <template>

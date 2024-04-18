@@ -2,6 +2,9 @@
 import { ref, onMounted } from 'vue'
 const emit = defineEmits(['nextPageCaptcha'])
 
+import useSmileAPI from '@/core/composables/smileapi'
+const api = useSmileAPI()
+
 let MAX_TIME = 15000
 let start_time
 let timeout = ref(0)
@@ -28,7 +31,7 @@ const rotateImageDelta = (rotationAmount) => {
   //const rotationAmount = direction === 'left' ? -90 : 90
   if (imageRef.value) {
     initRotation += rotationAmount
-    console.log(initRotation)
+    api.log(`${initRotation}`)
     imageRef.value.style.transform = `rotate(${initRotation}deg)`
   }
 }
@@ -37,7 +40,7 @@ onMounted(() => {
   rotateImage(initRotation)
   start_time = Date.now()
   timeout.value = ((MAX_TIME - (Date.now(0) - start_time)) / MAX_TIME) * 100
-  console.log(timeout)
+  api.log(`${timeout}`)
 })
 
 var myInterval = setInterval(() => {

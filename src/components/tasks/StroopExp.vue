@@ -74,15 +74,15 @@ onKeyDown(
   (e) => {
     if (api.getCurrentTrial() < trials.length) {
       e.preventDefault()
-      console.log('pressed ', e)
+      api.debug('pressed ${e}')
       if (['r', 'R'].includes(e.key)) {
-        console.log('red')
+        api.debug('red')
       } else if (['g', 'G'].includes(e.key)) {
-        console.log('green')
+        api.debug('green')
       } else if (['b', 'B'].includes(e.key)) {
-        console.log('blue')
+        api.debug('blue')
       }
-      console.log(trial.value)
+      api.debug(`${trial.value}`)
       api.saveTrialData({
         trialnum: api.getCurrentTrial(),
         word: trial.value.word,
@@ -102,7 +102,7 @@ onKeyDown(
 var final_score = ref(0)
 function finalize() {
   // sort out what data you are putting in the smile store here?
-  console.log('finished, so will save data and stuff')
+  api.debug('finished, so will save data and stuff')
   final_score.value = 100 // compute a final score here
 }
 

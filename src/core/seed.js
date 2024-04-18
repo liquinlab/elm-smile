@@ -9,6 +9,9 @@ import useSmileStore from '@/core/stores/smiledata' // get access to the global 
 
 const smilestore = useSmileStore(pinia)
 
+import useSmileAPI from '@/core/composables/smileapi'
+const api = useSmileAPI()
+
 function getParameterByName(name, url = window.location.href) {
   const nameClean = name.replace(/[\[\]]/g, '\\$&')
   const regex = new RegExp(`[?&]${nameClean}(=([^&#]*)|&|#|$)`)
@@ -28,12 +31,12 @@ const seed = getParameterByName('SEED')
 if (!seedSet) {
   // either pull the seed from the URL
   if (seed) {
-    console.log(`force seed id to ${seed}`)
+    api.log(`Forcing seed id to ${seed}`)
     smilestore.setSeedID(seed)
   } else {
     // otherwise, generate a random ID
     const participantID = uuidv4() // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
-    console.log(`set seed id to ${participantID}`)
+    api.log(`Set seed id to ${participantID}`)
     smilestore.setSeedID(participantID)
   }
 }

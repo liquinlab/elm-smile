@@ -31,12 +31,12 @@ api.setCompletionCode(completionCode)
 // create clipboard system
 const clipboard = new Clipboard('#copy_code');
 clipboard.on('success', (e) => {
-    console.log('code copied to clipboard', e.trigger.id);
+    api.debug(`code copied to clipboard ${e.trigger.id}`);
 });
 
 
 
-// console.log(computeCompletionCode())
+// api.debug(computeCompletionCode())
 // function finish(goto) { 
 //     smilestore.saveData()
 //     router.push(goto)

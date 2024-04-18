@@ -16,14 +16,14 @@ onMounted(() => {
   if (queryStr.length == 2) {
     redirectURL.value += queryStr[1]
   }
-  console.log(redirectURL.value)
+  api.debug(`${redirectURL.value}`)
   if (urlParams.assignmentId && urlParams.hitId && urlParams.workerId) {
     if (urlParams.assignmentId === 'ASSIGNMENT_ID_NOT_AVAILABLE') {
-      console.log('AMT mode, but no assignment (preview mode)')
+      api.debug('AMT mode, but no assignment (preview mode)')
       // supposed to show the ad here
       mturkPreview.value = true
     } else {
-      console.log('AMT mode, with assignment')
+      api.debug('AMT mode, with assignment')
       mturkPreview.value = false
     }
   }
@@ -47,7 +47,7 @@ function clicked() {
 // }
 const turkSubmitTo = 'https://www.mturk.com/mturk/externalSubmit'
 function submit() {
-  console.log('submitting to AMT')
+  api.debug('submitting to AMT')
 }
 </script>
 

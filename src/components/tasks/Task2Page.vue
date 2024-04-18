@@ -41,7 +41,7 @@ const trial = computed(() => {
 
 function finalize() {
   // sort out what data you are putting in the smile store here?
-  console.log('finished ')
+  api.debug('finished ')
   finish()
 }
 

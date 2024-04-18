@@ -26,10 +26,10 @@ function addGuards(r) {
     }
     to.query = newQueries
 
-    // console.log('query params', to.query)
-    // console.log('loading', to.name)
-    // console.log('from', from.name)
-    // console.log('allowAlways', to.meta.allowAlways)
+    // log.debug('query params', to.query)
+    // log.debug('loading', to.name)
+    // log.debug('from', from.name)
+    // log.debug('allowAlways', to.meta.allowAlways)
 
     const smilestore = useSmileStore()
 
@@ -43,7 +43,7 @@ function addGuards(r) {
     // if withdrew
     // this is leading to infinite redirects.
     // if (smilestore.isWithdrawn && !smilestore.dev.allowJumps) {
-    //   console.log("withdraw so can't go anywhere")
+    //   log.debug("withdraw so can't go anywhere")
     //   return {
     //     name: 'withdraw',
     //     replace: true,

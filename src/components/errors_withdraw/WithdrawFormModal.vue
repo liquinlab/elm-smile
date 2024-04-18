@@ -14,7 +14,7 @@ const forminfo = reactive({
 })
 
 // function testme() {
-//     console.log('testme')
+//     api.debug('testme')
 // }
 
 function withdraw() {
@@ -24,9 +24,9 @@ function withdraw() {
 }
 
 // function prefill_form() {
-//     console.log('caught prefill')
+//     api.debug('caught prefill')
 //     forminfo.email = prefill_email()
-//     console.log(forminfo.email)
+//     api.debug(forminfo.email)
 // }
 </script>
 

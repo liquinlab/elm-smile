@@ -2,6 +2,9 @@
 import { ref, reactive, shallowRef, onMounted } from 'vue'
 const emit = defineEmits(['nextPageCaptcha'])
 
+import useSmileAPI from '@/core/composables/smileapi'
+const api = useSmileAPI()
+
 let MAX_TIME = 5000
 let start_time
 let timeout = ref(0)
@@ -22,7 +25,7 @@ const trials = [
 onMounted(() => {
   start_time = Date.now()
   timeout.value = ((MAX_TIME - (Date.now(0) - start_time)) / MAX_TIME) * 100
-  //console.log(timeout)
+  //api.debug(timeout)
   var myInterval = setInterval(() => {
     timeout.value = ((MAX_TIME - (Date.now(0) - start_time)) / MAX_TIME) * 100
     if (timeout.value <= 0) {

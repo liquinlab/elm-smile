@@ -126,6 +126,18 @@ export default function useSmileAPI() {
     saveData: (force) => {
       smilestore.saveData(force)
     },
+    log: (message) => {
+      log.log(message)
+    },
+    debug: (message) => {
+      log.debug(message)
+    },
+    warn: (message) => {
+      log.warn(message)
+    },
+    error: (message) => {
+      log.error(message)
+    },
     saveTrialData: (data) => {
       smilestore.saveTrialData(data)
       log.debug('SMILE API: data ', smilestore.data.study_data)

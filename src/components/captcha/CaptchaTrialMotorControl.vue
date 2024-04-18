@@ -2,6 +2,9 @@
 const emit = defineEmits(['nextPageCaptcha'])
 import { ref, reactive, onMounted } from 'vue'
 
+import useSmileAPI from '@/core/composables/smileapi'
+const api = useSmileAPI()
+
 // use SVG
 import { SVG } from '@svgdotjs/svg.js'
 
@@ -63,9 +66,9 @@ const handleMouseMove = (event) => {
     svg.circle.move(newXreal - svg.radius, newYreal - svg.radius)
 
     svg.pathString += ` L ${newXreal} ${newYreal}`
-    //console.log(flagLocation)
+    //api.debug(flagLocation)
     // if newXreal and newYreal are withing the flag location
-    console.log(newXreal, newYreal, flagLocation.row * rectWidth, flagLocation.col * rectHeight)
+    api.debug(`${newXreal}, ${newYreal}, ${flagLocation.row * rectWidth}, ${flagLocation.col * rectHeight}`)
     if (
       newXreal > flagLocation.col * rectWidth &&
       newXreal < (flagLocation.col + 1) * rectWidth &&
@@ -76,8 +79,8 @@ const handleMouseMove = (event) => {
       //emit('nextPageCaptcha')
     }
 
-    console.log('in cell', Math.floor(newXreal / rectWidth), Math.floor(newYreal / rectHeight))
-    //console.log('color', )
+    api.debug(`in cell  ${Math.floor(newXreal / rectWidth)}, ${Math.floor(newYreal / rectHeight)}`)
+    //api.debug('color', )
     if (grid.value[Math.floor(newYreal / rectHeight)][Math.floor(newXreal / rectWidth)] == 'black') {
       touched_black.value = true
       bordercolor.value = red
@@ -98,7 +101,7 @@ onMounted(() => {
   svg.draw.on('mousemove', handleMouseMove)
   start_time = Date.now()
   timeout.value = ((MAX_TIME - (Date.now(0) - start_time)) / MAX_TIME) * 100
-  console.log(timeout)
+  api.debug(`${timeout}`)
 
   if (timed_task) {
     var myInterval = setInterval(() => {
@@ -130,19 +133,19 @@ function getRandomColor() {
 }
 
 const startDragging = () => {
-  // dconsole.log('start dragging')
+  // api.debug('start dragging')
   svg.isDragging = true
 }
 const stopDragging = () => {
-  //console.log('stop dragging')
+  //api.debug('stop dragging')
   svg.isDragging = false
 }
 
 const flag_touch = () => {
   if (svg.isDragging) {
-    console.log('flag touched')
+    api.debug('flag touched')
   } else {
-    console.log('nice try')
+    api.debug('nice try')
   }
 }
 

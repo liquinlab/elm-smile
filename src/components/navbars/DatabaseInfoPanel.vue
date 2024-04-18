@@ -29,19 +29,19 @@ const sync_state = computed(() => {
 })
 
 // smilestore.dev.show_data_bar.$subscribe((mutation, newstate) => {
-//   console.log('show_data_bar', newstate)
+//   api.debug('show_data_bar', newstate)
 // })
 
 /*
 watch(() => smilestore.dev.show_data_bar, (newVal, oldVal) => {
-  console.log('show_data_bar', newVal, oldVal)
+  api.debug('show_data_bar', newVal, oldVal)
 })
 */
 
 const last_write_time_string = ref('Never happened') // default
 onMounted(() => {
   var myInterval = setInterval(() => {
-    //console.log("updating timer", api.dev.show_data_bar)
+    //api.debug("updating timer", api.dev.show_data_bar)
     if (!api.global.db_connected) {
       last_write_time_string.value = `Never happened`
     } else {

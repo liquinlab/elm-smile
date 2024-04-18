@@ -49,7 +49,7 @@ const { nextTrial } = api.useTrialStepper(pages, api.currentRouteName(), () => {
 
 function finalize() {
   // sort out what data you are putting in the smile store here?
-  console.log('finished, so will save data and stuff')
+  api.log('finished, so will save data and stuff')
 }
 
 function next_trial() {
