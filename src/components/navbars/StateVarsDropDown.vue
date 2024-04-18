@@ -70,7 +70,7 @@ function onDragCallback(x, y) {
                       type="checkbox"
                       name="switchRoundedDefault3"
                       class="switch is-rounded is-rtl is-small"
-                      v-model="smilestore.data.consented"
+                      v-model="smilestore.local.consented"
                     />
                     <label for="switchRoundedDefault3"></label>
                   </div>
@@ -85,7 +85,7 @@ function onDragCallback(x, y) {
                       type="checkbox"
                       name="switchRoundedDefault2"
                       class="switch is-rounded is-rtl is-small"
-                      v-model="smilestore.data.done"
+                      v-model="smilestore.local.done"
                     />
                     <label for="switchRoundedDefault2"></label>
                   </div>
@@ -100,7 +100,7 @@ function onDragCallback(x, y) {
                       type="checkbox"
                       name="switchRoundedDefault4"
                       class="switch is-rounded is-rtl is-small"
-                      v-model="smilestore.data.withdraw"
+                      v-model="smilestore.local.withdrawn"
                     />
                     <label for="switchRoundedDefault4"></label>
                   </div>

@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import useSmileStore from '@/core/stores/smiledata'
 import appconfig from '@/core/config'
-
+import useSmileAPI from '@/core/composables/smileapi'
 // load sub-components used in this compomnents
 import WithdrawFormModal from '@/components/errors_withdraw/WithdrawFormModal.vue'
 import InformedConsentModal from '@/components/consent/InformedConsentModal.vue'
@@ -11,6 +11,7 @@ import ReportIssueModal from '@/components/errors_withdraw/ReportIssueModal.vue'
 
 const router = useRouter()
 const smilestore = useSmileStore() // get the global store
+const api = useSmileAPI() // get the api
 const withdrawform = ref(null) // this uses the ref="withdrawform" in the template
 const email = ref('')
 
@@ -68,13 +69,13 @@ function submitWithdraw() {
     <div id="infobar" class="infobar-menu is-active">
       <div class="infobar-end">
         <div class="infobar-item">
-          <div class="buttons" v-if="smilestore.data.withdraw !== true">
-            <button class="button is-info is-small is-light" v-if="smilestore.isConsented" @click="toggleConsent()">
+          <div class="buttons">
+            <button class="button is-info is-small is-light" v-if="api.local.consented" @click="toggleConsent()">
               <FAIcon icon="magnifying-glass" />&nbsp;&nbsp;View consent
             </button>
             <button
               class="button is-danger is-small is-light"
-              v-if="smilestore.isConsented && !smilestore.isDone"
+              v-if="api.local.consented && !api.local.withdrawn"
               @click="toggleWithdraw()"
             >
               <FAIcon icon="circle-xmark" />&nbsp;&nbsp;Withdraw
@@ -198,7 +199,7 @@ function submitWithdraw() {
   margin-left: auto;
 }
 
-@media screen and (max-width: 560px){
+@media screen and (max-width: 560px) {
   .studyinfo {
     display: none;
   }

@@ -77,6 +77,10 @@ class Timeline {
       newroute.meta.requiresDone = false // default to not require done
     }
 
+    if (newroute.meta.requiresWithdraw == undefined) {
+      newroute.meta.requiresWithdraw = false // default to not require done
+    }
+
     try {
       this.pushToRoutes(newroute)
     } catch (err) {
@@ -108,6 +112,10 @@ class Timeline {
 
     if (newroute.meta.requiresDone == undefined) {
       newroute.meta.requiresDone = false // default to not require done
+    }
+
+    if (newroute.meta.requiresWithdraw == undefined) {
+      newroute.meta.requiresWithdraw = false // default to not require done
     }
 
     try {

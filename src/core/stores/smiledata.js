@@ -31,6 +31,7 @@ export default defineStore('smilestore', {
         completionCode: null,
         current_page_done: false,
         consented: false,
+        withdrawn: false,
         done: false,
         totalWrites: 0,
         lastWrite: null,
@@ -96,7 +97,7 @@ export default defineStore('smilestore', {
       browser_fingerprint: {}, // empty
       browser_data: [], // empty
       demographic_form: {}, // empty
-      withdraw: false, // false
+      withdrawn: false, // false
       withdraw_data: {}, // empty
       route_order: [],
       conditions: {},
@@ -110,6 +111,7 @@ export default defineStore('smilestore', {
     isDataBarVisible: (state) => state.dev.show_data_bar,
     isKnownUser: (state) => state.local.knownUser,
     isConsented: (state) => state.local.consented,
+    isWithdrawn: (state) => state.local.withdrawn,
     isDone: (state) => state.local.done,
     lastRoute: (state) => state.local.lastRoute,
     isDBConnected: (state) => state.global.db_connected,
@@ -141,8 +143,9 @@ export default defineStore('smilestore', {
       this.local.consented = false
       this.data.consented = false
     },
-    setWithdraw(forminfo) {
-      this.data.withdraw = true
+    setWithdrawn(forminfo) {
+      this.local.withdrawn = true
+      this.data.withdrawn = true
       this.data.withdraw_data = forminfo
       this.data.endtime = fsnow()
     },

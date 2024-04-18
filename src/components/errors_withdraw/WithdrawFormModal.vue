@@ -18,7 +18,7 @@ const forminfo = reactive({
 // }
 
 function withdraw() {
-  api.setWithdraw(forminfo) // set withdraw data fields
+  api.setWithdrawn(forminfo) // set withdraw data fields
   api.saveData(true) // force a data save
   emit('submit-withdraw')
 }

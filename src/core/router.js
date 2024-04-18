@@ -42,7 +42,7 @@ function addGuards(r) {
 
     // if withdrew
     // this is leading to infinite redirects.
-    // if (smilestore.data.withdraw && !smilestore.dev.allowJumps) {
+    // if (smilestore.isWithdrawn && !smilestore.dev.allowJumps) {
     //   console.log("withdraw so can't go anywhere")
     //   return {
     //     name: 'withdraw',
@@ -56,6 +56,24 @@ function addGuards(r) {
       smilestore.setLastRoute(to.name)
       smilestore.recordRoute(to.name)
       return true
+    }
+
+    // if the route requires withdraw and the user has withdrawn
+    // then allow it.
+    if (to.meta.requiresWithdraw && smilestore.isWithdrawn) {
+      log.warn('ROUTER GUARD: Requested withdraw route and is withdrawn so allowing it')
+      smilestore.setLastRoute(to.name)
+      smilestore.recordRoute(to.name)
+      return true
+    }
+
+    // // If user is withdraw
+    if (smilestore.isWithdrawn) {
+      log.warn('ROUTER GUARD: User has withdrawn, redirecting to withdraw page')
+      return {
+        name: 'withdraw', // this could be lastRoute too
+        replace: true,
+      }
     }
 
     // if you're in jumping mode

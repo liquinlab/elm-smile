@@ -178,6 +178,7 @@ timeline.pushSeqRoute({
 timeline.pushRoute({
   path: '/withdraw',
   name: 'withdraw',
+  meta: { requiresWithdraw: true },
   component: Withdraw,
 })
 

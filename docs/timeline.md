@@ -75,7 +75,7 @@ The `meta` field specifies additional optional information about the route:
 - It can be used to specify different previous and next routes, in case the experiment timeline flow branches (see [Branching and randomized flows](#branching-and-randomized-flows) for more details).
 - It can be used to specify randomized sub-timelines (see [Randomized flows and complex branching](#randomized-flows-and-complex-branching) for more details).
 - It can also be used to allow direct navigation to particular routes, which can allow for unconditional navigation by setting `allowAlways: true` in the `meta`.
-- It can be used to block access to particular routes until the user has consented to the study (`requiresConsent: true`) as well as only showing content when the user is "done" with the experiment (`requiresDone: true`).
+- It can be used to block access to particular routes until the user has consented to the study (`requiresConsent: true`) as well as only showing content when the user is "done" with the experiment (`requiresDone: true`). Another option (`requiresWithdraw: true`) requires the participant to have withdrawn from the page before showing.
 
 ## Timeline
 

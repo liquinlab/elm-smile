@@ -31,7 +31,10 @@ export default function useSmileAPI() {
     hasPrevRoute: () => route.meta.prev && route.meta.sequential,
     shuffle: shuffle,
     useTrialStepper: useTrialStepper,
-    isKnownUser: smilestore.isKnownUser,
+    // isKnownUser: smilestore.local.knownUser,
+    // isDone: smilestore.local.done,
+    // isConsented: smilestore.local.consented,
+    // isWithdrawn: smilestore.local.withdrawn,
     urls: smilestore.global.urls,
     resetStore: () => {
       smilestore.resetLocal()
@@ -55,8 +58,8 @@ export default function useSmileAPI() {
     setConsented: () => {
       smilestore.setConsented()
     },
-    setWithdraw: (forminfo) => {
-      smilestore.setWithdraw(forminfo)
+    setWithdrawn: (forminfo) => {
+      smilestore.setWithdrawn(forminfo)
     },
     saveDemographicForm: (data) => {
       smilestore.saveDemographicForm(data)
@@ -143,11 +146,7 @@ export default function useSmileAPI() {
       }, 1)
     },
     completeConsent: () => {
-      // so that content loads faster
-      // will load in background while doing
-      // intro demographic surveys, etc...
-
-      if (!api.isKnownUser) {
+      if (!api.local.knownUser) {
         api.setKnown() // set new user and add document, then assign conditions
       }
       api.setConsented()
