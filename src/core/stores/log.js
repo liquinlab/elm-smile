@@ -19,12 +19,27 @@ function getLogTrace() {
   }
 }
 
+function argsToString(args) {
+  return args.map(arg => {
+    if (typeof arg === 'object') {
+      try {
+        return JSON.stringify(arg);
+      } catch (e) {
+        return ''
+      }
+    } else {
+      return String(arg)
+    }
+  }).join(' ')
+}
+
 export default defineStore('log', {
   state: () => ({
     history: [],
   }),
   actions: {
-    log(message) {
+    log(...args) {
+      const message = argsToString(args)
       const msg = {
         type: 'log',
         time: new Date().toLocaleTimeString('en-US', { timeZoneName: 'short' }),
@@ -33,7 +48,8 @@ export default defineStore('log', {
       }
       this.history.push(msg)
     },
-    debug(message) {
+    debug(...args) {
+      const message = argsToString(args)
       const msg = {
         type: 'debug',
         time: new Date().toLocaleTimeString('en-US', { timeZoneName: 'short' }),
@@ -45,7 +61,9 @@ export default defineStore('log', {
       }
       this.history.push(msg)
     },
-    warn(message) {
+    warn(...args) {
+      const message = argsToString(args)
+      console.warn(message)
       const msg = {
         type: 'warn',
         time: new Date().toLocaleTimeString('en-US', { timeZoneName: 'short' }),
@@ -59,7 +77,8 @@ export default defineStore('log', {
       console.warn(message)
       this.history.push(msg)
     },
-    error(message) {
+    error(...args) {
+      const message = argsToString(args)
       const msg = {
         type: 'error',
         time: new Date().toLocaleTimeString('en-US', { timeZoneName: 'short' }),
@@ -73,7 +92,8 @@ export default defineStore('log', {
       console.error(message)
       this.history.push(msg)
     },
-    success(message) {
+    success(...args) {
+      const message = argsToString(args)
       const msg = {
         type: 'success',
         time: new Date().toLocaleTimeString('en-US', { timeZoneName: 'short' }),
