@@ -1,13 +1,12 @@
-# This is a basic workflow to deploy your smile experiment
 name: Build and Deploy
 
-# Controls when the workflow will run
 on:
   workflow_call:
     inputs:
       node_version:
-        description: 'The version of node you want to use'
+        description: 'The version of Node.js to use'
         required: true
+        type: string
     secrets:
       SECRET_APP_CONFIG:
         required: true
@@ -21,26 +20,50 @@ on:
         required: true
       EXP_DEPLOY_PORT:
         required: true
-      EXP_DEPLOY_PATH:
-        required: true
       SLACK_WEBHOOK_URL:
         required: true
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build_and_deploy:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # setup node.js
-      - name: Setup node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ inputs.node_version }} # this is what i'm using locally
+          node-version: ${{ inputs.node_version }}
 
-      # install node packages
-      - name: Install node dependencies
+      - name: Install Node Dependencies
         run: npm install
+
+      - name: Expose Git-Specific Information to Vite Environment
+        env:
+          ENV_FILE: 'env/.env.git.local'
+        run: |
+          # Your bash script for processing environment variables
+
+      - name: Load Environment Configurations
+        uses: falti/dotenv-action@v1.1
+        with:
+          path: 'env/.env.local'
+
+      - name: Build Web App
+        run: npm run build
+
+      - name: Deploy Files to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EXP_DEPLOY_HOST }}
+          username: ${{ secrets.EXP_DEPLOY_USER }}
+          key: ${{ secrets.EXP_DEPLOY_KEY }}
+          port: ${{ secrets.EXP_DEPLOY_PORT }}
+          script: |
+            # Your deployment script
+
+      - name: Send Notification
+        if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          payload: |
+            {
+              "text": "Deployment successful"
+            }
