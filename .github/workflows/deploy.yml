@@ -30,6 +30,9 @@ jobs:
       ## TODO CHANGE THIS TO CHECK OUT THE BRANCH THAT WAS COMMITTED TO
       - name: Checkout code commited to branch
         uses: actions/checkout@v4
+      - name: list files
+        run: |
+          ls -la .
 
   build_and_deploy:
     needs: checkout_code
