@@ -8,32 +8,23 @@ on:
       node_version:
         description: 'The version of node you want to use'
         required: true
-        type: string
     secrets:
       SECRET_APP_CONFIG:
         required: true
-        type: string
       EXP_DEPLOY_PATH:
         required: true
-        type: string
       EXP_DEPLOY_HOST:
         required: true
-        type: string
       EXP_DEPLOY_USER:
         required: true
-        type: string
       EXP_DEPLOY_KEY:
         required: true
-        type: string
       EXP_DEPLOY_PORT:
         required: true
-        type: string
       EXP_DEPLOY_PATH:
         required: true
-        type: string
       SLACK_WEBHOOK_URL:
         required: true
-        type: string
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -50,3 +41,6 @@ jobs:
         with:
           node-version: ${{ inputs.node_version }} # this is what i'm using locally
 
+      # install node packages
+      - name: Install node dependencies
+        run: npm install

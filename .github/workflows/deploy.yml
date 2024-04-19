@@ -35,5 +35,5 @@ jobs:
     needs: checkout_code
     uses: ./.github/workflows/build-and-deploy.yml
     with:
-      node_version: '20.11.1'
+      node_version: 20.11.1
     secrets: inherit
