@@ -126,16 +126,16 @@ export default function useSmileAPI() {
     saveData: (force) => {
       smilestore.saveData(force)
     },
-    log: (message) => {
+    log: (...message) => {
       log.log(message)
     },
-    debug: (message) => {
+    debug: (...message) => {
       log.debug(message)
     },
-    warn: (message) => {
+    warn: (...message) => {
       log.warn(message)
     },
-    error: (message) => {
+    error: (...message) => {
       log.error(message)
     },
     saveTrialData: (data) => {
