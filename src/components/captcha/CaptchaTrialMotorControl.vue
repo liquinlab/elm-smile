@@ -41,8 +41,8 @@ const touched_black = ref(false)
 const grey = '#7f7f7f'
 const red = '#ff0000'
 const bordercolor = ref(grey)
-const rows = ref(25)
-const cols = ref(25)
+const rows = ref(15)
+const cols = ref(15)
 const grid = ref([])
 const rectHeight = 500 / rows.value
 const rectWidth = 500 / rows.value
@@ -120,7 +120,50 @@ function finished_task() {
 }
 // Function to generate the grid
 function generateGrid() {
-  grid.value = Array.from({ length: rows.value }, () => Array.from({ length: cols.value }, () => getRandomColor()))
+  grid.value = Array.from({ length: rows.value }, () => Array.from({ length: cols.value }, () => 'black'))
+  let y = 7 //Math.floor(Math.random() * rows.value) // Random starting row
+  let path = [[0, y]]
+
+  // Continue building the path until the rightmost column is reached
+  while (path[path.length - 1][0] < rows.value - 1) {
+    let x = path[path.length - 1][0]
+    let y = path[path.length - 1][1]
+    let possibleMoves = []
+
+    // Move right if possible
+    if (x + 1 < rows.value) {
+      possibleMoves.push([x + 1, y])
+    }
+
+    // Move up if possible, avoiding revisits
+    if (y - 1 >= 0 && !path.some((p) => p[0] === x && p[1] === y - 1)) {
+      possibleMoves.push([x, y - 1])
+    }
+
+    // Move down if possible, avoiding revisits
+    if (y + 1 < rows.value && !path.some((p) => p[0] === x && p[1] === y + 1)) {
+      possibleMoves.push([x, y + 1])
+    }
+
+    // Choose the next move randomly from the possible moves
+    if (possibleMoves.length > 0) {
+      let nextMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)]
+      path.push(nextMove)
+    } else {
+      // No possible move (which is rare), start over
+      return generateRandomPath(rows.value)
+    }
+  }
+
+  // Mark the path in the grid
+  path.forEach((p) => {
+    grid.value[p[1]][p[0]] = 'white'
+  })
+
+  let lastcell = path[path.length - 1]
+  grid.value[lastcell[1]][lastcell[0]] = 'red'
+  flagLocation.row = lastcell[1]
+  flagLocation.col = lastcell[0]
 }
 
 // Function to generate a random color
