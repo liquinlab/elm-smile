@@ -23,10 +23,6 @@ import WindowSizerPage from '@/components/screen_adjust/WindowSizerPage.vue'
 import useSmileAPI from '@/core/composables/smileapi'
 const api = useSmileAPI()
 
-// use the log feature
-import useLog from '@/core/stores/log'
-const log = useLog()
-
 // get the smilestore
 import useSmileStore from '@/core/stores/smiledata'
 const smilestore = useSmileStore() // load the global store
@@ -43,7 +39,7 @@ smilestore.$subscribe((mutation, newstate) => {
         newv = JSON.stringify(newstate.data[key])
       }
 
-      log.log(`SMILESTORE: smilestore.data value changed for ${key}: from ${oldv} to ${newv}`)
+      api.log(`SMILESTORE: smilestore.data value changed for ${key}: from ${oldv} to ${newv}`)
       smilestore.global.db_changes = true
     }
   })
@@ -62,7 +58,7 @@ const total_height = computed(() => {
 const toosmall = ref(api.isBrowserTooSmall())
 
 onMounted(() => {
-  log.log('App.vue initialized')
+  api.log('App.vue initialized')
 
   window.addEventListener('resize', (event) => {
     api.recordWindowEvent('resize', { width: window.innerWidth, height: window.innerHeight })
@@ -115,7 +111,7 @@ onMounted(() => {
 <style>
 .router {
   height: '100vh';
-  height: v-bind(total_height); /* // SMILE_DEV_ONLY */
+  height: v-bind(total_height);
   background-color: var(--page-bg-color);
 }
 

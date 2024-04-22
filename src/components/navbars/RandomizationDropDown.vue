@@ -24,7 +24,7 @@ function onDragCallback(x, y) {
 function randomize_seed() {
   // seed.value = uuidv4()
   //seed = smilestore.randomizeSeed()
-  api.debug('setting seed to ', seed.value)
+  api.debug('Setting seed to ', seed.value)
   smilestore.setSeedID(seed.value)
 }
 

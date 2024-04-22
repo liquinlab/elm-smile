@@ -7,7 +7,6 @@ const api = SmileAPI()
 const browse_panels = reactive({ path: ['data', null, null] })
 
 onMounted(() => {
-  api.debug('mounted')
   if (api.dev.data_path !== null) {
     browse_panels.path = JSON.parse(api.dev.data_path) // hydrate from api/localstorage
   }
