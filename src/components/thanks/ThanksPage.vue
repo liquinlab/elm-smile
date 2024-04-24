@@ -21,7 +21,19 @@ function computeCompletionCode() {
     // stringify the data
     const data = stringify(api.data)
     const hashDigest = Base64url.stringify(sha256(data))
-    return hashDigest.slice(0, 20) // only use first 20 characters, may need to update to shortest possible code
+
+    const codes = {
+        'withdrew': 'xx',
+        'completed': 'oo',
+    }
+    let end_code = ''
+    if (api.local.withdrawn) {
+        end_code = codes['withdrew']
+    }
+    else if (api.local.done) {
+        end_code =  codes['completed']
+    }
+    return hashDigest.slice(0, 20) + end_code// only use first 20 characters, may need to update to shortest possible code
 }
 
 const completionCode = computeCompletionCode()
