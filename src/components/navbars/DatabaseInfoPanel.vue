@@ -1,12 +1,14 @@
 <script setup>
 //import { useTimeAgo } from '@vueuse/core'
-import { computed, ref, onMounted, watch } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 
 import SmileAPI from '@/core/composables/smileapi'
 const api = SmileAPI()
 
 import useSmileStore from '@/core/stores/smiledata'
 const smilestore = useSmileStore()
+
+var timer = ref(null)
 
 const firebase_url = computed(() => {
   const mode = api.config.mode == 'development' ? 'testing' : 'real'
@@ -28,19 +30,13 @@ const sync_state = computed(() => {
   }
 })
 
-// smilestore.dev.show_data_bar.$subscribe((mutation, newstate) => {
-//   api.debug('show_data_bar', newstate)
-// })
+const stopTimer = () => {
+  clearInterval(timer.value)
+  timer.value = null
+}
 
-/*
-watch(() => smilestore.dev.show_data_bar, (newVal, oldVal) => {
-  api.debug('show_data_bar', newVal, oldVal)
-})
-*/
-
-const last_write_time_string = ref('Never happened') // default
-onMounted(() => {
-  var myInterval = setInterval(() => {
+const startTimer = () => {
+  timer.value = setInterval(() => {
     //api.debug("updating timer", api.dev.show_data_bar)
     if (!api.global.db_connected) {
       last_write_time_string.value = `Never happened`
@@ -51,15 +47,23 @@ onMounted(() => {
       } else if (time < 180) {
         time = (time / 60).toFixed(2)
         last_write_time_string.value = `${time} mins ago`
-      } else {
-        clearInterval(myInterval)
+      } else if (time < 60 * 10) {
+        // say, 10 mins
         last_write_time_string.value = `a few mins ago`
-        setTimeout(() => {
-          last_write_time_string.value = `many mins ago`
-        }, 420000)
+      } else {
+        last_write_time_string.value = `a long time ago`
       }
     }
   }, 500)
+}
+const last_write_time_string = ref('') // default
+
+onMounted(() => {
+  startTimer()
+})
+
+onBeforeUnmount(() => {
+  stopTimer()
 })
 </script>
 <template>
