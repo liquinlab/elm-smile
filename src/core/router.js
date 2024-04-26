@@ -251,6 +251,7 @@ router.beforeResolve((to) => {
     })
   }
   log.clear_page_history()
+  smilestore.dev.page_provides_trial_stepper = false // by default
   smilestore.dev.current_page_done = false // set teh current page to done
   log.log('ROUTER GUARD: Router navigated to /' + to.name)
 })
