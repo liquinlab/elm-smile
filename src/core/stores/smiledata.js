@@ -26,6 +26,7 @@ function removeFirestore(config) {
 const init_dev = {
   // syncs with local storage
   page_provides_autofill: null,
+  page_provides_trial_stepper: false,
   allowJumps: true,
   show_data_bar: false,
   data_bar_height: 370,

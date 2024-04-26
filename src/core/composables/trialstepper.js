@@ -6,6 +6,8 @@ import useLog from '@/core/stores/log'
 export function useTrialStepper(trials, page, finishedCallback) {
   const smilestore = useSmileStore()
   const log = useLog()
+  smilestore.dev.page_provides_trial_stepper = true
+
   //const index = ref(0)
   const n_trials = trials.length
 
