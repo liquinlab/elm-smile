@@ -2,7 +2,7 @@ name: Deploy Error Notification
 
 on:
   workflow_run:
-    workflows: [Build and Deploy Site, Deploy and Build Docs]
+    workflows: [BUILD_DEPLOY, DOCS_DEPLOY]
     types: [completed]
 
 jobs:

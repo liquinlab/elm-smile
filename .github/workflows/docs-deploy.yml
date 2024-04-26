@@ -1,6 +1,6 @@
 # This is the workflow for deploying the smile docs
 
-name: Deploy and Build Docs
+name: DOCS_DEPLOY
 
 # Controls when the workflow will run
 on:

@@ -1,6 +1,6 @@
 # This is a basic workflow to deploy your smile experiment
 
-name: Build and Deploy Site
+name: BUILD_DEPLOY
 
 on:
   workflow_dispatch:
