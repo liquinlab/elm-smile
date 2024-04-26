@@ -46,6 +46,7 @@ export default function useTimelineStepper() {
       smilestore.saveData() // automatically saves data
     }
     if (goto) router.push(goto)
+    log.clear_page_history()
   }
 
   const stepNextRoute = (fn) => {

@@ -250,7 +250,7 @@ router.beforeResolve((to) => {
       global: true,
     })
   }
-
+  log.clear_page_history()
   smilestore.dev.current_page_done = false // set teh current page to done
   log.log('ROUTER GUARD: Router navigated to /' + to.name)
 })

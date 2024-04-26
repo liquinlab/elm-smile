@@ -40,8 +40,16 @@ function argsToString(args) {
 export default defineStore('log', {
   state: () => ({
     history: [],
+    page_history: [],
   }),
   actions: {
+    add_to_history(msg) {
+      this.history.push(msg)
+      this.page_history.push(msg)
+    },
+    clear_page_history() {
+      this.page_history = []
+    },
     log(...args) {
       const message = argsToString(args)
       const msg = {
@@ -50,7 +58,7 @@ export default defineStore('log', {
         message: message,
         trace: getLogTrace(),
       }
-      this.history.push(msg)
+      this.add_to_history(msg)
     },
     debug(...args) {
       const message = argsToString(args)
@@ -63,7 +71,7 @@ export default defineStore('log', {
       if (appconfig.mode === 'development') {
         console.log(message)
       }
-      this.history.push(msg)
+      this.add_to_history(msg)
     },
     warn(...args) {
       const api = useSmileAPI()
@@ -82,7 +90,7 @@ export default defineStore('log', {
         push.warning(message)
       }
       console.warn(message)
-      this.history.push(msg)
+      this.add_to_history(msg)
     },
     error(...args) {
       const api = useSmileAPI()
@@ -100,7 +108,7 @@ export default defineStore('log', {
         push.error(message)
       }
       console.error(message)
-      this.history.push(msg)
+      this.add_to_history(msg)
     },
     success(...args) {
       const api = useSmileAPI()
@@ -119,7 +127,7 @@ export default defineStore('log', {
         push.success(message)
       }
       console.log(message)
-      this.history.push(msg)
+      this.add_to_history(msg)
     },
   },
 })

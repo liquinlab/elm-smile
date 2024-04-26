@@ -59,6 +59,7 @@ import { faAnglesLeft } from '@fortawesome/free-solid-svg-icons'
 import { faHammer } from '@fortawesome/free-solid-svg-icons'
 import { faSquareCaretRight } from '@fortawesome/free-solid-svg-icons'
 import { faCodeBranch } from '@fortawesome/free-solid-svg-icons'
+import { faMagnifyingGlassArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons'
 import { faClock as farClock } from '@fortawesome/free-regular-svg-icons'
 
@@ -93,6 +94,7 @@ library.add(
   faGlobe,
   faHand,
   faMagnifyingGlass,
+  faMagnifyingGlassArrowRight,
   faCircleXmark,
   faClipboard,
   faBahai,
