@@ -38,50 +38,48 @@ const init_dev = {
   route_panel: { visible: false, x: -0, y: -3 },
 }
 
+const init_local = {
+  // syncs with local storage
+  knownUser: false,
+  lastRoute: initLastRoute(appconfig.mode),
+  docRef: null,
+  completionCode: null,
+  current_page_done: false,
+  consented: false,
+  withdrawn: false,
+  done: false,
+  totalWrites: 0,
+  lastWrite: null,
+  approx_data_size: 0,
+  seedActive: true, // do you want to use a random seed based on the participant's ID?
+  seedID: '',
+  seedSet: false,
+  pageTracker: {},
+  possibleConditions: { taskOrder: ['AFirst', 'BFirst'], instructions: ['version1', 'version2', 'version3'] },
+}
+
+const init_global = {
+  // ephemeral state, resets on browser refresh
+  progress: 0,
+  db_connected: false,
+  db_changes: true,
+  urls: {
+    prolific: '?PROLIFIC_PID=XXXX&STUDY_ID=XXXX&SESSION_ID=XXXXX#/welcome/prolific/',
+    cloudresearch:
+      '#/welcome/cloudresearch/?assignmentId=123RVWYBAZW00EXAMPLE456RVWYBAZW00EXAMPLE&hitId=123RVWYBAZW00EXAMPLE&turkSubmitTo=https://www.mturk.com/&workerId=AZ3456EXAMPLE',
+    mturk:
+      '#/mturk/?assignmentId=123RVWYBAZW00EXAMPLE456RVWYBAZW00EXAMPLE&hitId=123RVWYBAZW00EXAMPLE&turkSubmitTo=https://www.mturk.com/&workerId=AZ3456EXAMPLE',
+    citizensci:
+      '#/welcome/citizensci/?CITIZEN_ID=XXXXX&CITIZEN_STUDY_ID=123RVWYBAZW00EXAMPLE&CITIZEN_SESSION_ID=AZ3456EXAMPLE',
+    web: '#/welcome',
+  },
+}
+
 export default defineStore('smilestore', {
   // arrow function recommended for full type inference
   state: () => ({
-    local: useStorage(
-      appconfig.local_storage_key,
-      {
-        // syncs with local storage
-        knownUser: false,
-        lastRoute: initLastRoute(appconfig.mode),
-        docRef: null,
-        completionCode: null,
-        current_page_done: false,
-        consented: false,
-        withdrawn: false,
-        done: false,
-        totalWrites: 0,
-        lastWrite: null,
-        approx_data_size: 0,
-        seedActive: true, // do you want to use a random seed based on the participant's ID?
-        seedID: '',
-        seedSet: false,
-        pageTracker: {},
-        possibleConditions: { taskOrder: ['AFirst', 'BFirst'], instructions: ['version1', 'version2', 'version3'] },
-      },
-      localStorage,
-      { mergeDefaults: true }
-    ),
-    global: {
-      // ephemeral state, resets on browser refresh
-      progress: 0,
-      db_connected: false,
-      db_changes: true,
-      search_params: null,
-      urls: {
-        prolific: '?PROLIFIC_PID=XXXX&STUDY_ID=XXXX&SESSION_ID=XXXXX#/welcome/prolific/',
-        cloudresearch:
-          '#/welcome/cloudresearch/?assignmentId=123RVWYBAZW00EXAMPLE456RVWYBAZW00EXAMPLE&hitId=123RVWYBAZW00EXAMPLE&turkSubmitTo=https://www.mturk.com/&workerId=AZ3456EXAMPLE',
-        mturk:
-          '#/mturk/?assignmentId=123RVWYBAZW00EXAMPLE456RVWYBAZW00EXAMPLE&hitId=123RVWYBAZW00EXAMPLE&turkSubmitTo=https://www.mturk.com/&workerId=AZ3456EXAMPLE',
-        citizensci:
-          '#/welcome/citizensci/?CITIZEN_ID=XXXXX&CITIZEN_STUDY_ID=123RVWYBAZW00EXAMPLE&CITIZEN_SESSION_ID=AZ3456EXAMPLE',
-        web: '#/welcome',
-      },
-    },
+    local: useStorage(appconfig.local_storage_key, init_local, localStorage, { mergeDefaults: true }),
+    global: init_global,
     dev:
       appconfig.mode === 'development'
         ? useStorage(appconfig.dev_local_storage_key, init_dev, localStorage, { mergeDefaults: true })
