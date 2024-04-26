@@ -55,6 +55,18 @@ export const updateSubjectDataRecord = async (data, docid) => {
   }
 }
 
+export const updatePrivateSubjectDataRecord = async (data, docid) => {
+  // is it weird to have a aync method that doesn't return anything?
+  try {
+    const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/${docid}/private/`, 'private_data')
+    setDoc(docRef, data, {
+      merge: true,
+    })
+  } catch (e) {
+    console.error('Error updating document', e)
+  }
+}
+
 export const loadDoc = async (docid) => {
   const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/`, docid)
   const docSnap = await getDoc(docRef)
@@ -85,21 +97,30 @@ export const createDoc = async (data) => {
     console.log('Document written with ID: ', `${mode}/${appconfig.project_ref}`)
 
     // Add a new document with a generated id.
-    const docRef = await addDoc(
-      collection(db, `${mode}/${appconfig.project_ref}/data`),
-      data
-      )
+    const docRef = await addDoc(collection(db, `${mode}/${appconfig.project_ref}/data`), data)
     console.log('Document written with ID: ', docRef.id)
     return docRef.id
-    } catch (e) {
-      console.error('Error adding document: ', e)
-      return null
-    }
+  } catch (e) {
+    console.error('Error adding document: ', e)
+    return null
   }
+}
 
+export const createPrivateDoc = async (data, docId) => {
+  console.log(`trying to create a private document in ${docId}`)
+  try {
+    // Add a new document with a generated id.
+    const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/${docId}/private/`, 'private_data')
+    await setDoc(docRef, data)
+    console.log('Private document written with ID: ', docRef.id)
+    return docRef.id
+  } catch (e) {
+    console.error('Error adding document: ', e)
+    return null
+  }
+}
 
 export const balancedAssignConditions = async (conditionDict, currentConditions) => {
-  
   const num_shards = 20
 
   // if there are current conditions and we're in developer mode, we won't assign new ones
@@ -131,42 +152,41 @@ export const balancedAssignConditions = async (conditionDict, currentConditions)
   // do this in a transaction so we don't accidentally overwrite
   try {
     await runTransaction(db, async (transaction) => {
-      const docSnap = await transaction.get(docRef);
+      const docSnap = await transaction.get(docRef)
       if (!docSnap.exists()) {
         // Initialize the counter document
-        transaction.set(docRef, { num_shards: num_shards });
+        transaction.set(docRef, { num_shards: num_shards })
 
         // Initialize each shard with count=0
         for (let i = 0; i < num_shards; i++) {
-            const shardRef = doc(db, `${mode}/${appconfig.project_ref}/counters/conditions/shards/`, i.toString());
-            const newCondCounter = {}
-            conditionCombos.forEach((condition) => {
-              newCondCounter[condition] = 0
-            })
-            transaction.set(shardRef, newCondCounter);
+          const shardRef = doc(db, `${mode}/${appconfig.project_ref}/counters/conditions/shards/`, i.toString())
+          const newCondCounter = {}
+          conditionCombos.forEach((condition) => {
+            newCondCounter[condition] = 0
+          })
+          transaction.set(shardRef, newCondCounter)
         }
-      } else{
+      } else {
         // if doc does exist, get shard 0 and check if it has all the conditions
-        const shardRef = doc(db, `${mode}/${appconfig.project_ref}/counters/conditions/shards/`, '0');
-        const shardSnap = await transaction.get(shardRef);
+        const shardRef = doc(db, `${mode}/${appconfig.project_ref}/counters/conditions/shards/`, '0')
+        const shardSnap = await transaction.get(shardRef)
         const shardData = shardSnap.data()
         const shardConditions = Object.keys(shardData)
         const missingConditions = conditionCombos.filter((cond) => !shardConditions.includes(cond))
         if (missingConditions.length > 0) {
           // if there are any missing conditions, we're going to start over everything at zero and choose at random
           for (let i = 0; i < num_shards; i++) {
-            const shardRef = doc(db, `${mode}/${appconfig.project_ref}/counters/conditions/shards/`, i.toString());
+            const shardRef = doc(db, `${mode}/${appconfig.project_ref}/counters/conditions/shards/`, i.toString())
             const newCondCounter = {}
             conditionCombos.forEach((condition) => {
               newCondCounter[condition] = 0
             })
-            transaction.set(shardRef, newCondCounter);
+            transaction.set(shardRef, newCondCounter)
           }
         }
       }
-    });
-  }
-  catch (e) {
+    })
+  } catch (e) {
     console.error('Error creating counter: ', e)
   }
 
@@ -175,16 +195,16 @@ export const balancedAssignConditions = async (conditionDict, currentConditions)
 
   // get the current condition counts across all shards
   const querySnapshot = await getDocs(conditionCollection)
-  let oldCondCounter = {};
+  let oldCondCounter = {}
   querySnapshot.forEach((doc) => {
-      Object.keys(doc.data()).forEach((key) => {
-        if (oldCondCounter[key]) {
-          oldCondCounter[key] += doc.data()[key]
-        } else {
-          oldCondCounter[key] = doc.data()[key]
-        }
-      })
-  });
+    Object.keys(doc.data()).forEach((key) => {
+      if (oldCondCounter[key]) {
+        oldCondCounter[key] += doc.data()[key]
+      } else {
+        oldCondCounter[key] = doc.data()[key]
+      }
+    })
+  })
 
   // choose a condition based on these counts
   // randomly select from among the minima
@@ -194,31 +214,30 @@ export const balancedAssignConditions = async (conditionDict, currentConditions)
   const selectedCondition = matchMinConds[Math.floor(Math.random() * matchMinConds.length)]
 
   // increment the count for that condition from a random shard, in a transaction
-  const shard_id = Math.floor(Math.random() * num_shards).toString();
+  const shard_id = Math.floor(Math.random() * num_shards).toString()
   const shard_ref = doc(db, `${mode}/${appconfig.project_ref}/counters/conditions/shards/`, shard_id)
   try {
     await runTransaction(db, async (transaction) => {
-      const shard_doc = await transaction.get(shard_ref);
+      const shard_doc = await transaction.get(shard_ref)
       // increment the count
-      const new_count = shard_doc.data()[selectedCondition] + 1;
-      transaction.update(shard_ref, { [selectedCondition]: new_count });
-    });
-  }
-  catch (e) {
+      const new_count = shard_doc.data()[selectedCondition] + 1
+      transaction.update(shard_ref, { [selectedCondition]: new_count })
+    })
+  } catch (e) {
     console.error('Error updating counter: ', e)
   }
 
-    // Split back up into dictionary
-    // get keys from conditionDict
-    const keys = Object.keys(conditionDict)
-    // split condition string based on dash
-    const splitConditions = selectedCondition.split('--')
-    // zip keys and splitConditions
-    const selectedConditionsDict = Object.fromEntries(keys.map((key, i) => [key, splitConditions[i]]))
+  // Split back up into dictionary
+  // get keys from conditionDict
+  const keys = Object.keys(conditionDict)
+  // split condition string based on dash
+  const splitConditions = selectedCondition.split('--')
+  // zip keys and splitConditions
+  const selectedConditionsDict = Object.fromEntries(keys.map((key, i) => [key, splitConditions[i]]))
 
-    console.log('Conditions set to ', selectedConditionsDict)
+  console.log('Conditions set to ', selectedConditionsDict)
 
-    return selectedConditionsDict
+  return selectedConditionsDict
 }
 
 // export default createDoc

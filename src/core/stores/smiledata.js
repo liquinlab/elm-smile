@@ -3,7 +3,15 @@ import { useStorage } from '@vueuse/core'
 import axios from 'axios'
 import appconfig from '@/core/config'
 
-import { createDoc, updateSubjectDataRecord, balancedAssignConditions, loadDoc, fsnow } from './firestore-db'
+import {
+  createDoc,
+  createPrivateDoc,
+  updateSubjectDataRecord,
+  updatePrivateSubjectDataRecord,
+  balancedAssignConditions,
+  loadDoc,
+  fsnow,
+} from './firestore-db'
 import sizeof from 'firestore-size'
 
 import useLog from '@/core/stores/log'
@@ -47,6 +55,7 @@ const init_local = {
   knownUser: false,
   lastRoute: initLastRoute(appconfig.mode),
   docRef: null,
+  privateDocRef: null,
   completionCode: null,
   current_page_done: false,
   consented: false,
@@ -91,6 +100,7 @@ export default defineStore('smilestore', {
     private: {
       recruitment_info: {},
       withdraw_data: {},
+      browser_fingerprint: {}, // empty
     },
     data: {
       // syncs with firestore
@@ -102,7 +112,6 @@ export default defineStore('smilestore', {
       starttime: null, // time consented
       endtime: null, // time finished or withdrew
       recruitment_service: 'web', // fake
-      browser_fingerprint: {}, // empty
       browser_data: [], // empty
       demographic_form: {}, // empty
       withdrawn: false, // false
@@ -250,7 +259,7 @@ export default defineStore('smilestore', {
     },
     setFingerPrint(ip, userAgent, language, webdriver) {
       const log = useLog()
-      this.data.browser_fingerprint = {
+      this.private.browser_fingerprint = {
         ip,
         userAgent,
         language,
@@ -294,6 +303,7 @@ export default defineStore('smilestore', {
       this.local.knownUser = true
       this.data.seedID = this.local.seedID
       this.local.docRef = await createDoc(this.data)
+      this.local.privateDocRef = await createPrivateDoc(this.private, this.local.docRef)
       // if possible conditions are not empty, assign conditions
       if (this.local.possibleConditions) {
         this.data.conditions = await balancedAssignConditions(this.local.possibleConditions, this.data.conditions)
@@ -347,6 +357,7 @@ export default defineStore('smilestore', {
           return
         }
         await updateSubjectDataRecord(this.data, this.local.docRef)
+        await updatePrivateSubjectDataRecord(this.private, this.local.docRef)
         //console.log('data size = ', sizeof(data))
         this.local.approx_data_size = sizeof(this.data)
         this.local.totalWrites += 1
