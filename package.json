@@ -53,6 +53,7 @@
     "@svgdotjs/svg.js": "^3.2.0",
     "@vitejs/plugin-vue": "5.0.4",
     "@vueuse/core": "^10.9.0",
+    "@vueuse/motion": "^2.1.0",
     "axios": "^1.6.8",
     "bulma-extensions": "^6.2.7",
     "bulma-steps": "^2.2.1",
@@ -96,6 +97,7 @@
     "node-sass": "^9.0.0",
     "prettier": "^3.2.5",
     "shelljs": "^0.8.5",
+    "vite-plugin-inspect": "^0.8.4",
     "vitepress": "^1.1.0",
     "vitest": "^1.5.0"
   }
