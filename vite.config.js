@@ -24,7 +24,7 @@ export default ({ mode }) => {
       Inspect(),
       stripDevToolPlugin(),
       vue(),
-      //preLoaderPlugin(),
+      preLoaderPlugin(),
     ],
     // if you need an additional page you have to list them here
     // see https://vitejs.dev/guide/build.html#multi-page-app
