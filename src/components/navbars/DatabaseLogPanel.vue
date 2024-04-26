@@ -53,6 +53,12 @@ function getBgClass(msg) {
     <div class="togglebar">
       <ul>
         <li>
+          <label class="checkbox">
+            <b>Since last page change:</b>&nbsp;
+            <input type="checkbox" v-model="api.dev.last_page_limit" />
+          </label>
+        </li>
+        <li>
           <b>Search:</b>&nbsp;
           <input class="input is-small search" placeholder="Search..." type="text" v-model="api.dev.search_params" />
         </li>
@@ -86,7 +92,20 @@ function getBgClass(msg) {
 
     <div class="scrollablelog">
       <aside class="menu">
-        <ul class="menu-list">
+        <ul class="menu-list" v-if="api.dev.last_page_limit">
+          <template v-for="msg in log.page_history">
+            <li :class="getBgClass(msg)" v-if="filter_log(msg)">
+              <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
+              <FAIcon icon="fa-solid fa-database" v-else-if="msg.message.includes('SMILESTORE')" />
+              <FAIcon icon="fa-solid fa-gear" v-else-if="msg.message.includes('DEV MODE')" />
+              <FAIcon icon="fa-solid fa-clock" v-else-if="msg.message.includes('TIMELINE STEPPER')" />
+              <FAIcon icon="fa-regular fa-clock" v-else-if="msg.message.includes('TRIAL STEPPER')" />
+              <FAIcon icon="fa-solid fa-angle-right" v-else />
+              &nbsp;{{ msg.time }} <b>{{ msg.message }}</b> <br />&nbsp;&nbsp;{{ msg.trace }}
+            </li>
+          </template>
+        </ul>
+        <ul class="menu-list" v-else>
           <template v-for="msg in log.history">
             <li :class="getBgClass(msg)" v-if="filter_log(msg)">
               <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />

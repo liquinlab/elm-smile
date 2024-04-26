@@ -3,7 +3,6 @@ import { useMouse } from '@vueuse/core'
 import { ref, computed } from 'vue'
 import DatabaseInfoPanel from '@/components/navbars/DatabaseInfoPanel.vue'
 import DatabaseLogPanel from '@/components/navbars/DatabaseLogPanel.vue'
-import DatabasePageLogPanel from '@/components/navbars/DatabasePageLogPanel.vue'
 import DatabaseBrowsePanel from '@/components/navbars/DatabaseBrowsePanel.vue'
 
 import useSmileAPI from '@/core/composables/smileapi'
@@ -59,11 +58,6 @@ function move() {
             <FAIcon icon="fa-solid fa-book icon" />
           </a>
         </li>
-        <li :class="{ active: api.dev.data_bar_tab == 'page' }">
-          <a @click="api.dev.data_bar_tab = 'page'" class="has-tooltip-arrow has-tooltip-right" data-tooltip="Page Log">
-            <FAIcon icon="fa-solid fa-magnifying-glass-arrow-right icon" />
-          </a>
-        </li>
       </ul>
     </aside>
 
@@ -81,9 +75,6 @@ function move() {
             <div class="databar-panel-header-item info" v-if="api.dev.data_bar_tab == 'log'">
               <FAIcon icon="fa-solid fa-book icon" />&nbsp;&nbsp;<b>Narrative Log</b>
             </div>
-            <div class="databar-panel-header-item info" v-if="api.dev.data_bar_tab == 'page'">
-              <FAIcon icon="fa-solid fa-magnifying-glass-arrow-right icon" />&nbsp;&nbsp;<b>Page Log</b>
-            </div>
           </div>
 
           <div class="databar-panel-header-end">
@@ -100,7 +91,6 @@ function move() {
       <DatabaseInfoPanel v-if="api.dev.data_bar_tab == 'database'"></DatabaseInfoPanel>
       <DatabaseBrowsePanel v-if="api.dev.data_bar_tab == 'browse'"></DatabaseBrowsePanel>
       <DatabaseLogPanel v-if="api.dev.data_bar_tab == 'log'"></DatabaseLogPanel>
-      <DatabasePageLogPanel v-if="api.dev.data_bar_tab == 'page'"></DatabasePageLogPanel>
     </section>
   </nav>
 </template>
