@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import appconfig from '@/core/config'
 import { push } from 'notivue'
 
+import useSmileAPI from '@/core/composables/smileapi'
+
 function getLogTrace() {
   // some browsers use 'at ', some use '@'
   const lines = new Error().stack.split('\n').filter((line) => line.includes('at ') || line.includes('@'))
@@ -20,17 +22,19 @@ function getLogTrace() {
 }
 
 function argsToString(args) {
-  return args.map(arg => {
-    if (typeof arg === 'object') {
-      try {
-        return JSON.stringify(arg);
-      } catch (e) {
-        return ''
+  return args
+    .map((arg) => {
+      if (typeof arg === 'object') {
+        try {
+          return JSON.stringify(arg)
+        } catch (e) {
+          return ''
+        }
+      } else {
+        return String(arg)
       }
-    } else {
-      return String(arg)
-    }
-  }).join(' ')
+    })
+    .join(' ')
 }
 
 export default defineStore('log', {
@@ -62,6 +66,7 @@ export default defineStore('log', {
       this.history.push(msg)
     },
     warn(...args) {
+      const api = useSmileAPI()
       const message = argsToString(args)
       console.warn(message)
       const msg = {
@@ -70,14 +75,17 @@ export default defineStore('log', {
         message: message,
         trace: getLogTrace(),
       }
-      if (appconfig.mode === 'development') {
-        console.log(message)
+      if (
+        appconfig.mode === 'development' &&
+        (api.dev.notification_filter == 'Warnings and Errors' || api.dev.notification_filter == 'Warnings only')
+      ) {
         push.warning(message)
       }
       console.warn(message)
       this.history.push(msg)
     },
     error(...args) {
+      const api = useSmileAPI()
       const message = argsToString(args)
       const msg = {
         type: 'error',
@@ -85,14 +93,18 @@ export default defineStore('log', {
         message: message,
         trace: getLogTrace(),
       }
-      if (appconfig.mode === 'development') {
-        console.log(message)
+      if (
+        appconfig.mode === 'development' &&
+        (api.dev.notification_filter == 'Warnings and Errors' || api.dev.notification_filter == 'Errors only')
+      ) {
         push.error(message)
       }
       console.error(message)
       this.history.push(msg)
     },
     success(...args) {
+      const api = useSmileAPI()
+
       const message = argsToString(args)
       const msg = {
         type: 'success',
@@ -100,7 +112,10 @@ export default defineStore('log', {
         message: message,
         trace: getLogTrace(),
       }
-      if (appconfig.mode === 'development') {
+      if (
+        appconfig.mode === 'development' &&
+        (api.dev.notification_filter == 'All' || api.dev.notification_filter == 'Success only')
+      ) {
         push.success(message)
       }
       console.log(message)

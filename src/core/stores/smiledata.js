@@ -32,6 +32,7 @@ const init_dev = {
   data_bar_tab: 'database',
   search_params: '',
   log_filter: 'All',
+  notification_filter: 'Errors only',
   data_path: null,
   config_panel: { type: 'local', visible: false, x: -280, y: 0 },
   state_var_panel: { visible: false, x: -150, y: 0 },

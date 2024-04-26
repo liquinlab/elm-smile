@@ -72,12 +72,12 @@ function getBgClass(msg) {
         <li>
           <b>Notifications:</b>&nbsp;
           <div class="select is-small">
-            <select>
+            <select v-model="api.dev.notification_filter">
               <option>All</option>
               <option>Warnings and Errors</option>
-              <option>Errors</option>
-              <option>Debug only</option>
+              <option>Warnings only</option>
               <option>Errors only</option>
+              <option>Success only</option>
             </select>
           </div>
         </li>
