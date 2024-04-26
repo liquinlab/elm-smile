@@ -84,6 +84,7 @@ export default defineStore('log', {
         trace: getLogTrace(),
       }
       if (
+        api.dev.notification_filter !== 'None' &&
         appconfig.mode === 'development' &&
         (api.dev.notification_filter == 'Warnings and Errors' || api.dev.notification_filter == 'Warnings only')
       ) {
@@ -102,6 +103,7 @@ export default defineStore('log', {
         trace: getLogTrace(),
       }
       if (
+        api.dev.notification_filter !== 'None' &&
         appconfig.mode === 'development' &&
         (api.dev.notification_filter == 'Warnings and Errors' || api.dev.notification_filter == 'Errors only')
       ) {
@@ -121,6 +123,7 @@ export default defineStore('log', {
         trace: getLogTrace(),
       }
       if (
+        api.dev.notification_filter !== 'None' &&
         appconfig.mode === 'development' &&
         (api.dev.notification_filter == 'All' || api.dev.notification_filter == 'Success only')
       ) {

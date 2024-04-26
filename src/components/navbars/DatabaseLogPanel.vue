@@ -80,6 +80,7 @@ function getBgClass(msg) {
           <div class="select is-small">
             <select v-model="api.dev.notification_filter">
               <option>All</option>
+              <option>None</option>
               <option>Warnings and Errors</option>
               <option>Warnings only</option>
               <option>Errors only</option>
