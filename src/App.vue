@@ -89,11 +89,11 @@ onMounted(() => {
     "
   ></StatusBar>
   <!-- the router loads here -->
-  <div class="router" v-if="!toosmall">
-    <router-view></router-view>
+  <div class="router" v-if="toosmall">
+    <WindowSizerPage triggered="true"></WindowSizerPage>
   </div>
   <div v-else>
-    <WindowSizerPage triggered="true"></WindowSizerPage>
+    <router-view></router-view>
   </div>
   <ProgressBar
     v-if="

@@ -65,14 +65,14 @@ export default function useSmileAPI() {
       smilestore.saveDemographicForm(data)
     },
     verifyVisibility: (value) => {
-      smilestore.verifyVisibility(value)
+      smilestore.data.verified_visibility = value
     },
     getVerifiedVisibility: () => {
       return smilestore.verifiedVisibility
     },
     isBrowserTooSmall: () => {
       let val = false
-      if (smilestore.config.windowsizer_aggressive && smilestore.verifiedVisibility) {
+      if (smilestore.config.windowsizer_aggressive === true && smilestore.data.verified_visibility === true) {
         val =
           window.innerWidth < smilestore.config.windowsizer_request.width + 40 ||
           window.innerHeight < smilestore.config.windowsizer_request.height + 40

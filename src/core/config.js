@@ -28,7 +28,7 @@ export default {
     }`,
   },
   browser_exclude: import.meta.env.VITE_BROWSER_EXCLUDE,
-  allow_repeats: import.meta.env.VITE_ALLOW_REPEATS,
+  allow_repeats: import.meta.env.VITE_ALLOW_REPEATS === 'true',
   auto_save: import.meta.env.VITE_AUTO_SAVE_DATA,
   max_writes: import.meta.env.VITE_MAX_WRITES,
   min_write_interval: import.meta.env.VITE_MIN_WRITE_INTERVAL,
@@ -40,7 +40,7 @@ export default {
   payrate: import.meta.env.VITE_PAYRATE,
   google_analytics_id: import.meta.env.VITE_GOOGLE_ANALYTICS,
   windowsizer_request: parse_w_h(import.meta.env.VITE_WINDOWSIZER_REQUEST),
-  windowsizer_aggressive: import.meta.env.VITE_WINDOWSIZER_AGGRESSIVE,
+  windowsizer_aggressive: import.meta.env.VITE_WINDOWSIZER_AGGRESSIVE === 'true',
   firebaseConfig: {
     apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
     authDomain: import.meta.env.VITE_FIREBASE_AUTHDOMAIN,

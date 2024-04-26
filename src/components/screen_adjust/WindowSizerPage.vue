@@ -3,13 +3,12 @@ import { reactive } from 'vue'
 // import and initalize smile API
 import useSmileAPI from '@/core/composables/smileapi'
 const api = useSmileAPI()
-//const props = defineProps(['triggered']
+const props = defineProps(['triggered'])
 
 const sizer = reactive({
   w: api.config.windowsizer_request.width + 'px',
   h: api.config.windowsizer_request.height + 'px',
 })
-
 
 function finish() {
   // smilestore.setConsented()
@@ -22,7 +21,7 @@ function finish() {
 <template>
   <div class="page prevent-select">
     <div class="sizer border-animation">
-      <div class="info">
+      <div class="info" v-if="!props.triggered">
         <span class="is-size-2">
           <FAIcon icon="fa-solid fa-arrows-up-down-left-right "></FAIcon>
         </span>
@@ -40,6 +39,20 @@ function finish() {
           It is visible now, I'm ready &nbsp;
           <FAIcon icon="fa-solid fa-arrow-right" />
         </button>
+      </div>
+      <div class="info" v-else>
+        <span class="is-size-2">
+          <FAIcon icon="fa-solid fa-arrows-up-down-left-right "></FAIcon>
+        </span>
+        <h1 class="is-size-4">
+          <b>We don't want you to miss anything!</b><br />Please re-adjust the size of your browser window until
+          <b>ALL</b> four edges of this box are visible.
+        </h1>
+        <hr />
+        <div class="is-8 is-size-7 has-text-left note">
+          <b>Warning</b>: If you can't resize your window and see the entire box please click the red "withdraw" button
+          at the top of the page and return the task. You need to be able view the entire page at once.
+        </div>
       </div>
     </div>
   </div>
