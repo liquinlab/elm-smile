@@ -9,10 +9,6 @@ function finish() {
   // smilestore.saveData()
   api.stepNextRoute()
 }
-
-onMounted(() => {
-  api.getBrowserFingerprint()
-})
 </script>
 
 <template>

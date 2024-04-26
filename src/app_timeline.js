@@ -69,6 +69,9 @@ timeline.pushSeqRoute({
   name: 'welcome_anonymous',
   component: Advertisement,
   meta: { prev: undefined, next: 'consent', allowAlways: true, requiresConsent: false }, // override what is next
+  beforeEnter: (to) => {
+    api.getBrowserFingerprint()
+  },
 })
 
 // welcome screen for referral
@@ -84,6 +87,7 @@ timeline.pushSeqRoute({
   }, // override what is next
   beforeEnter: (to) => {
     processQuery(to.query, to.params.service)
+    api.getBrowserFingerprint()
   },
 })
 
