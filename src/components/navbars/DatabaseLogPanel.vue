@@ -32,7 +32,7 @@ function getBgClass(msg) {
       <ul>
         <li>
           <b>Search:</b>&nbsp;
-          <input class="input is-small search" placeholder="Search..." type="text" />
+          <input class="input is-small search" placeholder="Search..." type="text" v-model="api.dev.search_params" />
         </li>
         <li>
           <b>Filter:</b>&nbsp;
@@ -61,18 +61,21 @@ function getBgClass(msg) {
         </li>
       </ul>
     </div>
+
     <div class="scrollablelog">
       <aside class="menu">
         <ul class="menu-list">
-          <li v-for="msg in log.history" :class="getBgClass(msg)">
-            <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
-            <FAIcon icon="fa-solid fa-database" v-else-if="msg.message.includes('SMILESTORE')" />
-            <FAIcon icon="fa-solid fa-gear" v-else-if="msg.message.includes('DEV MODE')" />
-            <FAIcon icon="fa-solid fa-clock" v-else-if="msg.message.includes('TIMELINE STEPPER')" />
-            <FAIcon icon="fa-regular fa-clock" v-else-if="msg.message.includes('TRIAL STEPPER')" />
-            <FAIcon icon="fa-solid fa-angle-right" v-else />
-            &nbsp;{{ msg.time }} <b>{{ msg.message }}</b> <br />&nbsp;&nbsp;{{ msg.trace }}
-          </li>
+          <template v-for="msg in log.history">
+            <li :class="getBgClass(msg)" v-if="msg.message.toLowerCase().includes(api.dev.search_params.toLowerCase())">
+              <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
+              <FAIcon icon="fa-solid fa-database" v-else-if="msg.message.includes('SMILESTORE')" />
+              <FAIcon icon="fa-solid fa-gear" v-else-if="msg.message.includes('DEV MODE')" />
+              <FAIcon icon="fa-solid fa-clock" v-else-if="msg.message.includes('TIMELINE STEPPER')" />
+              <FAIcon icon="fa-regular fa-clock" v-else-if="msg.message.includes('TRIAL STEPPER')" />
+              <FAIcon icon="fa-solid fa-angle-right" v-else />
+              &nbsp;{{ msg.time }} <b>{{ msg.message }}</b> <br />&nbsp;&nbsp;{{ msg.trace }}
+            </li>
+          </template>
         </ul>
       </aside>
     </div>

@@ -30,6 +30,7 @@ const init_dev = {
   show_data_bar: false,
   data_bar_height: 370,
   data_bar_tab: 'database',
+  search_params: '',
   data_path: null,
   config_panel: { type: 'local', visible: false, x: -280, y: 0 },
   state_var_panel: { visible: false, x: -150, y: 0 },
@@ -118,7 +119,7 @@ export default defineStore('smilestore', {
     lastRoute: (state) => state.local.lastRoute,
     isDBConnected: (state) => state.global.db_connected,
     hasAutofill: (state) => state.dev.page_provides_autofill,
-    searchParams: (state) => state.global.search_params,
+    searchParams: (state) => state.dev.search_params,
     recruitmentService: (state) => state.data.recruitment_service,
     isSeedSet: (state) => state.local.seedSet,
     getSeedID: (state) => state.local.seedID,
@@ -134,7 +135,7 @@ export default defineStore('smilestore', {
       this.global.db_connected = true
     },
     setSearchParams(search_params) {
-      this.global.search_params = search_params
+      this.dev.search_params = search_params
     },
     setConsented() {
       this.local.consented = true
