@@ -62,6 +62,11 @@ function autofill() {
 
 api.setPageAutofill(autofill)
 
+const pages = ['page1', 'page2', 'page3']
+const { nextTrial } = api.useTrialStepper(pages, api.currentRouteName(), () => {
+  finish()
+})
+
 function finish() {
   api.removePageAutofill() // you are responsible for removing the autofill
   api.saveDemographicForm(forminfo)

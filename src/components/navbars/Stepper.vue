@@ -30,6 +30,7 @@ const route = useRoute()
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
         v-on:click="api.decrementTrial()"
         data-tooltip="Step trial back"
+        :disabled="api.dev.page_provides_trial_stepper == false"
       >
         <span>
           <FAIcon icon="fa-solid fa-angle-left" />
@@ -41,6 +42,7 @@ const route = useRoute()
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
         v-on:click="api.incrementTrial()"
         data-tooltip="Step trial forward"
+        :disabled="api.dev.page_provides_trial_stepper == false"
       >
         <span>
           <FAIcon icon="fa-solid fa-angle-right" />

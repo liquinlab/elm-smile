@@ -21,6 +21,7 @@ const buttonstyle = computed(() => {
       <button
         class="button is-small is-jump-bar has-tooltip-arrow has-tooltip-bottom"
         data-tooltip="Current trial counter"
+        :disabled="api.dev.page_provides_trial_stepper == false"
       >
         <span class="counter">{{ api.getPageTracker(api.currentRouteName()) }}</span>
       </button>
