@@ -3,6 +3,9 @@
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
+import Inspect from 'vite-plugin-inspect'
+import preLoaderPlugin from './scripts/preloader'
+import stripDevToolPlugin from './scripts/strip-devtool'
 
 // https://vitejs.dev/config/
 export default ({ mode }) => {
@@ -16,7 +19,13 @@ export default ({ mode }) => {
   // import.meta.env.VITE_NAME available here with: process.env.VITE_NAME
   // import.meta.env.VITE_PORT available here with: process.env.VITE_PORT
   return defineConfig({
-    plugins: [vue()],
+    // prettier-ignore
+    plugins: [
+      Inspect(),
+      stripDevToolPlugin(),
+      vue(),
+      preLoaderPlugin(),
+    ],
     // if you need an additional page you have to list them here
     // see https://vitejs.dev/guide/build.html#multi-page-app
     // build: {
@@ -33,6 +42,7 @@ export default ({ mode }) => {
       port: process.env.VITE_DEV_PORT_NUM,
       strictPort: true,
     },
+    clearScreen: false,
     test: {
       globals: true,
       environment: 'happy-dom',
