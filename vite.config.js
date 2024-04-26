@@ -4,7 +4,7 @@ import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import Inspect from 'vite-plugin-inspect'
-import preLoaderPlugin from './scripts/preloader'
+//import preLoaderPlugin from './scripts/preloader'
 import stripDevToolPlugin from './scripts/strip-devtool'
 
 // https://vitejs.dev/config/
