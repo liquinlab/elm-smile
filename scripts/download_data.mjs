@@ -27,16 +27,18 @@ const init = () => {
 }
 
 async function askQuestions() {
-  const program = new Command();
+  const program = new Command()
   program
     .addOption(new Option('-t, --type <type>', 'type of data to download').choices(['testing', 'real']))
-    .addOption(new Option('-c, --complete_only <complete_only>', 'complete only or all data').choices(['all', 'complete_only']))
+    .addOption(
+      new Option('-c, --complete_only <complete_only>', 'complete only or all data').choices(['all', 'complete_only'])
+    )
     .option('-b, --branch_name <branch_name>', 'branch name')
     .option('-f, --filename <filename>', 'filename')
     .option('-r', '--save_recruitment_info', 'save recruitment info')
 
-  program.parse();
-  const options = program.opts();
+  program.parse()
+  const options = program.opts()
 
   const questions = [
     {
@@ -69,20 +71,20 @@ async function askQuestions() {
       message: 'What is the name of the file without extension?',
       default: 'data',
     },
-  ];
+  ]
 
-  const filteredQuestions = questions.filter((q) => !(q.name.toLowerCase() in options));
-  const answers = filteredQuestions.length === 0 ? {} : await inquirer.prompt(filteredQuestions);
-  
+  const filteredQuestions = questions.filter((q) => !(q.name.toLowerCase() in options))
+  const answers = filteredQuestions.length === 0 ? {} : await inquirer.prompt(filteredQuestions)
+
   return {
     ...answers,
     ...Object.fromEntries(Object.entries(options).map(([k, v]) => [k.toUpperCase(), v])),
   }
 }
 
-const storeData = async (data, path, relativeDir = 'data/raw', ext = '.json' ) => {
+const storeData = async (data, path, relativeDir = 'data/raw', ext = '.json') => {
   try {
-    let filename = path;
+    let filename = path
     if (extname(path) !== ext) {
       filename = `${path}${ext}`
     }
@@ -90,19 +92,19 @@ const storeData = async (data, path, relativeDir = 'data/raw', ext = '.json' ) =
     if (!isAbsolute(filename)) {
       filename = `${relativeDir}/${filename}`
     }
-    
-    const dir = dirname(filename);
+
+    const dir = dirname(filename)
     if (!fs.existsSync(dir)) {
-      console.log(`creating directory ${dir} since it does not exist`);
-      fs.mkdirSync(dir, { recursive: true });
+      console.log(`creating directory ${dir} since it does not exist`)
+      fs.mkdirSync(dir, { recursive: true })
     }
     fs.writeFileSync(filename, JSON.stringify(data))
-    return filename;
+    return filename
   } catch (err) {
     console.error(err)
   }
 
-  return null;
+  return null
 }
 
 const getData = async (path, completeOnly, filename, saveRecruitmentInfo = false) => {
@@ -127,10 +129,10 @@ const getData = async (path, completeOnly, filename, saveRecruitmentInfo = false
   }
   const data = []
   querySnapshot.forEach((doc) => {
-    const docData = doc.data();
-    docData.smile_config.firebaseConfig = {};
+    const docData = doc.data()
+    docData.smile_config.firebaseConfig = {}
     if (!saveRecruitmentInfo) {
-      docData.recruitment_info = {};
+      docData.recruitment_info = {}
     }
     data.push({ id: doc.id, data: docData })
   })
@@ -159,29 +161,27 @@ const run = async () => {
   const path = `${TYPE}/${projectRef}/data`
 
   const formatFilename = (f) => {
-    const prefix = `${TYPE}-${COMPLETE_ONLY}-${BRANCH_NAME}`;
+    const prefix = `${TYPE}-${COMPLETE_ONLY}-${BRANCH_NAME}`
     if (!f.startsWith(prefix)) {
-      return `${prefix}-${f}`;
+      return `${prefix}-${f}`
     }
 
-    return f;
-  };
-
-  let filename = FILENAME;
-  if (isAbsolute(FILENAME)) {
-    const parsedFile = parse(FILENAME);
-    parsedFile.base = formatFilename(parsedFile.base);
-    filename = format(parsedFile);
-
-  } else {
-    filename = formatFilename(filename);
-
+    return f
   }
-  
+
+  let filename = FILENAME
+  if (isAbsolute(FILENAME)) {
+    const parsedFile = parse(FILENAME)
+    parsedFile.base = formatFilename(parsedFile.base)
+    filename = format(parsedFile)
+  } else {
+    filename = formatFilename(filename)
+  }
+
   const finalPath = await getData(path, COMPLETE_ONLY, filename, SAVE_RECRUITMENT_INFO)
 
   // show success message
-  success(finalPath);
+  success(finalPath)
 }
 
 run()

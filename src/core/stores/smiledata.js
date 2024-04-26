@@ -88,6 +88,10 @@ export default defineStore('smilestore', {
       appconfig.mode === 'development'
         ? useStorage(appconfig.dev_local_storage_key, init_dev, localStorage, { mergeDefaults: true })
         : init_dev,
+    private: {
+      recruitment_info: {},
+      withdraw_data: {},
+    },
     data: {
       // syncs with firestore
       seedID: '',
@@ -98,12 +102,10 @@ export default defineStore('smilestore', {
       starttime: null, // time consented
       endtime: null, // time finished or withdrew
       recruitment_service: 'web', // fake
-      recruitment_info: {}, // empty
       browser_fingerprint: {}, // empty
       browser_data: [], // empty
       demographic_form: {}, // empty
       withdrawn: false, // false
-      withdraw_data: {}, // empty
       route_order: [],
       conditions: {},
       smile_config: removeFirestore(appconfig), //  adding config info to firebase document
@@ -151,7 +153,7 @@ export default defineStore('smilestore', {
     setWithdrawn(forminfo) {
       this.local.withdrawn = true
       this.data.withdrawn = true
-      this.data.withdraw_data = forminfo
+      this.private.withdraw_data = forminfo
       this.data.endtime = fsnow()
     },
     setDone() {
@@ -264,7 +266,7 @@ export default defineStore('smilestore', {
     },
     setRecruitmentService(service, info) {
       this.data.recruitment_service = service
-      this.data.recruitment_info = info
+      this.private.recruitment_info = info
     },
     autofill() {
       if (this.dev.page_provides_autofill) {
