@@ -57,7 +57,7 @@ function autofill() {
   forminfo.country = 'United States'
   forminfo.zipcode = '12345'
   forminfo.education_level = 'Doctorate Degree (PhD/Other)'
-  forminfo.household_income = '$100,000-$199,999'
+  forminfo.household_income = '$100,000–$199,999'
 }
 
 api.setPageAutofill(autofill)
