@@ -8,6 +8,28 @@ const log = useLog()
 
 const height_pct = computed(() => `${api.dev.data_bar_height - 70}px`)
 
+function filter_log(msg) {
+  const search_match = msg.message.toLowerCase().includes(api.dev.search_params.toLowerCase())
+  let type_match = true
+  switch (api.dev.log_filter) {
+    case 'All':
+      break
+    case 'Debug only':
+      type_match = msg.type === 'debug'
+      break
+    case 'Warnings and Errors only':
+      type_match = msg.type === 'warn' || msg.type === 'error'
+      break
+    case 'Warnings only':
+      type_match = msg.type === 'warn'
+      break
+    case 'Errors only':
+      type_match = msg.type === 'error'
+      break
+  }
+  return search_match && type_match
+}
+
 function getBgClass(msg) {
   switch (msg.type) {
     case 'log':
@@ -37,11 +59,11 @@ function getBgClass(msg) {
         <li>
           <b>Filter:</b>&nbsp;
           <div class="select is-small">
-            <select>
+            <select v-model="api.dev.log_filter">
               <option>All</option>
-              <option>Warnings and Errors</option>
-              <option>Errors</option>
+              <option>Current page only</option>
               <option>Debug only</option>
+              <option>Warnings and Errors only</option>
               <option>Warnings only</option>
               <option>Errors only</option>
             </select>
@@ -66,7 +88,7 @@ function getBgClass(msg) {
       <aside class="menu">
         <ul class="menu-list">
           <template v-for="msg in log.history">
-            <li :class="getBgClass(msg)" v-if="msg.message.toLowerCase().includes(api.dev.search_params.toLowerCase())">
+            <li :class="getBgClass(msg)" v-if="filter_log(msg)">
               <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
               <FAIcon icon="fa-solid fa-database" v-else-if="msg.message.includes('SMILESTORE')" />
               <FAIcon icon="fa-solid fa-gear" v-else-if="msg.message.includes('DEV MODE')" />
