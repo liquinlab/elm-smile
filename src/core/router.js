@@ -257,11 +257,12 @@ router.beforeResolve((to) => {
 })
 
 // Check if the next route has a preload function, and if so, run it asynchronously
-router.afterEach((to) => {
+router.afterEach(async (to) => {
   if (to.meta !== undefined && to.meta.next !== undefined) {
     const fullTo = router.resolve({ name: to.meta.next })
+
     if (fullTo.meta !== undefined && fullTo.meta.preload !== undefined) {
-      setTimeout(fullTo.meta.preload, 1)
+      await fullTo.meta.preload()
     }
   }
 })

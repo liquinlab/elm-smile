@@ -77,8 +77,6 @@ function panel_jump(index) {
 </script>
 <template>
   <!-- content of panel here -->
-  <!-- <FAIcon icon="fa-solid fa-home" />&nbsp;&nbsp; -->
-  <!--         <li><a @click="panel1_select(null)">data</a></li> -->
   <div class="contentpanel">
     <nav class="breadcrumb has-arrow-separator" aria-label="breadcrumbs">
       <ul>
