@@ -18,7 +18,7 @@ import {
 } from 'firebase/firestore'
 import { split } from 'lodash'
 import appconfig from '@/core/config'
-
+import useLog from '@/core/stores/log'
 // initialize firebase connection
 // since this is a module these will run once at the start
 
@@ -44,6 +44,7 @@ export const fsnow = () => Timestamp.now()
 
 // create a collection
 export const updateSubjectDataRecord = async (data, docid) => {
+  const log = useLog()
   // is it weird to have a aync method that doesn't return anything?
   try {
     const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/`, docid)
@@ -51,11 +52,12 @@ export const updateSubjectDataRecord = async (data, docid) => {
       merge: true,
     })
   } catch (e) {
-    console.error('Error updating document', e)
+    log.error('Error updating document', e)
   }
 }
 
 export const updatePrivateSubjectDataRecord = async (data, docid) => {
+  const log = useLog()
   // is it weird to have a aync method that doesn't return anything?
   try {
     const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/${docid}/private/`, 'private_data')
@@ -63,11 +65,12 @@ export const updatePrivateSubjectDataRecord = async (data, docid) => {
       merge: true,
     })
   } catch (e) {
-    console.error('Error updating document', e)
+    log.error('Error updating document', e)
   }
 }
 
 export const loadDoc = async (docid) => {
+  const log = useLog()
   const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/`, docid)
   const docSnap = await getDoc(docRef)
   if (docSnap.exists()) {
@@ -76,12 +79,13 @@ export const loadDoc = async (docid) => {
     return data
   }
   // doc.data() will be undefined in this case
-  console.log('No such document!')
+  log.error('No such document!')
   return undefined
 }
 
 export const createDoc = async (data) => {
-  console.log('trying to create document')
+  const log = useLog()
+  log.log(`FIRESTORE-DB: trying to create a main document.`)
   try {
     const expRef = doc(db, mode, appconfig.project_ref)
     await setDoc(
@@ -98,40 +102,42 @@ export const createDoc = async (data) => {
 
     // Add a new document with a generated id.
     const docRef = await addDoc(collection(db, `${mode}/${appconfig.project_ref}/data`), data)
-    console.log('Document written with ID: ', docRef.id)
+    log.log(`FIRESTORE-DB: Document written with ID: `, docRef.id)
     return docRef.id
   } catch (e) {
-    console.error('Error adding document: ', e)
+    log.error('FIRESTORE-DB: Error adding document: ', e)
     return null
   }
 }
 
 export const createPrivateDoc = async (data, docId) => {
-  console.log(`trying to create a private document in ${docId}`)
+  const log = useLog()
+  log.log(`FIRESTORE-DB: trying to create a private document in ${docId}`)
   try {
     // Add a new document with a generated id.
     const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/${docId}/private/`, 'private_data')
     await setDoc(docRef, data)
-    console.log('Private document written with ID: ', docRef.id)
+    log.log(`FIRESTORE-DB: Private document written with ID: `, docRef.id)
     return docRef.id
   } catch (e) {
-    console.error('Error adding document: ', e)
+    log.error('FIRESTORE-DB: Error adding private document: ', e)
     return null
   }
 }
 
 export const balancedAssignConditions = async (conditionDict, currentConditions) => {
+  const log = useLog()
   const num_shards = 20
 
   // if there are current conditions and we're in developer mode, we won't assign new ones
   if (Object.keys(currentConditions).length !== 0 && appconfig.mode === 'development') {
-    console.log('conditions already set, not assigning new ones in dev mode')
+    log.log('FIRESTORE-DB: conditions already set, not assigning new ones in dev mode')
     return currentConditions
   }
 
   // if the conditionDict is empty, we'll just return an empty list
   if (Object.keys(conditionDict).length === 0) {
-    console.log('no conditions to assign')
+    log.log('FIRESTORE-DB: no conditions to assign')
     return {}
   }
 
@@ -187,7 +193,7 @@ export const balancedAssignConditions = async (conditionDict, currentConditions)
       }
     })
   } catch (e) {
-    console.error('Error creating counter: ', e)
+    log.error('FIRESTORE-DB: Error creating counter: ', e)
   }
 
   // collection where the shards are
@@ -224,7 +230,7 @@ export const balancedAssignConditions = async (conditionDict, currentConditions)
       transaction.update(shard_ref, { [selectedCondition]: new_count })
     })
   } catch (e) {
-    console.error('Error updating counter: ', e)
+    log.error('FIRESTORE-DB: Error updating counter: ', e)
   }
 
   // Split back up into dictionary
@@ -235,7 +241,7 @@ export const balancedAssignConditions = async (conditionDict, currentConditions)
   // zip keys and splitConditions
   const selectedConditionsDict = Object.fromEntries(keys.map((key, i) => [key, splitConditions[i]]))
 
-  console.log('Conditions set to ', selectedConditionsDict)
+  log.log('FIRESTORE-DB: Conditions set to: ', selectedConditionsDict)
 
   return selectedConditionsDict
 }
