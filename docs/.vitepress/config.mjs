@@ -6,6 +6,7 @@ export default defineConfig({
   title: '🫠 Smile.',
   description: 'a gureckislab joint.',
   head: [['link', { rel: 'icon', href: '/favicon.ico' }]],
+  lastUpdated: true,
   markdown: {
     toc: {
       listType: 'ol',
@@ -15,6 +16,9 @@ export default defineConfig({
     },
   },
   themeConfig: {
+    search: {
+      provider: 'local',
+    },
     editLink: {
       pattern: 'https://github.com/nyuccl/smile/edit/main/docs/:path',
       text: 'Suggest changes to this page on GitHub',

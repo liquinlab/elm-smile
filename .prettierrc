@@ -2,5 +2,28 @@
   "semi": false,
   "singleQuote": true,
   "trailingComma": "es5",
-  "printWidth": 120
+  "printWidth": 120,
+  "overrides": [
+    {
+      "files": "docs/*.md",
+      "options": {
+        "printWidth": 80,
+        "proseWrap": "always"
+      }
+    },
+    {
+      "files": "docs/research/*.md",
+      "options": {
+        "printWidth": 80,
+        "proseWrap": "always"
+      }
+    },
+    {
+      "files": "docs/advanced/*.md",
+      "options": {
+        "printWidth": 80,
+        "proseWrap": "always"
+      }
+    }
+  ]
 }

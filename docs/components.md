@@ -1,26 +1,55 @@
 # :jigsaw: Components
 
-A key to making development faster in <SmileText/> is to organize parts of the overall
-user interface into smaller, modular units called **components**. Most of <SmileText />
-is developed with a component-based framework known as [Vue.js](https://vuejs.org) (version 3.0).
+A key to making development faster in <SmileText/> is to organize parts of the
+overall user interface into smaller, modular units called **components**. Most
+of <SmileText /> is developed with a component-based framework known as
+[Vue.js](https://vuejs.org) (version 3.0).
 
-Using components, the meaningful parts of a complex webpage are broken down into smaller elements which are then built up into a hierarchy. The code for these smaller elements can, in many cases, be developed completely independently from the rest of the project or webpage.
+Using components, the meaningful parts of a complex webpage are broken down into
+smaller elements which are then built up into a hierarchy. The code for these
+smaller elements can, in many cases, be developed completely independently from
+the rest of the project or webpage.
 
 ![components](/images/components.png)
 
-[Component development](https://www.componentdriven.org) speeds the process of designing a new experiment because you don't have to understand every part of the code in order to begin adding new interface elements and logic.
+[Component development](https://www.componentdriven.org) speeds the process of
+designing a new experiment because you don't have to understand every part of
+the code in order to begin adding new interface elements and logic.
 
-Well-designed components are reuseable across projects so that if someone else develops a useful component you can easily import it into your project. In addition, novel components are easily built up out of other components leveraging modularity and code resuse.
+Well-designed components are reuseable across projects so that if someone else
+develops a useful component you can easily import it into your project. In
+addition, novel components are easily built up out of other components
+leveraging modularity and code resuse.
 
-Components are somewhat similar to the role that ["plugins"](https://www.jspsych.org/7.2/overview/plugins/) play in a library like [JSPsych](https://www.jspsych.org/7.2/) but generally JSPsych plugins handle single trials of an experiment whereas a component might be as small as a button or as big as an entire webpage or even application. In addition, components leverage some other concepts in modern web design such as [reactivity and declarative rendering](/reactive) that make your life easier (read about these after this page).
+Components are somewhat similar to the role that
+["plugins"](https://www.jspsych.org/7.2/overview/plugins/) play in a library
+like [JSPsych](https://www.jspsych.org/7.2/) but generally JSPsych plugins
+handle single trials of an experiment whereas a component might be as small as a
+button or as big as an entire webpage or even application. In addition,
+components leverage some other concepts in modern web design such as
+[reactivity and declarative rendering](/reactive) that make your life easier
+(read about these after this page).
 
 ## Vue.js components
 
-Vue components are a method for designing modular and reusable user interfaces for the web.
+Vue components are a method for designing modular and reusable user interfaces
+for the web.
 
-If you are familiar with traditional methods for interactive web development (e.g., [JQuery](https://jquery.com) or [d3](https://d3js.org)), components can seem quite mysterious. However, effectively Vue components define a specific API which, when "compiled" using a build step, creates a simple Javascript function that is called to determine the behavior of a small section of an overall larger webpage.
+If you are familiar with traditional methods for interactive web development
+(e.g., [JQuery](https://jquery.com) or [d3](https://d3js.org)), components can
+seem quite mysterious. However, effectively Vue components define a specific API
+which, when "compiled" using a build step, creates a simple Javascript function
+that is called to determine the behavior of a small section of an overall larger
+webpage.
 
-The preferred way to develop components is using a special file format known as SFC (Single File Component). These files end with an extension `.vue`. The SFC files combine elements of Javascript, HTML, and CSS/SCSS into a single modular element that defines your component. These files can be opened and processed best using the [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) extension for [VSCode](https://code.visualstudio.com) (i.e., it provides syntax highlighting and other code formatting hints).
+The preferred way to develop components is using a special file format known as
+SFC (Single File Component). These files end with an extension `.vue`. The SFC
+files combine elements of Javascript, HTML, and CSS/SCSS into a single modular
+element that defines your component. These files can be opened and processed
+best using the
+[Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) extension
+for [VSCode](https://code.visualstudio.com) (i.e., it provides syntax
+highlighting and other code formatting hints).
 
 Here is an example SFC file:
 
@@ -46,14 +75,25 @@ button {
 </style>
 ```
 
-Look closely at this example and notice how this example has a `<script>` section, as `<template>` section, and a `<style>` section. These sections define the javascript behavior, the HTML rendering, and the look/feel of the component. These three factors are typical for interactive websites (e.g., you typically import your javascript code, and style sheet (CSS) code into your basic HTML document). However, normally you define these for the entire page not separately for individual pieces of a larger page. The SFC file format is the first concept I want to introduce that highlights the value of modularity since it helps you group the code for a particular part of the page together with its HTML and CSS styling.
+Look closely at this example and notice how this example has a `<script>`
+section, as `<template>` section, and a `<style>` section. These sections define
+the javascript behavior, the HTML rendering, and the look/feel of the component.
+These three factors are typical for interactive websites (e.g., you typically
+import your javascript code, and style sheet (CSS) code into your basic HTML
+document). However, normally you define these for the entire page not separately
+for individual pieces of a larger page. The SFC file format is the first concept
+I want to introduce that highlights the value of modularity since it helps you
+group the code for a particular part of the page together with its HTML and CSS
+styling.
 
 ## Using Vue components
 
-Vue is a flexible framework and so there are many ways to use Vue components in your code. However, frequently the first step is to create a Vue app. Typically you create a HTML page that looks something like this:
+Vue is a flexible framework and so there are many ways to use Vue components in
+your code. However, frequently the first step is to create a Vue app. Typically
+you create a HTML page that looks something like this:
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -81,36 +121,63 @@ const app = createApp(App)
 app.mount('#app')
 ```
 
-Notice that in the HTML there is a `<div>` with id set to `"app"`. Then in the Javascript file we import `createApp` and call `mount('#app')`. This "binds" the Vue application to that div, effectively giving control of the rendering of the contents of that `<div>` over to the application.
+Notice that in the HTML there is a `<div>` with id set to `"app"`. Then in the
+Javascript file we import `createApp` and call `mount('#app')`. This "binds" the
+Vue application to that div, effectively giving control of the rendering of the
+contents of that `<div>` over to the application.
 
-Notice that `App.vue` is imported at the top of the file. Since `App.vue` is not valid javascript (it is a Single File Component) you might think this import should fail. However, the build step in Vue compiles references such as these into simple Javascript which can be imported.
+Notice that `App.vue` is imported at the top of the file. Since `App.vue` is not
+valid javascript (it is a Single File Component) you might think this import
+should fail. However, the build step in Vue compiles references such as these
+into simple Javascript which can be imported.
 
 ## Learning Vue
 
-Teaching the internals of Vue.js is beyond this particular guide. However, luckily Vue has a rich ecosystem of documentation and guides which can help (and also excellent documentation). The following are some useful pointers:
+Teaching the internals of Vue.js is beyond this particular guide. However,
+luckily Vue has a rich ecosystem of documentation and guides which can help (and
+also excellent documentation). The following are some useful pointers:
 
-- If you are coming to Vue with experience in jQuery this guide [comparing the two is interesting](https://www.smashingmagazine.com/2018/02/jquery-vue-javascript/).
+- If you are coming to Vue with experience in jQuery this guide
+  [comparing the two is interesting](https://www.smashingmagazine.com/2018/02/jquery-vue-javascript/).
 - Vue.js explained in [100 seconds](https://www.youtube.com/watch?v=nhBVL41-_Cw)
-- Vue.js documentary about the [lead developer](https://www.youtube.com/watch?v=OrxmtDw4pVI)
+- Vue.js documentary about the
+  [lead developer](https://www.youtube.com/watch?v=OrxmtDw4pVI)
 - The Vue.js [documentation](https://vuejs.org/guide/introduction.html)
 - Official Vue.js [tutorial](https://vuejs.org/tutorial/#step-1)
 - Online school for learning [Vue](https://learnvue.co)
-- [LearnVue](https://www.youtube.com/LearnVue) a YouTube channel devoted to teaching Vue
-- Long video with a guy walking through the [code and thinking of developing a simple game in Vue](https://www.youtube.com/watch?v=WQa9-4K3me4&t=1652s)
+- [LearnVue](https://www.youtube.com/LearnVue) a YouTube channel devoted to
+  teaching Vue
+- Long video with a guy walking through the
+  [code and thinking of developing a simple game in Vue](https://www.youtube.com/watch?v=WQa9-4K3me4&t=1652s)
 
-One very useful tool for learning about components is the [Vue Single File Component Playground](https://sfc.vuejs.org/). On this page, you can write simple components see how they will render in real-time, and even build slightly larger components that include sub-components. It can be useful for learning setting up <SmileText/> on your computer and even can help engage students in the research process.
+One very useful tool for learning about components is the
+[Vue Single File Component Playground](https://sfc.vuejs.org/). On this page,
+you can write simple components see how they will render in real-time, and even
+build slightly larger components that include sub-components. It can be useful
+for learning setting up <SmileText/> on your computer and even can help engage
+students in the research process.
 
 ## Reactivity and Declarative Rendering
 
-
 ## Preloading images
+
 <SmileText/> offers two ways to preload images:
 
-If your experiment is simple enough such that most or all images included in the project will likely be used, you can set the optional flag `preloadImages` in `api.completeConsent` to true (`api.completeConsent(true)`). This will load all images in the background once a participant has consented to participate in the experiment.
+If your experiment is simple enough such that most or all images included in the
+project will likely be used, you can set the optional flag `preloadImages` in
+`api.completeConsent` to true (`api.completeConsent(true)`). This will load all
+images in the background once a participant has consented to participate in the
+experiment.
 
-Alternatively, suppose you want to preload some images before entering a particular component. The approach we suggest currently only works with deterministic timelines -- if you need to preload images before a randomized timeline route, you'll have to adapt this or contact us for assistance. 
+Alternatively, suppose you want to preload some images before entering a
+particular component. The approach we suggest currently only works with
+deterministic timelines -- if you need to preload images before a randomized
+timeline route, you'll have to adapt this or contact us for assistance.
 
-We arbitrarily demonstrate this for the `StroopExp`. First, add a `<script>...</script>` section to the component file, and adapt the following code snippet to your requirements (probably limiting the glob in some way):
+We arbitrarily demonstrate this for the `StroopExp`. First, add a
+`<script>...</script>` section to the component file, and adapt the following
+code snippet to your requirements (probably limiting the glob in some way):
+
 ```
 <script>
 // eslint-disable-next-line import/prefer-default-export
@@ -124,14 +191,24 @@ export function preloadAllImages() {
 }
 </script>
 ```
+
 Then, im `app_timeline.js`, import it in addition to the module itself.
+
 ```javascript
 // Before:
 import StroopExp from '@/components/tasks/StroopExp.vue'
 // After:
-import { default as StroopExp, preloadAllImages } from '@/components/tasks/StroopExp.vue'
+import {
+  default as StroopExp,
+  preloadAllImages,
+} from '@/components/tasks/StroopExp.vue'
 ```
-Finally, add it as to `meta` under the `preload` key in the route definition. Being the scenes, <SmileText/> makes sure that when entering the _previous_ component, the preload for the specified component is called, so that preloading happens before the images are necessary. 
+
+Finally, add it as to `meta` under the `preload` key in the route definition.
+Being the scenes, <SmileText/> makes sure that when entering the _previous_
+component, the preload for the specified component is called, so that preloading
+happens before the images are necessary.
+
 ```javascript
 // stroop exp
 timeline.pushSeqRoute({
@@ -140,19 +217,32 @@ timeline.pushSeqRoute({
   component: StroopExp,
   meta: {
     preload: preloadAllImages, // add this line, and the entire meta object if doesn't already exist
-  }
+  },
 })
 ```
 
-_Note_: you cannot dynamically specify the glob (that is, read it from a variable). For this to work, the glob needs to be hard-coded in the call to `import.meta.glob`, as this allows [Vite](https://vitejs.dev) to resolve it appropriately when the experiment is built and deployed. See the restrictions here: https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations .
-
+_Note_: you cannot dynamically specify the glob (that is, read it from a
+variable). For this to work, the glob needs to be hard-coded in the call to
+`import.meta.glob`, as this allows [Vite](https://vitejs.dev) to resolve it
+appropriately when the experiment is built and deployed. See the restrictions
+here:
+https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
+.
 
 ## Component organization in Smile
 
-When you start developing your own components there are a few guidelines. First, components should be named using Pascal Case names (e.g., `StatusBar.vue` or `InformedConsentButton.vue` as opposed to `statusbar.vue` (lowercase), `statusBar.vue` (camel case) or `status-bar.vue` (kebab case)). This is the official recommendation of the [Vue documentation](https://vuejs.org/guide/components/registration.html#component-name-casing).
+When you start developing your own components there are a few guidelines. First,
+components should be named using Pascal Case names (e.g., `StatusBar.vue` or
+`InformedConsentButton.vue` as opposed to `statusbar.vue` (lowercase),
+`statusBar.vue` (camel case) or `status-bar.vue` (kebab case)). This is the
+official recommendation of the
+[Vue documentation](https://vuejs.org/guide/components/registration.html#component-name-casing).
 
-Second, components should be organized into folders based on the type of role the component plays. For this, <SmileText /> borrows sensibly from the organization of a typical experiment in psychology.
-In <SmileText />, the components are organized in the `src/components` directly which has the following layout:
+Second, components should be organized into folders based on the type of role
+the component plays. For this, <SmileText /> borrows sensibly from the
+organization of a typical experiment in psychology. In <SmileText />, the
+components are organized in the `src/components` directly which has the
+following layout:
 
 ```
 src/components
@@ -200,10 +290,13 @@ src/components
     └── ThanksPage.vue
 ```
 
-The following sections describe which types of components go in each folder. Based on what type of component you are developing, place the corresponding component file in the correct folder. This will help you stay organized and help other users of your code know where to look to find an element they might like to reuse in their projects.
+The following sections describe which types of components go in each folder.
+Based on what type of component you are developing, place the corresponding
+component file in the correct folder. This will help you stay organized and help
+other users of your code know where to look to find an element they might like
+to reuse in their projects.
 
 ### Captcha
-
 
 ### Consent
 
