@@ -34,6 +34,7 @@ export default defineConfig({
         items: [
           { text: '👋 Introduction', link: '/introduction' },
           { text: '👾 Required software', link: '/requirements' },
+          { text: '🥸 Design principles', link: '/principles' },
           { text: '✨ Starting a new project', link: '/starting' },
           { text: '☁️ Deploying', link: '/deploying' },
           { text: '⚙️ Configuring', link: '/configuration' },
@@ -41,6 +42,7 @@ export default defineConfig({
           { text: '👩‍💻 Developing', link: '/developing' },
           { text: '🐞 Testing', link: '/testing' },
           { text: '👩‍🏫 Presentation mode', link: '/presentation' },
+          { text: '📈 Dashboard', link: '/dashboard' },
           { text: '🧪 Lab Config', link: '/labconfig' },
         ],
       },
@@ -67,26 +69,14 @@ export default defineConfig({
       },
       {
         text: 'Contributing',
-        collapsible: true,
-        collapsed: true,
         items: [
           { text: '🙋Getting started contributing', link: '/gettingstarted' },
           { text: '✍️ Contributing to the docs', link: '/contributing' },
-          { text: '⚡️ Manifesto', link: '/manifesto' },
-          { text: '🥸 Design principles', link: '/principles' },
         ],
       },
       {
         text: 'Misc',
-        collapsible: true,
-        collapsed: true,
-        items: [
-          { text: '📄 Cheat sheet', link: '/cheatsheet' },
-          {
-            text: '🌤 Gitpod Dev Environment',
-            link: '/gitpod',
-          },
-        ],
+        items: [{ text: '📄 Cheat sheet', link: '/cheatsheet' }],
       },
       {
         text: 'Notes',

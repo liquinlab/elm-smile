@@ -77,20 +77,25 @@ giving access to the encrypted files to your email address.
 
 ## 4. Install a web browser (or two or three)
 
-Install Safari, Chrome and/or Firefox. It can make sense to install multiple
-browsers and test your code against each of them. However, for
-developing/testing your code Chrome is particularly recommended because of the
-wide range of available extensions.
+Install Safari, Chrome, ARC and/or Firefox. It can make sense to install
+multiple browsers and test your code against each of them. However, for
+developing/testing your cod ARC/Chrome is particularly recommended because of
+the wide range of available extensions.
 
 ## 5. Install Vue Devtools (optional)
 
 Optionally install the [Vue Devtools](https://devtools.vuejs.org) in your
 browser (e.g., Chrome). This can help in debugging your experiment.
 
-## 6. Install VSCode and Volar (optional)
+## 6. Install VSCode, Volar, and Prettier
 
-It is highly recommended that you use [VS Code](https://code.visualstudio.com/)
-and the [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+It is highly recommended that you use [VS Code](https://code.visualstudio.com/),
+the [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+extension, and the
+[Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+extension. These tools will help you write and debug your code more easily. You
+can also use the
+[Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)
 extension as your text editor/development environment.
 
 ## 7. Install the Google Cloud Command Line Tool (optional)

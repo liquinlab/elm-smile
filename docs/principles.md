@@ -1,10 +1,11 @@
-# :disguised_face: Design Principles
+# 🥸 Design Philosophy
 
 The design of online experiments (and webpages in general) requires a lot of
 complex choices. The goal of <SmileText/> is to make sensible choices as much as
-possible so you don't have to think about things. Experience developing psiTurk
-is instructive in many ways. Reflecting on this leads to several design
-principles that you should keep in mind while contributing to this project:
+possible so you don't have to think about things. The core team's experience
+developing [psiTurk](https://psiturk.org) was instructive in many ways.
+Reflecting on this leads to several design principles that you should keep in
+mind while contributing to this project:
 
 [[toc]]
 
@@ -45,6 +46,23 @@ then the state is updated automatically when things change. Or like if data
 needs to be saved from an experiment do it automatically in the background with
 some fault tolerance rather than asking the experiment designer to think about
 this.
+
+## Leverage open-source web technologies and standards.
+
+The modern web is one of the most highly developed software ecosystems in the
+history of the world. Many companies and individuals have invested considerable
+time and money in developing tools and libraries that can be used to make your
+life easier. The goal of <SmileText/> is to leverage these tools as much as
+possible. This means using modern web technologies like Vue.js, Vite, and Bulma
+CSS. It also means using open-source libraries and tools that are
+well-maintained and have a large community of users. This will make it easier to
+develop and maintain your experiment code.
+
+The problem is that if you try to write anything more complex than a simple
+"Hello world!" project you quickly start writing your own Javascript framework
+(like [jsPsych](https://www.jspsych.org/)). The <SmileText/> philosophy is to
+leverage the immense open-source community on the web in the service of better
+science!
 
 ## Don't sweat the dumb stuff.
 
@@ -90,7 +108,7 @@ Related to D.R.Y. is when something becomes useful enough it should be
 abstracted into a component, object, or plugin that can be reused by others. As
 one example of a failure, in the first version of psiTurk we envisioned most of
 it working using a command line. This meant that we had a command-line shell
-interpreter that made direct calls to Bobo (the library that interfaces to
+interpreter that made direct calls to Boto (the library that interfaces to
 Amazon Web Services). Later we wanted to make a web dashboard GUI to replace the
 command line. However, we had to go back and re-abstract the Mechanical Turk
 function into a more general class that could be used by _either_ the command
