@@ -18,7 +18,9 @@ arguments, the script will ask your four questions before downloading the data:
 Alternatively, you can specify any number of these through command-line
 arguments:
 
-`npm run getdata -- --type <real|testing> --complete_only <all|complete_only> --branch_name <name> --filename <name-or-path>`
+```
+npm run getdata -- --type <real|testing> --complete_only <all|complete_only> --branch_name <name> --filename <name-or-path>
+```
 
 The script will ask you regarding any arguments not specified through the
 command-line.

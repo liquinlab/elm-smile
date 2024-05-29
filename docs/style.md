@@ -297,7 +297,7 @@ If so you can do this by overriding basic
 definitions in the `css/main.css` file. Refer to that file for some examples as
 well as read the Bulma docs for the definition of
 [customizable](https://bulma.io/documentation/customize/list-of-sass-variables/)
-CSS variables](https://bulma.io/documentation/customize/with-css-variables/).
+CSS [variables](https://bulma.io/documentation/customize/with-css-variables/).
 
 ## Customizing CSS
 
