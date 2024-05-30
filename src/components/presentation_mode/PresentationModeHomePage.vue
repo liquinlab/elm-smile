@@ -5,14 +5,26 @@
   <section class="hero">
     <div class="hero-body">
       <p class="title">
-        <span id="bigsmile">🤠</span>
+        <span id="bigsmile">
+          A title for a project that is kind of long
+        </span>
       </p>
       <p class="subtitle">
-      <h1 class="title is-1">Welcome to presentation 👩‍🏫 mode !</h1>
+        <h1 class="title is-1">Subtitle</h1>
       </p>
     </div>
   </section>
   <div class="content">
+    <div class="columns">
+        <div class="column is-4 has-text-right">
+          Todd Gureckis, Michael Lee, and others
+        </div>
+        <div class="column is-8">
+          <p class="title has-text-left">
+            A title for a project that is kind of long
+          </p>
+        </div>
+      </div>
     <p class="is-size-5 has-text-left">
       Use the links below to navigate to different parts of the experiment, or
       use the navigation bar at the top of the page.
@@ -51,11 +63,18 @@
     </a>
     </p>
   </div>
+  <footer class="footer">
+  <div class="has-text-centered">
+    <p>
+      Created by <a href="https://jgthms.com">Todd Gureckis</a> using 🫠 <a href="https://smile.gureckislab.org">Smile</a>.
+    </p>
+  </div>
+</footer>
 </template>
 
 <style scoped>
 .hero {
-  background-color: rgb(255, 212, 102);
+  background-color: var(--dev-bar-mild-grey);
   margin-bottom: 30px;
   padding: 0px;
 }
@@ -71,7 +90,7 @@
 
 }
 
-.content a {
+.button {
   margin-left: 10px;
 }
 
@@ -89,6 +108,6 @@
 }
 
 #bigsmile {
-  font-size: 100px;
+  font-size: 50px;
 }
 </style>
