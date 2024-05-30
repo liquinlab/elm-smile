@@ -42,7 +42,7 @@ const api = useSmileAPI()
 
             <!-- randomization button -->
             <div class="devbar-randomizationdropdown">
-            <RandomizationDropDown></RandomizationDropDown>
+              <RandomizationDropDown></RandomizationDropDown>
             </div>
 
             <!-- state variable buttons -->
@@ -57,15 +57,13 @@ const api = useSmileAPI()
 
             <!-- database info button -->
             <DataBarButton></DataBarButton>
-
-            <!-- route info buttons -->
-            <div class="devbar-routeinfodropdown">
-              <RouteInfoDropDrop></RouteInfoDropDrop>
-            </div>
-
             <!-- responsive hides this if the page is too small-->
             <div class="devbar-stepper">
               <Stepper></Stepper>
+            </div>
+            <!-- route info buttons -->
+            <div class="devbar-routeinfodropdown">
+              <RouteInfoDropDrop></RouteInfoDropDrop>
             </div>
           </div>
         </div>
@@ -178,12 +176,10 @@ const api = useSmileAPI()
 }
 
 @media screen and (max-width: 560px) {
-
   .devbar-statevarsdropdown {
     display: none;
   }
 }
-
 
 @media screen and (max-width: 520px) {
   .devbar-randomizationdropdown {

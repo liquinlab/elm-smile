@@ -12,7 +12,7 @@ const router = useRouter()
       <button
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
         v-on:click="router.go(-1)"
-        data-tooltip="Step page back"
+        data-tooltip="Previous page"
       >
         <span>
           <FAIcon icon="fa-solid fa-angles-left" />
@@ -52,7 +52,7 @@ const router = useRouter()
     </p>
     <p class="control" v-if="api.hasNextRoute()">
       <button
-        class="button is-small devbar-button has-tooltip-arrow has-tooltip-left"
+        class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
         v-on:click="api.stepNextRoute()"
         data-tooltip="Step page forward"
       >

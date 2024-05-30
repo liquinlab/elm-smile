@@ -116,7 +116,6 @@ function getBgClass(msg) {
               <FAIcon icon="fa-solid fa-clock" v-else-if="msg.message.includes('TIMELINE STEPPER')" />
               <FAIcon icon="fa-regular fa-clock" v-else-if="msg.message.includes('TRIAL STEPPER')" />
               <img src="/src/assets/dev/firebase-bw.svg" width="15" v-else-if="msg.message.includes('FIRESTORE')" />
-
               <FAIcon icon="fa-solid fa-angle-right" v-else />
               &nbsp;{{ msg.time }} <b>{{ msg.message }}</b> <br />&nbsp;&nbsp;{{ msg.trace }}
             </li>
@@ -150,8 +149,10 @@ function getBgClass(msg) {
   padding: 5px;
   font-size: 0.7em;
 }
+/*
 .togglebar select {
 }
+*/
 
 .columnheader {
   background: #f4f4f4;
