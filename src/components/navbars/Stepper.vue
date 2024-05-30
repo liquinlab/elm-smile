@@ -3,6 +3,7 @@ import useSmileAPI from '@/core/composables/smileapi'
 const api = useSmileAPI()
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
+const router = useRouter()
 </script>
 
 <template>
@@ -10,7 +11,7 @@ const route = useRoute()
     <p class="control" v-if="api.hasPrevRoute()">
       <button
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
-        v-on:click="api.stepPrevRoute()"
+        v-on:click="router.go(-1)"
         data-tooltip="Step page back"
       >
         <span>
