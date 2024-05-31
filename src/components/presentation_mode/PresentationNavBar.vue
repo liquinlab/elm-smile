@@ -3,7 +3,7 @@ import { onMounted, watch, ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import RouteInfoDropDrop from '@/components/navbars/RouteInfoDropDown.vue'
-import ResetButton from '@/components/navbars/ResetButton.vue'
+import ResetButton from '@/components/presentation_mode/PresentationModeResetButton.vue'
 
 import useSmileAPI from '@/core/composables/smileapi'
 const api = useSmileAPI()
@@ -23,7 +23,7 @@ const api = useSmileAPI()
           <div class="buttons">
             <!-- reset button -->
             <div class="devbar-resetbutton">
-              <ResetButton></ResetButton>
+              <ResetButton home></ResetButton>
             </div>
 
             <!-- route info buttons -->
