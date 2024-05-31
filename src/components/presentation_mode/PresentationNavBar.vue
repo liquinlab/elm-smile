@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router'
 
 import RouteInfoDropDrop from '@/components/navbars/RouteInfoDropDown.vue'
 import ResetButton from '@/components/presentation_mode/PresentationModeResetButton.vue'
+import QRCodeButton from '@/components/presentation_mode/QRCodeButton.vue'
 
 import useSmileAPI from '@/core/composables/smileapi'
 const api = useSmileAPI()
@@ -21,6 +22,11 @@ const api = useSmileAPI()
       <div class="devbar-end">
         <div class="devbar-item devbar-buttonpanel">
           <div class="buttons">
+            <!-- QR code button -->
+            <div class="devbar-qrbutton">
+              <QRCodeButton></QRCodeButton>
+            </div>
+
             <!-- reset button -->
             <div class="devbar-resetbutton">
               <ResetButton home></ResetButton>

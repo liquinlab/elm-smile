@@ -98,6 +98,7 @@
     "markdown-it-footnote": "^4.0.0",
     "node-sass": "^9.0.0",
     "prettier": "^3.2.5",
+    "qrcode-svg": "^1.1.0",
     "shelljs": "^0.8.5",
     "vite-plugin-inspect": "^0.8.4",
     "vitepress": "^1.1.0",

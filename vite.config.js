@@ -6,6 +6,7 @@ import path from 'path'
 import Inspect from 'vite-plugin-inspect'
 //import preLoaderPlugin from './scripts/preloader'
 import stripDevToolPlugin from './scripts/strip-devtool'
+import generateQRCode from './scripts/generate-qr.js'
 
 // https://vitejs.dev/config/
 export default ({ mode }) => {
@@ -24,6 +25,7 @@ export default ({ mode }) => {
       Inspect(),
       stripDevToolPlugin(),
       vue(),
+      generateQRCode(),
       //preLoaderPlugin(),
     ],
     // if you need an additional page you have to list them here
