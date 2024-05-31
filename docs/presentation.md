@@ -36,6 +36,12 @@ This will launch a website that looks something like this:
 Notice that you can use the drop-down "jump" menu to jump around between the
 parts of your experiment in this mode.
 
+## QR Code download
+
+The small QR code button in the top nav bar opens a dropdown menu that shows a
+QR code for the current webpage. This can be downloaded as a SVG and inserted
+into poster and talks.
+
 ## How to customize Presentation Mode
 
 To customize this presentation mode page edit the
