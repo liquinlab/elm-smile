@@ -484,6 +484,4 @@ of buttons, checkboxes, tables, etc... <SmileText/> includes the
 additional UI elements like sliders, steppers (show how many steps there are to
 a form), etc...
 
-And, of course, you can create custom components yourself (simple UI elements
-often are considered [Atoms](/components#atoms) in the design organization of
-<SmileText/>).
+And, of course, you can create custom components yourself!

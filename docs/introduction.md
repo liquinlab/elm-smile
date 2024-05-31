@@ -6,72 +6,50 @@ fun to develop rich and interactive online experiments.
 ### Key features:
 
 - Fast and fun front-end interface development with [Vue.js](https://vuejs.org)
-  and [Bulma](https://bulma.io). Make complex games, animations, and surveys
-  with relative ease.
-- Developer [mode](/developing) which makes it easier to debug and develop
-  experiments. It's like brain surgery for your experiment. Jump between
-  sections without endless clicking, autofill forms, generate realistic but fake
-  data, monitor database status,
-  [hot-reload parts](https://vitejs.dev/guide/features.html#hot-module-replacement)
-  of the code you are working on, and more.
-- Presentation [mode](/presentation) which makes it easy to make an interactive
+  and [Bulma CSS](https://bulma.io). Make complex games, animations, and surveys
+  with ease using
+  [declarative programming and reactive data binding](/components#declarative-rendering-and-reactivity).
+- Built-in support for [common experiment elements](/builtins) like consent
+  forms, captchas, instructions, and surveys. Just add your custom experiment
+  logic and start collecting data.
+- Participant-friendly features include the ability to withdraw from the
+  experiment (while providing feedback), incremental data saving in case of
+  problems, optimized load times, graceful error handling, and a responsive
+  design that works on most/all devices.
+- Developer [mode](/developing) which makes it easier to debug and design
+  experiments. Jump quickly between phases and trials in your experiments,
+  [autofill forms and generate fake data for testing](/developing#autofill-and-data-faking),
+  visualize the flow through your project,
+  [hot-reload](/developing#hot-module-replacement) the code you are working on
+  without restarting the entire experiment, and more!
+- Presentation [mode](/presentation) which provides a beautiful and interactive
   demo site you can share with reviewers and collaborators.
-- [Dashboard GUI](/dashboard) for monitoring data collection and performing
-  quality control to screen bots and bad actors.
+- [Dashboard](/dashboard) for monitoring data collection, downloading and
+  analyzing data, and performing quality control to screen bots and other bad
+  actors.
 - Built-in support for multiple [recruitment services](/recruitment) including
   Prolific, MTurk, CloudResearch, and more.
-- Automatic and secure data storage and retrieval using a simple and flexible
-  [database](/datastorage) system based on
+- Secure data storage and retrieval using a flexible, but easy-to-use
+  [database](/datastorage) API based on
   [Google Firestore and and Real-time Database ](https://firebase.google.com).
-- Modular design includes built-in support for common experiment needs like
-  consent forms, captchas, instructions, surveys, randomization, and data
-  storage. Just add your custom experiment logic and start collecting data.
-- Automatic deployment of the latest code to the web using
-  [GitHub Actions](https://github.com/features/actions). No worries about
-  remembering to upload your latest code.
-- Automated testing framework including unit tests and end-to-end tests using
-  [Cypress.io](https://www.cypress.io/). Make sure your code is reliable and
-  bug-free.
-- Integrates with the rest of your research life including Slack notifications,
-  automatic generation of QR codes for posters and representations, and more.
+- Automatic and highly reproducible [deployment](/deploying) of the latest code
+  to the web using [GitHub Actions](https://github.com/features/actions).
+- Automated [testing](/testing) framework including unit tests and end-to-end
+  tests using [Cypress.io](https://www.cypress.io/) helps experimenters ensure
+  code is reliable and bug-free.
+- Integrates with the rest of your research life including
+  [Slack notifications](/deploying#notifying-the-slack-bot), automatic
+  generation of QR codes for recruitment posters (or for presentations),
+  [anonymized links](/deploying#what-url-do-you-send-participants-to), and more.
+- Data provenance features include an audit trail of which version of the code
+  was used to create each data file.
 - Great looking and detailed docs, if we do say so ourselves!
-
-The [Smile philosophy](/principles) is to leverage the power of modern
-open-source web technologies, including heavily supported frameworks like
-[Vue.js](https://vuejs.org) and [Vite](https://vitejs.dev) along with CSS
-frameworks like [Bulma](https://bulma.io), to make it easier to create and run
-online experiments. The platform is designed for programmers with a reasonable
-understanding of Javascript and modern web design^[Beginners might find
-[jspych](https://www.jspsych.org/), [Gorilla](https://gorilla.sc/),
-[Google Forms](https://forms.google.com) easier to start with.].
 
 The current development is happening at
 [https://github.com/nyuccl/smile](https://github.com/nyuccl/smile).
 
-Want to learn more? Continue [here](/requirements).
+Ready to get started? Continue [here](/requirements).
 
----
+Not sure? Let us walk you through an [example](/example).
 
-::: warning What we assume
-
-Generally this project assumes you know basic to intermediate modern
-[Javascript](https://javascript.info/), have some familiarity with typing
-commands in a terminal program, git, [GitHub](https://github.com), and
-understand basic concepts about web servers and web design. Some helpful
-websites to address deficiencies:
-
-- [Modern Javascript](https://javascript.info) - a great resource for learning
-  Javascript
-- [The missing semester of your CS education](https://missing.csail.mit.edu) -
-  how to use the shell/terminal program, git, security concepts/encryption
-- [Shell.how](https://www.shell.how) - helps you learn and interpret different
-  shell/terminal commands
-- [Git for beginners](https://medium.com/dwarsoft/git-for-beginners-part-i-basic-git-concepts-a7beb5a136d)
-- [Interneting is hard](https://www.internetingishard.com) - Friendly web
-  development tutorials for complete beginners
-- [Learn Vue](https://learnvue.co) - useful website for learning the Vue.js
-  framework
-- [Vuejs tutorial](https://vuejs.org/tutorial/#step-1)
-- [Vuejs docs](https://vuejs.org/guide/introduction.html)
-
-:::
+Need help? Go [here](/help).

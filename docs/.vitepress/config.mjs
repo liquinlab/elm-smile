@@ -34,8 +34,15 @@ export default defineConfig({
         items: [
           { text: '👋 Introduction', link: '/introduction' },
           { text: '👾 Required software', link: '/requirements' },
-          { text: '🥸 Design principles', link: '/principles' },
           { text: '✨ Starting a new project', link: '/starting' },
+          { text: '🧪 Setup a base repo', link: '/labconfig' },
+          { text: '🚶‍♂️ Walking through an example', link: '/example' },
+          { text: '🙋‍♀️ Getting help', link: '/help' },
+        ],
+      },
+      {
+        text: 'Basic Functions',
+        items: [
           { text: '☁️ Deploying', link: '/deploying' },
           { text: '⚙️ Configuring', link: '/configuration' },
           { text: '📦 Data storage', link: '/datastorage' },
@@ -43,20 +50,21 @@ export default defineConfig({
           { text: '🐞 Testing', link: '/testing' },
           { text: '👩‍🏫 Presentation mode', link: '/presentation' },
           { text: '📈 Dashboard', link: '/dashboard' },
-          { text: '🧪 Lab Config', link: '/labconfig' },
         ],
       },
       {
-        text: 'Experiment Design',
+        text: 'Designing Experiments',
         items: [
           { text: '🧑‍🎨 Overview', link: '/experimentdesign' },
           { text: '🧩 Components', link: '/components' },
           { text: '🔀 Timeline', link: '/timeline' },
+          { text: '🧱 Built In Components', link: '/builtins' },
+          { text: '🖼️ Images and Videos', link: '/imagesvideo.md' },
           { text: '🎲 Randomization', link: '/randomization' },
           { text: '🧑‍🎨 Styling, CSS, and icons', link: '/style' },
           //{ text: '💰 Computing bonuses', link: '/bonuses' },
           { text: '🆘 Errors and other issues', link: '/problems' },
-          { text: '🧐 Analyzing data', link: '/analysis' },
+
           //{ text: '🔌 Server-side Computations', link: '/server' },
         ],
       },
@@ -65,6 +73,13 @@ export default defineConfig({
         items: [
           { text: '🙋 Overview', link: '/recruitment' },
           { text: '😇 Ethical considerations', link: '/ethics' },
+        ],
+      },
+      {
+        text: 'Analyzing data',
+        items: [
+          { text: '🧐 Analyzing data', link: '/analysis' },
+          { text: '🤖 Quality control', link: '/qualitycontrol' },
         ],
       },
       {
@@ -88,6 +103,7 @@ export default defineConfig({
           { text: 'Backend research', link: '/research/backend' },
           { text: 'Frontend research', link: '/research/frontend' },
           { text: 'Setup', link: '/advanced/notes' },
+          { text: 'Philosophy', link: '/research/principles' },
         ],
       },
     ],

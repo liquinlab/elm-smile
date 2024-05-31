@@ -72,15 +72,14 @@ Next, you can view the website almost exactly as it will appear online by typing
 npm run preview
 ```
 
-## Vite development features
+## Hot Module Replacement
 
 One of the most useful features of Vite in development mode is that it
 automatically reloads the webpage anytime changes are made to any project files.
 This prevents you from having to go back and forth between your editor and the
 browser and pressing shift-reload.
 
-[Some](https://marketplace.visualstudio.com/items?itemName=ziishaned.livereload)
-[tools](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)
+[Some tools](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)
 provide this automatic updating by forcing the entire browser webpage to reload
 anytime a file changes.
 
@@ -97,6 +96,8 @@ and trigger an error, etc... Once you understand this difference you'll wonder
 how you every programmed for the web without it. This feature is known as
 [Hot Module Replacement](https://vitejs.dev/guide/features.html#hot-module-replacement).
 
+## Bundling, Tree-Shaking, and Code-spliting
+
 A second key feature of Vite is that it acts as a bundler. When you use complex
 libraries in your project there may be lots of dependencies both within and
 between packages. As one example, the popular [lodash](https://lodash.com)
@@ -107,13 +108,18 @@ might overload the server. As a result modern website "bundle" the required code
 into a single, optimized file so that only one file is imported. Vite does this
 behind the scenes for you both in development and building mode.
 
-(There are several other features of Vite including a process called
+There are several other features of Vite including a process called
 [Tree-Shaking](https://developer.mozilla.org/en-US/docs/Glossary/Tree_shaking)
 which removes functions from the bundle which are not used in the current app to
 reduce the file size and
 [Code Splitting](https://developer.mozilla.org/en-US/docs/Glossary/Code_splitting)
 which organizes files into "chunks" the reflect common dependencies across
-different pages of a site.)
+different pages of a site.
+
+## Autofill and Data Faking
+
+When you are developing your project it can be helpful to "fake" data from a
+component.
 
 ## Merging changes to the template into your existing project
 

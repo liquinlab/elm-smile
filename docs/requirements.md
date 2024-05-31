@@ -1,14 +1,14 @@
 # :space_invader: Required software you will need to install
 
 Before getting started working on a <SmileText/> project you will need to
-install a few items on your local computer (see [^gitpod] for other options).
+install a few items on your local computer.
 
-:::warning
+:::warning First time setting Smile up for a new lab?
 
-First time setting Smile up for a new lab? This guide (and most of the docs)
-assumes you have set up Smile for your lab. If you need to set up Smile for your
-lab please read [this guide](/labconfig) first. From here on out you will be
-called your lab's Smile coordinator.
+This guide (and most of the docs) assumes you have set up a base repo of Smile
+for your lab. If you need to set up a base repo please follow
+[this guide](/labconfig) first. If you are not sure if you'd like to use this
+project you can continue reading to learn more.
 
 :::
 
@@ -82,36 +82,10 @@ multiple browsers and test your code against each of them. However, for
 developing/testing your cod ARC/Chrome is particularly recommended because of
 the wide range of available extensions.
 
-## 5. Install Vue Devtools (optional)
-
-Optionally install the [Vue Devtools](https://devtools.vuejs.org) in your
-browser (e.g., Chrome). This can help in debugging your experiment.
-
-## 6. Install VSCode, Volar, and Prettier
+## 5. Install VSCode, Volar, and Prettier
 
 It is highly recommended that you use [VS Code](https://code.visualstudio.com/),
 the [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
 extension, and the
 [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-extension. These tools will help you write and debug your code more easily. You
-can also use the
-[Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)
-extension as your text editor/development environment.
-
-## 7. Install the Google Cloud Command Line Tool (optional)
-
-If you need to write custom software that runs on the server-side (e.g., to
-[compute bonuses](/bonuses) for your experiment securely), then install the
-Google Command Line tools:
-
-```
-brew install --cask google-cloud-sdk
-```
-
-[^gitpod]:
-    This guide is the recommended strategy for most people (particularly core
-    lab members like postdocs and phd students). However, there is also the
-    option of working on the project using a pre-configured cloud-based
-    environment hosted by [Gitpod](https://gitpod.io) which might be nice for
-    undergrads with less experience installing software using the command line.
-    Click [here](/gitpod) for more info.
+extension. These tools will help you write and debug your code more easily.

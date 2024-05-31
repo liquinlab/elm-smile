@@ -5,19 +5,21 @@ they can be used to share examples of an experiment with other people. This can
 be helpful in cases where you want to share a link to your experiment with
 readers of a paper, collaborators, or others. You can also use this mode to
 develop richer, interactive views of the data in your experiment as well as
-complete websites devoted to a paper or project. A good example of an
-<SmileText /> experiment being shared in presentation mode is
+complete websites devoted to a paper or project. A good example of an experiment
+being shared in presentation mode is
 [here](https://exps.gureckislab.org/e/telephone-gleaming-kill/#/).
 
-There are two things that presentation mode enables:
+There are three things that presentation mode enables:
 
-1. A colorful "landing page" that you can customize to show links to
+1. A nicely designed "landing page" that you can customize to show links to
    preprints/published articles, figures, and also links that let you jump
    between various parts of your experiment
 2. It disables the control on which page/route of the experiment is shown in
    which order allowing you and your audience to jump around and explore
    different parts of the task (e.g., jump to read the instructions without
    first completing the consent form)
+3. A automatically generated QR code that you can use to link to the
+   presentation mode site from posters, papers, or other materials.
 
 ## How to use Presentation Mode
 
@@ -31,7 +33,7 @@ This will launch a website that looks something like this:
 
 ![Presentation Mode](/images/presentmode.png)
 
-Notice that you can use the drop down "jump" menu to jump around between the
+Notice that you can use the drop-down "jump" menu to jump around between the
 parts of your experiment in this mode.
 
 ## How to customize Presentation Mode

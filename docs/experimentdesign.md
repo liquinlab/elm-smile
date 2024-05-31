@@ -1,114 +1,54 @@
-# :artist: Designing Good Web Experiments
+# :artist: Designing Quality Experiments
 
-```
-.
-├── LICENSE
-├── README.md
-├── css
-│   ├── main.css
-│   └── styles.css
-├── data
-├── docs
-├── env
-├── index.html            <-- main html page
-├── package-lock.json
-├── package.json
-├── public
-│   └── favicon.ico
-├── sass
-│   └── mystyles.scss
-├── scripts
-├── src
-│   ├── App.vue
-│   ├── assets
-│   ├── components/
-│   ├── composables/
-│   ├── config.js        <-- configuration object
-│   ├── icons.js
-│   ├── main.js          <-- javascript execution starts here
-│   ├── router.js        <-- configure timeline here
-│   ├── seed.js
-│   ├── stores
-│   ├── timeline.js
-│   └── utils.js
-├── tests
-│   ├── cypress
-│   ├── cypress.config.js
-│   └── vitest
-└── vite.config.js
-```
+Designing good web based experiments is a deceivingly complex task. At the most
+basic level, a web experiment is simply a web page that presents stimuli and
+records people's responses. Such technology has been around for decades and is
+pretty simple in most cases.
 
-## Captcha
+However, several factors have conspired to make designing web experiments more
+complex.
 
-Very fast tasks, requiring human common sense, that are diverse, unpredictable,
-and have a large number of incorrect responses.
+- The web is a complex environment with many different browsers, devices, and
+  operating systems. This means that web experiments need to be designed to work
+  across a wide range of platforms.
+- Institutional Review Boards at most universities have become more concerned
+  about subject privacy and data security. This means that web experiments need
+  to be protect the anonymity of participants and the security of their data.
+- Most human subjects research _requires_ that participants provide informed
+  consent and that they are free to _withdraw_ from the study at any time.
+  Handling the logic of withdrawing and reporting this adds complexity to
+  experiments.
+- Researchers increasingly turn towards paid participant pools like Amazon
+  Mechanical Turk to recruit participants. This means that web experiments need
+  to be designed to work in a way that is compatible with these varied
+  platforms.
+- Workers on paid platforms like Amazon Mechanical Turk have become more
+  sophisticated at bypassing attention checks and other quality control
+  measures. This means that web experiments need to be designed to prevent
+  cheating and data corruption by bots and AI-assisted workers (at least for
+  most psychological studies).
+- Expectations of users about the quality of web experiences is increasing.
+  Worker may be less interested and engaged with tasks which seems old, buggy,
+  or do not work well in their browser.
+- Research questions in psychology and cognitive science are becoming more
+  complex. This means that web experiments need to be designed to handle more
+  complex experimental designs and data collection strategies. This include
+  group and multi-player experiments, longitudinal studies, and more. Interfaces
+  might need to be more interactive and complex than simple stimulus-response
+  tasks.
 
-- view everyday photos and answer common sense reasoning question sby clicking
-  on the image in a location (e.g., picture of two people one laughing and say
-  "click on the happy one")
+There are several other dimension that are important:
 
-100 images an interesting image -- click on the with masks that are appropriate
+- Reducing bugs introduced by sloppy programming is important for the
+  replicability of research.
+- Fasciliating the sharing of code and materials is important for the
+  transparency of research.
 
-- show an image and record where you click on it
-
-- move an object in a physics/phaser game to achieve something
-
-- normal distorted text (type the word that you can see)
-
-- move a slider slowly so that it doesn't wake up a bear (too fast == wake up,
-  beat clock on time)
-
-- watch a crazy video and type the words it says
-
-## Informed Consent
-
-The text of the informed consent should be updated for each study and placed in
-`src/components/consent/InformedConsentText.vue`. After participants accept the
-informed consent (usually the first few steps of study) they will see a button
-that will always be available allowing them to re-review the consent form in
-case they have questions.
-
-## Withdraw
-
-As part of most IRB approved protocols participants should be eligible to
-withdraw from a study at any time for any reason. Online this is as simple as
-closing the browser windows and moving onto something else. However,
-<SmileText/> provides a simple way to withdraw at any time from a study.
-
-![Withdraw button](/images/withdraw.png)
-
-When participants click this button (only appears after accepting the informed
-consent), then they are presented with a form with several optional questions
-about why they are withdrawing and also providing information about partial
-compensation. If a participant is eligible for partial compensation depends on
-several things specific to each study. When they submit this form they will be
-taken to a final page asking them to return the task/hit. It is the
-responsibility of the experimenter to monitor withdraws and to try to contact
-the participant.
-
-## WindowSizerPage
-
-The window sizer is a small component `src/components/pages/WindowSizerPage.vue`
-that will display a box with a configured size on the screen and asked the
-participant to adjust their browser window to that size so everything is
-visible. It looks like this:
-
-![Window Sizer](/images/windowsizer.png)
-
-The size of the box is configured in `env/.env` file using the
-`VITE_WINDOWSIZER_REQUEST` configuration option. The default value is `800x600`
-which means 800 pixel wide and 600 pixels tall. You can change these values as
-needed. In development mode you will need to restart the development server
-since environment files are only read once on the loading of the application.
-
-To add it to the timeline just add this in the appropriate place inside
-`src/router.js`;
-
-```js
-// windowsizer
-timeline.pushSeqRoute({
-  path: '/windowsizer',
-  name: 'windowsizer',
-  component: WindowSizer,
-})
-```
+The <SmileText/> project was designed with these sets of considerations in mind.
+The focus is on making it easy to design and deploy high-quality web
+experiments. While Smile can be used for simple stimulus-response type tasks, it
+is easily capable of handling more complex experimental designs. This is
+accomplished by leveraing state of the art web technologies and best practices
+in web development. Smile doesn't reinvent the wheel by making an entirely new
+web framework. Instead it leverages the currently best tools for building high
+quality web applications use in industry.

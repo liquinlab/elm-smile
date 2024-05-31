@@ -113,8 +113,8 @@ different sections of the task.
 
 ### The route object
 
-Each route is specified by a javascript object, which usually contains at the
-following fields:
+Each route is specified by a javascript object, which usually contains at least
+the following fields:
 
 ```js
 {

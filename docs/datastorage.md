@@ -320,26 +320,20 @@ while (e.g., filling out a form or reading some instructions). However, during
 testing if you click through things quickly several of your writes might be
 skipped by this throttling.
 
-## Data saving outside of Vue Components
-
-Sometimes your page might have additional content that is defined outside of the
-Vue SPA. For these you need to import a library to access the data store. [TO BE
-WRITTEN]
-
 ## Local storage
 
 In addition to the persistence of data from the application state in Firebase,
-<SmileText/> makes use of persisted data in the browser as well using a feature
-known as Local Storage which is similar to "browser cookies". Basically, local
-storage is a way for a website to write small amounts of data to the users
-computer and access it at a later time. In <SmileText/> this is used to track
-things across page reloads. For example, if a subject reloads the page in the
-middle of an experiment, we'd like them to pick up where they left off. In
-addition, that subject needs to "reconnect" to the Firebase database document
-that they were currently working from. To persist data like this, which is
-specific to the user, across page reloads or restarts of the browser we sync a
-few key values with the browser's local storage. The data which is synced to
-local storage is in `smilestore.local` (see `smiledata.js`).
+Smile makes use of persisted data in the browser as well using a feature known
+as Local Storage which is similar to "browser cookies". Basically, local storage
+is a way for a website to write small amounts of data to the users computer and
+access it at a later time. In <SmileText/> this is used to track things across
+page reloads. For example, if a subject reloads the page in the middle of an
+experiment, we'd like them to pick up where they left off. In addition, that
+subject needs to "reconnect" to the Firebase database document that they were
+currently working from. To persist data like this, which is specific to the
+user, across page reloads or restarts of the browser we sync a few key values
+with the browser's local storage. The data which is synced to local storage is
+in `smilestore.local` (see `smiledata.js`).
 
 ## Setting up Google Firestore
 

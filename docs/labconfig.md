@@ -1,4 +1,4 @@
-# Configuring for a new lab/organization
+# Configuring a base repo for a lab/organization
 
 If you would like to use <SmileText/> in new lab/organization you need to
 configure a small set of services (Github, Firebase, Slack, and a webserver) to
