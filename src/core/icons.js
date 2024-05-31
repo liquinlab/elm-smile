@@ -6,6 +6,8 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 /* to limit the size of the final project you import individal icons */
 /* NOTE: you also have to load them below by adding to the library */
 import { faSwatchbook, faUserSecret } from '@fortawesome/free-solid-svg-icons'
+import { faQrcode } from '@fortawesome/free-solid-svg-icons'
+import { faDownload } from '@fortawesome/free-solid-svg-icons'
 import { faGear } from '@fortawesome/free-solid-svg-icons'
 import { faBook } from '@fortawesome/free-solid-svg-icons'
 import { faClock } from '@fortawesome/free-solid-svg-icons'
@@ -66,6 +68,8 @@ import { faClock as farClock } from '@fortawesome/free-regular-svg-icons'
 /* add icons to the library */
 library.add(
   farCircle,
+  faQrcode,
+  faDownload,
   faClock,
   farClock,
   faCodeBranch,
