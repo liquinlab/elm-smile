@@ -4,7 +4,7 @@ import { onMounted, computed, ref } from 'vue'
 // load sub-components used in this compomnents
 import DeveloperNavBar from '@/components/navbars/DeveloperNavBar.vue'
 import DevDataBar from '@/components/navbars/DevDataBar.vue'
-import PresentationNavBar from '@/components/navbars/PresentationNavBar.vue'
+import PresentationNavBar from '@/components/presentation_mode/PresentationNavBar.vue'
 
 // bars that are part of the actual experiments
 import StatusBar from '@/components/navbars/StatusBar.vue'
