@@ -40,7 +40,8 @@ parts of your experiment in this mode.
 
 The small QR code button in the top nav bar opens a dropdown menu that shows a
 QR code for the current webpage. This can be downloaded as a SVG and inserted
-into poster and talks.
+into posters and talks. It points to the deployed location of the presentation
+mode website.
 
 ## How to customize Presentation Mode
 

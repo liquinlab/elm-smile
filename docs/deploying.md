@@ -260,11 +260,12 @@ adjust.
 
 ### Notifying the Slack bot
 
-In the <GureckisLabText/>, the final step is to send a notification about the
-deployment to a Slack
+If you set up the Slac connection, the final step is to send a notification
+about the deployment to a Slack
 [Workflow Builder](https://slack.com/help/articles/360035692513-Guide-to-Workflow-Builder)
 bot. This lets you verify the code was deployed and provides you with an
-up-to-date URL to share with participants.
+up-to-date URL to share with participants. This includes a QR code which can be
+used to recruit anonymous participants to the task via a physical flye/poster.
 
 If the deployment script fails, GitHub will attempt to notify the slack bot
 about the error. However, it requires that the GitHub secrets have been properly

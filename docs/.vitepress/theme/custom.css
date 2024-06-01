@@ -1,6 +1,7 @@
 /**
  * Colors: Solid
  * -------------------------------------------------------------------------- */
+@import 'bulma-prefixed.min.css';
 
 :root {
   --vp-c-white: #ffffff;

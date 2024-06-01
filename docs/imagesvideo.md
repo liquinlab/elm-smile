@@ -1,6 +1,6 @@
-# Preloading images
+# :framed_picture: Preloading images
 
-<SmileText/> offers two ways to preload images:
+The <SmileText/> offers two ways to preload images:
 
 If your experiment is simple enough such that most or all images included in the
 project will likely be used, you can set the optional flag `preloadImages` in

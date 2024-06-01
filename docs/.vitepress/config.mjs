@@ -47,23 +47,27 @@ export default defineConfig({
           { text: '⚙️ Configuring', link: '/configuration' },
           { text: '📦 Data storage', link: '/datastorage' },
           { text: '👩‍💻 Developing', link: '/developing' },
-          { text: '🐞 Testing', link: '/testing' },
           { text: '👩‍🏫 Presentation mode', link: '/presentation' },
           { text: '📈 Dashboard', link: '/dashboard' },
         ],
       },
       {
-        text: 'Designing Experiments',
+        text: 'Designing and Testing Experiments',
         items: [
           { text: '🧑‍🎨 Overview', link: '/experimentdesign' },
+          { text: '👩‍💻 Developer mode', link: '/developermode' },
           { text: '🧩 Components', link: '/components' },
-          { text: '🔀 Timeline', link: '/timeline' },
-          { text: '🧱 Built In Components', link: '/builtins' },
-          { text: '🖼️ Images and Videos', link: '/imagesvideo.md' },
+          { text: '🔀 Timeline and Views', link: '/timeline' },
+          { text: '🧱 Built In Views', link: '/builtins' },
+          { text: '🪜 Stepping Trials', link: '/trials' },
+          { text: '✍️ Autofill', link: '/autofill' },
           { text: '🎲 Randomization', link: '/randomization' },
+          { text: '🖼️ Images and Videos', link: '/imagesvideo.md' },
           { text: '🧑‍🎨 Styling, CSS, and icons', link: '/style' },
+          { text: '🎥 Recording and Saving data', link: '/recordingdata' },
           //{ text: '💰 Computing bonuses', link: '/bonuses' },
-          { text: '🆘 Errors and other issues', link: '/problems' },
+          { text: '🆘 Dealing with Errors', link: '/problems' },
+          { text: '🐞 Automated Testing', link: '/testing' },
 
           //{ text: '🔌 Server-side Computations', link: '/server' },
         ],
@@ -82,6 +86,11 @@ export default defineConfig({
           { text: '🤖 Quality control', link: '/qualitycontrol' },
         ],
       },
+      {
+        text: 'APIs and Advanced Documentation',
+        items: [],
+      },
+
       {
         text: 'Contributing',
         items: [

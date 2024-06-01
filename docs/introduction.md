@@ -13,9 +13,9 @@ fun to develop rich and interactive online experiments.
   forms, captchas, instructions, and surveys. Just add your custom experiment
   logic and start collecting data.
 - Participant-friendly features include the ability to withdraw from the
-  experiment (while providing feedback), incremental data saving in case of
-  problems, optimized load times, graceful error handling, and a responsive
-  design that works on most/all devices.
+  experiment (while providing feedback), incremental data saving, optimized load
+  times, graceful error handling, and a responsive design that works on most/all
+  devices.
 - Developer [mode](/developing) which makes it easier to debug and design
   experiments. Jump quickly between phases and trials in your experiments,
   [autofill forms and generate fake data for testing](/developing#autofill-and-data-faking),
@@ -39,7 +39,9 @@ fun to develop rich and interactive online experiments.
   code is reliable and bug-free.
 - Integrates with the rest of your research life including
   [Slack notifications](/deploying#notifying-the-slack-bot), automatic
-  generation of QR codes for recruitment posters (or for presentations),
+  generation of QR codes for
+  [recruitment posters](/deploying#notifying-the-slack-bot) (or for
+  [presentations](/presentation#qr-code-download)),
   [anonymized links](/deploying#what-url-do-you-send-participants-to), and more.
 - Data provenance features include an audit trail of which version of the code
   was used to create each data file.

@@ -2,7 +2,7 @@
 head:
   - - link
     - rel: stylesheet
-      href: '/css/bulma.min.css'
+      href: /css/bulma-prefixed.min.css
 ---
 
 # :artist: Styling, CSS, and Icons
@@ -71,7 +71,7 @@ add Bulma's button styling by adding the class "button":
 <button class="button">Click me</button>
 ```
 
-<button class="button">Click me</button>
+<button class="bulma-button">Click me</button>
 
 which makes the button larger, easier to click, adds a hover state, etc...
 
@@ -83,7 +83,7 @@ by adding the `is-primary` class to the list:
 <button class="button is-primary">Click me</button>
 ```
 
-<button class="button is-primary">Click me</button>
+<button class="bulma-button bulma-is-primary">Click me</button>
 
 or red adding `is-danger`:
 
@@ -91,7 +91,7 @@ or red adding `is-danger`:
 <button class="button is-danger">Click me</button>
 ```
 
-<button class="button is-danger">Click me</button>
+<button class="bulma-button bulma-is-danger">Click me</button>
 
 or we can make it small and yellow:
 
@@ -99,7 +99,7 @@ or we can make it small and yellow:
 <button class="button is-warning is-small">Click me</button>
 ```
 
-<button class="button is-warning is-small">Click me</button>
+<button class="bulma-button bulma-is-warning bulma-is-small">Click me</button>
 
 or big and green:
 
@@ -107,7 +107,7 @@ or big and green:
 <button class="button is-success is-large">Click me</button>
 ```
 
-<button class="button is-success is-large">Click me</button>
+<button class="bulma-button bulma-is-success bulma-is-large">Click me</button>
 
 You can read the full Bulma documentation on button elements
 [here](https://bulma.io/documentation/elements/button/) which demonstrates many
@@ -197,7 +197,7 @@ Add a large margin on the left to indent and on the top to add space:
 </p>
 ```
 
-<p class="has-text-centered is-size-5 ml-6 mt-6">
+<p class="has-text-centered is-size-5 ml-6 mt-16">
 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo odio nam itaque accusantium amet iste, ipsum, corrupti laudantium vero tempora velit possimus dolorum libero eaque perspiciatis harum quibusdam fugiat? Nemo.
 </p>
 
@@ -251,20 +251,20 @@ as well as different types of tags:
 
 which will render as:
 
-<div class="columns">
-    <div class="column">
-        <span class="tag is-black">Black</span><br>
-        <span class="tag is-dark">Dark</span><br>
-        <span class="tag is-light">Light</span><br>
-        <span class="tag is-white">White</span><br>
-        <span class="tag is-primary">Primary</span><br>
+<div class="bulma-columns">
+    <div class="bulma-column">
+        <span class="bulma-tag bulma-is-black">Black</span><br>
+        <span class="bulma-tag bulma-is-dark">Dark</span><br>
+        <span class="bulma-tag bulma-is-light">Light</span><br>
+        <span class="bulma-tag bulma-is-white">White</span><br>
+        <span class="bulma-tag bulma-is-primary">Primary</span><br>
     </div>
-    <div class="column">
-        <span class="tag is-link">Link</span><br>
-        <span class="tag is-info">Info</span><br>
-        <span class="tag is-success">Success</span><br>
-        <span class="tag is-warning">Warning</span><br>
-        <span class="tag is-danger">Danger</span><br>
+    <div class="bulma-column">
+        <span class="bulma-tag bulma-is-link">Link</span><br>
+        <span class="bulma-tag bulma-is-info">Info</span><br>
+        <span class="bulma-tag bulma-is-success">Success</span><br>
+        <span class="bulma-tag bulma-is-warning">Warning</span><br>
+        <span class="bulma-tag bulma-is-danger">Danger</span><br>
     </div>
 </div>
 
@@ -306,17 +306,6 @@ new options), you can also add global css classes to `css/main.css`. This file
 includes the Bulma-generated `css/styles.css` and then appends additional
 options. Adding things here apply to _all_ your components and/or pages, so it
 is a global option similar to modifying the default Bulma theme.
-
-:::info Where is the best place to make global style changes?
-
-Whether you override a Bulma setting (or add a new setting in the
-`sass/mystyles.scss`) or directly in the global CSS file (using `css/main.css`)
-is up to you. Some people are more familiar with CSS than the SCSS language used
-by Bulma. Also modifying `css/main.css` doesn't require the build step.
-Generally, it makes sense to use CSS to add styles and the SCSS to override or
-modify the Bulma theme.
-
-:::
 
 ## Component specific stylesheet
 

@@ -1,9 +1,9 @@
-# Configuring a base repo for a lab/organization
+# :test_tube: Setup a base repo
 
-If you would like to use <SmileText/> in new lab/organization you need to
-configure a small set of services (Github, Firebase, Slack, and a webserver) to
-play well together. This document walks you through the steps to configure a set
-up so that multiple users in a lab can share the same resources.
+If you would like to use <SmileText/> in new lab/organization or for yourself
+you need to configure a small set of services (Github, Firebase, Slack, and a
+webserver) to play well together. This document walks you through the steps to
+configure a set up so that multiple users in a lab can share the same resources.
 
 Even if you are using Smile alone you still will need to configure these
 services the first time you develop an experiment. However, afterwards you can
@@ -28,12 +28,22 @@ developing and launching experiments relatively painless.
   there are some technical limits, see [here](/datastorage) for more info).
 
 - **Slack** (weakly required).  
-  In order notify you and your other lab members when certain tasks are complete
-  or if there are errors, Smile uses a slack bot. You need to have a Slack
-  account and get API keys to enable this. If you don't want to use Slack it is
-  possible to modify the scripts to provide notifications another way (e.g.,
-  email) but currently that is not implemented and you'd have to research that
-  yourself.
+   In order notify you and your other lab members when certain tasks are complete
+  or if there are errors, Smile uses a slack bot. You need to have a Slack account
+  and get API keys to enable this. If you don't want to use Slack it is possible
+  to modify the scripts to provide notifications another way (e.g., email) but currently,
+  that is not implemented and you'd have to research that yourself.
+
+  ::: info Slack alternatives
+
+  One very simple option is to modify the scripts to send you an email when your
+  task is deployed. Another option is [ntfy.sh](https://ntfy.sh) which can send
+  notifications to your phone or computer (using browser notifications) when a
+  script completes (see
+  [StackOverview](https://stackoverflow.com/questions/62304258/github-actions-notifications-on-workflow-failure)
+  for a discussion).
+
+  :::
 
 - **A SSL signed HTTP/web server** (required).  
   Finally, you need to provide a web hosting site to host your experiments. The

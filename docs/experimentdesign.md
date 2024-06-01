@@ -1,54 +1,113 @@
-# :artist: Designing Quality Experiments
+# :artist: Overview
 
-Designing good web based experiments is a deceivingly complex task. At the most
-basic level, a web experiment is simply a web page that presents stimuli and
-records people's responses. Such technology has been around for decades and is
-pretty simple in most cases.
+The following sections describe how to design experiments using the <SmileText/>
+project. It covers the basic of programming new task elements, configuring the
+timeline/flow of your experiments, and customizing the look and feel of your
+experiments.
 
-However, several factors have conspired to make designing web experiments more
-complex.
+## :woman_technologist: Developer mode
 
-- The web is a complex environment with many different browsers, devices, and
-  operating systems. This means that web experiments need to be designed to work
-  across a wide range of platforms.
-- Institutional Review Boards at most universities have become more concerned
-  about subject privacy and data security. This means that web experiments need
-  to be protect the anonymity of participants and the security of their data.
-- Most human subjects research _requires_ that participants provide informed
-  consent and that they are free to _withdraw_ from the study at any time.
-  Handling the logic of withdrawing and reporting this adds complexity to
-  experiments.
-- Researchers increasingly turn towards paid participant pools like Amazon
-  Mechanical Turk to recruit participants. This means that web experiments need
-  to be designed to work in a way that is compatible with these varied
-  platforms.
-- Workers on paid platforms like Amazon Mechanical Turk have become more
-  sophisticated at bypassing attention checks and other quality control
-  measures. This means that web experiments need to be designed to prevent
-  cheating and data corruption by bots and AI-assisted workers (at least for
-  most psychological studies).
-- Expectations of users about the quality of web experiences is increasing.
-  Worker may be less interested and engaged with tasks which seems old, buggy,
-  or do not work well in their browser.
-- Research questions in psychology and cognitive science are becoming more
-  complex. This means that web experiments need to be designed to handle more
-  complex experimental designs and data collection strategies. This include
-  group and multi-player experiments, longitudinal studies, and more. Interfaces
-  might need to be more interactive and complex than simple stimulus-response
-  tasks.
+When learning about <SmileText/> and later developing/debugging your experiment
+it is useful to interact with Smile using a web server running on your local
+computer (i.e., your laptop or desktop). <SmileText/> provides a special local
+developer mode that adds some interface elements to the page that help you debug
+and test your experiment. You can learn more about developer mode
+[here](/developermode). But the TL;DR is
 
-There are several other dimension that are important:
+```
+npm run dev
+```
 
-- Reducing bugs introduced by sloppy programming is important for the
-  replicability of research.
-- Fasciliating the sharing of code and materials is important for the
-  transparency of research.
+in the project folder to get started.
 
-The <SmileText/> project was designed with these sets of considerations in mind.
-The focus is on making it easy to design and deploy high-quality web
-experiments. While Smile can be used for simple stimulus-response type tasks, it
-is easily capable of handling more complex experimental designs. This is
-accomplished by leveraing state of the art web technologies and best practices
-in web development. Smile doesn't reinvent the wheel by making an entirely new
-web framework. Instead it leverages the currently best tools for building high
-quality web applications use in industry.
+## :jigsaw: Components
+
+<img src="/images/components.png" width="50%" align="right">
+
+Our guide begins by introducing the concept of a [**component**](/components)
+and how components help organize code by making it more modular and reusable.
+Then we discuss specific features of Vue.js components (e.g.,
+[single-file components](/components#single-file-components),
+[declarative rendering](/components#declarative-rendering-and-reactivity), and
+[reactivity](/components#declarative-rendering-and-reactivity)) that help make
+web development code more compact and error-free.
+
+## :twisted_rightwards_arrows: Timeline and Views
+
+Most experiments are made of of several phases (e.g., welcome, informed consent,
+instructions, debriefing, etc...). We call the phases "Views" and each major
+phase of an experiment is associated with its own Vue component. Learn about
+views [here](/timeline#views).
+
+Most experiments require participants to proceed through these phases in a
+particular order. For example, informed consent must be provided and agreed to
+before we perform the actual experiment. Smile provides a
+[timeline](/timeline#timeline) that you use to configure this behavior.
+
+## :bricks: Built-in Views
+
+Smile comes with several [built-in views](/builtins) for common phases of an
+experiment. This includes things like obtaining informed consent, presenting
+instructions, CAPTCHAs and presenting a thank you page. We describe these
+default built-in views and provide an overview of how to customize them for your
+own experiment.
+
+## :ladder: Stepping trials
+
+Many experiments are organized into a series of repeated events called "trials".
+Trials are different than views (see above) because they often repeat the same
+basic structure many times. Smile provides several features for
+[organizing and managing trials](/trials). We introduce the concept of a "trial"
+and how to programmatically advance through a sequence of trials within a
+particular View. The same concept is also used to add sequential build to any
+type of view (e.g., a sequence of instructions).
+
+## :writing_hand: Autofill
+
+When developing and debugging your experiment it is useful to have a way to
+"fake" data from participants. This can be used to quickly advance through the
+experiment to test different parts of the code. Smile provides a way to
+[autofill forms](/autofill) with fake data. In addition, you can generate fake,
+but realistic data for your experiment. This can help later to test your data
+analysis scripts.
+
+## :game_die: Randomization
+
+Almost all experiments require some form of randomization. This could be
+randomizing participants to a condition or randomizing the order of trials.
+Smile provides several mechanisms for [randomizing](/randomization) the order of
+the flow of experiments.
+
+## :framed_picture: Image and Videos
+
+Many experiments preset videos or images to participants. We describe how to
+distribute [images and videos](/imagesvideo) with your Smile project, how to
+preload them so that they appear immediately when needed, and how to display
+them in your experiment.
+
+## :artist: Styling, CSS, and Icons
+
+Smile uses the Bulma CSS framework for help with styling interface elements.
+This provides nice looking buttons, tables, and other design elements.
+[Here](/style) we describe how to use Bulma to change the look and feel of your
+experiments. We also describe how to use icons in your experiments which add
+polish and help users understand the interface. Of course, you can style your
+components with custom CSS as well or overwrite Smile defaults for your entire
+project.
+
+## ::movie_camera:: Saving and Recording Data
+
+The most important function of any web experiment platform is securely saving
+data. Smile provides serveral ways to [save and record data](/datastorage). In
+addition the Smile API takes care of manny functions for you so you rarely have
+to think much about data storage and saving.
+
+## :sos: Dealing with Errors
+
+When running an experiment it is important to handle errors gracefully. Smile
+provides several helpful features to deal gracefully with errors.
+
+## :lady_beetle: Automated Testing
+
+When running an experiment it is important to handle errors gracefully. Smile
+provides several helpful features to deal gracefully with errors.

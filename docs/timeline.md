@@ -1,4 +1,4 @@
-# :twisted_rightwards_arrows: Timeline
+# :twisted_rightwards_arrows: Timeline and Views
 
 Web experiments are often composed of several parts presented in sequence. For
 example, first, we might show a welcome page &rarr; informed consent
@@ -10,6 +10,22 @@ This page shows how to configure and control <SmileText />'s Timeline
 implementation, and how to customize it with more complex behaviors. Most of the
 configuration happens in `src/app_timeline.js` which is short, self-explanatory,
 and well commented so you jump there if you feel confident.
+
+## Views
+
+In <SmileText />, each major phase of an experiment is associated with its own
+component. We call these phases "Views" although there is nothing particularly
+special about them (they are in fact just ordinary Vue components). "Views" is
+just a useful conceptual difference for thinking about these bigger "parts" or
+"phases" of an experiment. We might have called them "pages", "routes",
+"sections", "parts", or "phases" but "views" is a common designation in other
+packages. For example, the welcome page, informed consent, instructions, and
+debriefing are all examples of Views. Each View is associated with one Vue
+component that is responsible for rendering the content of that View. A view is
+of course made up of many smaller components, but the view is a special,
+top-level component that is configurable on a **timeline**. When we create a
+view we usually includes it into the filename: `WelcomeView.vue`,
+`ConsentView.vue`, etc...
 
 ## Single-page Applications and Routing
 
@@ -26,9 +42,9 @@ Because SPAs load the entire app from a single URL, the solution to this for
 SPAs is known as a **router**. A router is a piece of software running in the
 browser which interprets URL requests and programmatically changes the visible
 content on the webpage, mimicking normal browser requests for specific pages. In
-<SmileText />, routing is handled by the [Vue Router](https://router.vuejs.org)
-which is a powerful open-source project built for routing in
-[Vue](https://vuejs.org) applications.
+Smile, routing is handled by the [Vue Router](https://router.vuejs.org) which is
+a powerful open-source project built for routing in [Vue](https://vuejs.org)
+applications.
 
 A simple example of using the Vue router is visible here (adapted from the Vue
 Router [documentation](https://router.vuejs.org/guide/#javascript)):
@@ -36,14 +52,14 @@ Router [documentation](https://router.vuejs.org/guide/#javascript)):
 ```js
 // 1. Define route Vue components
 // These can be imported from other files
-const Welcome = { template: '<div>Welcome</div>' }
-const Consent = { template: '<div>Consent</div>' }
+const WelcomeView = { template: '<div>Welcome</div>' }
+const ConsentView = { template: '<div>Consent</div>' }
 
 // 2. Define some routes
 // Each route should map to a component
 const routes = [
-  { path: '/', component: Welcome }, // maps '/' to 'Welcome'
-  { path: '/consent', component: Consent }, // maps '/about' to 'Consent'
+  { path: '/', component: WelcomeView }, // maps '/' to 'Welcome'
+  { path: '/consent', component: ConsentView }, // maps '/about' to 'Consent'
 ]
 
 // 3. Create the router instance and pass the `routes` option
@@ -53,11 +69,12 @@ const router = VueRouter.createRouter({
 })
 ```
 
-First, we define two simple Vue [components](/components), then we create an
-array called `routes` which configures each route. Each route is, in effect, a
-mapping between a particular URL and a component. For example, in this code
-snippet, `/` on the server is mapped to the `Welcome` component and `/consent`
-to the `Consent` component.
+First, we define two simple Vue [components](/components) (here we used a
+short-hand technique which avoided even needing a Single-File Component), then
+we create an array called `routes` which configures each route. Each route is,
+in effect, a mapping between a particular URL and a component. For example, in
+this code snippet, `/` on the server is mapped to the `Welcome` component and
+`/consent` to the `Consent` component.
 
 You can read this as saying "When the user requests the `/` URL on this
 application, display the `Welcome` component". Specifically, it renders the
