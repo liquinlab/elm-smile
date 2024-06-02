@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import appconfig from '@/core/config'
 import { push } from 'notivue'
 
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 
 function getLogTrace() {
   // some browsers use 'at ', some use '@'

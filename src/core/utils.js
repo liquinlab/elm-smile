@@ -1,5 +1,5 @@
 import useSmileStore from '@/core/stores/smiledata' // get access to the global store
-import useSmileAPI from './composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 
 export function getQueryParams() {
   const queryString = window.location.search
@@ -58,7 +58,7 @@ export function processQuery(query, service) {
       session_id: urlParams.CITIZEN_SESSION_ID,
     })
   } else {
-    // api.log('const { next, prev } = useTimelineStepper() mode')
+    // api.log('const { next, prev } = useTimeline() mode')
   }
 }
 

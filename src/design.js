@@ -20,7 +20,7 @@ import Withdraw from '@/components/errors_withdraw/WithdrawPage.vue'
 import WindowSizer from '@/components/screen_adjust/WindowSizerPage.vue'
 // add new routes here.  generally these will be things in components/pages/[something].vue
 
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 
 import Timeline from '@/core/timeline'
@@ -91,12 +91,22 @@ timeline.pushSeqRoute({
   },
 })
 
+console.log(Advertisement)
+
 // consent
 timeline.pushSeqRoute({
   path: '/consent',
   name: 'consent',
   component: Consent,
-  meta: { requiresConsent: false },
+  meta: {
+    requiresConsent: false,
+    preload: async () => {
+      // can you figure that out yourself
+      console.log('PRELOADING DATA from AdvertisementPage.preload.js')
+      let data = await import('@/components/recruitment/AdvertisementPage.preload.js')
+      console.log('DATA LOADED', data.default)
+    },
+  },
 })
 
 // demographic survey

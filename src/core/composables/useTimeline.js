@@ -4,7 +4,7 @@ import { RandomizeSubTimeline } from '@/core/subtimeline'
 import useSmileStore from '@/core/stores/smiledata'
 import useLog from '@/core/stores/log'
 
-export default function useTimelineStepper() {
+export default function useTimeline() {
   const smilestore = useSmileStore()
   const route = useRoute()
   const router = useRouter()

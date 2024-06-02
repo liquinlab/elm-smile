@@ -6,7 +6,7 @@ import RouteInfoDropDrop from '@/components/navbars/RouteInfoDropDown.vue'
 import ResetButton from '@/components/presentation_mode/PresentationModeResetButton.vue'
 import QRCodeButton from '@/components/presentation_mode/QRCodeButton.vue'
 
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 </script>
 

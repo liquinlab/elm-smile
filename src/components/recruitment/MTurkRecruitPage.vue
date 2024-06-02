@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue'
 import StudyPreviewText from '@/components/recruitment/StudyPreviewText.vue'
 
 // import and initalize smile API
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 
 const mturkPreview = ref(true)

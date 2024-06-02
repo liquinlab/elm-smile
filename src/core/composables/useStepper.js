@@ -1,18 +1,21 @@
 import { shuffle } from '@/core/randomization'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import useSmileStore from '@/core/stores/smiledata'
 import useLog from '@/core/stores/log'
+import { useRoute } from 'vue-router'
 
-export function useTrialStepper(trials, page, finishedCallback) {
+export function useStepper(trials, finishedCallback) {
   const smilestore = useSmileStore()
   const log = useLog()
+  const route = useRoute()
+  const page = route.name
   smilestore.dev.page_provides_trial_stepper = true
 
   //const index = ref(0)
   const n_trials = trials.length
 
-  function nextTrial() {
-    log.log('TRIAL STEPPER: Advancing to next trial')
+  function nextStep() {
+    log.log('STEPPER: Advancing to next step')
     if (smilestore.getPageTracker(page) < n_trials - 1) {
       //index += 1
       smilestore.incrementPageTracker(page)
@@ -22,7 +25,7 @@ export function useTrialStepper(trials, page, finishedCallback) {
     }
   }
 
-  function prevTrial() {
+  function prevStep() {
     log.warn('TRIAL STEPPER: Rewinding to prev trial')
     if (smilestore.getPageTracker(page) > 0) {
       //index -= 1
@@ -30,15 +33,23 @@ export function useTrialStepper(trials, page, finishedCallback) {
     }
   }
 
-  return { nextTrial, prevTrial }
+  const step = computed(() => {
+    return trials[smilestore.getPageTracker(page)]
+  })
+
+  const step_index = computed(() => {
+    return smilestore.getPageTracker(page)
+  })
+
+  return { nextStep, prevStep, step, step_index }
 }
 
-export function useStatelessTrialStepper(trials, index, finishedCallback) {
+export function useStatelessStepper(trials, index, finishedCallback) {
   //const index = ref(0)
   const n_trials = trials.length
 
-  function nextTrial() {
-    log.log('TRIAL STEPPER: Advancing to next trial')
+  function nextStep() {
+    log.log('STATELESS STEPPER: Advancing to next trial')
     //log.log("i see index", smilestore.getPageTracker(route.name))
     if (index.value < n_trials - 1) {
       index.value += 1
@@ -48,14 +59,14 @@ export function useStatelessTrialStepper(trials, index, finishedCallback) {
     }
   }
 
-  function prevTrial() {
-    log.warn('TRIAL STEPPER: Rewinding to prev trial')
+  function prevStep() {
+    log.warn('STATELESSS STEPPER: Rewinding to prev trial')
     if (index.value > 0) {
       index.value -= 1
     }
   }
 
-  return { nextTrial, prevTrial }
+  return { nextStep, prevStep }
 }
 
 /*
@@ -94,4 +105,4 @@ export function useTrialStepper(trials, page, finishedCallback) {
 }
 */
 //export { useTrialStepper, useStatelessTrialStepper }
-export default useTrialStepper
+export default useStepper

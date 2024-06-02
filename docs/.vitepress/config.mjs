@@ -52,14 +52,14 @@ export default defineConfig({
         ],
       },
       {
-        text: 'Designing and Testing Experiments',
+        text: 'Designing and Testing',
         items: [
           { text: '🧑‍🎨 Overview', link: '/experimentdesign' },
           { text: '👩‍💻 Developer mode', link: '/developermode' },
           { text: '🧩 Components', link: '/components' },
           { text: '🔀 Timeline and Views', link: '/timeline' },
           { text: '🧱 Built In Views', link: '/builtins' },
-          { text: '🪜 Stepping Trials', link: '/trials' },
+          { text: '🪜 Stepping Views', link: '/steps' },
           { text: '✍️ Autofill', link: '/autofill' },
           { text: '🎲 Randomization', link: '/randomization' },
           { text: '🖼️ Images and Videos', link: '/imagesvideo.md' },

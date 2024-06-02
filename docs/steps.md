@@ -1,4 +1,79 @@
-# :ladder: Stepping through trials
+# :ladder: Stepping Views
+
+Many experiments are organized into a series of repeated events called "trials".
+Trials are different than views (see above) because they often repeat the same
+basic structure many times. Smile provides several features for organizing and
+managing trials. We introduce the concept of a "trial" and how to
+programmatically advance through a sequence of trials within a particular View.
+The same concept is also used to add sequential build to any type of view (e.g.,
+a sequence of instructions).
+
+## Create a trial-based View
+
+To create a trial-based view, you need to import the SmileAPI, define a list of
+trials and then use the `useTrialStepper` method to advance through the trials.
+Here we walk through the steps.
+
+### Import the SmileAPI
+
+In your `<script setup>` section, import the SmileAPI and initialize it. This
+will give you access to the `useTrialStepper` method which will allow you to
+advance through the trials.
+
+```vue
+<script setup>
+...
+import useSmileAPI from '@/core/composables/useSmileAPI' // [!code highlight]
+const api = useSmileAPI() // [!code highlight]
+...
+</script>
+```
+
+### Define the trials
+
+Next, still in `<script setup>`, define a list of trials. Each trial is an
+object with keys that define aspects of what you wish to display on a given
+trial.
+
+```js
+var trials = [
+  { word: 'SHIP', color: 'red', condition: 'unrelated' },
+  { word: 'MONKEY', color: 'green', condition: 'unrelated' },
+  { word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
+  { word: 'RED', color: 'red', condition: 'congruent' },
+  { word: 'GREEN', color: 'green', condition: 'congruent' },
+  { word: 'BLUE', color: 'blue', condition: 'congruent' },
+  { word: 'GREEN', color: 'red', condition: 'incongruent' },
+  { word: 'BLUE', color: 'green', condition: 'incongruent' },
+  { word: 'RED', color: 'blue', condition: 'incongruent' },
+]
+```
+
+### Randomize the trials
+
+You can then shuffle the trials randomly using
+
+```vue
+trials = api.shuffle(trials)
+```
+
+### Use the `useTrialStepper` method
+
+Next, use the `useTrialStepper` method to advance through the trials. This
+method uses a Vue composable to provide the `nextTrial` and `prevTrial` methods
+to advance and go back through the trials. It also provides a callback function
+that is called when the last trial is shown. This is where you might do some
+additional data saving or analysis.
+
+```js
+const { nextTrial, prevTrial } = api.useTrialStepper(
+  trials,
+  api.currentRouteName(),
+  () => {
+    finalize()
+  }
+)
+```
 
 ```vue
 <script setup>
@@ -12,7 +87,7 @@ import { onKeyDown } from '@vueuse/core'
 import { useMouse } from '@vueuse/core'
 
 // import and initalize smile API
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 
 // this progress bar is not implemented and a little hard so lets pass for now
@@ -48,7 +123,7 @@ trials = api.shuffle(trials)
 // or analysis (e.g., if you are showing the subject performance feedback about
 // their performance on the task).  it called the finalize() function which is
 // defined below
-const { nextTrial, prevTrial } = api.useTrialStepper(
+const { nextTrial, prevTrial, trialData } = api.useTrialStepper(
   trials,
   api.currentRouteName(),
   () => {
@@ -56,9 +131,9 @@ const { nextTrial, prevTrial } = api.useTrialStepper(
   }
 )
 
-const trial = computed(() => {
-  return trials[api.getCurrentTrial()]
-})
+// const trial = computed(() => {
+//   return trials[api.getCurrentTrial()]
+// })
 
 // Handle the key presses for the task
 // onKeyDown is a composable from the VueUse package

@@ -2,7 +2,7 @@
 //import { useTimeAgo } from '@vueuse/core'
 import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 
-import SmileAPI from '@/core/composables/smileapi'
+import SmileAPI from '@/core/composables/useSmileAPI'
 const api = SmileAPI()
 
 import useSmileStore from '@/core/stores/smiledata'

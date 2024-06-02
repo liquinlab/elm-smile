@@ -31,7 +31,7 @@ export function preloadAllImages() {
 </script>
 ```
 
-Then, im `app_timeline.js`, import it in addition to the module itself.
+Then, in `design.js`, import it in addition to the module itself.
 
 ```javascript
 // Before:

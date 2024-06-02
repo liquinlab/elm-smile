@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import useSmileStore from '@/core/stores/smiledata'
 import appconfig from '@/core/config'
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 // load sub-components used in this compomnents
 import WithdrawFormModal from '@/components/errors_withdraw/WithdrawFormModal.vue'
 import InformedConsentModal from '@/components/consent/InformedConsentModal.vue'

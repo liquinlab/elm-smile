@@ -1,7 +1,7 @@
 <script setup>
 import { reactive, onMounted } from 'vue'
 // import and initalize smile API
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 // get access to the global store
 const emit = defineEmits(['toggleWithdraw', 'submitWithdraw'])

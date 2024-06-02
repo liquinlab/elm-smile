@@ -6,26 +6,25 @@ example, first, we might show a welcome page &rarr; informed consent
 or timeline feature which makes it easy to configure, customize, and move
 through different stages of an experiment.
 
+The timeline feature is more than just a way to control the presentation order
+of different phases. It also acts as a way to prevent subjects from doing things
+in the tasks that you might not want. For example, in many web-based experiments
+if the subject reloads the webpage the task will start over. Although
+researchers often add a warning about this, it would allow subjects to repeat
+the instructions after seeing the task, accidentally participate in multiple
+conditions, or start over if they make a mistake to increase their bonus.
+Smile's timeline logic prevents this by controlling the flow of the experiment
+even across reloads of the webpage. For instance, when properly configured, a
+subject in a Smile experiment can close their browser, restart their computer,
+and come back to the experiment on the **same trial** they left off on.
+
 This page shows how to configure and control <SmileText />'s Timeline
 implementation, and how to customize it with more complex behaviors. Most of the
-configuration happens in `src/app_timeline.js` which is short, self-explanatory,
-and well commented so you jump there if you feel confident.
+configuration happens in `src/design.js` which is short, self-explanatory, and
+well commented so you jump there if you feel confident.
 
-## Views
-
-In <SmileText />, each major phase of an experiment is associated with its own
-component. We call these phases "Views" although there is nothing particularly
-special about them (they are in fact just ordinary Vue components). "Views" is
-just a useful conceptual difference for thinking about these bigger "parts" or
-"phases" of an experiment. We might have called them "pages", "routes",
-"sections", "parts", or "phases" but "views" is a common designation in other
-packages. For example, the welcome page, informed consent, instructions, and
-debriefing are all examples of Views. Each View is associated with one Vue
-component that is responsible for rendering the content of that View. A view is
-of course made up of many smaller components, but the view is a special,
-top-level component that is configurable on a **timeline**. When we create a
-view we usually includes it into the filename: `WelcomeView.vue`,
-`ConsentView.vue`, etc...
+We begin by introducing some basic concepts about how Smile works and then
+introduce the concept of Views and the Timeline.
 
 ## Single-page Applications and Routing
 
@@ -166,6 +165,42 @@ The `meta` field specifies additional optional information about the route:
   content when the user is "done" with the experiment (`requiresDone: true`).
   Another option (`requiresWithdraw: true`) requires the participant to have
   withdrawn from the page before showing.
+
+## Views
+
+In <SmileText />, each major phase of an experiment is associated with its own
+component. We call these phases "Views" although there is nothing particularly
+special about them (they are in fact just ordinary Vue components). "Views" is
+just a useful conceptual difference for thinking about these bigger "parts" or
+"phases" of an experiment. We might have called them "pages", "routes",
+"sections", "parts", or "phases" but "views" is a common designation in other
+packages. For example, the welcome page, informed consent, instructions, and
+debriefing are all examples of Views. Each View is associated with one Vue
+component that is responsible for rendering the content of that View. A view is
+of course made up of many smaller components, but the view is a special,
+top-level component that is configurable on a **timeline**. When we create a
+view we usually include it into the filename: `WelcomeView.vue`,
+`ConsentView.vue`, etc...
+
+To help make clear the distinction between a "View" and a "Component", consider
+the following examples:
+
+- A block of trials in an experiment might be one "View" but be composed of many
+  "Components" (e.g., a trial component, a fixation component, a feedback
+  component, etc...).
+- A consent form might be one "View" but be composed of many "Components" (e.g.,
+  a consent text component, a signature component, a submit button component,
+  etc...).
+- A welcome page might be one "View" but be composed of many "Components" (e.g.,
+  a welcome text component, a start button component, etc...).
+
+Of course it would be possible to make your experiment just use a single view
+and have the logic of that view flip between things like instructions, trials,
+and debriefing. However, it is often easier to manage the complexity of an
+experiment by breaking it into smaller, more manageable pieces. This is the idea
+behind the "View" concept. Views tend be to modular and reusable "sections" of
+an experiment that you might use in different experiments or in different parts
+of the same experiment.
 
 ## Timeline
 
@@ -346,7 +381,7 @@ sub-timeline</b>.
 
 Let's say you want two tasks to be presented in a random order, following a
 route called `/exp`. After the two tasks, you want to show the debrief route.
-Here's what your `app_timeline.js` file might look like:
+Here's what your `src/design.js` file might look like:
 
 ```js
 import RandomSubTimeline from '@/core/subtimeline'
@@ -476,8 +511,8 @@ when we are done.
 The way to import the stepper composable into your component is:
 
 ```js
-import useTimelineStepper from '@/composables/timelinestepper'
-const { next, prev } = useTimelineStepper()
+import useTimeline from '@/composables/useTimeline'
+const { next, prev } = useTimeline()
 ```
 
 This imports the composable, then creates a `next()` and `prev()` which are
@@ -499,13 +534,13 @@ button (calling the `finish()` method):
 ```vue
 <script setup>
 import { useRoute } from 'vue-router'
-import useTimelineStepper from '@/composables/timelinestepper'
+import useTimeline from '@/composables/useTimeline'
 import useSmileStore from '@/stores/smiledata' // get access to the global store
 
 const route = useRoute()
 const smilestore = useSmileStore()
 
-const { next, prev } = useTimelineStepper()
+const { next, prev } = useTimeline()
 
 function finish(goto) {
   if (goto) router.push(goto)
@@ -526,8 +561,8 @@ function finish(goto) {
 </template>
 ```
 
-Details about the implementation of the `useTimelineStepper` are quite simple
-and in `src/composables/timelinestepper.js`.
+Details about the implementation of the `useTimeline` are quite simple and in
+`src/composables/useTimeline.js`.
 
 :::warning IMPORTANT (and helpful!)
 
@@ -593,13 +628,13 @@ Your quiz module then might implement something like the following:
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import useTimelineStepper from '@/composables/timelinestepper'
+import useTimeline from '@/composables/useTimeline'
 import useSmileStore from '@/stores/smiledata' // get access to the global store
 
 const route = useRoute()
 const smilestore = useSmileStore()
 
-const { next, prev } = useTimelineStepper()
+const { next, prev } = useTimeline()
 
 
 quizPassed = computed(() => {...}); // computed property that checks if the quiz was passed

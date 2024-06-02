@@ -2,8 +2,8 @@
 import * as d3 from 'd3'
 import * as dagre from '@dagrejs/dagre'
 import { ref, onMounted, computed } from 'vue'
-import timeline from '@/app_timeline'
-import useSmileAPI from '@/core/composables/smileapi'
+import timeline from '@/design'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 
 const props = defineProps(['currentRoute', 'hoverRoute'])

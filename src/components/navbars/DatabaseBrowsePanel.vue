@@ -1,7 +1,7 @@
 <script setup>
 import { reactive, computed, onMounted } from 'vue'
 import DatabaseList from '@/components/navbars/DatabaseList.vue'
-import SmileAPI from '@/core/composables/smileapi'
+import SmileAPI from '@/core/composables/useSmileAPI'
 const api = SmileAPI()
 
 const browse_panels = reactive({ path: ['data', null, null] })

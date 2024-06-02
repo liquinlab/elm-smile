@@ -1,18 +1,18 @@
 import { useRoute, useRouter } from 'vue-router'
 import useSmileStore from '@/core/stores/smiledata'
-import useTimelineStepper from '@/core/composables/timelinestepper'
+import useTimeline from '@/core/composables/useTimeline'
 // import seeded randomization function for this component/route
 // random seeding is unique to each component/route
 import { shuffle } from '@/core/randomization'
 
 // import the trial stepper functionality which advances linearly through
 // a set of trials
-import { useTrialStepper } from '@/core/composables/trialstepper'
+import { useStepper } from '@/core/composables/useStepper'
 
 import useLog from '@/core/stores/log'
 
 export default function useSmileAPI() {
-  const { stepNextRoute, stepPrevRoute } = useTimelineStepper()
+  const { stepNextRoute, stepPrevRoute } = useTimeline()
   const route = useRoute()
   const router = useRouter()
   const smilestore = useSmileStore()
@@ -30,7 +30,7 @@ export default function useSmileAPI() {
     hasNextRoute: () => route.meta.next && route.meta.sequential,
     hasPrevRoute: () => route.meta.prev && route.meta.sequential,
     shuffle: shuffle,
-    useTrialStepper: useTrialStepper,
+    useStepper: useStepper,
     // isKnownUser: smilestore.local.knownUser,
     // isDone: smilestore.local.done,
     // isConsented: smilestore.local.consented,

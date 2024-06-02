@@ -1,7 +1,7 @@
 <script setup>
 import { reactive } from 'vue'
 // import and initalize smile API
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 const props = defineProps(['triggered'])
 

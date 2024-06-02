@@ -20,7 +20,7 @@ import { pastelTheme } from 'notivue'
 import WindowSizerPage from '@/components/screen_adjust/WindowSizerPage.vue'
 
 // import and initalize smile API
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 
 // get the smilestore

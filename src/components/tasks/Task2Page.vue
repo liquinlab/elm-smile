@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 // import and initalize smile API
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 
 var trials = [
@@ -25,13 +25,10 @@ var trials = [
 // next we shuffle the trials
 trials = api.shuffle(trials)
 
-const { nextTrial, prevTrial } = api.useTrialStepper(trials, api.currentRouteName(), () => {
+const { nextStep, prevStep, step, step_index } = api.useStepper(trials, api.currentRouteName(), () => {
   finalize()
 })
 
-const trial = computed(() => {
-  return trials[api.getCurrentTrial()]
-})
 // const index = ref(0)
 // trials = shuffle(trials) // shuffle is not "in place"
 
@@ -51,16 +48,16 @@ function finish() {
 }
 
 function next() {
-  if (api.getCurrentTrial() < trials.length - 1) {
-    nextTrial()
+  if (step_index < trials.length - 1) {
+    nextStep()
   } else {
     api.stepNextRoute()
   }
 }
 
 function prev() {
-  if (api.getCurrentTrial() > 0) {
-    prevTrial()
+  if (step_index > 0) {
+    prevStep()
   }
 }
 // custom advance to next route when we finish showing all the trials
@@ -76,8 +73,8 @@ function prev() {
 <template>
   <div class="page prevent-select">
     <h1 class="title is-3">Task 2</h1>
-    {{ trial.sentence }}/{{ api.getCurrentTrial() }}<br /><br />
-    <button class="button is-success is-light" id="finish" @click="prev()" v-if="api.getCurrentTrial() > 0">
+    {{ step.sentence }}/{{ step_index }}<br /><br />
+    <button class="button is-success is-light" id="finish" @click="prev()" v-if="step_index > 0">
       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; prev
     </button>
     &nbsp;&nbsp;&nbsp;

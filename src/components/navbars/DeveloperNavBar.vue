@@ -12,7 +12,7 @@ import ResetButton from '@/components/navbars/ResetButton.vue'
 
 import DataBarButton from '@/components/navbars/DataBarButton.vue'
 
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 </script>
 

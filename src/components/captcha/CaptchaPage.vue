@@ -10,7 +10,7 @@ import CaptchaTrialStroop from '@/components/captcha/CaptchaTrialStroop.vue'
 import CaptchaRotateImage from '@/components/captcha/CaptchaRotateImage.vue'
 
 // import and initalize smile API
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 
 //  need to set up not just the pages but the trials here with configuration inputs
@@ -43,7 +43,7 @@ const currentTab = computed(() => {
 // 5 - human brain should show stroop interference
 // 6 -
 
-const { nextTrial } = api.useTrialStepper(pages, api.currentRouteName(), () => {
+const { nextStep } = api.useStepper(pages, () => {
   finalize()
 })
 
@@ -58,7 +58,7 @@ function next_trial() {
     finish()
   } else {
     ///api.incrementTrial()
-    nextTrial()
+    nextStep()
   }
 }
 

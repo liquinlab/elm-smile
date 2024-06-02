@@ -2,7 +2,7 @@
 const emit = defineEmits(['nextPageCaptcha'])
 import { ref, reactive, onMounted } from 'vue'
 
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 
 // use SVG
@@ -13,7 +13,7 @@ import { SVG } from '@svgdotjs/svg.js'
 // import { useMouse } from '@vueuse/core'
 
 // import and initalize smile API
-// import useSmileAPI from '@/core/composables/smileapi'
+// import useSmileAPI from '@/core/composables/useSmileAPI'
 // const api = useSmileAPI()
 const timed_task = false
 let MAX_TIME = 15000

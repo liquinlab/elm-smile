@@ -321,6 +321,7 @@ export default defineStore('smilestore', {
       let data
       if (this.local.docRef) {
         data = await loadDoc(this.local.docRef)
+        // ALSO WHAT IF THIS FAILS?
       }
       if (data) {
         this.data = data

@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 
 const props = defineProps(['data', 'selected'])
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 const emit = defineEmits(['selected'])
 

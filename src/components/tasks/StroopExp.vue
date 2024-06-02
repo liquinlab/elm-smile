@@ -21,7 +21,7 @@ import { onKeyDown } from '@vueuse/core'
 import { useMouse } from '@vueuse/core'
 
 // import and initalize smile API
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 
 // this progress bar is not implemented and a little hard so lets pass for now
@@ -57,13 +57,13 @@ trials = api.shuffle(trials)
 // or analysis (e.g., if you are showing the subject performance feedback about
 // their performance on the task).  it called the finalize() function which is
 // defined below
-const { nextTrial, prevTrial } = api.useTrialStepper(trials, api.currentRouteName(), () => {
+const { nextStep, prevStep, step, step_index } = api.useStepper(trials, () => {
   finalize()
 })
 
-const trial = computed(() => {
-  return trials[api.getCurrentTrial()]
-})
+// const trial = computed(() => {
+//   return trials[api.getCurrentTrial()]
+// })
 
 // Handle the key presses for the task
 // onKeyDown is a composable from the VueUse package
@@ -72,7 +72,7 @@ const trial = computed(() => {
 onKeyDown(
   ['r', 'R', 'g', 'G', 'b', 'B'],
   (e) => {
-    if (api.getCurrentTrial() < trials.length) {
+    if (step_index.value < trials.length) {
       e.preventDefault()
       api.debug('pressed ${e}')
       if (['r', 'R'].includes(e.key)) {
@@ -82,15 +82,15 @@ onKeyDown(
       } else if (['b', 'B'].includes(e.key)) {
         api.debug('blue')
       }
-      api.debug(`${trial.value}`)
+      api.debug(`${step.value}`)
       api.saveTrialData({
-        trialnum: api.getCurrentTrial(),
-        word: trial.value.word,
-        color: trial.value.color,
-        condition: trial.value.condition,
+        trialnum: step_index.value,
+        word: step.value.word,
+        color: step.value.color,
+        condition: step.value.condition,
         response: e.key,
       })
-      nextTrial()
+      nextStep()
     }
   },
   { dedupe: true }
@@ -115,9 +115,9 @@ function finish() {
 <template>
   <div class="page prevent-select">
     <!-- Show this for each trial -->
-    <div class="strooptrial" v-if="api.getCurrentTrial() < trials.length">
-      {{ api.getCurrentTrial() + 1 }} / {{ trials.length }}
-      <h1 class="title is-1 is-huge" :class="trial.color">{{ trial.word }}</h1>
+    <div class="strooptrial" v-if="step_index < trials.length">
+      {{ step_index + 1 }} / {{ trials.length }}
+      <h1 class="title is-1 is-huge" :class="step.color">{{ step.word }}</h1>
       <p id="prompt">Type "R" for Red, "B" for blue, "G" for green.</p>
     </div>
 

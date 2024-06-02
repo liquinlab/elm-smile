@@ -2,7 +2,7 @@
 import { ref, reactive, computed } from 'vue'
 
 // import and initalize smile API
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 
 const forminfo = reactive({
@@ -63,7 +63,7 @@ function autofill() {
 api.setPageAutofill(autofill)
 
 const pages = ['page1', 'page2', 'page3']
-const { nextTrial } = api.useTrialStepper(pages, api.currentRouteName(), () => {
+const { nextStep, step_index } = api.useStepper(pages, () => {
   finish()
 })
 
@@ -83,7 +83,7 @@ function finish() {
         Your privacy will be maintained and the data will not be linked to your online identity (e.g., email).
       </p>
 
-      <div class="formstep" v-if="api.getCurrentTrial() == 0">
+      <div class="formstep" v-if="step_index == 0">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -151,12 +151,7 @@ function finish() {
               <div class="columns">
                 <div class="column">
                   <div class="has-text-right">
-                    <button
-                      class="button is-warning"
-                      id="finish"
-                      v-if="page_one_complete"
-                      @click="api.incrementTrial()"
-                    >
+                    <button class="button is-warning" id="finish" v-if="page_one_complete" @click="nextStep()">
                       Continue &nbsp;
                       <FAIcon icon="fa-solid fa-arrow-right" />
                     </button>
@@ -168,7 +163,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-if="api.getCurrentTrial() == 1">
+      <div class="formstep" v-if="step_index == 1">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -239,12 +234,7 @@ function finish() {
                 </div>
                 <div class="column">
                   <div class="has-text-right">
-                    <button
-                      class="button is-warning"
-                      id="finish"
-                      v-if="page_two_complete"
-                      @click="api.incrementTrial()"
-                    >
+                    <button class="button is-warning" id="finish" v-if="page_two_complete" @click="nextStep()">
                       Continue &nbsp;
                       <FAIcon icon="fa-solid fa-arrow-right" />
                     </button>
@@ -256,7 +246,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-if="api.getCurrentTrial() == 2">
+      <div class="formstep" v-if="step_index == 2">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -544,7 +534,7 @@ function finish() {
           </div>
         </div>
       </div>
-      <div class="formstep" v-if="api.getCurrentTrial() >= 3">
+      <div class="formstep" v-if="step_index >= 3">
         <article class="message is-danger">
           <div class="message-header">
             <p>Error</p>

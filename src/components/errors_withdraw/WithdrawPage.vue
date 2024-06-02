@@ -1,6 +1,6 @@
 <script setup>
 // import and initalize smile API
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 
 api.saveData(true) // force a data save

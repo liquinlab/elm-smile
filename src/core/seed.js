@@ -9,7 +9,7 @@ import useSmileStore from '@/core/stores/smiledata' // get access to the global 
 
 const smilestore = useSmileStore(pinia)
 
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 
 function getParameterByName(name, url = window.location.href) {

@@ -1,5 +1,5 @@
 <script setup>
-import useSmileAPI from '@/core/composables/smileapi'
+import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 
 function finish() {
@@ -9,7 +9,7 @@ function finish() {
 </script>
 
 <template>
-  <div class="page  prevent-select">
+  <div class="page prevent-select">
     <h1 class="title is-3">Experiment</h1>
     <hr />
     <button class="button is-success is-light" id="finish" @click="finish()">
