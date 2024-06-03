@@ -17,7 +17,7 @@ import 'notivue/animations.css' // Only needed if using built-in animations
 import 'notivue/notification-progress.css'
 import { pastelTheme } from 'notivue'
 
-import WindowSizerPage from '@/components/screen_adjust/WindowSizerPage.vue'
+import WindowSizerView from '@/components/window_sizer/WindowSizerView.vue'
 
 // import and initalize smile API
 import useSmileAPI from '@/core/composables/useSmileAPI'
@@ -90,7 +90,7 @@ onMounted(() => {
   ></StatusBar>
   <!-- the router loads here -->
   <div class="router" v-if="toosmall">
-    <WindowSizerPage triggered="true"></WindowSizerPage>
+    <WindowSizerView triggered="true"></WindowSizerView>
   </div>
   <div v-else>
     <router-view></router-view>

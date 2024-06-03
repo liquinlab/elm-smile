@@ -67,6 +67,7 @@ import { faClock as farClock } from '@fortawesome/free-regular-svg-icons'
 
 /* add icons to the library */
 library.add(
+  faSwatchbook,
   farCircle,
   faQrcode,
   faDownload,

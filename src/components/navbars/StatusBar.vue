@@ -5,9 +5,9 @@ import useSmileStore from '@/core/stores/smiledata'
 import appconfig from '@/core/config'
 import useSmileAPI from '@/core/composables/useSmileAPI'
 // load sub-components used in this compomnents
-import WithdrawFormModal from '@/components/errors_withdraw/WithdrawFormModal.vue'
+import WithdrawFormModal from '@/components/withdraw/WithdrawFormModal.vue'
 import InformedConsentModal from '@/components/consent/InformedConsentModal.vue'
-import ReportIssueModal from '@/components/errors_withdraw/ReportIssueModal.vue'
+import ReportIssueModal from '@/components/report_issue/ReportIssueModal.vue'
 
 const router = useRouter()
 const smilestore = useSmileStore() // get the global store

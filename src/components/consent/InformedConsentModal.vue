@@ -11,8 +11,7 @@ import InformedConsentText from '@/components/consent/InformedConsentText.vue'
       <InformedConsentText />
       <!-- load text of consent form -->
       <div class="has-text-right mt-5">
-        <button class="button" aria-label="close"
-          @click="$emit('toggleConsent')">
+        <button class="button" aria-label="close" @click="$emit('toggleConsent')">
           Thanks, take me back to the study!
         </button>
       </div>

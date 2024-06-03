@@ -2,22 +2,25 @@ import { processQuery } from '@/core/utils'
 import RandomSubTimeline from '@/core/subtimeline'
 
 // 1. Import route components
-import RecruitmentChooser from '@/components/recruitment/RecruitmentChooserPage.vue'
+import RecruitmentChooser from '@/components/recruitment/RecruitmentChooserView.vue'
 import PresentationModeHomePage from '@/components/presentation_mode/PresentationModeHomePage.vue'
-import MTurk from '@/components/recruitment/MTurkRecruitPage.vue'
-import Advertisement from '@/components/recruitment/AdvertisementPage.vue'
-import Consent from '@/components/consent/ConsentPage.vue'
-import DemographicSurvey from '@/components/surveys/DemographicSurveyPage.vue'
-import Captcha from '@/components/captcha/CaptchaPage.vue'
-import Instructions from '@/components/instructions/InstructionsPage.vue'
-import Exp from '@/components/tasks/ExpPage.vue'
-import Task1 from '@/components/tasks/Task1Page.vue'
-import Task2 from '@/components/tasks/Task2Page.vue'
-import StroopExp from '@/components/tasks/StroopExp.vue'
-import Debrief from '@/components/debrief/DebriefPage.vue'
-import Thanks from '@/components/thanks/ThanksPage.vue'
-import Withdraw from '@/components/errors_withdraw/WithdrawPage.vue'
-import WindowSizer from '@/components/screen_adjust/WindowSizerPage.vue'
+import MTurk from '@/components/recruitment/MTurkRecruitView.vue'
+import Advertisement from '@/components/recruitment/AdvertisementView.vue'
+import Consent from '@/components/consent/ConsentView.vue'
+import DemographicSurvey from '@/components/demographic_survey/DemographicSurveyView.vue'
+import Captcha from '@/components/captcha/CaptchaView.vue'
+import Instructions from '@/components/instructions/InstructionsView.vue'
+import Debrief from '@/components/debrief/DebriefView.vue'
+import Thanks from '@/components/thanks/ThanksView.vue'
+import Withdraw from '@/components/withdraw/WithdrawView.vue'
+import WindowSizer from '@/components/window_sizer/WindowSizerView.vue'
+
+// user parts
+import Exp from '@/components/tasks/ExpView.vue'
+import Task1 from '@/components/tasks/Task1View.vue'
+import Task2 from '@/components/tasks/Task2View.vue'
+import StroopExp from '@/user/components/stroop_exp/StroopView.vue'
+
 // add new routes here.  generally these will be things in components/pages/[something].vue
 
 import useSmileAPI from '@/core/composables/useSmileAPI'
@@ -103,7 +106,7 @@ timeline.pushSeqRoute({
     preload: async () => {
       // can you figure that out yourself
       console.log('PRELOADING DATA from AdvertisementPage.preload.js')
-      let data = await import('@/components/recruitment/AdvertisementPage.preload.js')
+      let data = await import('@/components/recruitment/AdvertisementView.preload.js')
       console.log('DATA LOADED', data.default)
     },
   },
