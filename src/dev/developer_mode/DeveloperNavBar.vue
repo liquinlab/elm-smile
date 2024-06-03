@@ -12,8 +12,8 @@ import ResetButton from '@/dev/developer_mode/ResetButton.vue'
 
 import DataBarButton from '@/dev/developer_mode/DataBarButton.vue'
 
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 </script>
 
 <template>

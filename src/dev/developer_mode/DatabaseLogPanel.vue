@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import SmileAPI from '@/core/composables/useSmileAPI'
+import SmileAPI from '@/core/composables/useAPI'
 const api = SmileAPI()
 
 import useLog from '@/core/stores/log'

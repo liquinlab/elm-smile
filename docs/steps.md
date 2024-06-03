@@ -23,8 +23,8 @@ advance through the trials.
 ```vue
 <script setup>
 ...
-import useSmileAPI from '@/core/composables/useSmileAPI' // [!code highlight]
-const api = useSmileAPI() // [!code highlight]
+import useAPI from '@/core/composables/useAPI' // [!code highlight]
+const api = useAPI() // [!code highlight]
 ...
 </script>
 ```
@@ -83,8 +83,8 @@ import { onKeyDown } from '@vueuse/core'
 import { useMouse } from '@vueuse/core'
 
 // import and initalize smile API
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 // this progress bar is not implemented and a little hard so lets pass for now
 //if (route.meta.progress) smilestore.global.progress = route.meta.progress

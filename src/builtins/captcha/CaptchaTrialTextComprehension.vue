@@ -2,8 +2,8 @@
 import { ref, reactive, shallowRef, onMounted } from 'vue'
 const emit = defineEmits(['nextPageCaptcha'])
 
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 let MAX_TIME = 5000
 let start_time

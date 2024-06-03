@@ -20,8 +20,8 @@ import Task2 from '@/builtins/tasks/Task2View.vue'
 import StroopExp from '@/user/components/stroop_exp/StroopView.vue'
 
 // #3. Import smile API and timeline
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 import Timeline from '@/core/timeline'
 const timeline = new Timeline()

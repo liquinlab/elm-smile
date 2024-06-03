@@ -3,8 +3,8 @@ import { onMounted, ref } from 'vue'
 import StudyPreviewText from '@/builtins/recruitment/StudyPreviewText.vue'
 
 // import and initalize smile API
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 const mturkPreview = ref(true)
 const launched = ref(false)

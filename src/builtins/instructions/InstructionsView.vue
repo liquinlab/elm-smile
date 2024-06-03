@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 // computed property based on condition in data
 const instText = computed(() => {

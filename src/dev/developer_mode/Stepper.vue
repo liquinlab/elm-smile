@@ -1,6 +1,6 @@
 <script setup>
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()

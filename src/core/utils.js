@@ -1,5 +1,5 @@
 import useSmileStore from '@/core/stores/smiledata' // get access to the global store
-import useSmileAPI from '@/core/composables/useSmileAPI'
+import useAPI from '@/core/composables/useAPI'
 
 export function getQueryParams() {
   const queryString = window.location.search
@@ -14,7 +14,7 @@ export function getQueryParams() {
 export function processQuery(query, service) {
   const smilestore = useSmileStore()
   const urlParams = query
-  const api = useSmileAPI()
+  const api = useAPI()
 
   if (!urlParams) return // do nothing if no query
 

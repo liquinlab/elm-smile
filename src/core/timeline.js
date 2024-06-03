@@ -8,8 +8,8 @@ import RandomSubTimeline from '@/core/subtimeline'
 import RecruitmentChooser from '@/builtins/recruitment/RecruitmentChooserView.vue'
 import PresentationMode from '@/dev/presentation_mode/PresentationModeView.vue'
 
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 class Timeline {
   constructor() {

@@ -10,8 +10,8 @@ import CaptchaTrialStroop from '@/builtins/captcha/CaptchaTrialStroop.vue'
 import CaptchaRotateImage from '@/builtins/captcha/CaptchaRotateImage.vue'
 
 // import and initalize smile API
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 //  need to set up not just the pages but the trials here with configuration inputs
 // for the image categorization and rotate image task need a bunch of images

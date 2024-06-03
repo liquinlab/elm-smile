@@ -6,8 +6,8 @@ import sha256 from 'crypto-js/sha256'
 import Base64url from 'crypto-js/enc-base64'
 import stringify from 'json-stable-stringify'
 
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 
 

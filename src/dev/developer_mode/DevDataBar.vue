@@ -5,8 +5,8 @@ import DatabaseInfoPanel from '@/dev/developer_mode/DatabaseInfoPanel.vue'
 import DatabaseLogPanel from '@/dev/developer_mode/DatabaseLogPanel.vue'
 import DatabaseBrowsePanel from '@/dev/developer_mode/DatabaseBrowsePanel.vue'
 
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 const mousedown = ref(false)
 
 const { x, y } = useMouse()

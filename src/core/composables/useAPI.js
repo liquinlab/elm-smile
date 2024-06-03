@@ -11,7 +11,7 @@ import { useStepper } from '@/core/composables/useStepper'
 
 import useLog from '@/core/stores/log'
 
-export default function useSmileAPI() {
+export default function useAPI() {
   const { stepNextRoute, stepPrevRoute } = useTimeline()
   const route = useRoute()
   const router = useRouter()

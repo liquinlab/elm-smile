@@ -1,8 +1,8 @@
 <script setup>
 import { reactive, onMounted } from 'vue'
 // import and initalize smile API
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 // get access to the global store
 const emit = defineEmits(['toggleWithdraw', 'submitWithdraw'])
 const props = defineProps(['prefillEmail'])

@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import useSmileStore from '@/core/stores/smiledata'
 import appconfig from '@/core/config'
-import useSmileAPI from '@/core/composables/useSmileAPI'
+import useAPI from '@/core/composables/useAPI'
 // load sub-components used in this compomnents
 import WithdrawFormModal from '@/builtins/withdraw/WithdrawFormModal.vue'
 import InformedConsentModal from '@/builtins/consent/InformedConsentModal.vue'
@@ -11,7 +11,7 @@ import ReportIssueModal from '@/builtins/report_issue/ReportIssueModal.vue'
 
 const router = useRouter()
 const smilestore = useSmileStore() // get the global store
-const api = useSmileAPI() // get the api
+const api = useAPI() // get the api
 const withdrawform = ref(null) // this uses the ref="withdrawform" in the template
 const email = ref('')
 

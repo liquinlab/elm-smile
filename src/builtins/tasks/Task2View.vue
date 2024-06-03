@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 // import and initalize smile API
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 var trials = [
   {

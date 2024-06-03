@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import appconfig from '@/core/config'
 import { push } from 'notivue'
 
-import useSmileAPI from '@/core/composables/useSmileAPI'
+import useAPI from '@/core/composables/useAPI'
 
 function getLogTrace() {
   // some browsers use 'at ', some use '@'
@@ -74,7 +74,7 @@ export default defineStore('log', {
       this.add_to_history(msg)
     },
     warn(...args) {
-      const api = useSmileAPI()
+      const api = useAPI()
       const message = argsToString(args)
       console.warn(message)
       const msg = {
@@ -94,7 +94,7 @@ export default defineStore('log', {
       this.add_to_history(msg)
     },
     error(...args) {
-      const api = useSmileAPI()
+      const api = useAPI()
       const message = argsToString(args)
       const msg = {
         type: 'error',
@@ -113,7 +113,7 @@ export default defineStore('log', {
       this.add_to_history(msg)
     },
     success(...args) {
-      const api = useSmileAPI()
+      const api = useAPI()
 
       const message = argsToString(args)
       const msg = {

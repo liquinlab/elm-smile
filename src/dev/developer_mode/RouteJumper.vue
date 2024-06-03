@@ -5,8 +5,8 @@ import { watch, ref } from 'vue'
 import { useKeyModifier } from '@vueuse/core'
 const altKeyState = useKeyModifier('Alt')
 
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 const props = defineProps(['routeName'])
 
 import useSmileStore from '@/core/stores/smiledata'

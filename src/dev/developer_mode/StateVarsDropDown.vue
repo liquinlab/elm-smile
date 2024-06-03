@@ -1,6 +1,6 @@
 <script setup>
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 import useSmileStore from '@/core/stores/smiledata'
 const smilestore = useSmileStore() // load the global store
 

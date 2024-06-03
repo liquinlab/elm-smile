@@ -9,8 +9,8 @@ import useSmileStore from '@/core/stores/smiledata' // get access to the global 
 
 const smilestore = useSmileStore(pinia)
 
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 function getParameterByName(name, url = window.location.href) {
   const nameClean = name.replace(/[\[\]]/g, '\\$&')

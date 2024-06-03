@@ -1,9 +1,9 @@
 <script setup>
 import { computed } from 'vue'
-import useSmileAPI from '@/core/composables/useSmileAPI'
+import useAPI from '@/core/composables/useAPI'
 import RouteJumper from '@/dev/developer_mode/RouteJumper.vue'
 
-const api = useSmileAPI()
+const api = useAPI()
 
 const buttonstyle = computed(() => {
   let base = 'button is-small is-route is-jump-bar has-tooltip-arrow has-tooltip-bottom'
