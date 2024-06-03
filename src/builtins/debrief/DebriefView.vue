@@ -14,7 +14,6 @@ function finish() {
 
 <template>
   <div class="page prevent-select">
-    <h1 class="title is-3">What was that about?</h1>
     <DebriefText />
     <button class="button is-success is-light" id="finish" @click="finish()">
       next &nbsp;
