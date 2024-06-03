@@ -1,13 +1,13 @@
 <script setup>
 import { shallowRef, ref, computed } from 'vue'
 
-import CaptchaInstructionsText_01 from '@/components/captcha/CaptchaInstructionsText_01.vue'
-import CaptchaInstructionsText_02 from '@/components/captcha/CaptchaInstructionsText_02.vue'
-import CaptchaTrialImageCategorization from '@/components/captcha/CaptchaTrialImageCategorization.vue'
-import CaptchaTrialMotorControl from '@/components/captcha/CaptchaTrialMotorControl.vue'
-import CaptchaTrialTextComprehension from '@/components/captcha/CaptchaTrialTextComprehension.vue'
-import CaptchaTrialStroop from '@/components/captcha/CaptchaTrialStroop.vue'
-import CaptchaRotateImage from '@/components/captcha/CaptchaRotateImage.vue'
+import CaptchaInstructionsText_01 from '@/builtins/captcha/CaptchaInstructionsText_01.vue'
+import CaptchaInstructionsText_02 from '@/builtins/captcha/CaptchaInstructionsText_02.vue'
+import CaptchaTrialImageCategorization from '@/builtins/captcha/CaptchaTrialImageCategorization.vue'
+import CaptchaTrialMotorControl from '@/builtins/captcha/CaptchaTrialMotorControl.vue'
+import CaptchaTrialTextComprehension from '@/builtins/captcha/CaptchaTrialTextComprehension.vue'
+import CaptchaTrialStroop from '@/builtins/captcha/CaptchaTrialStroop.vue'
+import CaptchaRotateImage from '@/builtins/captcha/CaptchaRotateImage.vue'
 
 // import and initalize smile API
 import useSmileAPI from '@/core/composables/useSmileAPI'

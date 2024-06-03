@@ -5,6 +5,8 @@ const smilestore = useSmileStore()
 import useLog from '@/core/stores/log'
 const log = useLog()
 import RandomSubTimeline from '@/core/subtimeline'
+import RecruitmentChooser from '@/builtins/recruitment/RecruitmentChooserView.vue'
+import PresentationMode from '@/dev/presentation_mode/PresentationModeView.vue'
 
 class Timeline {
   constructor() {

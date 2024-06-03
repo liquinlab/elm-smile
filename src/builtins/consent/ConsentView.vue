@@ -2,7 +2,7 @@
 import { ref, watch, onBeforeUnmount } from 'vue'
 import { animate } from 'motion'
 
-import InformedConsentText from '@/components/consent/InformedConsentText.vue'
+import InformedConsentText from '@/builtins/consent/InformedConsentText.vue'
 
 // import and initalize smile API
 import useSmileAPI from '@/core/composables/useSmileAPI'

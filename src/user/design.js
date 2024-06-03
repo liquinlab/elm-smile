@@ -1,72 +1,44 @@
 import { processQuery } from '@/core/utils'
 import RandomSubTimeline from '@/core/subtimeline'
 
-// 1. Import route components
-import RecruitmentChooser from '@/components/recruitment/RecruitmentChooserView.vue'
-import PresentationMode from '@/dev/components/presentation_mode/PresentationModeView.vue'
-import MTurk from '@/components/recruitment/MTurkRecruitView.vue'
-import Advertisement from '@/components/recruitment/AdvertisementView.vue'
-import Consent from '@/components/consent/ConsentView.vue'
-import DemographicSurvey from '@/components/demographic_survey/DemographicSurveyView.vue'
-import Captcha from '@/components/captcha/CaptchaView.vue'
-import Instructions from '@/components/instructions/InstructionsView.vue'
-import Debrief from '@/components/debrief/DebriefView.vue'
-import Thanks from '@/components/thanks/ThanksView.vue'
-import Withdraw from '@/components/withdraw/WithdrawView.vue'
-import WindowSizer from '@/components/window_sizer/WindowSizerView.vue'
+// 1. Import main built-in View components
+import MTurk from '@/builtins/recruitment/MTurkRecruitView.vue'
+import Advertisement from '@/builtins/recruitment/AdvertisementView.vue'
+import Consent from '@/builtins/consent/ConsentView.vue'
+import DemographicSurvey from '@/builtins/demographic_survey/DemographicSurveyView.vue'
+import Captcha from '@/builtins/captcha/CaptchaView.vue'
+import Instructions from '@/builtins/instructions/InstructionsView.vue'
+import Debrief from '@/builtins/debrief/DebriefView.vue'
+import Thanks from '@/builtins/thanks/ThanksView.vue'
+import Withdraw from '@/builtins/withdraw/WithdrawView.vue'
+import WindowSizer from '@/builtins/window_sizer/WindowSizerView.vue'
 
-// user parts
-import Exp from '@/components/tasks/ExpView.vue'
-import Task1 from '@/components/tasks/Task1View.vue'
-import Task2 from '@/components/tasks/Task2View.vue'
+// 2. Import user View components
+import Exp from '@/builtins/tasks/ExpView.vue'
+import Task1 from '@/builtins/tasks/Task1View.vue'
+import Task2 from '@/builtins/tasks/Task2View.vue'
 import StroopExp from '@/user/components/stroop_exp/StroopView.vue'
 
-// add new routes here.  generally these will be things in components/pages/[something].vue
-
+// #3. Import smile API and timeline
 import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 
 import Timeline from '@/core/timeline'
 const timeline = new Timeline()
 
-// 2. Define some routes to the timeline
-// Each route should map to a component.
+// #4. Define some routes to the timeline
+// Each route should map to a View component.
 // Each needs a name
-// these routes can be accessed in any order generally
 // but for most experiment they go in sequence from begining
 // to the end of this list
 
 // by default routes have meta.requiresConsent = true (so you need to manually override it)
 // by default routes have meta.requiresDone = false (so you need to manually override it)
 
-// add the recruitment chooser if in development mode
-if (api.config.mode === 'development') {
-  timeline.pushView({
-    path: '/',
-    name: 'recruit',
-    component: RecruitmentChooser,
-    meta: { allowAlways: true, requiresConsent: false },
-  })
-} else if (api.config.mode === 'presentation') {
-  timeline.pushView({
-    path: '/',
-    name: 'presentation_home',
-    component: PresentationMode,
-    meta: { allowAlways: true, requiresConsent: false },
-  })
-} else {
-  // auto refer to the anonymous welcome page
-  timeline.pushView({
-    path: '/',
-    name: 'landing',
-    redirect: {
-      name: 'welcome_anonymous',
-    },
-    meta: { allowAlways: true, requiresConsent: false },
-  })
-}
+// IMPORTANT: A least one route needs to be called 'welcome_anonymous'
+// to handle the landing case for someone not coming from a recruitment services
 
-// welcome screen for non-referral
+// First welcome screen for non-referral
 timeline.pushSeqView({
   path: '/welcome',
   name: 'welcome_anonymous',
@@ -77,7 +49,7 @@ timeline.pushSeqView({
   },
 })
 
-// welcome screen for referral
+// welcome screen for referral from a service (e.g., prolific)
 timeline.pushSeqView({
   path: '/welcome/:service',
   name: 'welcome_referred',
@@ -94,8 +66,6 @@ timeline.pushSeqView({
   },
 })
 
-console.log(Advertisement)
-
 // consent
 timeline.pushSeqView({
   path: '/consent',
@@ -106,7 +76,7 @@ timeline.pushSeqView({
     preload: async () => {
       // can you figure that out yourself
       console.log('PRELOADING DATA from AdvertisementPage.preload.js')
-      let data = await import('@/components/recruitment/AdvertisementView.preload.js')
+      let data = await import('@/builtins/recruitment/AdvertisementView.preload.js')
       console.log('DATA LOADED', data.default)
     },
   },

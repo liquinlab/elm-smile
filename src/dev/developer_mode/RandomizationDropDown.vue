@@ -6,7 +6,7 @@ import useSmileStore from '@/core/stores/smiledata'
 const smilestore = useSmileStore() // load the global store
 const seed = ref(smilestore.getSeedID)
 import { v4 as uuidv4 } from 'uuid'
-import TextInputWithButton from '@/dev/components/developer_mode/TextInputWithButton.vue'
+import TextInputWithButton from '@/dev/developer_mode/TextInputWithButton.vue'
 
 function toggle_and_reset() {
   api.dev.randomization_panel.visible = !api.dev.randomization_panel.visible

@@ -2,13 +2,13 @@
 import { onMounted, computed, ref } from 'vue'
 
 // load sub-components used in this compomnents
-import DeveloperNavBar from '@/dev/components/developer_mode/DeveloperNavBar.vue'
-import DevDataBar from '@/dev/components/developer_mode/DevDataBar.vue'
-import PresentationNavBar from '@/dev/components/presentation_mode/PresentationNavBar.vue'
+import DeveloperNavBar from '@/dev/developer_mode/DeveloperNavBar.vue'
+import DevDataBar from '@/dev/developer_mode/DevDataBar.vue'
+import PresentationNavBar from '@/dev/presentation_mode/PresentationNavBar.vue'
 
 // bars that are part of the actual experiments
-import StatusBar from '@/components/navbars/StatusBar.vue'
-import ProgressBar from '@/components/navbars/ProgressBar.vue'
+import StatusBar from '@/builtins/navbars/StatusBar.vue'
+import ProgressBar from '@/builtins/navbars/ProgressBar.vue'
 
 // notification library
 import { Notivue, Notification, NotificationProgress } from 'notivue'
@@ -17,7 +17,7 @@ import 'notivue/animations.css' // Only needed if using built-in animations
 import 'notivue/notification-progress.css'
 import { pastelTheme } from 'notivue'
 
-import WindowSizerView from '@/components/window_sizer/WindowSizerView.vue'
+import WindowSizerView from '@/builtins/window_sizer/WindowSizerView.vue'
 
 // import and initalize smile API
 import useSmileAPI from '@/core/composables/useSmileAPI'

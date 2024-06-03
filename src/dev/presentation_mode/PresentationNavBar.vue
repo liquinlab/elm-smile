@@ -2,9 +2,9 @@
 import { onMounted, watch, ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
-import RouteInfoDropDrop from '@/dev/components/developer_mode/RouteInfoDropDown.vue'
-import ResetButton from '@/dev/components/presentation_mode/PresentationModeResetButton.vue'
-import QRCodeButton from '@/dev/components/presentation_mode/QRCodeButton.vue'
+import RouteInfoDropDrop from '@/dev/developer_mode/RouteInfoDropDown.vue'
+import ResetButton from '@/dev/presentation_mode/PresentationModeResetButton.vue'
+import QRCodeButton from '@/dev/presentation_mode/QRCodeButton.vue'
 </script>
 
 <template>
