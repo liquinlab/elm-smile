@@ -8,14 +8,45 @@ import RandomSubTimeline from '@/core/subtimeline'
 import RecruitmentChooser from '@/builtins/recruitment/RecruitmentChooserView.vue'
 import PresentationMode from '@/dev/presentation_mode/PresentationModeView.vue'
 
+import useSmileAPI from '@/core/composables/useSmileAPI'
+const api = useSmileAPI()
+
 class Timeline {
   constructor() {
     this.routes = [] // the actual routes given to VueRouter
     this.seqtimeline = [] // copies of routes that are sequential
     this.type = 'timeline'
     this.g = null
+    this.has_welcome_anonymous = false
     this.g_nonseq = null
     this._IS_ROOT_NODE = '_IS_ROOT_NODE'
+
+    // add the recruitment chooser if in development mode
+    if (api.config.mode === 'development') {
+      this.pushView({
+        path: '/',
+        name: 'recruit',
+        component: RecruitmentChooser,
+        meta: { allowAlways: true, requiresConsent: false },
+      })
+    } else if (api.config.mode === 'presentation') {
+      this.pushView({
+        path: '/',
+        name: 'presentation_home',
+        component: PresentationMode,
+        meta: { allowAlways: true, requiresConsent: false },
+      })
+    } else {
+      // auto refer to the anonymous welcome page
+      this.pushView({
+        path: '/',
+        name: 'landing',
+        redirect: {
+          name: 'welcome_anonymous',
+        },
+        meta: { allowAlways: true, requiresConsent: false },
+      })
+    }
   }
 
   pushToRoutes(route) {
@@ -96,6 +127,10 @@ class Timeline {
       log.error('Smile FATAL ERROR: ', err)
       throw err
     }
+
+    if (newroute.name === 'welcome_anonymous') {
+      this.has_welcome_anonymous = true
+    }
   }
 
   pushView(routeConfig) {
@@ -125,6 +160,10 @@ class Timeline {
     } catch (err) {
       console.error('Smile FATAL ERROR: ', err)
       throw err
+    }
+
+    if (newroute.name === 'welcome_anonymous') {
+      this.has_welcome_anonymous = true
     }
   }
 
@@ -158,6 +197,10 @@ class Timeline {
   }
 
   build() {
+    if (!this.has_welcome_anonymous) {
+      log.error('No welcome_anonymous route defined in src/user/design.js  This is required.')
+      throw new Error('NoWelcomeAnonymousRouteError')
+    }
     this.buildGraph()
     this.registerCounters()
     if (smilestore.config.mode === 'development') {
