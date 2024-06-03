@@ -3,7 +3,7 @@ import RandomSubTimeline from '@/core/subtimeline'
 
 // 1. Import route components
 import RecruitmentChooser from '@/components/recruitment/RecruitmentChooserView.vue'
-import PresentationModeHomePage from '@/components/presentation_mode/PresentationModeHomePage.vue'
+import PresentationMode from '@/dev/components/presentation_mode/PresentationModeView.vue'
 import MTurk from '@/components/recruitment/MTurkRecruitView.vue'
 import Advertisement from '@/components/recruitment/AdvertisementView.vue'
 import Consent from '@/components/consent/ConsentView.vue'

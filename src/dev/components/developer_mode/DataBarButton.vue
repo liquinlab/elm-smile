@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()
 
-import CircleProgress from '@/components/navbars/CircleProgress.vue'
+import CircleProgress from '@/dev/components/developer_mode/CircleProgress.vue'
 
 const database_tooltip = computed(() => {
   var msg = 'Toggle data panel | '

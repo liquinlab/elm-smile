@@ -2,12 +2,9 @@
 import { onMounted, watch, ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
-import RouteInfoDropDrop from '@/components/navbars/RouteInfoDropDown.vue'
-import ResetButton from '@/components/presentation_mode/PresentationModeResetButton.vue'
-import QRCodeButton from '@/components/presentation_mode/QRCodeButton.vue'
-
-import useSmileAPI from '@/core/composables/useSmileAPI'
-const api = useSmileAPI()
+import RouteInfoDropDrop from '@/dev/components/developer_mode/RouteInfoDropDown.vue'
+import ResetButton from '@/dev/components/presentation_mode/PresentationModeResetButton.vue'
+import QRCodeButton from '@/dev/components/presentation_mode/QRCodeButton.vue'
 </script>
 
 <template>

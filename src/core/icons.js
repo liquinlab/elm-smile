@@ -5,7 +5,8 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 /* import specific icons */
 /* to limit the size of the final project you import individal icons */
 /* NOTE: you also have to load them below by adding to the library */
-import { faSwatchbook, faUserSecret } from '@fortawesome/free-solid-svg-icons'
+import { faSwatchbook } from '@fortawesome/free-solid-svg-icons'
+import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
 import { faQrcode } from '@fortawesome/free-solid-svg-icons'
 import { faDownload } from '@fortawesome/free-solid-svg-icons'
 import { faGear } from '@fortawesome/free-solid-svg-icons'

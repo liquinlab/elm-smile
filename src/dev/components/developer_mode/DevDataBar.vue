@@ -1,9 +1,9 @@
 <script setup>
 import { useMouse } from '@vueuse/core'
 import { ref, computed } from 'vue'
-import DatabaseInfoPanel from '@/components/navbars/DatabaseInfoPanel.vue'
-import DatabaseLogPanel from '@/components/navbars/DatabaseLogPanel.vue'
-import DatabaseBrowsePanel from '@/components/navbars/DatabaseBrowsePanel.vue'
+import DatabaseInfoPanel from '@/dev/components/developer_mode/DatabaseInfoPanel.vue'
+import DatabaseLogPanel from '@/dev/components/developer_mode/DatabaseLogPanel.vue'
+import DatabaseBrowsePanel from '@/dev/components/developer_mode/DatabaseBrowsePanel.vue'
 
 import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()

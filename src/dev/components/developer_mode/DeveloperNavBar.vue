@@ -2,15 +2,15 @@
 import { onMounted, watch, ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
-import DocsDropDown from '@/components/navbars/DocsDropDown.vue'
-import RandomizationDropDown from '@/components/navbars/RandomizationDropDown.vue'
-import ConfigDropDown from '@/components/navbars/ConfigDropDown.vue'
-import StateVarsDropDown from '@/components/navbars/StateVarsDropDown.vue'
-import Stepper from '@/components/navbars/Stepper.vue'
-import RouteInfoDropDrop from '@/components/navbars/RouteInfoDropDown.vue'
-import ResetButton from '@/components/navbars/ResetButton.vue'
+import DocsDropDown from '@/dev/components/developer_mode/DocsDropDown.vue'
+import RandomizationDropDown from '@/dev/components/developer_mode/RandomizationDropDown.vue'
+import ConfigDropDown from '@/dev/components/developer_mode/ConfigDropDown.vue'
+import StateVarsDropDown from '@/dev/components/developer_mode/StateVarsDropDown.vue'
+import Stepper from '@/dev/components/developer_mode/Stepper.vue'
+import RouteInfoDropDrop from '@/dev/components/developer_mode/RouteInfoDropDown.vue'
+import ResetButton from '@/dev/components/developer_mode/ResetButton.vue'
 
-import DataBarButton from '@/components/navbars/DataBarButton.vue'
+import DataBarButton from '@/dev/components/developer_mode/DataBarButton.vue'
 
 import useSmileAPI from '@/core/composables/useSmileAPI'
 const api = useSmileAPI()

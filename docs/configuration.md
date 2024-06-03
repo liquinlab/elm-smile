@@ -154,7 +154,7 @@ means they are made available to the web application/experiment.
 - `VITE_SHOW_PROGRESS_BAR` configures if the progress bar should be visible at
   the bottom of the screen.
 - `VITE_WINDOWSIZER_REQUEST` configures the requested size of the page for
-  rendering content (used by WindowSizerPage.vue component)
+  rendering content (used by WindowSizerView.vue component)
 - `VITE_WINDOWSIZER_AGGRESSIVE` if set to true and the user resizes the page,
   this will hide the task and show a guide to resize the window. It is called
   "aggressive" since it really stops the task moving forward when the user makes

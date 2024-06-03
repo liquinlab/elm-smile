@@ -1,6 +1,6 @@
 <script setup>
 import { reactive, computed, onMounted } from 'vue'
-import DatabaseList from '@/components/navbars/DatabaseList.vue'
+import DatabaseList from '@/dev/components/developer_mode/DatabaseList.vue'
 import SmileAPI from '@/core/composables/useSmileAPI'
 const api = SmileAPI()
 

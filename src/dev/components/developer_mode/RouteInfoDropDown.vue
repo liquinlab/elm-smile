@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import useSmileAPI from '@/core/composables/useSmileAPI'
-import RouteJumper from '@/components/navbars/RouteJumper.vue'
+import RouteJumper from '@/dev/components/developer_mode/RouteJumper.vue'
 
 const api = useSmileAPI()
 
