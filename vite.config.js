@@ -3,6 +3,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
+import handlebars from 'vite-plugin-handlebars'
 import Inspect from 'vite-plugin-inspect'
 //import preLoaderPlugin from './scripts/preloader'
 import stripDevToolPlugin from './scripts/strip-devtool'
@@ -26,6 +27,11 @@ export default ({ mode }) => {
       stripDevToolPlugin(),
       vue(),
       generateQRCode(),
+      handlebars({
+        context: {
+          main_js: mode=='dashboard'? "/src/dev/dashboard/dashboard.js": "/src/core/main.js"
+        }
+      }),
       //preLoaderPlugin(),
     ],
     // if you need an additional page you have to list them here
