@@ -42,6 +42,8 @@ function toggleReport() {
   showreportissuemodal.value = !showreportissuemodal.value // have to use .value in <script> when using ref()
 }
 
+const lab_url = import.meta.env.VITE_LAB_URL
+
 function submitWithdraw() {
   // submit the withdraw form and jump to the thanks
   toggleWithdraw()
@@ -52,8 +54,8 @@ function submitWithdraw() {
 <template>
   <div class="infobar" role="navigation" aria-label="main navigation">
     <div class="infobar-brand">
-      <a class="infobar-item" href="https://gureckislab.org">
-        <img src="@/assets/nyu.png" width="90" />
+      <a class="infobar-item" :href="lab_url" target="_new">
+        <img src="@/user/assets/universitylogo.png" width="90" />
       </a>
       <div class="infobar-item">
         <p class="is-size-7 studyinfo">

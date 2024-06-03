@@ -132,6 +132,8 @@ VITE_WINDOWSIZER_AGRESSIVE       = true
 
 VITE_ESTIMATED_TIME              = "30-40 minutes"
 VITE_PAYRATE_HOURLY              = "$15USD/hour + performance related bonus"
+
+VITE_LAB_URL                     = 'https://gureckislab.org'
 ```
 
 Notice that the configuration options in this file begin with `VITE_`. This
@@ -169,6 +171,9 @@ means they are made available to the web application/experiment.
 - `VITE_PAYRATE` is text about the payrate for the study. Again, it is a
   configuration option since it might need to be referenced in several
   components and templates.
+- `VITE_LAB_URL` is the URL of the lab website. This can be used to link to the
+  lab website or university homepage so participants can learn more about the
+  organization conducting the study.
 
 #### Web Services Options (`.env.local`)
 

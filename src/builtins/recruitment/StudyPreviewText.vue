@@ -34,7 +34,7 @@ const api = useAPI()
                 </p>
             </div>
             <div class="column is-two-fifths">
-                <img src="@/assets/brain.svg" width="220"><br><br>
+                <img src="@/user/assets/brain.svg" width="220"><br><br>
                 <article class="message">
                     <div class="message-header is-size-7">
                         <p>

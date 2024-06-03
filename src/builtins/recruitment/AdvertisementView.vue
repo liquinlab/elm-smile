@@ -47,7 +47,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="page prevent-select">
     <br /><br /><br />
-    <img ref="logo" src="@/assets/brain.svg" width="220" />
+    <img ref="logo" src="@/user/assets/brain.svg" width="220" />
     <h1 ref="title" class="title is-3">Please help us understand the mind!</h1>
     <p>Take part in a short experiment where you play some games.</p>
     <br />
