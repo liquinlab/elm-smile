@@ -57,22 +57,18 @@ You can then shuffle the trials randomly using
 trials = api.shuffle(trials)
 ```
 
-### Use the `useTrialStepper` method
+### Use the `useStepper` method
 
-Next, use the `useTrialStepper` method to advance through the trials. This
-method uses a Vue composable to provide the `nextTrial` and `prevTrial` methods
-to advance and go back through the trials. It also provides a callback function
+Next, use the `useStepper` method to advance through the trials. This method
+uses a Vue composable to provide the `nextStep` and `prevStep` methods to
+advance and go back through the trials. It also provides a callback function
 that is called when the last trial is shown. This is where you might do some
 additional data saving or analysis.
 
 ```js
-const { nextTrial, prevTrial } = api.useTrialStepper(
-  trials,
-  api.currentRouteName(),
-  () => {
-    finalize()
-  }
-)
+const { nextStep, prevStep, step, step_index } = api.useStepper(trials, () => {
+  finalize()
+})
 ```
 
 ```vue
@@ -123,13 +119,9 @@ trials = api.shuffle(trials)
 // or analysis (e.g., if you are showing the subject performance feedback about
 // their performance on the task).  it called the finalize() function which is
 // defined below
-const { nextTrial, prevTrial, trialData } = api.useTrialStepper(
-  trials,
-  api.currentRouteName(),
-  () => {
-    finalize()
-  }
-)
+const { nextStep, prevStep, step, step_index } = api.useStepper(trials, () => {
+  finalize()
+})
 
 // const trial = computed(() => {
 //   return trials[api.getCurrentTrial()]
@@ -142,7 +134,7 @@ const { nextTrial, prevTrial, trialData } = api.useTrialStepper(
 onKeyDown(
   ['r', 'R', 'g', 'G', 'b', 'B'],
   (e) => {
-    if (api.getCurrentTrial() < trials.length) {
+    if (step_index < trials.length) {
       e.preventDefault()
       api.debug('pressed ${e}')
       if (['r', 'R'].includes(e.key)) {
@@ -152,12 +144,12 @@ onKeyDown(
       } else if (['b', 'B'].includes(e.key)) {
         api.debug('blue')
       }
-      api.debug(`${trial.value}`)
+      api.debug(`${step.value}`)
       api.saveTrialData({
         trialnum: api.getCurrentTrial(),
-        word: trial.value.word,
-        color: trial.value.color,
-        condition: trial.value.condition,
+        word: step.value.word,
+        color: step.value.color,
+        condition: step.value.condition,
         response: e.key,
       })
       nextTrial()
@@ -185,9 +177,9 @@ function finish() {
 <template>
   <div class="page prevent-select">
     <!-- Show this for each trial -->
-    <div class="strooptrial" v-if="api.getCurrentTrial() < trials.length">
-      {{ api.getCurrentTrial() + 1 }} / {{ trials.length }}
-      <h1 class="title is-1 is-huge" :class="trial.color">{{ trial.word }}</h1>
+    <div class="strooptrial" v-if="step_index < trials.length">
+      {{ step_index + 1 }} / {{ trials.length }}
+      <h1 class="title is-1 is-huge" :class="step.color">{{ step.word }}</h1>
       <p id="prompt">Type "R" for Red, "B" for blue, "G" for green.</p>
     </div>
 
