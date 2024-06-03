@@ -420,8 +420,8 @@ they can be, optinally, scoped to apply to the current component only).
 
 Components are a powerful way to organize and develop web applications. However,
 currently browsers do not natively know how to read and process .vue (Vue SFC)
-files (although there are proposals for native component support being
-considered). How do they work then?
+files (although there are proposals for native component support in browsers).
+How do they work then?
 
 Vue applications use a build system that sort of "compiles" and "bundles" the
 code in the SFC into one or more .html, .js, and .css files that work in the way
@@ -429,28 +429,30 @@ that browsers can understand. This is the role that Vite plays in <SmileText/>.
 Vite is a super-optimized build tool that can take the SFC files and turn them
 into a webpage that can be loaded in a browser. This aspect of Vite is similar
 to other build tools you might have heard of including Webpack, Parcel, or
-Rollup.
+Rollup. It takes in the .vue file and outputs a .html, .js, and .css file you
+can load in a browser.
 
-Building a website might seem like a unnecessary complexity, but is fairly
-common (if you've used Overleaf to write a paper you are familar with letting a
-program "build" your paper into a PDF). It even offers a number of advantages.
+Building a website might seem like an unnecessary complexity, but is fairly
+common (if you've used Overleaf to write a paper you are familiar with letting a
+program "build" your paper into a PDF). It even offers several unique
+advantages.
+
 First, the build process can optimize the code for quick loading (e.g., when
-Vite processes the SFC files it can remove comments and whitespace making the
-imported code smaller and faster to load over the web). Second, the build
-process can strip out unused functions from libraries you use. So for example,
-the
+Vite processes the SFC files it can remove comments and whitespace, a process
+call "minifying", making the imported code smaller and faster to load over the
+web). Second, the build process can strip out unused functions from the
+libraries you use. So for example, the
 [simplest method](https://www.jspsych.org/7.3/tutorials/hello-world/#step-3-create-a-script-element-and-initialize-jspsych)
 of using JSPsych you import the current version of the library which includes
-all the functions of JSPsych even if you never use them.
-
-In contrast, Vite, through it's build function can analyze your code and only
-include the parts of the library that you actually use. This is called
-**tree-shaking** and is a powerful way to reduce the size of your website.
-Finally, the build process can **code-split** your website. This means that the
-build process can break your website into smaller pieces that can be loaded on
-demand or in parallel. This has a huge impact on the speed of your
-website/experiment and is especially important for collecting data from
-populations with slow internet connections.
+all the functions of JSPsych even if you never use them. In contrast, Vite,
+through it's build function can analyze your code and only include the parts of
+the library that you actually use. This is called **tree-shaking** and is a
+powerful way to reduce the size of your website. Finally, the build process can
+**code-split** your website. This means that the build process can break your
+website into smaller pieces that can be loaded on demand or in parallel
+(breaking the code into multiple .js file "chunks"). This has a huge impact on
+the speed of your website/experiment and is especially important for collecting
+data from populations with slow internet connections.
 
 ## Learning Vue
 
@@ -458,20 +460,30 @@ Teaching the internals of Vue.js is beyond this particular guide. However,
 luckily Vue has a rich ecosystem of documentation and guides which can help (and
 also excellent documentation). The following are some useful pointers:
 
+The main resources you will find helpful are to first step through this
+interactive tutorial to get some experience with Vue:
+
+- Official Vue.js [tutorial](https://vuejs.org/tutorial/#step-1)
+
+Then read through the main docs (this is actually quite readable and
+informative):
+
+- The Vue.js [documentation](https://vuejs.org/guide/introduction.html)
+
+Here are some additional resources:
+
 - If you are coming to Vue with experience in jQuery this guide
   [comparing the two is interesting](https://www.smashingmagazine.com/2018/02/jquery-vue-javascript/).
 - Vue.js explained in [100 seconds](https://www.youtube.com/watch?v=nhBVL41-_Cw)
 - Vue.js documentary about the
   [lead developer](https://www.youtube.com/watch?v=OrxmtDw4pVI)
-- The Vue.js [documentation](https://vuejs.org/guide/introduction.html)
-- Official Vue.js [tutorial](https://vuejs.org/tutorial/#step-1)
 - Online school for learning [Vue](https://learnvue.co)
 - [LearnVue](https://www.youtube.com/LearnVue) a YouTube channel devoted to
   teaching Vue
 - Long video with a guy walking through the
-  [code and thinking of developing a simple game in Vue](https://www.youtube.com/watch?v=WQa9-4K3me4&t=1652s)
+  [code while developing a simple game in Vue](https://www.youtube.com/watch?v=WQa9-4K3me4&t=1652s)
 
-One very useful tool for learning about components is the
+Finally, one very useful tool for learning about components is the
 [Vue Single File Component Playground](https://sfc.vuejs.org/). On this page,
 you can write simple components see how they will render in real-time, and even
 build slightly larger components that include sub-components. It can be useful
