@@ -50,7 +50,7 @@ happens before the images are necessary.
 
 ```javascript
 // stroop exp
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/stroop',
   name: 'stroop',
   component: StroopExp,
