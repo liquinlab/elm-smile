@@ -51,7 +51,7 @@ class Timeline {
     this.seqtimeline.push(route)
   }
 
-  pushSeqRoute(routeConfig) {
+  pushSeqView(routeConfig) {
     const newroute = _.cloneDeep(routeConfig)
     if (!newroute.meta) {
       newroute.meta = { next: undefined, prev: undefined } // need to configure it
@@ -96,7 +96,7 @@ class Timeline {
     }
   }
 
-  pushRoute(routeConfig) {
+  pushView(routeConfig) {
     const newroute = _.cloneDeep(routeConfig)
     // should NOT allow meta next/prev to exist
     if (!newroute.meta) {

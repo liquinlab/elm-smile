@@ -226,7 +226,7 @@ const timeline = new Timeline()
 
 There are four key methods available on the timeline instance:
 
-### `timeline.pushSeqRoute(route_obj)`
+### `timeline.pushSeqView(route_obj)`
 
 Pushes a new route (specified in `route_obj`) into the sequential timeline. The
 first call to this function will make the configured route the first route in
@@ -234,7 +234,7 @@ the sequence. The second call will make it the second route in the sequence and
 so forth. The format of `route_obj` is what
 [VueRouter](https://router.vuejs.org/) allows.
 
-### `timeline.pushRoute(route_obj)`
+### `timeline.pushView(route_obj)`
 
 This pushes a new route (specified in `route_obj`) into a nonsequential
 timeline. This route will exist in the Vue router but will not be in the
@@ -267,28 +267,28 @@ import { Timeline } from '@/timeline' // @ resolves to /src in Smile
 const timeline = new Timeline()
 
 // first route
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/',
   name: 'welcome',
   component: WelcomeComponent,
 })
 
 // second route
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/instructions',
   name: 'instructions',
   component: InstructionsComponent,
 })
 
 // third route
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/thanks',
   name: 'thanks',
   component: ThanksComponent,
 })
 
 // a non sequential route available for debugging
-timeline.pushNonSeqRoute({
+timeline.pushView({
   path: '/config',
   name: 'config',
   component: ConfigComponent,
@@ -326,7 +326,7 @@ successor using `meta: {next: 'some_name'}` (or predecessor using
 
 ```js
 // first route
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/first',
   name: 'first',
   meta: { next: 'second' }, // this should jump to a specific route (by name)
@@ -334,7 +334,7 @@ timeline.pushSeqRoute({
 })
 
 // alternative first route
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/first_alt',
   name: 'first_alternate',
   meta: { next: 'second' }, // this should jump to a specific route (by name)
@@ -342,14 +342,14 @@ timeline.pushSeqRoute({
 })
 
 // second route
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/second',
   name: 'second',
   component: SecondComponent,
 })
 
 // third route
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/third',
   name: 'third',
   component: ThirdComponent,
@@ -362,7 +362,7 @@ Using this approach you can configure fairly complex branching flows through
 pages.
 
 The `timeline.build()` method steps through all nodes pushed using
-`pushSeqRoute()` and makes the `next` point to the successor and `prev` point to
+`pushSeqView()` and makes the `next` point to the successor and `prev` point to
 the previous route. If this is not what you want (because your routes need more
 complex flows) you can simply omit the `build` step.
 
@@ -389,7 +389,7 @@ import Timeline from '@/core/timeline'
 const timeline = new Timeline()
 
 // exp route
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/exp',
   name: 'exp',
   component: Exp,
@@ -399,13 +399,13 @@ timeline.pushSeqRoute({
 const randTimeline = new RandomSubTimeline()
 
 // push tasks into sub-timeline as "non-sequential" routes
-randTimeline.pushRoute({
+randTimeline.pushView({
   path: '/task1',
   name: 'task1',
   component: Task1,
 })
 
-randTimeline.pushRoute({
+randTimeline.pushView({
   path: '/task2',
   name: 'task2',
   component: Task2,
@@ -417,7 +417,7 @@ timeline.pushRandomizedTimeline({
 })
 
 // debriefing form
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/debrief',
   name: 'debrief',
   component: Debrief,
@@ -428,8 +428,8 @@ timeline.build()
 export default timeline
 ```
 
-Note that all sub-timelines routes are added with the `pushRoute` method, not
-the `pushSeqRoute` method. There is no `pushSeqRoute` method for randomized
+Note that all sub-timelines routes are added with the `pushView` method, not the
+`pushSeqView` method. There is no `pushSeqView` method for randomized
 sub-timelines.
 
 The randomized sub-timeline can contain any number of routes. Any routes
@@ -497,7 +497,7 @@ In this case, the participant will only see task 1 (between the `/exp` and
 see task 2 (between the `/exp` and `/debrief` routes) if their assigned
 `taskCondition` is `task2`.
 
-## TimelineStepper
+## Using the Timeline
 
 In each component in our router we need to call a method when that component is
 "finished" and allow the timeline/router to pass control to the next route in
@@ -590,7 +590,7 @@ route, to allow to return to it from any place in the timeline):
 import { Timeline } from '@/timeline' // @ resolves to /src in Smile
 const timeline = new Timeline()
 
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/',
   name: 'welcome',
   component: WelcomeComponent,
@@ -598,7 +598,7 @@ timeline.pushSeqRoute({
 
 // Consent form, etc., ...
 
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/instructions',
   name: 'instructions',
   component: InstructionsComponent,
@@ -607,7 +607,7 @@ timeline.pushSeqRoute({
 
 // ...
 
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/quiz',
   name: 'quiz',
   component: QuizComponent,
@@ -615,7 +615,7 @@ timeline.pushSeqRoute({
 
 // ...
 
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/thanks',
   name: 'thanks',
   component: ThanksComponent,
@@ -680,7 +680,7 @@ Timeline object.
 
 ```js
 // welcome screen
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/welcome',
   name: 'welcome',
   component: Advertisement,

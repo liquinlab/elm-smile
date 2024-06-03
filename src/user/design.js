@@ -41,22 +41,22 @@ const timeline = new Timeline()
 
 // add the recruitment chooser if in development mode
 if (api.config.mode === 'development') {
-  timeline.pushRoute({
+  timeline.pushView({
     path: '/',
     name: 'recruit',
     component: RecruitmentChooser,
     meta: { allowAlways: true, requiresConsent: false },
   })
 } else if (api.config.mode === 'presentation') {
-  timeline.pushRoute({
+  timeline.pushView({
     path: '/',
     name: 'presentation_home',
-    component: PresentationModeHomePage,
+    component: PresentationMode,
     meta: { allowAlways: true, requiresConsent: false },
   })
 } else {
   // auto refer to the anonymous welcome page
-  timeline.pushRoute({
+  timeline.pushView({
     path: '/',
     name: 'landing',
     redirect: {
@@ -67,7 +67,7 @@ if (api.config.mode === 'development') {
 }
 
 // welcome screen for non-referral
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/welcome',
   name: 'welcome_anonymous',
   component: Advertisement,
@@ -78,7 +78,7 @@ timeline.pushSeqRoute({
 })
 
 // welcome screen for referral
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/welcome/:service',
   name: 'welcome_referred',
   component: Advertisement,
@@ -97,7 +97,7 @@ timeline.pushSeqRoute({
 console.log(Advertisement)
 
 // consent
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/consent',
   name: 'consent',
   component: Consent,
@@ -113,35 +113,35 @@ timeline.pushSeqRoute({
 })
 
 // demographic survey
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/demograph',
   name: 'demograph',
   component: DemographicSurvey,
 })
 
 // windowsizer
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/windowsizer',
   name: 'windowsizer',
   component: WindowSizer,
 })
 
 // captcha
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/captcha',
   name: 'captcha',
   component: Captcha,
 })
 
 // instructions
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/instructions',
   name: 'instructions',
   component: Instructions,
 })
 
 // main experiment
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/exp',
   name: 'exp',
   component: Exp,
@@ -150,13 +150,13 @@ timeline.pushSeqRoute({
 // create subtimeline for randomization
 const randTimeline = new RandomSubTimeline()
 
-randTimeline.pushRoute({
+randTimeline.pushView({
   path: '/task1',
   name: 'task1',
   component: Task1,
 })
 
-randTimeline.pushRoute({
+randTimeline.pushView({
   path: '/task2',
   name: 'task2',
   component: Task2,
@@ -170,21 +170,21 @@ timeline.pushRandomizedTimeline({
 })
 
 // stroop exp
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/stroop',
   name: 'stroop',
   component: StroopExp,
 })
 
 // debriefing form
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/debrief',
   name: 'debrief',
   component: Debrief,
 })
 
 // thanks/submit page
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/thanks',
   name: 'thanks',
   component: Thanks,
@@ -192,7 +192,7 @@ timeline.pushSeqRoute({
 })
 
 // this is a special page that is for a withdraw
-timeline.pushRoute({
+timeline.pushView({
   path: '/withdraw',
   name: 'withdraw',
   meta: { requiresWithdraw: true },
@@ -200,7 +200,7 @@ timeline.pushRoute({
 })
 
 // this is a the special page that loads in the iframe on mturk.com
-timeline.pushRoute({
+timeline.pushView({
   path: '/mturk',
   name: 'mturk',
   component: MTurk,
