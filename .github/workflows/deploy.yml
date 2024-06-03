@@ -159,9 +159,6 @@ jobs:
           echo 'VITE_CODE_NAME_DEPLOY_URL         =  "https://${{ secrets.EXP_DEPLOY_HOST }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }}"' >> $DEPLOY_ENV_FILE
           cat $DEPLOY_ENV_FILE
 
-      - name: echo App.vue
-        run: cat src/App.vue
-
       # Build the web app
       - name: Build web app
         run: |
