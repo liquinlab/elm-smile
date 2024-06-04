@@ -61,11 +61,11 @@ export default function useAPI() {
     setWithdrawn: (forminfo) => {
       smilestore.setWithdrawn(forminfo)
     },
-    saveDemographicForm: (data) => {
-      smilestore.saveDemographicForm(data)
-    },
     verifyVisibility: (value) => {
       smilestore.data.verified_visibility = value
+    },
+    saveForm: (name, data) => {
+      smilestore.saveForm(name, data)
     },
     getVerifiedVisibility: () => {
       return smilestore.verifiedVisibility

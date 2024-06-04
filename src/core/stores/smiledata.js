@@ -113,7 +113,8 @@ export default defineStore('smilestore', {
       endtime: null, // time finished or withdrew
       recruitment_service: 'web', // fake
       browser_data: [], // empty
-      demographic_form: {}, // empty
+      // demographic_form: {}, // empty
+      // device_form: {}, // empty
       withdrawn: false, // false
       route_order: [],
       conditions: {},
@@ -287,8 +288,8 @@ export default defineStore('smilestore', {
     saveTrialData(data) {
       this.data.study_data.push(data)
     },
-    saveDemographicForm(data) {
-      this.data.demographic_form = data
+    saveForm(name, data) {
+      this.data[name + '_form'] = data
     },
     verifyVisibility(value) {
       this.data.verified_visibility = value

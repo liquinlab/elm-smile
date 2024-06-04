@@ -1,75 +1,52 @@
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { reactive, computed } from 'vue'
 
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
 const forminfo = reactive({
-  dob: '',
-  gender: '',
-  race: '',
-  hispanic: '',
-  fluent_english: '',
-  normal_vision: '',
-  color_blind: '',
-  learning_disability: '',
-  neurodevelopmental_disorder: '',
-  psychiatric_disorder: '',
-  country: '',
-  zipcode: '',
-  education_level: '',
-  household_income: '',
+  device_type: '', // type of device (e.g., desktop, laptop, tablet, phone)
+  connection: '', // type of internet connection (e.g., wifi, ethernet, cellular)
+  connection_quality: '', // self-reported connection quality
+  browser: '', // self-reported browser
+  pointer: '', // self-reported pointing device (mouse, trackpad, touchscreen)
+  assistive_technology: '', // self-reported assistive technology
+  tools: '', // self-report of tools
 })
 
 const page_one_complete = computed(
   () =>
-    forminfo.dob !== '' &&
-    forminfo.gender !== '' &&
-    forminfo.race !== '' &&
-    forminfo.hispanic !== '' &&
-    forminfo.fluent_english !== ''
+    forminfo.device_type !== '' &&
+    forminfo.connection !== '' &&
+    forminfo.connection_quality !== '' &&
+    forminfo.browser !== ''
 )
 
 const page_two_complete = computed(
-  () =>
-    forminfo.color_blind !== '' &&
-    forminfo.learning_disability !== '' &&
-    forminfo.neurodevelopmental_disorder !== '' &&
-    forminfo.psychiatric_disorder !== ''
-)
-
-const page_three_complete = computed(
-  () => forminfo.country !== '' && forminfo.education_level !== '' && forminfo.household_income !== ''
+  () => forminfo.pointer !== '' && forminfo.assistive_technology !== '' && forminfo.tools !== ''
 )
 
 function autofill() {
-  forminfo.dob = '1978-09-12'
-  forminfo.gender = 'Male'
-  forminfo.race = 'Caucasian/White'
-  forminfo.hispanic = 'No'
-  forminfo.fluent_english = 'Yes'
-  forminfo.normal_vision = 'Yes'
-  forminfo.color_blind = 'No'
-  forminfo.learning_disability = 'No'
-  forminfo.neurodevelopmental_disorder = 'No'
-  forminfo.psychiatric_disorder = 'No'
-  forminfo.country = 'United States'
-  forminfo.zipcode = '12345'
-  forminfo.education_level = 'Doctorate Degree (PhD/Other)'
-  forminfo.household_income = '$100,000–$199,999'
+  forminfo.device_type = 'Desktop Computer'
+  forminfo.connection = 'Wifi'
+  forminfo.connection_quality = 'Fast'
+  forminfo.browser = 'ARC'
+  forminfo.pointer = 'Mouse'
+  forminfo.assistive_technology = 'No'
+  forminfo.tools = 'No'
 }
 
 api.setPageAutofill(autofill)
 
-const pages = ['page1', 'page2', 'page3']
-const { nextStep, step_index } = api.useStepper(pages, () => {
+const pages = ['page1', 'page2']
+const { nextStep, prevStep, step_index } = api.useStepper(pages, () => {
   finish()
 })
 
 function finish() {
   api.removePageAutofill() // you are responsible for removing the autofill
-  api.saveDemographicForm(forminfo)
+  api.saveForm('device', forminfo)
   api.stepNextRoute()
 }
 </script>
@@ -77,75 +54,101 @@ function finish() {
 <template>
   <div class="page prevent-select">
     <div class="formcontent">
-      <h3 class="is-size-4 has-text-weight-bold">Demographic Information</h3>
+      <h3 class="is-size-4 has-text-weight-bold">Computer/Device Information</h3>
       <p class="is-size-6">
-        We request some information about you which we can use to understand aggregate differences between individuals.
-        Your privacy will be maintained and the data will not be linked to your online identity (e.g., email).
+        We request some basic information about the computer you are using right now. We also can use this information
+        to improve the quality of our experiments in the future.
       </p>
 
       <div class="formstep" v-if="step_index == 0">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
-              <h3 class="is-size-6 has-text-weight-bold">Basic Info</h3>
-              <p class="is-size-7">First, we need some basic information. We collected this demographic information.</p>
+              <h3 class="is-size-6 has-text-weight-bold">Important Note</h3>
+              <p class="is-size-6">
+                If this is a paid study your answers to these questions will have no effect on your final payment. We
+                are just interested in your honest answers.
+              </p>
             </div>
           </div>
           <div class="column">
             <div class="box is-shadowless formbox">
               <FormKit
-                type="date"
-                label="Date of Birth"
-                placeholder="1/1/1960"
-                name="dob"
-                v-model="forminfo.dob"
-                help="Enter your birthday (required)"
-                validation="required"
-              />
-              <FormKit
                 type="select"
-                label="Gender"
-                name="gender"
-                help="Enter your self-identified gender (required)"
-                placeholder="Select an option"
-                :options="['Male', 'Female', 'Other']"
-                v-model="forminfo.gender"
-              />
-              <FormKit
-                type="select"
-                label="Race"
-                name="race"
-                v-model="forminfo.race"
-                help="Enter the race that best describes you (required)"
+                label="What best describes the computer you are using right now?"
+                name="connection"
+                help="Enter your computer type (choose the best match)"
                 placeholder="Select an option"
                 :options="[
-                  'Asian',
-                  'Black/African American',
-                  'Caucasian/White',
-                  'Native American',
-                  'Mixed Race',
-                  'Pacific Islander/Native Hawaiian',
+                  'Laptop Computer',
+                  'Desktop Computer',
+                  'iPad/Tablet',
+                  'Smartphone',
+                  'Television',
+                  'Other',
+                  'I\'m not sure',
+                  'I\'d rather not say',
                 ]"
+                v-model="forminfo.device_type"
               />
               <FormKit
                 type="select"
-                label="Are you hispanic?"
-                name="hispanic"
-                v-model="forminfo.hispanic"
+                label="What type of Internet connection are you using right now?"
+                name="connection"
+                help="Enter your internet connection type"
                 placeholder="Select an option"
-                help="Do you consider yourself hispanic? (required)"
-                validation="required"
-                :options="['No', 'Yes']"
+                :options="[
+                  'Ethernet',
+                  'Wifi',
+                  'Cellular (5G)',
+                  'Cellular (4G/LTE)',
+                  'Cellular (3G)',
+                  'DSL',
+                  'Dialup Modem',
+                  'Other',
+                  'I\'m not sure',
+                  'I\'d rather not say',
+                ]"
+                v-model="forminfo.connection"
               />
               <FormKit
                 type="select"
-                label="Are you fluent in English?"
-                name="english"
-                v-model="forminfo.fluent_english"
-                help="Are you able to speak and understanding English? (required)"
+                label="How would you rate you Internet connection quality today?"
+                name="browser"
+                help="How would you rate your Internet connection"
                 placeholder="Select an option"
-                validation="required"
-                :options="['Yes', 'No']"
+                :options="[
+                  'Fast',
+                  'Moderate',
+                  'Slow but reliable',
+                  'Very slow, unreliable',
+                  'I\'m not sure',
+                  'I\'d rather not say',
+                ]"
+                v-model="forminfo.connection_quality"
+              />
+              <FormKit
+                type="select"
+                label="What web browser are you using?"
+                name="connection"
+                help="Enter your internet browser type"
+                placeholder="Select an option"
+                :options="[
+                  'Safari (Mac)',
+                  'Chrome',
+                  'Firefox',
+                  'Opera',
+                  'Microsoft Edge',
+                  'Microsoft Internet Explorer',
+                  'UC Browser',
+                  'Samsung Internet',
+                  'ARC',
+                  'Chromium',
+                  'Other',
+                  'I\'m not sure',
+                  'I\'d rather not say',
+                ]"
+                v-model="forminfo.browser"
               />
               <hr />
               <div class="columns">
@@ -167,74 +170,66 @@ function finish() {
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
-              <h3 class="is-size-6 has-text-weight-bold">Psychological Information</h3>
-              <p class="is-size-7">First, we need some basic information. We collected this demographic information.</p>
+              <h3 class="is-size-6 has-text-weight-bold">Important Note</h3>
+              <p class="is-size-6">
+                If this is a paid study your answers to these questions will have no effect on your final payment. We
+                are just interested in your honest answers.
+              </p>
             </div>
           </div>
           <div class="column">
             <div class="box is-shadowless formbox">
               <FormKit
                 type="select"
-                name="vision"
-                label="Do you have normal vision (or corrected to be normal)?"
-                help="Do you have normal vision? (required)"
+                label="What best descries how you moved the cursor, clicked, or scrolled things during this experiment?"
+                name="connection"
+                help="Enter your input type"
                 placeholder="Select an option"
-                validation="required"
-                v-model="forminfo.normal_vision"
-                :options="['Yes', 'No']"
+                :options="[
+                  'Mouse',
+                  'Trackpad',
+                  'Scrollwheel',
+                  'Touchscreen/Finger',
+                  'Trackpoint/pointing stick',
+                  'Stylus/Pen/Pencil',
+                  'Keyboard Only',
+                  'Game Controller',
+                  'Other',
+                  'I\'m not sure',
+                  'I\'d rather not say',
+                ]"
+                v-model="forminfo.pointer"
               />
               <FormKit
                 type="select"
-                name="colorblind"
-                label="Are you color blind?"
-                help="Do you have any color blindness? (required)"
+                label="Are you using any assistive technologies?"
+                name="browser"
+                help="Examples include screen readers, screen magnifiers, or voice input systems."
                 placeholder="Select an option"
-                validation="required"
-                v-model="forminfo.color_blind"
-                :options="['Yes', 'No']"
+                :options="['No', 'Yes', 'I\'m not sure', 'I\'d rather not say']"
+                v-model="forminfo.assistive_technology"
               />
               <FormKit
                 type="select"
-                name="learningdisability"
-                label="Have you been diagnosed with a learning disability (e.g., dyslexia, dysclaculia)?"
-                help="Do you have a diagnosed learning disability? (required)"
+                label="Did you use any tools to help you complete this experiment?"
+                name="browser"
+                help="Examples include browser extensions that help you fill forms, enter text, or navigate the web or copying answers from AI/Large Language Models."
                 placeholder="Select an option"
-                validation="required"
-                v-model="forminfo.learning_disability"
-                :options="['Yes', 'No']"
-              />
-              <FormKit
-                type="select"
-                name="neurodevelopmentaldisorder"
-                label="Have you been diagnosed with a neurodevelopmental disorder (e.g., autism, tic disorder)?"
-                help="Do you have a diagnosis of a neurodevelopmental disorder? (required)"
-                placeholder="Select an option"
-                validation="required"
-                v-model="forminfo.neurodevelopmental_disorder"
-                :options="['Yes', 'No']"
-              />
-              <FormKit
-                type="select"
-                name="psychiatricdisorder"
-                label="Have you been diagnosed with a psychiatric disorder (e.g., anxiety, depression, OCD)?"
-                help="Do you have diagnosis of a psychiatric disorder? (required)"
-                validation="required"
-                v-model="forminfo.psychiatric_disorder"
-                placeholder="Select an option"
-                :options="['Yes', 'No']"
+                :options="['No', 'Yes', 'I\'m not sure', 'I\'d rather not say']"
+                v-model="forminfo.tools"
               />
               <hr />
               <div class="columns">
                 <div class="column">
                   <div class="has-text-left">
-                    <button class="button is-warning" id="finish" @click="api.decrementTrial()">
+                    <button class="button is-warning" id="finish" @click="prevStep()">
                       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous
                     </button>
                   </div>
                 </div>
                 <div class="column">
                   <div class="has-text-right">
-                    <button class="button is-warning" id="finish" v-if="page_two_complete" @click="nextStep()">
+                    <button class="button is-warning" id="finish" v-if="page_two_complete" @click="finish()">
                       Continue &nbsp;
                       <FAIcon icon="fa-solid fa-arrow-right" />
                     </button>
@@ -246,304 +241,15 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-if="step_index == 2">
-        <div class="columns">
-          <div class="column is-one-third">
-            <div class="formsectionexplainer">
-              <h3 class="is-size-6 has-text-weight-bold">Household Info</h3>
-              <p class="is-size-7">First, we need some basic information. We collected this demographic information.</p>
-            </div>
-          </div>
-          <div class="column">
-            <div class="box is-shadowless formbox">
-              <FormKit
-                type="select"
-                label="Country"
-                name="country"
-                placeholder="Select an option"
-                validation="required"
-                v-model="forminfo.country"
-                help="Select the country in which you reside. (required)"
-                :options="[
-                  'Afghanistan',
-                  'Albania',
-                  'Algeria',
-                  'Andorra',
-                  'Angola',
-                  'Antigua & Deps',
-                  'Argentina',
-                  'Armenia',
-                  'Australia',
-                  'Austria',
-                  'Azerbaijan',
-                  'Bahamas',
-                  'Bahrain',
-                  'Bangladesh',
-                  'Barbados',
-                  'Belarus',
-                  'Belgium',
-                  'Belize',
-                  'Benin',
-                  'Bhutan',
-                  'Bolivia',
-                  'Bosnia Herzegovina',
-                  'Botswana',
-                  'Brazil',
-                  'Brunei',
-                  'Bulgaria',
-                  'Burkina',
-                  'Burundi',
-                  'Cambodia',
-                  'Cameroon',
-                  'Canada',
-                  'Cape Verde',
-                  'Central African Rep',
-                  'Chad',
-                  'Chile',
-                  'China',
-                  'Colombia',
-                  'Comoros',
-                  'Congo',
-                  'Congo {Democratic Rep}',
-                  'Costa Rica',
-                  'Croatia',
-                  'Cuba',
-                  'Cyprus',
-                  'Czech Republic',
-                  'Denmark',
-                  'Djibouti',
-                  'Dominica',
-                  'Dominican Republic',
-                  'East Timor',
-                  'Ecuador',
-                  'Egypt',
-                  'El Salvador',
-                  'Equatorial Guinea',
-                  'Eritrea',
-                  'Estonia',
-                  'Ethiopia',
-                  'Fiji',
-                  'Finland',
-                  'France',
-                  'Gabon',
-                  'Gambia',
-                  'Georgia',
-                  'Germany',
-                  'Ghana',
-                  'Greece',
-                  'Grenada',
-                  'Guatemala',
-                  'Guinea',
-                  'Guinea-Bissau',
-                  'Guyana',
-                  'Haiti',
-                  'Honduras',
-                  'Hungary',
-                  'Iceland',
-                  'India',
-                  'Indonesia',
-                  'Iran',
-                  'Iraq',
-                  'Ireland {Republic}',
-                  'Israel',
-                  'Italy',
-                  'Ivory Coast',
-                  'Jamaica',
-                  'Japan',
-                  'Jordan',
-                  'Kazakhstan',
-                  'Kenya',
-                  'Kiribati',
-                  'Korea North',
-                  'Korea South',
-                  'Kosovo',
-                  'Kuwait',
-                  'Kyrgyzstan',
-                  'Laos',
-                  'Latvia',
-                  'Lebanon',
-                  'Lesotho',
-                  'Liberia',
-                  'Libya',
-                  'Liechtenstein',
-                  'Lithuania',
-                  'Luxembourg',
-                  'Macedonia',
-                  'Madagascar',
-                  'Malawi',
-                  'Malaysia',
-                  'Maldives',
-                  'Mali',
-                  'Malta',
-                  'Marshall Islands',
-                  'Mauritania',
-                  'Mauritius',
-                  'Mexico',
-                  'Micronesia',
-                  'Moldova',
-                  'Monaco',
-                  'Mongolia',
-                  'Montenegro',
-                  'Morocco',
-                  'Mozambique',
-                  'Myanmar, {Burma}',
-                  'Namibia',
-                  'Nauru',
-                  'Nepal',
-                  'Netherlands',
-                  'New Zealand',
-                  'Nicaragua',
-                  'Niger',
-                  'Nigeria',
-                  'Norway',
-                  'Oman',
-                  'Pakistan',
-                  'Palau',
-                  'Panama',
-                  'Papua New Guinea',
-                  'Paraguay',
-                  'Peru',
-                  'Philippines',
-                  'Poland',
-                  'Portugal',
-                  'Qatar',
-                  'Romania',
-                  'Russian Federation',
-                  'Rwanda',
-                  'St Kitts & Nevis',
-                  'St Lucia',
-                  'Saint Vincent & the Grenadines',
-                  'Samoa',
-                  'San Marino',
-                  'Sao Tome & Principe',
-                  'Saudi Arabia',
-                  'Senegal',
-                  'Serbia',
-                  'Seychelles',
-                  'Sierra Leone',
-                  'Singapore',
-                  'Slovakia',
-                  'Slovenia',
-                  'Solomon Islands',
-                  'Somalia',
-                  'South Africa',
-                  'South Sudan',
-                  'Spain',
-                  'Sri Lanka',
-                  'Sudan',
-                  'Suriname',
-                  'Swaziland',
-                  'Sweden',
-                  'Switzerland',
-                  'Syria',
-                  'Taiwan',
-                  'Tajikistan',
-                  'Tanzania',
-                  'Thailand',
-                  'Togo',
-                  'Tonga',
-                  'Trinidad & Tobago',
-                  'Tunisia',
-                  'Turkey',
-                  'Turkmenistan',
-                  'Tuvalu',
-                  'Uganda',
-                  'Ukraine',
-                  'United Arab Emirates',
-                  'United Kingdom',
-                  'United States',
-                  'Uruguay',
-                  'Uzbekistan',
-                  'Vanuatu',
-                  'Vatican City',
-                  'Venezuela',
-                  'Vietnam',
-                  'Yemen',
-                  'Zambia',
-                  'Zimbabwe',
-                ]"
-              />
-              <FormKit
-                type="text"
-                name="zipcode"
-                label="Zipcode/Postal Code"
-                placeholder="Enter zip or postal code"
-                validation="optional"
-                v-model="forminfo.zipcode"
-                help="Select zipcode or postal code of your primary residence. (optional)"
-              />
-
-              <FormKit
-                type="select"
-                name="education"
-                label="Highest level of education"
-                placeholder="Select an option"
-                v-model="forminfo.education_level"
-                help="What is your highest level of schooling that you completed? (required)"
-                :options="[
-                  'No Formal Qualifications',
-                  'Secondary Education (ie. GED/GCSE)',
-                  'High School Diploma (A-levels)',
-                  'Technical/Community College',
-                  'Undergraduate Degree (BA/BS/Other)',
-                  'Graduate Degree (MA/MS/MPhil/Other)',
-                  'Doctorate Degree (PhD/Other)',
-                  'Don’t Know/Not Applicable',
-                ]"
-              />
-              <FormKit
-                type="select"
-                name="income"
-                label="Enter your approximate household income."
-                help="What is your approximate household income? (required)"
-                placeholder="Select an option"
-                v-model="forminfo.household_income"
-                :options="[
-                  'Less than $20,000',
-                  '$20,000–$39,999',
-                  '$40,000–$59,999',
-                  '$60,000–$79,999',
-                  '$80,000–$99,999',
-                  '$100,000–$199,999',
-                  '$200,000–$299,999',
-                  '$300,000–$399,999',
-                  '$400,000–$499,999',
-                  '$500,000+',
-                  'I don’t know',
-                  'I prefer not to answer',
-                ]"
-              />
-              <hr />
-              <div class="columns">
-                <div class="column">
-                  <div class="has-text-left">
-                    <button class="button is-warning" id="finish" @click="api.decrementTrial()">
-                      <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous
-                    </button>
-                  </div>
-                </div>
-                <div class="column">
-                  <div class="has-text-right">
-                    <button class="button is-success" id="finish" v-if="page_three_complete" @click="finish()">
-                      That was easy!
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="formstep" v-if="step_index >= 3">
+      <div class="formstep" v-if="step_index >= 2">
         <article class="message is-danger">
           <div class="message-header">
             <p>Error</p>
             <button class="delete" aria-label="delete"></button>
           </div>
           <div class="message-body">
-            Error, you shouldn't have been able to get this far! This happened because the pageTracker for this route
-            has been incremented too many times. There's no problem so long as your code doesn't allow this in live
-            mode.
+            Error, you shouldn't have been able to get this far! This happened because the stepper for this route has
+            been incremented too many times. There's no problem so long as your code doesn't allow this in live mode.
           </div>
         </article>
       </div>

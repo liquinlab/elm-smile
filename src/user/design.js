@@ -6,6 +6,7 @@ import MTurk from '@/builtins/recruitment/MTurkRecruitView.vue'
 import Advertisement from '@/builtins/recruitment/AdvertisementView.vue'
 import Consent from '@/builtins/consent/ConsentView.vue'
 import DemographicSurvey from '@/builtins/demographic_survey/DemographicSurveyView.vue'
+import DeviceSurvey from '@/builtins/device_survey/DeviceSurveyView.vue'
 import Captcha from '@/builtins/captcha/CaptchaView.vue'
 import Instructions from '@/builtins/instructions/InstructionsView.vue'
 import Debrief from '@/builtins/debrief/DebriefView.vue'
@@ -87,6 +88,13 @@ timeline.pushSeqView({
   path: '/demograph',
   name: 'demograph',
   component: DemographicSurvey,
+})
+
+// device survey
+timeline.pushSeqView({
+  path: '/device',
+  name: 'device',
+  component: DeviceSurvey,
 })
 
 // windowsizer

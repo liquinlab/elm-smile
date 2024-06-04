@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { reactive, computed } from 'vue'
 
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
@@ -63,13 +63,13 @@ function autofill() {
 api.setPageAutofill(autofill)
 
 const pages = ['page1', 'page2', 'page3']
-const { nextStep, step_index } = api.useStepper(pages, () => {
+const { nextStep, prevStep, step_index } = api.useStepper(pages, () => {
   finish()
 })
 
 function finish() {
   api.removePageAutofill() // you are responsible for removing the autofill
-  api.saveDemographicForm(forminfo)
+  api.saveForm('demographic', forminfo)
   api.stepNextRoute()
 }
 </script>
@@ -88,7 +88,7 @@ function finish() {
           <div class="column is-one-third">
             <div class="formsectionexplainer">
               <h3 class="is-size-6 has-text-weight-bold">Basic Info</h3>
-              <p class="is-size-7">First, we need some basic information. We collected this demographic information.</p>
+              <p class="is-size-7">First, we need some basic, generic information about you.</p>
             </div>
           </div>
           <div class="column">
@@ -108,7 +108,7 @@ function finish() {
                 name="gender"
                 help="Enter your self-identified gender (required)"
                 placeholder="Select an option"
-                :options="['Male', 'Female', 'Other']"
+                :options="['Male', 'Female', 'Other', 'I prefer not to say']"
                 v-model="forminfo.gender"
               />
               <FormKit
@@ -123,8 +123,10 @@ function finish() {
                   'Black/African American',
                   'Caucasian/White',
                   'Native American',
-                  'Mixed Race',
                   'Pacific Islander/Native Hawaiian',
+                  'Mixed Race',
+                  'Other',
+                  'I prefer not to say',
                 ]"
               />
               <FormKit
@@ -135,7 +137,7 @@ function finish() {
                 placeholder="Select an option"
                 help="Do you consider yourself hispanic? (required)"
                 validation="required"
-                :options="['No', 'Yes']"
+                :options="['No', 'Yes', 'I prefer not to say']"
               />
               <FormKit
                 type="select"
@@ -145,7 +147,7 @@ function finish() {
                 help="Are you able to speak and understanding English? (required)"
                 placeholder="Select an option"
                 validation="required"
-                :options="['Yes', 'No']"
+                :options="['Yes', 'No', 'I prefer not to say']"
               />
               <hr />
               <div class="columns">
@@ -168,7 +170,7 @@ function finish() {
           <div class="column is-one-third">
             <div class="formsectionexplainer">
               <h3 class="is-size-6 has-text-weight-bold">Psychological Information</h3>
-              <p class="is-size-7">First, we need some basic information. We collected this demographic information.</p>
+              <p class="is-size-7">Next, we need some basic information about your ability to perceive this study.</p>
             </div>
           </div>
           <div class="column">
@@ -181,7 +183,7 @@ function finish() {
                 placeholder="Select an option"
                 validation="required"
                 v-model="forminfo.normal_vision"
-                :options="['Yes', 'No']"
+                :options="['Yes', 'No', 'Unsure', 'I prefer not to say']"
               />
               <FormKit
                 type="select"
@@ -191,7 +193,7 @@ function finish() {
                 placeholder="Select an option"
                 validation="required"
                 v-model="forminfo.color_blind"
-                :options="['Yes', 'No']"
+                :options="['Yes', 'No', 'Unsure', 'I prefer not to say']"
               />
               <FormKit
                 type="select"
@@ -201,7 +203,7 @@ function finish() {
                 placeholder="Select an option"
                 validation="required"
                 v-model="forminfo.learning_disability"
-                :options="['Yes', 'No']"
+                :options="['Yes', 'No', 'Unsure', 'I prefer not to say']"
               />
               <FormKit
                 type="select"
@@ -211,7 +213,7 @@ function finish() {
                 placeholder="Select an option"
                 validation="required"
                 v-model="forminfo.neurodevelopmental_disorder"
-                :options="['Yes', 'No']"
+                :options="['Yes', 'No', 'Unsure', 'I prefer not to say']"
               />
               <FormKit
                 type="select"
@@ -221,13 +223,13 @@ function finish() {
                 validation="required"
                 v-model="forminfo.psychiatric_disorder"
                 placeholder="Select an option"
-                :options="['Yes', 'No']"
+                :options="['Yes', 'No', 'Unsure', 'I prefer not to say']"
               />
               <hr />
               <div class="columns">
                 <div class="column">
                   <div class="has-text-left">
-                    <button class="button is-warning" id="finish" @click="api.decrementTrial()">
+                    <button class="button is-warning" id="finish" @click="prevStep()">
                       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous
                     </button>
                   </div>
@@ -251,7 +253,7 @@ function finish() {
           <div class="column is-one-third">
             <div class="formsectionexplainer">
               <h3 class="is-size-6 has-text-weight-bold">Household Info</h3>
-              <p class="is-size-7">First, we need some basic information. We collected this demographic information.</p>
+              <p class="is-size-7">Finally we need some basic household information.</p>
             </div>
           </div>
           <div class="column">
@@ -489,6 +491,7 @@ function finish() {
                   'Graduate Degree (MA/MS/MPhil/Other)',
                   'Doctorate Degree (PhD/Other)',
                   'Don’t Know/Not Applicable',
+                  'I prefer not to answer',
                 ]"
               />
               <FormKit
@@ -517,7 +520,7 @@ function finish() {
               <div class="columns">
                 <div class="column">
                   <div class="has-text-left">
-                    <button class="button is-warning" id="finish" @click="api.decrementTrial()">
+                    <button class="button is-warning" id="finish" @click="prevStep()">
                       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous
                     </button>
                   </div>
@@ -541,9 +544,8 @@ function finish() {
             <button class="delete" aria-label="delete"></button>
           </div>
           <div class="message-body">
-            Error, you shouldn't have been able to get this far! This happened because the pageTracker for this route
-            has been incremented too many times. There's no problem so long as your code doesn't allow this in live
-            mode.
+            Error, you shouldn't have been able to get this far! This happened because the stepper for this route has
+            been incremented too many times. There's no problem so long as your code doesn't allow this in live mode.
           </div>
         </article>
       </div>
