@@ -42,13 +42,13 @@ describe.skip('Stepper tests', () => {
     })
 
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'one',
       component: TestComponent,
     })
 
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/two',
       name: 'two',
       component: TestComponent,
@@ -75,13 +75,13 @@ describe.skip('Stepper tests', () => {
     })
 
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'one',
       component: TestComponent,
     })
 
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/two',
       name: 'two',
       component: TestComponent,
@@ -108,14 +108,14 @@ describe.skip('Stepper tests', () => {
     })
 
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'one',
       component: TestComponent,
       meta: { next: 'consent' }, // override what is next
     })
 
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/two',
       name: 'two',
       component: TestComponent,

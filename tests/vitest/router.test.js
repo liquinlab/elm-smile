@@ -15,6 +15,11 @@ import appconfig from '@/core/config'
 let router
 let pinia
 
+import axios from 'axios'
+vi.mock('axios', () => ({
+  get: vi.fn(() => Promise.resolve({ data: '127.0.0.1' })),
+}))
+
 /* general purpose helper functions */
 // sets up app and the mock dom
 function setupapp() {
