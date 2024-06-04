@@ -66,8 +66,8 @@ function finish() {
             <div class="formsectionexplainer">
               <h3 class="is-size-6 has-text-weight-bold">Important Note</h3>
               <p class="is-size-6">
-                If this is a paid study your answers to these questions will have no effect on your final payment. We
-                are just interested in your honest answers.
+                If this is a paid study your answers to these questions will have
+                <b>no effect on your final payment</b>. We are just interested in your honest answers.
               </p>
             </div>
           </div>
@@ -172,8 +172,8 @@ function finish() {
             <div class="formsectionexplainer">
               <h3 class="is-size-6 has-text-weight-bold">Important Note</h3>
               <p class="is-size-6">
-                If this is a paid study your answers to these questions will have no effect on your final payment. We
-                are just interested in your honest answers.
+                If this is a paid study your answers to these questions will have
+                <b>no effect on your final payment</b>. We are just interested in your honest answers.
               </p>
             </div>
           </div>

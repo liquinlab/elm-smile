@@ -90,13 +90,6 @@ timeline.pushSeqView({
   component: DemographicSurvey,
 })
 
-// device survey
-timeline.pushSeqView({
-  path: '/device',
-  name: 'device',
-  component: DeviceSurvey,
-})
-
 // windowsizer
 timeline.pushSeqView({
   path: '/windowsizer',
@@ -159,6 +152,13 @@ timeline.pushSeqView({
   path: '/debrief',
   name: 'debrief',
   component: Debrief,
+})
+
+// device survey
+timeline.pushSeqView({
+  path: '/device',
+  name: 'device',
+  component: DeviceSurvey,
 })
 
 // thanks/submit page
