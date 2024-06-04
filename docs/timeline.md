@@ -535,7 +535,7 @@ button (calling the `finish()` method):
 <script setup>
 import { useRoute } from 'vue-router'
 import useTimeline from '@/composables/useTimeline'
-import useSmileStore from '@/stores/smiledata' // get access to the global store
+import useSmileStore from '@/stores/smilestore' // get access to the global store
 
 const route = useRoute()
 const smilestore = useSmileStore()
@@ -629,7 +629,7 @@ Your quiz module then might implement something like the following:
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import useTimeline from '@/composables/useTimeline'
-import useSmileStore from '@/stores/smiledata' // get access to the global store
+import useSmileStore from '@/stores/smilestore' // get access to the global store
 
 const route = useRoute()
 const smilestore = useSmileStore()

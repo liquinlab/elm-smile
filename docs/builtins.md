@@ -57,7 +57,7 @@ src/components
 │   ├── RecruitmentChooserPage.vue
 │   └── StudyPreviewText.vue
 ├── screen_adjust
-│   └── WindowSizerPage.vue
+│   └── WindowSizerView.vue
 ├── surveys
 │   └── DemographicSurveyPage.vue
 ├── tasks
@@ -82,7 +82,7 @@ to reuse in their projects.
 ## MTurk Recruitment
 
 **Component**: `src/components/AdvertisementView.vue`  
-**Side effects**: Sets the `consent` key in the `localStorage` to `true.`
+**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
 **Typical accessibility**: Always
 
 There's two pages here. The advertisement page and the MTurk recruitment page.
@@ -90,7 +90,7 @@ There's two pages here. The advertisement page and the MTurk recruitment page.
 ## MTurk Recruitment
 
 **Component**: `src/components/AdvertisementView.vue`  
-**Side effects**: Sets the `consent` key in the `localStorage` to `true.`
+**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
 **Typical accessibility**: Always
 
 There's two pages here. The advertisement page and the MTurk recruitment page.
@@ -98,7 +98,7 @@ There's two pages here. The advertisement page and the MTurk recruitment page.
 ## Informed Consent
 
 **Component**: `src/components/AdvertisementView.vue`  
-**Side effects**: Sets the `consent` key in the `localStorage` to `true.`
+**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
 **Typical accessibility**: Always
 
 The text of the informed consent should be updated for each study and placed in
@@ -108,6 +108,10 @@ that will always be available allowing them to re-review the consent form in
 case they have questions.
 
 ## Captcha
+
+**Component**: `src/components/AdvertisementView.vue`  
+**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
+**Typical accessibility**: Always
 
 Very fast tasks, requiring human common sense, that are diverse, unpredictable,
 and have a large number of incorrect responses.
@@ -122,9 +126,13 @@ and have a large number of incorrect responses.
   beat clock on time
 - watch a crazy video and type the words it says
 
-## WindowSizerPage
+## WindowSizerView
 
-The window sizer is a small component `src/components/pages/WindowSizerPage.vue`
+**Component**: `src/components/AdvertisementView.vue`  
+**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
+**Typical accessibility**: Always
+
+The window sizer is a small component `src/components/pages/WindowSizerView.vue`
 that will display a box with a configured size on the screen and asked the
 participant to adjust their browser window to that size so everything is
 visible. It looks like this:
@@ -142,14 +150,30 @@ To add it to the timeline just add this in the appropriate place inside
 
 ```js
 // windowsizer
-timeline.pushSeqRoute({
+timeline.pushSeqView({
   path: '/windowsizer',
   name: 'windowsizer',
   component: WindowSizer,
 })
 ```
 
+## Instructions
+
+**Component**: `src/components/AdvertisementView.vue`  
+**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
+**Typical accessibility**: Always
+
+## Demographic Survey
+
+**Component**: `src/components/AdvertisementView.vue`  
+**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
+**Typical accessibility**: Always
+
 ## Withdraw
+
+**Component**: `src/components/AdvertisementView.vue`  
+**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
+**Typical accessibility**: Always
 
 As part of most IRB approved protocols participants should be eligible to
 withdraw from a study at any time for any reason. Online this is as simple as
@@ -167,26 +191,24 @@ taken to a final page asking them to return the task/hit. It is the
 responsibility of the experimenter to monitor withdraws and to try to contact
 the participant.
 
-### Captcha
+## Debrief
 
-### Consent
+**Component**: `src/components/AdvertisementView.vue`  
+**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
+**Typical accessibility**: Always
 
-### Debrief
+## Thanks
+
+**Component**: `src/components/AdvertisementView.vue`  
+**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
+**Typical accessibility**: Always
+
+## Withdraw
 
 ### Errors
 
-### Instructions
-
 ### Navbars
-
-### Presentation mode
 
 ### Recruitment
 
-### Screen adjust
-
-### Surveys
-
 ### Tasks
-
-### Thanks

@@ -2,7 +2,7 @@
 import { ref, reactive, watch } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
-import useSmileStore from '@/core/stores/smiledata'
+import useSmileStore from '@/core/stores/smilestore'
 const smilestore = useSmileStore() // load the global store
 const seed = ref(smilestore.getSeedID)
 import { v4 as uuidv4 } from 'uuid'

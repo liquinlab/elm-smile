@@ -2,7 +2,6 @@
 import '@/core/seed'
 import Timeline from '@/core/timeline'
 import { createTestingPinia } from '@pinia/testing'
-import useSmileStore from '@/core/stores/smiledata'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { mount } from '@vue/test-utils'
 import seedrandom from 'seedrandom'

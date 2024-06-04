@@ -2,7 +2,7 @@
 import { ref, reactive } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
-import useSmileStore from '@/core/stores/smiledata'
+import useSmileStore from '@/core/stores/smilestore'
 const smilestore = useSmileStore() // load the global store
 
 //const panel = reactive({ type: 'local', visible: false, x: -280, y: 0 })

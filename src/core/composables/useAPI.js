@@ -1,5 +1,5 @@
 import { useRoute, useRouter } from 'vue-router'
-import useSmileStore from '@/core/stores/smiledata'
+import useSmileStore from '@/core/stores/smilestore'
 import useTimeline from '@/core/composables/useTimeline'
 // import seeded randomization function for this component/route
 // random seeding is unique to each component/route

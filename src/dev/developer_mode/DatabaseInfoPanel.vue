@@ -5,7 +5,7 @@ import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import SmileAPI from '@/core/composables/useAPI'
 const api = SmileAPI()
 
-import useSmileStore from '@/core/stores/smiledata'
+import useSmileStore from '@/core/stores/smilestore'
 const smilestore = useSmileStore()
 
 var timer = ref(null)

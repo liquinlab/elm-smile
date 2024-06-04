@@ -1,7 +1,7 @@
 import { useRoute, useRouter } from 'vue-router'
 import _ from 'lodash'
 import { RandomizeSubTimeline } from '@/core/subtimeline'
-import useSmileStore from '@/core/stores/smiledata'
+import useSmileStore from '@/core/stores/smilestore'
 import useLog from '@/core/stores/log'
 
 export default function useTimeline() {

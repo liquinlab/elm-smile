@@ -5,7 +5,7 @@
 // this script simply defines an ID number that is used to set seeds throughout the experiment
 import { v4 as uuidv4 } from 'uuid'
 import { pinia } from '@/core/createpinia'
-import useSmileStore from '@/core/stores/smiledata' // get access to the global store
+import useSmileStore from '@/core/stores/smilestore' // get access to the global store
 
 const smilestore = useSmileStore(pinia)
 

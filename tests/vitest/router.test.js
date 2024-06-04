@@ -9,7 +9,7 @@ import '@/core/icons' // configure fontawesome
 
 import App from '@/App.vue'
 import { routes, addGuards } from '@/core/router' // This import should point to your routes file declared above
-import useSmileStore from '@/core/stores/smiledata'
+import useSmileStore from '@/core/stores/smilestore'
 import appconfig from '@/core/config'
 
 let router

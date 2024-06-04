@@ -72,7 +72,7 @@ a random number (e.g., multiple trials), you should generate all random numbers
 for that route at the beginning of the route (rather than within each specific
 trial). Here's why: If the participant refreshes the page, you want them to go
 back to the trial where they left off (see `pageTracker` in
-`stores/smiledata.js` for more on this). If you set all random numbers at the
+`stores/smilestore.js` for more on this). If you set all random numbers at the
 beginning, the participant can easily pick up from trial 10 with the same
 randomization (all random numbers are regenerated upon refresh, and the
 `pageTracker` will correctly point to the 10th random number for the 10th
@@ -214,7 +214,7 @@ experiment.
 ### Assigning conditions
 
 To balance condition assignment, all you need to do is add a field called
-`possibleConditions` to the local state (in `src/smiledata.js`):
+`possibleConditions` to the local state (in `src/smilestore.js`):
 
 ```js
 export default defineStore('smilestore', {
@@ -286,7 +286,7 @@ field called `conditions`. They can be accessed within a component using a
 getter called `getConditions`.
 
 ```js
-import useSmileStore from '@/core/stores/smiledata' // get access to the global store
+import useSmileStore from '@/core/stores/smilestore' // get access to the global store
 
 const smilestore = useSmileStore()
 
@@ -304,7 +304,7 @@ the conditions:
 
 ```js
 import { computed } from 'vue'
-import useSmileStore from '@/core/stores/smiledata'
+import useSmileStore from '@/core/stores/smilestore'
 
 const smilestore = useSmileStore()
 

@@ -209,7 +209,7 @@ the `useSmileStore` method and create a reference to the store instance:
 
 ```vue
 <script setup>
-import { useSmileStore } from '@/core/stores/smiledata'
+import { useSmileStore } from '@/core/stores/smilestore'
 const smilestore = useSmileStore()
 <script>
 ```
@@ -242,7 +242,7 @@ memory. In any Vue component simple write
 
 ```vue
 <script setup>
-import { useSmileStore } from '@/core/stores/smiledata'
+import { useSmileStore } from '@/core/stores/smilestore'
 const smilestore = useSmileStore()
 
 // sets a new variable called 'something' to 'true' in the global store
@@ -250,7 +250,7 @@ smilestore.data.something = true
 <script>
 ```
 
-A more preferred way is to modify `src/stores/smiledata.js` to add new setter
+A more preferred way is to modify `src/stores/smilestore.js` to add new setter
 and getter methods for your data type. Setters are function defined under the
 `actions` property that can be called via `smilestore.action()` (if the method
 was named `action`). You can use these to modify the state.
@@ -333,7 +333,7 @@ subject needs to "reconnect" to the Firebase database document that they were
 currently working from. To persist data like this, which is specific to the
 user, across page reloads or restarts of the browser we sync a few key values
 with the browser's local storage. The data which is synced to local storage is
-in `smilestore.local` (see `smiledata.js`).
+in `smilestore.local` (see `smilestore.js`).
 
 ## Setting up Google Firestore
 
@@ -346,11 +346,11 @@ in `smilestore.local` (see `smiledata.js`).
 
 ## SmileStore API
 
-`stores/smiledata.js`
+`stores/smilestore.js`
 
 ```vue
 <script setup>
-import { useSmileStore } from '@/core/stores/smiledata'
+import { useSmileStore } from '@/core/stores/smilestore'
 const smileStore = useSmileStore()
 <script>
 ```

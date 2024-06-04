@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import useSmileStore from '@/core/stores/smiledata'
+import useSmileStore from '@/core/stores/smilestore'
 import * as random from '@/core/randomization'
 import seedrandom from 'seedrandom'
 import { v4 as uuidv4 } from 'uuid'

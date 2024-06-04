@@ -47,7 +47,7 @@ is a dictionary with the participant's data. Many of the fields it includes are
 automatically populated by <SmileText/>, and it will include your experiment's
 data. The structure of the data should match the structure of the `data`
 attribute in your `smilestore` in
-[`smiledata.js`](https://github.com/NYUCCL/smile/blob/data-download-script-improvements/src/stores/smiledata.js).
+[`smilestore.js`](https://github.com/NYUCCL/smile/blob/data-download-script-improvements/src/stores/smilestore.js).
 
 For a slightly nicer data loading experience (which loads data into Python
 objects with attributes, rather than just dictionaries), you can use the

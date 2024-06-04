@@ -1,6 +1,6 @@
 import { shuffle } from '@/core/randomization'
 import { ref, computed } from 'vue'
-import useSmileStore from '@/core/stores/smiledata'
+import useSmileStore from '@/core/stores/smilestore'
 import useLog from '@/core/stores/log'
 import { useRoute } from 'vue-router'
 

@@ -1,4 +1,4 @@
-import useSmileStore from '@/core/stores/smiledata' // get access to the global store
+import useSmileStore from '@/core/stores/smilestore' // get access to the global store
 import useAPI from '@/core/composables/useAPI'
 
 export function getQueryParams() {

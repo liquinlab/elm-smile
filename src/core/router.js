@@ -3,7 +3,7 @@ import '@/core/seed'
 import seedrandom from 'seedrandom'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { v4 as uuidv4 } from 'uuid'
-import useSmileStore from '@/core/stores/smiledata' // get access to the global store
+import useSmileStore from '@/core/stores/smilestore' // get access to the global store
 import { getQueryParams } from '@/core/utils'
 import timeline from '@/user/design'
 

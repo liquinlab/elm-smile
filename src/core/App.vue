@@ -24,7 +24,7 @@ import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
 // get the smilestore
-import useSmileStore from '@/core/stores/smiledata'
+import useSmileStore from '@/core/stores/smilestore'
 const smilestore = useSmileStore() // load the global store
 
 var snapshot = { ...smilestore.$state.data }

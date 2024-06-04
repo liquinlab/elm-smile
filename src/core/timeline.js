@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import * as dagre from '@dagrejs/dagre'
-import useSmileStore from '@/core/stores/smiledata'
+import useSmileStore from '@/core/stores/smilestore'
 const smilestore = useSmileStore()
 import useLog from '@/core/stores/log'
 const log = useLog()

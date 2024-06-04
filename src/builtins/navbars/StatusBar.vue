@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import useSmileStore from '@/core/stores/smiledata'
+import useSmileStore from '@/core/stores/smilestore'
 import appconfig from '@/core/config'
 import useAPI from '@/core/composables/useAPI'
 // load sub-components used in this compomnents

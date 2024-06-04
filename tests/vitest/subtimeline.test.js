@@ -2,7 +2,6 @@
 import RandomizeSubTimeline from '@/core/subtimeline'
 import Timeline from '@/core/timeline'
 import { createTestingPinia, setActivePinia } from '@pinia/testing'
-import useSmileStore from '@/core/stores/smiledata'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { mount } from '@vue/test-utils'
 import { setActivePinia } from 'pinia'

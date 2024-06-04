@@ -9,7 +9,7 @@ import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 const props = defineProps(['routeName'])
 
-import useSmileStore from '@/core/stores/smiledata'
+import useSmileStore from '@/core/stores/smilestore'
 import { routes } from '@/core/router'
 import { useRouter, useRoute } from 'vue-router'
 const smilestore = useSmileStore() // load the global store

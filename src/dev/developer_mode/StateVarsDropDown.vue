@@ -1,7 +1,7 @@
 <script setup>
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
-import useSmileStore from '@/core/stores/smiledata'
+import useSmileStore from '@/core/stores/smilestore'
 const smilestore = useSmileStore() // load the global store
 
 function toggle_and_reset() {
