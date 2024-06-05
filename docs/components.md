@@ -35,26 +35,29 @@ leveraging modularity and code reuse.
 
 Components are somewhat similar to the role that
 ["plugins"](https://www.jspsych.org/7.2/overview/plugins/) play in a library
-like [JSPsych](https://www.jspsych.org/7.2/) but generally, JSPsych plugins
-handle single trials of an experiment whereas a Vue.js component might be as
-small as a button or as big as an entire webpage or even application. In
-addition, components leverage some other concepts in modern web design such as
+like [JSPsych](https://www.jspsych.org/7.2/) but JSPsych plugins often handle
+single trials of an experiment whereas a Vue.js component might be as small as a
+button or as big as an entire webpage or even application. In addition,
+components leverage some other concepts in modern web design such as
 [reactivity and declarative rendering](/reactive) that make your development and
 debugging much easier.
 
 ### How are components used in <SmileText/>?
 
-Typically in <SmileText/>, components are used to define trials of an experiment
-(i.e., the logic and flow of what is shown in a given trial). Some trials might
-be complex and composed of other components that define the look and layout of
-stimuli, buttons, etc... Smile provides several [built-in components](/builtins)
-(which we refer to as "Views") that do things like collect informed consent or
-show instructions. In addition, Smile provides a simple component API which
-makes it easy to [step through sequences of trials](/trials.md).
+Typically in <SmileText/>, components are used to define
+[phases of an experiment](/views) (e.g., consent, instructions, etc...), Smile
+provides several [built-in components](/views#built-in-views) (which we refer to
+as "Views") that implement nicely designs components that collect informed
+consent or show instructions. Components are also used to define the individual
+trials of an experiment (i.e., the logic and flow of what is shown in a given
+trial). Some trials might be complex and composed of other components that
+define the look and layout of stimuli, buttons, etc...In addition, Smile
+provides a simple component API which makes it easy to
+[step through sequences of trials](/steps).
 
 ## Vue.js components
 
-There are many libraries which utilize the concept of components on the web
+There are many frameworks which utilize the concept of components on the web
 including [React](https://reactjs.org/), [Angular](https://angular.io/), and
 [Svelte](https://svelte.dev/). In <SmileText/>, we use the
 [Vue.js](https://vuejs.org) framework.
@@ -66,11 +69,13 @@ including [React](https://reactjs.org/), [Angular](https://angular.io/), and
 Vue.js was chosen for <SmileText/> because it is easy to learn, opensource and
 free, has a large and active community, and is one of the few web frameworks not
 associated with a major company. In addition, the Vue community has developed
-strong international community (e.g., it is the most popular web framework in
-China) with docs in many langauges. There's a nice documentary about the leader
-of the Vue project [here](https://www.youtube.com/watch?v=OrxmtDw4pVI).
+strong international representation (e.g., it is the most popular web framework
+in China) with docs in many languages. There's a nice documentary about the
+leader of the Vue project [here](https://www.youtube.com/watch?v=OrxmtDw4pVI).
 
 :::
+
+### Single File Components
 
 The preferred way to develop Vue components is using a special file format known
 as SFC (Single File Component). These files end with an extension `.vue`. The
@@ -79,8 +84,6 @@ modular element that defines your component. These files can be edited best
 using the [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
 extension for [VSCode](https://code.visualstudio.com) (i.e., it provides syntax
 highlighting and other code formatting hints).
-
-### Single File Components
 
 Here is an example Vue 3 SFC file called `SimpleButton.vue` which is using the
 Vue 3.0 composition API:
@@ -128,10 +131,11 @@ It has a simple `<button>` element that when clicked (`@click`) increments a
 variable called `count`. The current value of `count` is rendered into the
 template using the <span v-pre>`{{ count }}`</span> syntax. The `@click` event
 handlers is not normal HTML but is a Vue directive/shorthand for adding the
-`onclick()` event listener. Similarly, the `{{ count }}` is template syntax for
-text interpolation which essentially converts the value of `count` to a string
-and inserts it into the HTML template. You can read more about Vue's template
-syntax [here](https://vuejs.org/guide/essentials/template-syntax.html).
+`onclick()` event listener. Similarly, the <span v-pre>`{{ count }}`</span> is
+template syntax for text interpolation which essentially converts the value of
+`count` to a string and inserts it into the HTML template. You can read more
+about Vue's template syntax
+[here](https://vuejs.org/guide/essentials/template-syntax.html).
 
 #### Scripts
 
@@ -144,9 +148,9 @@ const count = ref(0)
 </script>
 ```
 
-The script has the word `setup` initializes the `count` variable to zero and
-makes it reactive (more on that below, but here is Vue's
-[documentation](https://v3.vuejs.org/guide/reactivity.html).
+The script has the special word `setup` and initializes the `count` variable to
+zero and makes it reactive (more on that below, but here is Vue's
+[documentation](https://v3.vuejs.org/guide/reactivity.html)).
 
 #### Styles
 
@@ -211,7 +215,7 @@ will result in:
 each with a self-contained counter.
 
 Importantly, components can include and use other components. For example, the
-following component includes the `SimpleButton` component and a new `TextInput`
+following component imports the `SimpleButton` component and a new `TextInput`
 component:
 
 ```vue
@@ -263,10 +267,11 @@ magic for your online web developmenet?
 
 :::
 
-In the SFC code listing above, try to find where the value of the count variable
-is updated in the template. You'll notice there is no such code because it is
-**implicitly** updated according to the declaration in the template. This is the
-core idea of declarative rendering: you define how the page should look based on
+In the SFC code listing above, try to find where the displayed value of the
+count variable is updated in the template. You'll notice there is no such code
+because it is **implicitly** updated according to the
+<span v-pre>`{{ count }}`</span> declaration in the template. This is the core
+idea of declarative rendering -- you define how the page should look based on
 underlying state data and the page automatically updates when the state data
 changes.
 
@@ -280,10 +285,10 @@ value should be made reactive. Behind the scenes, this is done using a system of
 message passing and notifications where Vue keeps track of which parts of the
 template depend on which variables and updates them when the variables change.
 It's actually quite sophisticated to ensure the system works quickly even on
-complex websites (think Facebook news feed or the NYTimes) but the important
-point is that you don't have know how it works under the hood. **The important
-point from the perspective of a developer is that you don't have to write code
-to update the template when the underlying state changes.**
+complex websites (think Facebook news feed or the NYTimes) but amazingly you
+don't _need_ know how it works under the hood. **The important point from the
+perspective of a developer is that you don't have to write code to update the
+template when the underlying state changes.**
 
 #### Two-way binding
 
@@ -402,13 +407,13 @@ template.
 Conceptually these are not radically different -- in both cases we have to think
 about how our program reacts to inputs from the user. However, the JSPsych
 version, besides being more verbose, requires the programmer to manually
-coordinate more of the updating process (retreiving values and setting them in
+coordinate more of the updating process (retrieving values and setting them in
 the display). This can be error-prone. As the complexity of a plugin/component
-grows the savings from decalarative rendering and reactivity become more and
-more apparent. For example, if the same components was extended to include
-multiple form elements, each of a highly specialized type (e.g., date pickers,
-etc...) then the JSPsych version would require a lot of manual code to handle
-the updating of the display.
+grows the savings from declarative rendering and reactivity become more and more
+apparent. For example, if the same components was extended to include multiple
+form elements, each of a highly specialized type (e.g., date pickers, etc...)
+then the JSPsych version would require a lot of manual code to handle the
+updating of the display.
 
 In addition, this example didn't use it but the CSS styling for a JSPsych plugin
 is defined in a different file from the plugin itself which can make it harder
@@ -437,22 +442,27 @@ common (if you've used Overleaf to write a paper you are familiar with letting a
 program "build" your paper into a PDF). It even offers several unique
 advantages.
 
-First, the build process can optimize the code for quick loading (e.g., when
-Vite processes the SFC files it can remove comments and whitespace, a process
-call "minifying", making the imported code smaller and faster to load over the
-web). Second, the build process can strip out unused functions from the
-libraries you use. So for example, the
-[simplest method](https://www.jspsych.org/7.3/tutorials/hello-world/#step-3-create-a-script-element-and-initialize-jspsych)
-of using JSPsych you import the current version of the library which includes
-all the functions of JSPsych even if you never use them. In contrast, Vite,
-through it's build function can analyze your code and only include the parts of
-the library that you actually use. This is called **tree-shaking** and is a
-powerful way to reduce the size of your website. Finally, the build process can
-**code-split** your website. This means that the build process can break your
-website into smaller pieces that can be loaded on demand or in parallel
-(breaking the code into multiple .js file "chunks"). This has a huge impact on
-the speed of your website/experiment and is especially important for collecting
-data from populations with slow internet connections.
+- First, the build process can optimize the code for quick loading (e.g., when
+  Vite processes the SFC files it can remove comments and whitespace, a process
+  call "minifying", making the imported code smaller and faster to load over the
+  web).
+- Second, the build process can strip out unused functions from the libraries
+  you use. So for example, the
+  [simplest method](https://www.jspsych.org/7.3/tutorials/hello-world/#step-3-create-a-script-element-and-initialize-jspsych)
+  of using JSPsych you import the current version of the library which includes
+  all the functions of JSPsych even if you never use them. In contrast, Vite,
+  through it's build function can analyze your code and only include the parts
+  of the library that you actually use. This is called **tree-shaking** and is a
+  powerful way to reduce the size of your website.
+- Third, the build process can **code-split** your website. This means that the
+  build process can break your website into smaller pieces that can be loaded on
+  demand or in parallel (breaking the code into multiple .js file "chunks").
+  This has a huge impact on the speed of your website/experiment and is
+  especially important for collecting data from populations with slow internet
+  connections.
+- Finally, the Vite build process can be configured with plugins which do
+  additional processing and manipulation of the input code. This is used in
+  several key areas in this project.
 
 ## Learning Vue
 
@@ -489,3 +499,70 @@ you can write simple components see how they will render in real-time, and even
 build slightly larger components that include sub-components. It can be useful
 for learning setting up <SmileText/> on your computer and even can help engage
 students in the research process.
+
+## Component organization
+
+When you start developing your own components there are a few guidelines. First,
+components should be named using Pascal Case names (e.g., `StatusBar.vue` or
+`InformedConsentButton.vue` as opposed to `statusbar.vue` (lowercase),
+`statusBar.vue` (camel case) or `status-bar.vue` (kebab case)). This is the
+official recommendation of the
+[Vue documentation](https://vuejs.org/guide/components/registration.html#component-name-casing).
+
+Second, components should be organized into folders based on the type of role
+the component plays. For this, <SmileText /> borrows sensibly from the
+organization of a typical experiment in psychology. In <SmileText />, the
+components are organized in the `src/components` directly which has the
+following layout:
+
+```
+src/components
+├── captcha
+│   ├── CaptchaInstructionsText.vue
+│   ├── CaptchaPage.vue
+│   ├── CaptchaTrialImageCategorization.vue
+│   ├── CaptchaTrialMotorControl.vue
+│   ├── CaptchaTrialStroop.vue
+│   └── CaptchaTrialTextComprehension.vue
+├── consent
+│   ├── ConsentPage.vue
+│   ├── InformedConsentModal.vue
+│   └── InformedConsentText.vue
+├── debrief
+│   ├── DebriefPage.vue
+│   └── DebriefText.vue
+├── errors_withdraw
+│   ├── ReportIssueModal.vue
+│   ├── WithdrawFormModal.vue
+│   └── WithdrawPage.vue
+├── instructions
+│   └── InstructionsPage.vue
+├── navbars
+│   ├── DeveloperNavBar.vue
+│   ├── PresentationNavBar.vue
+│   ├── ProgressBar.vue
+│   └── StatusBar.vue
+├── presentation_mode
+│   └── PresentationModeHomePage.vue
+├── recruitment
+│   ├── AdvertisementPage.vue
+│   ├── MTurkRecruitPage.vue
+│   ├── RecruitmentChooserPage.vue
+│   └── StudyPreviewText.vue
+├── screen_adjust
+│   └── WindowSizerView.vue
+├── surveys
+│   └── DemographicSurveyPage.vue
+├── tasks
+│   ├── ExpPage.vue
+│   ├── Task1Page.vue
+│   └── Task2Page.vue
+└── thanks
+    └── ThanksPage.vue
+```
+
+The following sections describe which types of components go in each folder.
+Based on what type of component you are developing, place the corresponding
+component file in the correct folder. This will help you stay organized and help
+other users of your code know where to look to find an element they might like
+to reuse in their projects.

@@ -16,6 +16,9 @@ export default defineConfig({
     },
   },
   themeConfig: {
+    outline: {
+      level: 'deep',
+    },
     search: {
       provider: 'local',
     },
@@ -41,30 +44,20 @@ export default defineConfig({
         ],
       },
       {
-        text: 'Basic Functions',
-        items: [
-          { text: '☁️ Deploying', link: '/deploying' },
-          { text: '⚙️ Configuring', link: '/configuration' },
-          { text: '📦 Data storage', link: '/datastorage' },
-          { text: '👩‍💻 Developing', link: '/developing' },
-          { text: '👩‍🏫 Presentation mode', link: '/presentation' },
-          { text: '📈 Dashboard', link: '/dashboard' },
-        ],
-      },
-      {
         text: 'Designing and Testing',
         items: [
           { text: '🧑‍🎨 Overview', link: '/experimentdesign' },
-          { text: '👩‍💻 Developer mode', link: '/developermode' },
+          { text: '⚙️ Configuring', link: '/configuration' },
+          { text: '👩‍💻 Developing', link: '/developing' },
           { text: '🧩 Components', link: '/components' },
-          { text: '🔀 Timeline and Views', link: '/timeline' },
-          { text: '🧱 Built In Views and Components', link: '/builtins' },
+          { text: '🏗️ Views', link: '/views' },
+          { text: '🔀 Timeline', link: '/timeline' },
           { text: '🪜 Stepping Views', link: '/steps' },
           { text: '✍️ Autofill', link: '/autofill' },
           { text: '🎲 Randomization', link: '/randomization' },
           { text: '🖼️ Images and Videos', link: '/imagesvideo.md' },
           { text: '🧑‍🎨 Styling, CSS, and icons', link: '/style' },
-          { text: '🎥 Recording and Saving data', link: '/recordingdata' },
+          { text: '📦 Data storage', link: '/datastorage' },
           //{ text: '💰 Computing bonuses', link: '/bonuses' },
           { text: '🆘 Dealing with Errors', link: '/problems' },
           { text: '🐞 Automated Testing', link: '/testing' },
@@ -75,7 +68,9 @@ export default defineConfig({
       {
         text: 'Recruiting participants',
         items: [
-          { text: '🙋 Overview', link: '/recruitment' },
+          { text: '☁️ Deploying', link: '/deploying' },
+          { text: '🙋 Services', link: '/recruitment' },
+          { text: '📈 Dashboard', link: '/dashboard' },
           { text: '😇 Ethical considerations', link: '/ethics' },
         ],
       },
@@ -84,6 +79,7 @@ export default defineConfig({
         items: [
           { text: '🧐 Analyzing data', link: '/analysis' },
           { text: '🤖 Quality control', link: '/qualitycontrol' },
+          { text: '👩‍🏫 Presentation mode', link: '/presentation' },
         ],
       },
       {

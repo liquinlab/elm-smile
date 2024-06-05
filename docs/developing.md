@@ -116,11 +116,6 @@ reduce the file size and
 which organizes files into "chunks" the reflect common dependencies across
 different pages of a site.
 
-## Autofill and Data Faking
-
-When you are developing your project it can be helpful to "fake" data from a
-component.
-
 ## Merging changes to the template into your existing project
 
 Because Smile is still being developed, there may be changes to the Smile

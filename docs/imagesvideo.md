@@ -1,4 +1,18 @@
-# :framed_picture: Preloading images
+# :framed_picture: Images and Video
+
+Including images and videos in your experiment is straightforward. The main
+issues are where to place the files, and how to refer to them in your
+components, how to preload them so that the participant doesn't wait for them to
+appear, and what to do for very large files which might not be uploadable in a
+Github repository.
+
+## Including images, videos, and other static assets
+
+## Referring to static assets
+
+## How to preload static assets
+
+## Preloading
 
 The <SmileText/> offers two ways to preload images:
 
@@ -67,3 +81,5 @@ appropriately when the experiment is built and deployed. See the restrictions
 here:
 https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
 .
+
+## Dealing with large files

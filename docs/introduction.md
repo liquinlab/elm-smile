@@ -1,3 +1,7 @@
+---
+outline: none
+---
+
 # :wave: Welcome to Smile!
 
 The <SmileText/> project is a web-based platform designed to make it easy and

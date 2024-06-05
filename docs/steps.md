@@ -1,12 +1,15 @@
 # :ladder: Stepping Views
 
 Many experiments are organized into a series of repeated events called "trials".
-Trials are different than views (see above) because they often repeat the same
+Trials are different than [Views](/views) because they often repeat the same
 basic structure many times. Smile provides several features for organizing and
-managing trials. We introduce the concept of a "trial" and how to
-programmatically advance through a sequence of trials within a particular View.
-The same concept is also used to add sequential build to any type of view (e.g.,
-a sequence of instructions).
+managing trials or other sequenced elements _within_ a View (the
+[Timeline](/timeline) is used to sequence across Views).
+
+Here, we introduce the concept of a "step" and how to programmatically advance
+through a sequence of steps within a particular View. The same concept is also
+used to add sequential build to any type of view (e.g., a sequence of
+instructions, a multi-part form, or an animation).
 
 ## Create a trial-based View
 

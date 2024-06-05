@@ -1,4 +1,4 @@
-# :twisted_rightwards_arrows: Timeline and Views
+# :twisted_rightwards_arrows: Timeline
 
 Web experiments are often composed of several parts presented in sequence. For
 example, first, we might show a welcome page &rarr; informed consent
@@ -22,9 +22,6 @@ This page shows how to configure and control <SmileText />'s Timeline
 implementation, and how to customize it with more complex behaviors. Most of the
 configuration happens in `src/design.js` which is short, self-explanatory, and
 well commented so you jump there if you feel confident.
-
-We begin by introducing some basic concepts about how Smile works and then
-introduce the concept of Views and the Timeline.
 
 ## Single-page Applications and Routing
 
@@ -165,42 +162,6 @@ The `meta` field specifies additional optional information about the route:
   content when the user is "done" with the experiment (`requiresDone: true`).
   Another option (`requiresWithdraw: true`) requires the participant to have
   withdrawn from the page before showing.
-
-## Views
-
-In <SmileText />, each major phase of an experiment is associated with its own
-component. We call these phases "Views" although there is nothing particularly
-special about them (they are in fact just ordinary Vue components). "Views" is
-just a useful conceptual difference for thinking about these bigger "parts" or
-"phases" of an experiment. We might have called them "pages", "routes",
-"sections", "parts", or "phases" but "views" is a common designation in other
-packages. For example, the welcome page, informed consent, instructions, and
-debriefing are all examples of Views. Each View is associated with one Vue
-component that is responsible for rendering the content of that View. A view is
-of course made up of many smaller components, but the view is a special,
-top-level component that is configurable on a **timeline**. When we create a
-view we usually include it into the filename: `WelcomeView.vue`,
-`ConsentView.vue`, etc...
-
-To help make clear the distinction between a "View" and a "Component", consider
-the following examples:
-
-- A block of trials in an experiment might be one "View" but be composed of many
-  "Components" (e.g., a trial component, a fixation component, a feedback
-  component, etc...).
-- A consent form might be one "View" but be composed of many "Components" (e.g.,
-  a consent text component, a signature component, a submit button component,
-  etc...).
-- A welcome page might be one "View" but be composed of many "Components" (e.g.,
-  a welcome text component, a start button component, etc...).
-
-Of course it would be possible to make your experiment just use a single view
-and have the logic of that view flip between things like instructions, trials,
-and debriefing. However, it is often easier to manage the complexity of an
-experiment by breaking it into smaller, more manageable pieces. This is the idea
-behind the "View" concept. Views tend be to modular and reusable "sections" of
-an experiment that you might use in different experiments or in different parts
-of the same experiment.
 
 ## Timeline
 
@@ -504,22 +465,22 @@ In each component in our router we need to call a method when that component is
 the sequence. To do this we use the
 [composables](https://vuejs.org/guide/reusability/composables.html) feature of
 Vue. Composables are function that let you re-use logic across multiple
-components. To step to the next route in the sequence we import the
-TimelineStepper composable into our component and call the appropriate method
-when we are done.
+components. To step to the next route in the sequence we import the useTimeline
+composable into our component and call the appropriate method when we are done.
 
-The way to import the stepper composable into your component is:
+The way to import the useTimeline composable into your component is:
 
 ```js
 import useTimeline from '@/composables/useTimeline'
-const { next, prev } = useTimeline()
+const { stepNextView, stepPrevView, gotoView } = useTimeline()
 ```
 
-This imports the composable, then creates a `next()` and `prev()` which are
-functions that when they are called provides the `name` of the next route (or
-`null` if there is no "next" either because you are at the end of the sequence
-or because it is a non-sequential route). To navigate to the next route just use
-the `push()` method of the router:
+This imports the composable, then import three methods (`stepNextView()`,
+`stepPrevView()`, and `gotoView`) which are functions that when they are called
+provides the `name` of the next route (or `null` if there is no "next" either
+because you are at the end of the sequence or because it is a non-sequential
+route). To navigate to the next route just use the `push()` method of the
+router:
 
 ```js
 if (next) router.push(next) // go to the next
@@ -533,28 +494,18 @@ button (calling the `finish()` method):
 
 ```vue
 <script setup>
-import { useRoute } from 'vue-router'
-import useTimeline from '@/composables/useTimeline'
-import useSmileStore from '@/stores/smilestore' // get access to the global store
-
-const route = useRoute()
-const smilestore = useSmileStore()
-
-const { next, prev } = useTimeline()
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 function finish(goto) {
-  if (goto) router.push(goto)
+  api.stepNextView()
 }
 </script>
 
 <template>
   <div class="page">
     <h1 class="title is-3">Experiment</h1>
-    <button
-      class="button is-success is-light"
-      id="finish"
-      @click="finish(next())"
-    >
+    <button class="button is-success is-light" id="finish" @click="finish()">
       next &nbsp;<FAIcon icon="fa-solid fa-arrow-right" />
     </button>
   </div>
@@ -566,13 +517,12 @@ Details about the implementation of the `useTimeline` are quite simple and in
 
 :::warning IMPORTANT (and helpful!)
 
-One important feature of the stepper is that it calls `saveData()` on the global
-store prior to route changes. So as a result you can trust that your data will
-be saved/synchronized with the persistent store (Firestore) whenever you
-navigated between sequential routes. See the data storage docs on
+One important feature of the timeline is that it calls `saveData()` on the
+global store prior to View/route changes. So as a result you can trust that your
+data will be saved/synchronized with the persistent store (Firestore) whenever
+you navigated between sequential routes. See the data storage docs on
 [automatic saving](/datastorage.html#automatic-saving). This only works if you
-use the TimelineStepper to advance between pages/routes. If you call this
-manually you need to save manually as well using the `saveData()` method.
+use the API to advance between pages/routes.
 
 :::
 

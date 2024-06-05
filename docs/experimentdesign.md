@@ -20,13 +20,22 @@ npm run dev
 
 in the project folder to get started.
 
+## :gear: Configuring
+
+Every experiment is different and requires different configurations options for
+things like the database credentials, etc... In <SmileText/>, configs are set
+using `.env` files. Some of these are automatically generated, some are pass
+from the [base repo](/labconfig) to child repos, and some need to be customize
+for each experiment. [This section](/configuration) of the documentation
+explains all the configuration settings avaialble.
+
 ## :jigsaw: Components
 
 <img src="/images/components.png" width="50%" align="right">
 
-Our guide begins by introducing the concept of a [**component**](/components)
-and how components help organize code by making it more modular and reusable.
-Then we discuss specific features of Vue.js components (e.g.,
+This section introduces the concept of a [**component**](/components) and how
+components help organize code by making it more modular and reusable. Then we
+discuss specific features of Vue.js components (e.g.,
 [single-file components](/components#single-file-components),
 [declarative rendering](/components#declarative-rendering-and-reactivity), and
 [reactivity](/components#declarative-rendering-and-reactivity)) that help make
