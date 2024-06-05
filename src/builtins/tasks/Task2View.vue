@@ -44,14 +44,14 @@ function finalize() {
 
 function finish() {
   // do stuff if you want
-  api.stepNextRoute()
+  api.stepNextView()
 }
 
 function next() {
   if (step_index < trials.length - 1) {
     nextStep()
   } else {
-    api.stepNextRoute()
+    api.stepNextView()
   }
 }
 
@@ -63,7 +63,7 @@ function prev() {
 // custom advance to next route when we finish showing all the trials
 // function advance() {
 //   if (index.value >= trials.length - 1) {
-//     stepNextRoute(finalize())
+//     stepNextView(finalize())
 //   } else {
 //     index.value += 1
 //   }

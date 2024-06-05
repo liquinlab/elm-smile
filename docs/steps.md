@@ -170,7 +170,7 @@ function finalize() {
 
 function finish() {
   // do stuff if you want
-  api.stepNextRoute()
+  api.stepNextView()
 }
 </script>
 

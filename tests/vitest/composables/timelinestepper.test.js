@@ -34,9 +34,9 @@ describe.skip('Stepper tests', () => {
     const TestComponent = defineComponent({
       template: `<h2>{{ next }}</h2>`,
       setup(props) {
-        const { nextFn, prevFn } = useTimeline()
-        const next = nextFn()
-        const prev = prevFn()
+        const { stepNextView, stepPrevView } = useTimeline()
+        const next = stepNextView()
+        const prev = stepPrevView()
         return { next, prev }
       },
     })
@@ -67,7 +67,7 @@ describe.skip('Stepper tests', () => {
     const TestComponent = defineComponent({
       template: `<h2>{{ prev }}</h2>`,
       setup(props) {
-        const { nextFn, prevFn } = useTimeline()
+        const { stepNextView, stepPrevView } = useTimeline()
         const next = nextFn()
         const prev = prevFn()
         return { next, prev }
@@ -100,7 +100,7 @@ describe.skip('Stepper tests', () => {
     const TestComponent = defineComponent({
       template: `<h2>{{ next }}</h2>`,
       setup(props) {
-        const { nextFn, prevFn } = useTimeline()
+        const { stepNextView, stepPrevView } = useTimeline()
         const next = nextFn()
         const prev = prevFn()
         return { next, prev }

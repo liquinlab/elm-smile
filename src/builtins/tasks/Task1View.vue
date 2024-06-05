@@ -7,7 +7,7 @@ const ntrials = ref(1)
 
 function finish() {
   // do stuff if you want
-  api.stepNextRoute()
+  api.stepNextView()
 }
 </script>
 

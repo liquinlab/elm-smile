@@ -10,7 +10,7 @@ export default function useTimeline() {
   const router = useRouter()
   const log = useLog()
 
-  const nextRoute = () => {
+  const nextView = () => {
     // HANDLE RANDOMIZATION OF SUBTIMELINES
     // if the next thing has a type field of randomized_sub_timeline, then we want to randomize the subtimeline
 
@@ -30,13 +30,28 @@ export default function useTimeline() {
     return null
   }
 
-  const prevRoute = () => {
+  const prevView = () => {
     if (route.meta.prev) {
       return { name: route.meta.prev, query: route.query }
     }
     return null
   }
 
+  const gotoView = async (view, force = true) => {
+    // unfortunately this is required because the router
+    // doesn't allow you to pass configuration options
+    // directly to the router.push() function
+    // although there's some plan about it in future
+    if (force) {
+      smilestore.global.forceNavigate = true
+      await router.push({ name: view })
+      smilestore.global.forceNavigate = false
+    } else {
+      await router.push({ name: view })
+    }
+  }
+
+  // this is the internal function that actually navigates to the next route
   const navigateTo = (goto) => {
     // sets the current page as done
     smilestore.dev.current_page_done = true
@@ -48,14 +63,14 @@ export default function useTimeline() {
     if (goto) router.push(goto)
   }
 
-  const stepNextRoute = (fn) => {
+  const stepNextView = (fn) => {
     if (fn) fn()
-    navigateTo(nextRoute())
+    navigateTo(nextView())
   }
-  const stepPrevRoute = (fn) => {
+  const stepPrevView = (fn) => {
     if (fn) fn()
-    navigateTo(prevRoute())
+    navigateTo(prevView())
   }
 
-  return { stepNextRoute, stepPrevRoute, navigateTo }
+  return { stepNextView, stepPrevView, gotoView }
 }

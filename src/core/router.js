@@ -32,7 +32,7 @@ function addGuards(r) {
     // log.debug('allowAlways', to.meta.allowAlways)
 
     const smilestore = useSmileStore()
-
+    log.warn('ROUTER GUARD: Navigating to ', to)
     // on startup set the page to not autofill by default
 
     // if the database isn't connected and they're a known user, reload their data
@@ -42,7 +42,7 @@ function addGuards(r) {
 
     // if withdrew
     // this is leading to infinite redirects.
-    // if (smilestore.isWithdrawn && !smilestore.dev.allowJumps) {
+    // if (smilestore.isWithdrawn && !smilestore.global.forceNavigate) {
     //   log.debug("withdraw so can't go anywhere")
     //   return {
     //     name: 'withdraw',
@@ -79,7 +79,7 @@ function addGuards(r) {
     // if you're in jumping mode
     // or you're in presentation mode allow the new route
     if (
-      (smilestore.config.mode === 'development' && smilestore.dev.allowJumps) ||
+      (smilestore.config.mode === 'development' && smilestore.global.forceNavigate) ||
       smilestore.config.mode === 'presentation'
     ) {
       log.warn(
@@ -87,6 +87,19 @@ function addGuards(r) {
           to.name +
           //to.meta.allowAlways +,
           '.  This is allowed in development/presentation mode but not in production.'
+      )
+      smilestore.setLastRoute(to.name)
+      smilestore.recordRoute(to.name)
+      return true
+    }
+
+    // if this is forced
+    if (smilestore.global.forceNavigate) {
+      log.warn(
+        'ROUTER GUARD: Allowing direct, out-of-order navigation to /' +
+          to.name +
+          //to.meta.allowAlways +,
+          '.  This is being forced by api.gotoView().'
       )
       smilestore.setLastRoute(to.name)
       smilestore.recordRoute(to.name)

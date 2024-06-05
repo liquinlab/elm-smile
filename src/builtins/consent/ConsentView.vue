@@ -10,7 +10,7 @@ const api = useAPI()
 
 function finish() {
   api.completeConsent()
-  api.stepNextRoute()
+  api.stepNextView()
 }
 
 function wiggle() {

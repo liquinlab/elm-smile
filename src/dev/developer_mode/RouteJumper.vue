@@ -7,19 +7,17 @@ const altKeyState = useKeyModifier('Alt')
 
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
-const props = defineProps(['routeName'])
 
-import useSmileStore from '@/core/stores/smilestore'
-import { routes } from '@/core/router'
-import { useRouter, useRoute } from 'vue-router'
-const smilestore = useSmileStore() // load the global store
+const props = defineProps(['routeName'])
 
 import useLog from '@/core/stores/log'
 const log = useLog()
-
+import { useRoute, useRouter } from 'vue-router'
 const hoverRoute = ref('')
 const router = useRouter() // this is needed in composition API because this.$router not availabel
 const route = useRoute()
+
+const forceMode = ref(true)
 
 // watch route -- if route changes, update value of current query. This will get carried forward when you jump routes
 const currentQuery = ref(route.query)
@@ -32,16 +30,17 @@ function setHover(route) {
 }
 
 watch(altKeyState, (value) => {
-  api.dev.allowJumps = !value
+  forceMode.value = !value
 })
 
 function navigate(route) {
-  if (api.dev.allowJumps) {
+  if (forceMode.value) {
     log.warn(`DEV MODE: user requested to FORCE navigate to ${route}`)
+    api.gotoView(route, true)
   } else {
     log.warn(`DEV MODE: user requested to navigate to ${route}`)
+    api.gotoView(route, false)
   }
-  router.push({ name: route })
   // dismiss hover if open but not if panel is set to remain visible.
   //api.dev.route_panel.visible = false
 }

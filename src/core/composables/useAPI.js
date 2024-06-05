@@ -12,7 +12,7 @@ import { useStepper } from '@/core/composables/useStepper'
 import useLog from '@/core/stores/log'
 
 export default function useAPI() {
-  const { stepNextRoute, stepPrevRoute } = useTimeline()
+  const { stepNextView, stepPrevView, gotoView } = useTimeline()
   const route = useRoute()
   const router = useRouter()
   const smilestore = useSmileStore()
@@ -25,10 +25,11 @@ export default function useAPI() {
     dev: smilestore.dev,
     route: route,
     router: router,
-    stepNextRoute: stepNextRoute,
-    stepPrevRoute: stepPrevRoute,
-    hasNextRoute: () => route.meta.next && route.meta.sequential,
-    hasPrevRoute: () => route.meta.prev && route.meta.sequential,
+    stepNextView: stepNextView,
+    stepPrevView: stepPrevView,
+    gotoView: gotoView,
+    hasNextView: () => route.meta.next && route.meta.sequential,
+    hasPrevView: () => route.meta.prev && route.meta.sequential,
     shuffle: shuffle,
     useStepper: useStepper,
     // isKnownUser: smilestore.local.knownUser,

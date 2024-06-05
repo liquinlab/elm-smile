@@ -36,7 +36,7 @@ function finish() {
   clicked = true
   // if there's anything else you wanted to do here
   // smilestore.saveData()
-  api.stepNextRoute()
+  api.stepNextView()
 }
 
 onBeforeUnmount(() => {

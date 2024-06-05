@@ -35,7 +35,6 @@ const init_dev = {
   // syncs with local storage
   page_provides_autofill: null,
   page_provides_trial_stepper: false,
-  allowJumps: true,
   show_data_bar: false,
   data_bar_height: 370,
   data_bar_tab: 'database',
@@ -74,6 +73,7 @@ const init_local = {
 const init_global = {
   // ephemeral state, resets on browser refresh
   progress: 0,
+  forceNavigate: false,
   db_connected: false,
   db_changes: true,
   urls: {
@@ -374,7 +374,6 @@ export default defineStore('smilestore', {
     resetLocal() {
       // this.local.knownUser = false
       // this.local.lastRoute = 'welcome'
-      // this.local.allowJumps = false
       // this.global.db_connected = false
       this.$reset()
     },

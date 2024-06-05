@@ -70,7 +70,7 @@ const { nextStep, prevStep, step_index } = api.useStepper(pages, () => {
 function finish() {
   api.removePageAutofill() // you are responsible for removing the autofill
   api.saveForm('demographic', forminfo)
-  api.stepNextRoute()
+  api.stepNextView()
 }
 </script>
 
