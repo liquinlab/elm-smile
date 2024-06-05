@@ -8,7 +8,8 @@ import PresentationNavBar from '@/dev/presentation_mode/PresentationNavBar.vue'
 
 // bars that are part of the actual experiments
 import StatusBar from '@/builtins/navbars/StatusBar.vue'
-import ProgressBar from '@/builtins/navbars/ProgressBar.vue'
+// not implemented:
+//import ProgressBar from '@/builtins/navbars/ProgressBar.vue'
 
 // notification library
 import { Notivue, Notification, NotificationProgress } from 'notivue'
@@ -95,14 +96,7 @@ onMounted(() => {
   <div v-else>
     <router-view></router-view>
   </div>
-  <ProgressBar
-    v-if="
-      api.currentRouteName() !== 'config' &&
-      api.currentRouteName() !== 'recruit' &&
-      api.config.show_progress_bar == 'true'
-    "
-  >
-  </ProgressBar>
+
   <Transition name="v-slide">
     <DevDataBar v-if="api.config.mode == 'development' && api.dev.show_data_bar"></DevDataBar>
   </Transition>

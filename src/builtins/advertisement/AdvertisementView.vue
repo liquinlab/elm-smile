@@ -1,17 +1,20 @@
 <script setup>
+// import Vue functions
 import { onMounted, ref, onBeforeUnmount } from 'vue'
-import { animate, stagger } from 'motion'
-import SplitType from 'split-type'
+
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
-let timer
-let timer_text
-let clicked = false
-const button = ref(null)
-const title = ref(null)
+// animation library
+import { animate } from 'motion'
 
+let timer // waits before doing animation
+let clicked = false // has the button been clicked?
+const button = ref(null) // reference to button
+
+// this function wiggles the button a little if it hasn't been clicked
+// just some fun
 function wiggle() {
   if (!clicked) {
     animate(button.value, { rotate: [0, 10, -10, 10, -10, 0] }, { duration: 0.75 }).finished.then(() => {
@@ -20,22 +23,12 @@ function wiggle() {
   }
 }
 
-function titleappear() {
-  console.log('titleappear')
-  animate('.word', { opacity: [0, 1] }, { delay: stagger(0.5) })
-}
-
 onMounted(() => {
-  const text = new SplitType(title.value, { types: 'words, chars' })
-  //console.log(text)
-  //timer_text = setTimeout(titleappear, 300)
   timer = setTimeout(wiggle, 3000)
 })
 
 function finish() {
   clicked = true
-  // if there's anything else you wanted to do here
-  // smilestore.saveData()
   api.stepNextView()
 }
 
@@ -57,9 +50,3 @@ onBeforeUnmount(() => {
     </button>
   </div>
 </template>
-
-<style>
-.word {
-  opacity: 1;
-}
-</style>

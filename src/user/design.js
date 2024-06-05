@@ -1,10 +1,23 @@
+// design.js
+// This file configures the overall logic of your experiment.
+// The critical part is the timeline, which is a list of phases
+// the experiment goes through.  This file configues which phase
+// occurs in the sequence.  In addition, this can configure things like
+// preloading images, etc...
+
+// The key documentation for this file
+// Views: https://smile.gureckislab.org/views.html
+// Timeline: https://smile.gureckislab.org/timeline.html
+// Randomization: https://smile.gureckislab.org/randomization.html
+// Preloading: https://smile.gureckislab.org/imagesvideo.html#preloading
+
 import { processQuery } from '@/core/utils'
 import RandomSubTimeline from '@/core/subtimeline'
 
 // 1. Import main built-in View components
-import MTurk from '@/builtins/recruitment/MTurkRecruitView.vue'
-import Advertisement from '@/builtins/recruitment/AdvertisementView.vue'
-import Consent from '@/builtins/consent/ConsentView.vue'
+import Advertisement from '@/builtins/advertisement/AdvertisementView.vue'
+import MTurk from '@/builtins/mturk/MTurkRecruitView.vue'
+import Consent from '@/builtins/consent/InformedConsentView.vue'
 import DemographicSurvey from '@/builtins/demographic_survey/DemographicSurveyView.vue'
 import DeviceSurvey from '@/builtins/device_survey/DeviceSurveyView.vue'
 import Captcha from '@/builtins/captcha/CaptchaView.vue'
@@ -61,10 +74,23 @@ timeline.pushSeqView({
     next: 'consent',
     allowAlways: true,
     requiresConsent: false,
-  }, // override what is next
+  },
   beforeEnter: (to) => {
+    // processes info to get the service-specific
+    // participant info (e.g., Profilic ID)
     processQuery(to.query, to.params.service)
     api.getBrowserFingerprint()
+  },
+})
+
+// this is a the special page that loads in the iframe on mturk.com
+timeline.pushView({
+  path: '/mturk',
+  name: 'mturk',
+  component: MTurk,
+  meta: { allowAlways: true, requiresConsent: false },
+  beforeEnter: (to) => {
+    processQuery(to.query, 'mturk')
   },
 })
 
@@ -78,7 +104,7 @@ timeline.pushSeqView({
     preload: async () => {
       // can you figure that out yourself
       console.log('PRELOADING DATA from AdvertisementPage.preload.js')
-      let data = await import('@/builtins/recruitment/AdvertisementView.preload.js')
+      let data = await import('@/builtins/advertisement/AdvertisementView.preload.js')
       console.log('DATA LOADED', data.default)
     },
   },
@@ -182,17 +208,6 @@ timeline.pushView({
   name: 'withdraw',
   meta: { requiresWithdraw: true },
   component: Withdraw,
-})
-
-// this is a the special page that loads in the iframe on mturk.com
-timeline.pushView({
-  path: '/mturk',
-  name: 'mturk',
-  component: MTurk,
-  meta: { requiresConsent: false },
-  beforeEnter: (to) => {
-    processQuery(to.query, 'mturk')
-  },
 })
 
 timeline.build()

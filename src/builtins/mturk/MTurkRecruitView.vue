@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import StudyPreviewText from '@/builtins/recruitment/StudyPreviewText.vue'
+import StudyPreviewText from '@/builtins/advertisement/StudyPreviewText.vue'
 
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'

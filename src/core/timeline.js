@@ -5,7 +5,7 @@ const smilestore = useSmileStore()
 import useLog from '@/core/stores/log'
 const log = useLog()
 import RandomSubTimeline from '@/core/subtimeline'
-import RecruitmentChooser from '@/builtins/recruitment/RecruitmentChooserView.vue'
+import RecruitmentChooser from '@/dev/developer_mode/RecruitmentChooserView.vue'
 import PresentationMode from '@/dev/presentation_mode/PresentationModeView.vue'
 
 import useAPI from '@/core/composables/useAPI'
