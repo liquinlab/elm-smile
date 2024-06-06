@@ -86,7 +86,7 @@ These components are located in the `src/builtins` directory. In <SmileText/> a
 short-hand for the src folder is '@' so for instance '@/builtins' refers to the
 `src/builtins` directory.
 
-## Builtins API
+## Built-in Views
 
 ### Recruitment Advertisement
 
