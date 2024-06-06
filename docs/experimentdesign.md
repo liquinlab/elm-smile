@@ -41,35 +41,52 @@ discuss specific features of Vue.js components (e.g.,
 [reactivity](/components#declarative-rendering-and-reactivity)) that help make
 web development code more compact and error-free.
 
-## :twisted_rightwards_arrows: Timeline and Views
+**A large part of designing your own experiment will be implementing a custom
+component for your task, or borrowing from an existing one.**
+
+## :building_construction: Views
 
 Most experiments are made of of several phases (e.g., welcome, informed consent,
 instructions, debriefing, etc...). We call the phases "Views" and each major
 phase of an experiment is associated with its own Vue component. Learn about
-views [here](/timeline#views).
+views [here](/views).
+
+Smile comes with several [built-in views](/views#built-in-views) for common
+phases of an experiment. This includes things like obtaining informed consent,
+presenting instructions, CAPTCHAs and presenting a thank you page. We describe
+these default built-in views and provide an overview of how to customize them
+for your own experiment.
+
+## :twisted_rightwards_arrows: Timeline and Design
 
 Most experiments require participants to proceed through these phases in a
 particular order. For example, informed consent must be provided and agreed to
 before we perform the actual experiment. Smile provides a
 [timeline](/timeline#timeline) that you use to configure this behavior.
 
-## :bricks: Built-in Views
+The timeline is configured in an important file in every <SmileText/> project
+called the [design file](/timeline#the-design-file-user-design-js) (located at
+`src/user/design.js`). This file is where you configure the timeline for your
+experiment, including which phases are included and the order in which they
+appear. In addition the design is used to specify randomization across
+conditions, preloading of content, and other important features of your
+experiment.
 
-Smile comes with several [built-in views](/builtins) for common phases of an
-experiment. This includes things like obtaining informed consent, presenting
-instructions, CAPTCHAs and presenting a thank you page. We describe these
-default built-in views and provide an overview of how to customize them for your
-own experiment.
+**You almost certainly will need to edit this file for your experiment**.
 
 ## :ladder: Stepping trials
 
 Many experiments are organized into a series of repeated events called "trials".
 Trials are different than views (see above) because they often repeat the same
 basic structure many times. Smile provides several features for
-[organizing and managing trials](/trials). We introduce the concept of a "trial"
+[organizing and managing trials](/steps). We introduce the concept of a "trial"
 and how to programmatically advance through a sequence of trials within a
 particular View. The same concept is also used to add sequential build to any
-type of view (e.g., a sequence of instructions).
+type of view (e.g., a sequence of instructions or a multi-part form).
+
+**Critically by using the built-in <SmileText/> step feature if a participant
+refreshes the page or loses internet connection, they can pick up where they
+left off**.
 
 ## :writing_hand: Autofill
 

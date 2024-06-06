@@ -17,7 +17,7 @@ import RandomSubTimeline from '@/core/subtimeline'
 // 1. Import main built-in View components
 import Advertisement from '@/builtins/advertisement/AdvertisementView.vue'
 import MTurk from '@/builtins/mturk/MTurkRecruitView.vue'
-import Consent from '@/builtins/consent/InformedConsentView.vue'
+import Consent from '@/builtins/simple-consent/InformedConsentView.vue'
 import DemographicSurvey from '@/builtins/demographic_survey/DemographicSurveyView.vue'
 import DeviceSurvey from '@/builtins/device_survey/DeviceSurveyView.vue'
 import Captcha from '@/builtins/captcha/CaptchaView.vue'

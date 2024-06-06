@@ -128,7 +128,7 @@ VITE_MIN_WRITE_INTERVAL          = 2000
 VITE_SHOW_PROGRESS_BAR           = false
 
 VITE_VIEWPORT_REQUEST            = 800x600
-VITE_WINDOWSIZER_AGRESSIVE       = true
+VITE_WINDOWSIZER_AGGRESSIVE       = true
 
 VITE_ESTIMATED_TIME              = "30-40 minutes"
 VITE_PAYRATE_HOURLY              = "$15USD/hour + performance related bonus"

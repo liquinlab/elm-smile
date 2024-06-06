@@ -1,4 +1,4 @@
-# :twisted_rightwards_arrows: Timeline
+# :twisted_rightwards_arrows: Timeline and Design
 
 Web experiments are often composed of several parts presented in sequence. For
 example, first, we might show a welcome page &rarr; informed consent
@@ -19,9 +19,25 @@ subject in a Smile experiment can close their browser, restart their computer,
 and come back to the experiment on the **same trial** they left off on.
 
 This page shows how to configure and control <SmileText />'s Timeline
-implementation, and how to customize it with more complex behaviors. Most of the
-configuration happens in `src/design.js` which is short, self-explanatory, and
-well commented so you jump there if you feel confident.
+implementation, and how to customize it with more complex behaviors.
+
+## The Design File (`user/design.js`)
+
+Perhaps the most important user-configurable file in a <SmileText /> experiment
+is the design file located in `src/user/design.js`. This file is where you
+configure the timeline of your experiment. You can take a look at the
+[default version](https://github.com/NYUCCL/smile/blob/main/src/user/design.js)
+of this file which is short, self-explanatory, and well commented.
+
+The design file sets up the sequence of [Views](/views) that the participant
+will encounter, and can configure randomized branching if needed to create
+different experimental conditions. It also is where you configure
+[preloading](/imagesvideo#preloading) of content and other project-specific
+features. **It is very likely you will need to edit this file to create your
+experiment**!
+
+The following sections of this page describe the technical details of the
+Timeline object and how to configure your design file.
 
 ## Single-page Applications and Routing
 
@@ -119,10 +135,26 @@ components to load (based on the routing table that you configure).[^hash]
     the `#` navigation strategy.
 
 In <SmileText/> key steps in the experiment are indexed by routes that map to
-[page-level components](/components). So `/consent` might load the consent page
-form and `/debrief` would load the debriefing page form. This is good
-organization but also helpful for debugging since you can easily jump to
-different sections of the task.
+page-level components called [Views](/views). So `/consent` might load the
+consent View and `/debrief` would load the debriefing View. This is good
+organization but also helpful for [debugging/developing](/developermode) since
+you can easily jump to different sections of the task.
+
+## Timeline
+
+As just described, the Vue Router is a mapping between different URLs and Vue
+components (i.e., Views) to load. However, in experiments, we often want to step
+through content sequentially. For this purpose, Smile implements a simple
+Timeline class (see `src/timeline.js`) which acts as a wrapper around the basic
+Vue Router.
+
+The timeline class allows you to configure a sequence of routes as well as allow
+for routes that are not part of a sequence:
+
+<img src="/images/timeline.png" width="500" alt="timeline example" style="margin: auto;">
+
+Sequential routes are accessed in a chain/timeline. Non-sequential ruotes are
+not part of that timeline.
 
 ### The route object
 
@@ -133,7 +165,7 @@ the following fields:
 {
   path: '/my_name',
   name: 'my_name',
-  component: MyComponent,
+  component: MyViewComponent,
   meta: { ... },  // optional
 }
 ```
@@ -142,8 +174,8 @@ The `path` specifies the client-side route, as described above. The `name`
 offers another way to specify the route for navigation, which can be easier than
 using the path (see details in the `vue-router`
 [documentation](https://router.vuejs.org/guide/essentials/named-routes.html)).
-The `component` field specifies the component that should be loaded when the
-route is requested.
+The `component` field specifies the [View component](/views) that should be
+loaded when the route is requested.
 
 The `meta` field specifies additional optional information about the route:
 
@@ -151,9 +183,6 @@ The `meta` field specifies additional optional information about the route:
   experiment timeline flow branches (see
   [Branching and randomized flows](#branching-and-randomized-flows) for more
   details).
-- It can be used to specify randomized sub-timelines (see
-  [Randomized flows and complex branching](#randomized-flows-and-complex-branching)
-  for more details).
 - It can also be used to allow direct navigation to particular routes, which can
   allow for unconditional navigation by setting `allowAlways: true` in the
   `meta`.
@@ -163,20 +192,9 @@ The `meta` field specifies additional optional information about the route:
   Another option (`requiresWithdraw: true`) requires the participant to have
   withdrawn from the page before showing.
 
-## Timeline
+### Navigation permissions
 
-As just described, the Vue Router is a mapping between different URLs and Vue
-components to load. However, in experiments, we often want to step through
-content sequentially. For this purpose, Smile implements a simple Timeline class
-(see `src/timeline.js`) which acts as a wrapper around the basic Vue Router.
-
-The timeline class allows you to configure a sequence of routes as well as allow
-for routes that are not part of the sequence:
-
-<img src="/images/timeline.png" width="500" alt="timeline example" style="margin: auto;">
-
-Sequential routes are accessed in a chain/timeline. Non-sequential routes are
-not part of that timeline.
+### Creating a timeline
 
 A timeline is created like this:
 
@@ -202,13 +220,6 @@ timeline. This route will exist in the Vue router but will not be in the
 timeline sequence. This is useful for configuration and debugging routes as well
 as routes you want to define and even link to but not present in the regular
 timeline flow.
-
-### `timeline.pushRandomizedTimeline(subtimeline_obj)`
-
-This pushes a new randomized sub-timeline (specified in `subtimeline_obj`) into
-the sequential timeline. See
-[Randomized flows and complex branching](#randomized-flows-and-complex-branching)
-for further details.
 
 ### `timeline.build()`
 
@@ -261,12 +272,8 @@ timeline.build()
 During development you can, of course, comment out certain routes to help
 isolate and test particular aspects of your experiment. In addition, since
 routes are mapped to distinct URLs it is easy to jump between sections of your
-experiment during development.
-
-Hopefully, you are thinking this sounds super easy to set up, but how do you
-step from one component/route to the next? To do that we need to introduce the
-concept of a [stepper](#timelinestepper). But first, let's quickly consider more
-complex sequential flows.
+experiment during development (especially using the
+[developer mode](/developermode) tools).
 
 ## Branching and randomized flows
 
@@ -327,7 +334,7 @@ The `timeline.build()` method steps through all nodes pushed using
 the previous route. If this is not what you want (because your routes need more
 complex flows) you can simply omit the `build` step.
 
-### Randomized flows and complex branching
+### Randomized flows and branching
 
 Sometimes you want to randomize the order or presentation of routes. For
 example, your experiment might have two tasks, which are presented in a

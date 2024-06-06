@@ -4,18 +4,13 @@
 
 # :building_construction: Views
 
-In <SmileText />, each major phase of an experiment is associated with its own
-[component](/components). In <SmileText/>, we call these "Views" although there
-is nothing particularly special about them (they are just ordinary Vue
-components). (We will refer to Views using a capital 'V' to distinguish them
-from ordinary uses of the word "view.").
-
-Views are a useful way of thinking about these bigger parts or phases of an
-experiment. We might have called them "pages", "routes", "sections", "parts", or
-"phases." Views tend be to modular and reusable "sections" of an experiment that
-you might use in different experiments or different parts of the same
-experiment. The sequencing of different Views is controlled by the
-[**Timeline**](/timeline) (and more specifically `@/user/design.js`).
+[Components](/components) are the basic building blocks of a <SmileText/>
+experiment. However, components can play different roles. In <SmileText />, each
+major phase of an experiment is associated with its own special
+[component](/components) called a "View". (We will refer to Views using a
+capital 'V' to distinguish them from ordinary uses of the word "view."). Other
+packages might refer to View elements as "pages", "routes", "sections", "parts",
+or "phases."
 
 <img src="/images/viewstimeline.png" width="800" alt="timeline example" style="margin: auto;">
 
@@ -37,13 +32,20 @@ components. By convention, the filename of any component that is treated as a
 View should end in `View.vue` for example `WelcomeView.vue`, `ConsentView.vue`,
 etc...
 
+Views are a useful way of thinking about bigger parts or phases of an
+experiment. Views tend be to modular and reusable "sections" of an experiment
+that you might use in different experiments or different parts of the same
+experiment. The sequencing of different Views is controlled by the
+[**Timeline**](/timeline) (and more specifically `@/user/design.js`).
+
 ## Built-in Views
 
-When you [setup](/starting) the default <SmileText /> project you get a number
-of built-in Views and their associated sub-components that are useful for most
-experiments. These include things like obtaining informed consent, presenting
-instructions, CAPTCHAs, etc... This section describes these default built-in
-Views and provides an overview of how to customize them for your experiment.
+When you [setup](/starting) the default <SmileText /> project you automatically
+get a number of built-in Views that are useful for most experiments. These
+include things like obtaining [informed consent](#informed-consent), presenting
+[instructions](#simple-instructions), [CAPTCHAs](#the-smile-captcha), etc...
+This section describes these default built-in Views and provides an overview of
+how to customize them for your experiment.
 
 ### Side effects
 
@@ -57,31 +59,28 @@ this flag to verify that the subject has consented.
 Programmers call these "side-effects" because the break the apparent modularity
 of the View. For example, if your experiment needs to know if the participant
 has consented, and you remove the Informed Consent View, then you will need to
-add some other way to set the consent flag. This is a side-effect of the
-Informed Consent View.
-
-We do not include simply writing data as a side-effect (almost all views are
-going to write data). We specifically mean that it changes something that might
-affect the logic of the experiment.
+add some other way to set the consent flag.
 
 In the docs for built-in view we will describe the side-effects of each view.
 
 ## Overview of Built-in Views
 
-| Name                                         | Side&nbsp;effect? | Description                                                       |
-| -------------------------------------------- | :---------------- | :---------------------------------------------------------------- |
-| [Recruitment Ad](#recruitment-advertisement) | No                | Landing page for participants                                     |
-| [MTurk Ad](#mturk-recruitment)               | No                |                                                                   |
-| [Informed Consent](#informed-consent)        | Yes               | Collects informed consent                                         |
-| [CAPTCHA](#the-smile-captcha)                | No                | Fun tasks to verify human/attention                               |
-| [Window Sizer](#window-sizer)                | Yes               | Verifies a given area of the screen is visible                    |
-| [Simple Instructions](#simple-instructions)  | No                | A simple sequence of pages for instructions                       |
-| [Demographic Survey](#demographic-survey)    | No                | A survey which collects some demographic info                     |
-| [Device Survey](#device-survey)              | No                | A survey which collects some self-report about computer/device    |
-| [Withdraw](#withdraw)                        | Yes               | A survey which processes a subject request to withdraw from study |
-| [Debrief](#debrief)                          | No                | A simple text View which describes the purpose of the study       |
-| [Thanks Page](#thanks)                       | Yes               | A thank you page                                                  |
-| [Report Issue](#report-issue)                | Yes               | A thank you page                                                  |
+| Name                                                | Side&nbsp;effect? | Description                                                                                                                     |
+| --------------------------------------------------- | :---------------- | :------------------------------------------------------------------------------------------------------------------------------ |
+| [Recruitment Ad](#recruitment-advertisement)        | No                | Landing page for participants                                                                                                   |
+| [MTurk Ad](#mturk-recruitment)                      | No                | Interacts with the MTurk system                                                                                                 |
+| [Simple Informed Consent](#simple-informed-consent) | Yes               | Collects informed consent using a simple checkbox                                                                               |
+| [CAPTCHA](#the-smile-captcha)                       | No                | Fun tasks to verify human-ness and attention                                                                                    |
+| [Window Sizer](#window-sizer)                       | Yes               | Verifies a given area of the screen is visible (with a more that agressively hides page content if window is resized too small) |
+| [Simple Instructions](#simple-instructions)         | No                | A simple sequence of pages for instructions                                                                                     |
+| [Instructions+Quiz](#instructions--quiz)            | No                | A simple sequence of pages for instructions                                                                                     |
+| [Demographic Survey](#demographic-survey)           | No                | A survey which collects somedemographic info                                                                                    |
+| [Device Survey](#device-survey)                     | No                | A survey which collects some self-report about computer/device                                                                  |
+| [Withdraw](#withdraw)                               | Yes               | A survey which processes a subject request to withdraw from study                                                               |
+| [Debrief](#debrief)                                 | No                | A simple text View which describes the purpose of study                                                                         |
+| [Feedback](#feedback)                               | No                | A survey for soliciting structured and unstructured feedback on the study                                                       |
+| [Thanks Page](#thanks)                              | Yes               | A thank you page                                                                                                                |
+| [Report Issue](#report-issue)                       | Yes               | A form to report a bug/issue with the experiment                                                                                |
 
 These components are located in the `src/builtins` directory. In <SmileText/> a
 short-hand for the src folder is '@' so for instance '@/builtins' refers to the
@@ -194,26 +193,30 @@ this.pushView({
 })
 ```
 
-### Informed Consent
+### Simple Informed Consent
 
 **Base Component**: `@/builtins/consent/InformedConsentView.vue`  
 **Code**:
-[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/consent/InformedConsentView.vue)  
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/simple-consent/InformedConsentView.vue)  
 **Side effects**: Yes, sets the `isConsented` key in the [API](/api) to true.  
 **Typical accessibility**: `{requiresConsent: false, requiresDone: false}`
 
 Most studies require some type of informed consent from participants. This is
 usually a short piece of text describing the study and the participant's rights
 and responsibilities. The Informed Consent View is a simple page that displays
-this text and asks the participant to agree to participate. If the participant
-agrees, then the Informed Consent View sets a flag in the application state
-indicating that the participant has consented.
+this text and asks the participant to agree to participate by clicking a
+checkbox. If the participant agrees, then the Informed Consent View sets a flag
+in the application state indicating that the participant has consented. Clicking
+a button continue to the next View in the timeline.
 
 The text of the informed consent should be updated for each study and placed in
-`@/builtins/consent/InformedConsentText.vue`. After a participant accepts the
-informed consent (usually the first few steps of study) they will see a button
-in the [status bar](#status-bar) that will always be available allowing them to
-review the consent form in case they have questions.
+`@/builtins/consent/InformedConsentText.vue`.
+
+After a participant accepts the informed consent (usually the first few steps of
+study) they will see a button in the [status bar](#status-bar) that will always
+be available allowing them to review the consent form in case they have
+questions. Click this button pops up a modal with the text of the informed
+consent (also `@/builtins/consent/InformedConsentText.vue`).
 
 ```js
 // put this at the top of the file
@@ -286,7 +289,7 @@ since environment files are only read once on the loading of the application.
 In addition to a View appearing on the Timeline in a particular place, it is
 possible to re-trigger this View when the browser detects the user has adjusted
 the browser to no longer make the task viewport the requested size. To enable
-this behavior set `ITE_WINDOWSIZER_AGRESSIVE = true` in the `env/.env` file.
+this behavior set `VITE_WINDOWSIZER_AGGRESSIVE = true` in the `env/.env` file.
 
 To add it to the timeline just add this in the appropriate place inside
 `src/router.js`;
@@ -304,6 +307,12 @@ timeline.pushSeqView({
 ```
 
 ### Simple Instructions
+
+**Component**: `src/components/AdvertisementView.vue`  
+**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
+**Typical accessibility**: Always
+
+### Instructions + Quiz
 
 **Component**: `src/components/AdvertisementView.vue`  
 **Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
@@ -408,7 +417,13 @@ the participant.
 **Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
 **Typical accessibility**: Always
 
+### Feedback
+
+Coming soon
+
 ### Report Issue
+
+Coming soon
 
 ## Navbars and Modals
 
