@@ -8,7 +8,6 @@ import {
   createPrivateDoc,
   updateSubjectDataRecord,
   updatePrivateSubjectDataRecord,
-  balancedAssignConditions,
   loadDoc,
   fsnow,
 } from './firestore-db'
@@ -67,7 +66,7 @@ const init_local = {
   seedID: '',
   seedSet: false,
   pageTracker: {},
-  possibleConditions: { taskOrder: ['AFirst', 'BFirst'], instructions: ['version1', 'version2', 'version3'] },
+  possibleConditions: {},
 }
 
 const init_global = {
@@ -305,18 +304,11 @@ export default defineStore('smilestore', {
       this.data.seedID = this.local.seedID
       this.local.docRef = await createDoc(this.data)
       this.local.privateDocRef = await createPrivateDoc(this.private, this.local.docRef)
-      // if possible conditions are not empty, assign conditions
-      if (this.local.possibleConditions) {
-        this.data.conditions = await balancedAssignConditions(this.local.possibleConditions, this.data.conditions)
-      }
       if (this.local.docRef) {
         this.setDBConnected()
-        // force a data save so conditions get added to the data right away
-        this.saveData(true)
       } else {
         log.error('SMILESTORE: could not create document in firebase')
       }
-      return this.data.conditions
     },
     async loadData() {
       let data
