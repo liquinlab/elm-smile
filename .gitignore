@@ -27,3 +27,4 @@ dist-ssr
 !*.secret
 /css/styles.css
 /docs/.vitepress/cache
+/public/qr.svg
