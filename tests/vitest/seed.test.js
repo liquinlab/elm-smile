@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
-import '@/seed'
-import Timeline from '@/timeline'
+import '@/core/seed'
+import Timeline from '@/core/timeline'
 import { createTestingPinia } from '@pinia/testing'
-import useSmileStore from '@/stores/smiledata'
+import useSmileStore from '@/core/stores/smilestore'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { mount } from '@vue/test-utils'
 import seedrandom from 'seedrandom'
@@ -35,12 +35,12 @@ describe('Seed tests', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
 
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'first',
       component: MockComponent,
     })
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/second',
       name: 'second',
       component: MockComponent,

@@ -3,7 +3,11 @@
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
-import vitePluginHtmlEnv from './scripts/vite-plugin-html-env'
+import handlebars from 'vite-plugin-handlebars'
+import Inspect from 'vite-plugin-inspect'
+//import preLoaderPlugin from './scripts/preloader'
+import stripDevToolPlugin from './scripts/strip-devtool'
+import generateQRCode from './scripts/generate-qr.js'
 
 // https://vitejs.dev/config/
 export default ({ mode }) => {
@@ -17,7 +21,19 @@ export default ({ mode }) => {
   // import.meta.env.VITE_NAME available here with: process.env.VITE_NAME
   // import.meta.env.VITE_PORT available here with: process.env.VITE_PORT
   return defineConfig({
-    plugins: [vitePluginHtmlEnv(), vue()],
+    // prettier-ignore
+    plugins: [
+      Inspect(),
+      stripDevToolPlugin(),
+      vue(),
+      generateQRCode(),
+      handlebars({
+        context: {
+          main_js: mode=='dashboard'? "/src/dev/dashboard/dashboard.js": "/src/core/main.js"
+        }
+      }),
+      //preLoaderPlugin(),
+    ],
     // if you need an additional page you have to list them here
     // see https://vitejs.dev/guide/build.html#multi-page-app
     // build: {
@@ -33,14 +49,8 @@ export default ({ mode }) => {
     server: {
       port: process.env.VITE_DEV_PORT_NUM,
       strictPort: true,
-      hmr: process.env.GITPOD_WORKSPACE_URL
-        ? {
-            host: process.env.GITPOD_WORKSPACE_URL.replace('https://', `${process.env.VITE_DEV_PORT_NUM}-`),
-            protocol: 'wss',
-            clientPort: 443,
-          }
-        : true,
     },
+    clearScreen: false,
     test: {
       globals: true,
       environment: 'happy-dom',

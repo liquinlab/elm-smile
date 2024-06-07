@@ -30,7 +30,7 @@ echo "VITE_GIT_BRANCH_NAME   = $BRANCH" >> $ENV_FILE
 
 echo 'VITE_DEPLOY_BASE_PATH   =  "/${VITE_GIT_OWNER}/${VITE_GIT_REPO_NAME}/${VITE_GIT_BRANCH_NAME}/"' >> $ENV_FILE
 
-CODENAME=$(node scripts/codenamize.js "/${OWNER}/${PROJECT_NAME}/${BRANCH}")
+CODENAME=$(node scripts/codenamize.cjs "/${OWNER}/${PROJECT_NAME}/${BRANCH}")
 echo "VITE_CODE_NAME          = ${CODENAME}" >> $ENV_FILE
 
 

@@ -5,15 +5,15 @@ import { setActivePinia, createPinia } from 'pinia'
 import { createTestingPinia } from '@pinia/testing'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Advertisement from '@/components/recruitment/AdvertisementPage.vue'
-// import useSmileStore from '@/stores/smiledata'
-import { routes } from '@/router' // This import should point to your routes file declared above
+// import useSmileStore from '@/core/stores/smilestore'
+import { routes } from '@/core/router' // This import should point to your routes file declared above
 
 let router
 let pinia
 
 describe('Advertisement tests', () => {
   beforeEach(() => {
-    pinia = createTestingPinia({ stubActions: false })
+    pinia = createTestingPinia({ stubActions: true })
     router = createRouter({
       history: createWebHashHistory(),
       routes,

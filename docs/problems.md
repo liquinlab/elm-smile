@@ -6,8 +6,8 @@ What do to when things go wrong.
 
 ## Whoops Ya'll
 
-
 ## Static files
 
-To distribute static assets and other files with your Smile experiment 
-it can help to place them in the `public/` folder.  [Read more here](https://vitejs.dev/guide/assets.html)
+To distribute static assets and other files with your Smile experiment it can
+help to place them in the `public/` folder.
+[Read more here](https://vitejs.dev/guide/assets.html)

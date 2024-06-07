@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import { createTestingPinia } from '@pinia/testing'
-import useSmileStore from '@/stores/smiledata' // get access to the global store
-import { processQuery } from '@/utils'
+import useSmileStore from '@/core/stores/smilestore' // get access to the global store
+import { processQuery } from '@/core/utils'
 
 describe('processQuery tests', () => {
   beforeEach(() => {
@@ -24,7 +24,7 @@ describe('processQuery tests', () => {
     processQuery(query, service)
     expect(smilestore.data.recruitment_service).toBe(service)
     expect(smilestore.recruitmentService).toBe(service)
-    expect(smilestore.data.recruitment_info).toStrictEqual(finalform) // this is "deep" equality
+    expect(smilestore.private.recruitment_info).toStrictEqual(finalform) // this is "deep" equality
   })
 
   it('is detects when referred from cloudresearch', () => {
@@ -43,7 +43,7 @@ describe('processQuery tests', () => {
     processQuery(query, service)
     expect(smilestore.data.recruitment_service).toBe(service)
     expect(smilestore.recruitmentService).toBe(service)
-    expect(smilestore.data.recruitment_info).toStrictEqual(finalform)
+    expect(smilestore.private.recruitment_info).toStrictEqual(finalform)
   })
 
   it('is detects when referred from mechanical turk', () => {
@@ -62,7 +62,7 @@ describe('processQuery tests', () => {
     processQuery(query, service)
     expect(smilestore.data.recruitment_service).toBe(service)
     expect(smilestore.recruitmentService).toBe(service)
-    expect(smilestore.data.recruitment_info).toStrictEqual(finalform)
+    expect(smilestore.private.recruitment_info).toStrictEqual(finalform)
   })
 
   it('is detects when referred from citizen science portal', () => {
@@ -81,6 +81,6 @@ describe('processQuery tests', () => {
     processQuery(query, service)
     expect(smilestore.data.recruitment_service).toBe(service)
     expect(smilestore.recruitmentService).toBe(service)
-    expect(smilestore.data.recruitment_info).toStrictEqual(finalform)
+    expect(smilestore.private.recruitment_info).toStrictEqual(finalform)
   })
 })

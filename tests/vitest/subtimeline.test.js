@@ -1,11 +1,16 @@
 /* eslint-disable no-undef */
-import RandomSubTimeline from '@/subtimeline'
-import { RandomizeSubTimeline } from '@/subtimeline'
-import Timeline from '@/timeline'
-import { createTestingPinia } from '@pinia/testing'
-import useSmileStore from '@/stores/smiledata'
+import RandomizeSubTimeline from '@/core/subtimeline'
+import Timeline from '@/core/timeline'
+import { createTestingPinia, setActivePinia } from '@pinia/testing'
+import useSmileStore from '@/core/stores/smilestore'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { mount } from '@vue/test-utils'
+import { setActivePinia } from 'pinia'
+// import axios from 'axios'
+
+// vi.mock('axios', () => ({
+//   get: vi.fn(() => Promise.resolve({ data: '127.0.0.1' })),
+// }))
 
 let router
 let pinia
@@ -17,7 +22,7 @@ describe('Subtimeline tests', () => {
       template: `<h1>hi</h1><router-view></router-view>`,
     }
     pinia = createTestingPinia({ stubActions: true })
-
+    setActivePinia(pinia)
     router = createRouter({
       history: createWebHashHistory(),
       routes,
@@ -39,7 +44,7 @@ describe('Subtimeline tests', () => {
   it('should add a route to subtimeline', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const subtimeline = new RandomSubTimeline()
-    subtimeline.pushRoute({
+    subtimeline.pushView({
       path: '/',
       name: 'index',
       component: MockComponent,
@@ -50,7 +55,7 @@ describe('Subtimeline tests', () => {
   it('should leave next and prev undefined but meta defined', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const subtimeline = new RandomSubTimeline()
-    subtimeline.pushRoute({
+    subtimeline.pushView({
       path: '/',
       name: 'index',
       component: MockComponent,
@@ -65,7 +70,7 @@ describe('Subtimeline tests', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const subtimeline = new RandomSubTimeline()
     const errorTrigger = () => {
-      subtimeline.pushRoute({
+      subtimeline.pushView({
         path: '/',
         name: 'index',
         component: MockComponent,
@@ -78,14 +83,14 @@ describe('Subtimeline tests', () => {
   it('should not allow the same route to be registered twice', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const subtimeline = new RandomSubTimeline()
-    subtimeline.pushRoute({
+    subtimeline.pushView({
       path: '/thanks',
       name: 'thank',
       component: MockComponent,
     })
 
     const errorTrigger = () => {
-      subtimeline.pushRoute({
+      subtimeline.pushView({
         path: '/thanks',
         name: 'thanks',
         component: MockComponent,
@@ -100,12 +105,12 @@ describe('Subtimeline tests', () => {
     const MockComponent2 = { template: '<div>Mock Component</div>' }
     const subtimeline1 = new RandomSubTimeline()
     const subtimeline2 = new RandomSubTimeline()
-    subtimeline1.pushRoute({
+    subtimeline1.pushView({
       path: '/first',
       name: 'first',
       component: MockComponent1,
     })
-    subtimeline2.pushRoute({
+    subtimeline2.pushView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent2,
@@ -124,17 +129,17 @@ describe('Subtimeline tests', () => {
 
     const timeline = new Timeline()
     const subtimeline = new RandomSubTimeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'first',
       component: MockComponent,
     })
-    subtimeline.pushRoute({
+    subtimeline.pushView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
     })
-    subtimeline.pushRoute({
+    subtimeline.pushView({
       path: '/mid2',
       name: 'mid2',
       component: MockComponent,
@@ -144,7 +149,7 @@ describe('Subtimeline tests', () => {
       meta: { label: 'orderCond', orders: { cond1: ['mid1', 'mid2'], cond2: ['mid2', 'mid1'] } },
     })
 
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/last',
       name: 'last',
       component: MockComponent,
@@ -169,17 +174,17 @@ describe('Subtimeline tests', () => {
 
     const timeline = new Timeline()
     const subtimeline = new RandomSubTimeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'first',
       component: MockComponent,
     })
-    subtimeline.pushRoute({
+    subtimeline.pushView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
     })
-    subtimeline.pushRoute({
+    subtimeline.pushView({
       path: '/mid2',
       name: 'mid2',
       component: MockComponent,
@@ -189,7 +194,7 @@ describe('Subtimeline tests', () => {
       meta: { label: 'orderCond', orders: { cond1: ['mid1', 'mid2'], cond2: ['mid2', 'mid1'] } },
     })
 
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/last',
       name: 'last',
       component: MockComponent,
@@ -223,17 +228,17 @@ describe('Subtimeline tests', () => {
 
     const timeline = new Timeline()
     const subtimeline = new RandomSubTimeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'first',
       component: MockComponent,
     })
-    subtimeline.pushRoute({
+    subtimeline.pushView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
     })
-    subtimeline.pushRoute({
+    subtimeline.pushView({
       path: '/mid2',
       name: 'mid2',
       component: MockComponent,
@@ -242,7 +247,7 @@ describe('Subtimeline tests', () => {
       name: subtimeline,
     })
 
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/last',
       name: 'last',
       component: MockComponent,
@@ -266,17 +271,17 @@ describe('Subtimeline tests', () => {
 
     const timeline = new Timeline()
     const subtimeline = new RandomSubTimeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'first',
       component: MockComponent,
     })
-    subtimeline.pushRoute({
+    subtimeline.pushView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
     })
-    subtimeline.pushRoute({
+    subtimeline.pushView({
       path: '/mid2',
       name: 'mid2',
       component: MockComponent,
@@ -285,7 +290,7 @@ describe('Subtimeline tests', () => {
       name: subtimeline,
     })
 
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/last',
       name: 'last',
       component: MockComponent,
@@ -322,17 +327,17 @@ describe('Subtimeline tests', () => {
 
     const timeline = new Timeline()
     const subtimeline = new RandomSubTimeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'first',
       component: MockComponent,
     })
-    subtimeline.pushRoute({
+    subtimeline.pushView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
     })
-    subtimeline.pushRoute({
+    subtimeline.pushView({
       path: '/mid2',
       name: 'mid2',
       component: MockComponent,
@@ -342,7 +347,7 @@ describe('Subtimeline tests', () => {
       meta: { label: 'orderCond', orders: { cond1: ['mid1', 'mid2'], cond2: ['mid2', 'mid1'] } },
     })
 
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/last',
       name: 'last',
       component: MockComponent,
@@ -382,17 +387,17 @@ describe('Subtimeline tests', () => {
 
     const timeline = new Timeline()
     const subtimeline = new RandomSubTimeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'first',
       component: MockComponent,
     })
-    subtimeline.pushRoute({
+    subtimeline.pushView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
     })
-    subtimeline.pushRoute({
+    subtimeline.pushView({
       path: '/mid2',
       name: 'mid2',
       component: MockComponent,
@@ -401,7 +406,7 @@ describe('Subtimeline tests', () => {
       name: subtimeline,
     })
 
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/last',
       name: 'last',
       component: MockComponent,

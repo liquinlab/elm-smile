@@ -1,8 +1,9 @@
 # :page_facing_up: Cheat sheet
 
-
 ## Interacting with project
-### Creating a new project 
+
+### Creating a new project
+
 Called `my_cool_project` for GitHub user `ghuser`:
 
 ```
@@ -15,10 +16,10 @@ npm run config:upload
 npm run setup_project
 ```
 
-
 ### Delete a repo from the command line
 
-You may have to follow instructions to enable permissions to delete the repo) and the local files:
+You may have to follow instructions to enable permissions to delete the repo)
+and the local files:
 
 ```
 gh repo delete ghuser/my_cool_project
@@ -40,6 +41,7 @@ npm run docs:dev
 ```
 
 ### Build the local files and serve them
+
 This mimics the final deployment state of the files
 
 ```
