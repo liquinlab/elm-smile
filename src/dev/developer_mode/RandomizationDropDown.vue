@@ -28,21 +28,17 @@ function randomize_seed() {
   smilestore.setSeedID(seed.value)
 }
 
-// define selected from current conditions
+// define selected condition in toolbar from current conditions
 const selected = smilestore.getConditions
 
-// when toolbar conditions are changed, update the store
-watch(
-  () => selected,
-  async (newConds) => {
-    // for each key in newConds, update that entry in conditions
-    Object.keys(newConds).forEach((key) => {
-      smilestore.setCondition(key, newConds[key])
-    })
-  }
-)
 
-// when condition is set in the store, update the toolbar conditions
+// when toolbar selection changes, change conditions in the data
+function changeCond(key, event) {
+  const cond = event.target.value 
+  smilestore.setCondition(key, cond)
+}
+
+// when condition is set in the data, update the toolbar conditions
 watch(
   () => smilestore.data.conditions,
   async (newConds) => {
@@ -149,7 +145,7 @@ watch(
                   </td>
                   <td>
                     <div class="select is-small">
-                      <select v-model="selected[key]">
+                      <select v-model="selected[key]" @change="changeCond(key, $event)">
                         <option disabled value="">[not selected]</option>
                         <option v-for="cond in value" :key="cond">
                           {{ cond }}
