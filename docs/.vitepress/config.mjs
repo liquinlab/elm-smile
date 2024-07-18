@@ -1,5 +1,6 @@
 import footnote from 'markdown-it-footnote'
 import { defineConfig } from 'vitepress'
+import { version } from '../../package.json'
 
 export default defineConfig({
   lang: 'en-US',
@@ -26,7 +27,13 @@ export default defineConfig({
       pattern: 'https://github.com/nyuccl/smile/edit/main/docs/:path',
       text: 'Suggest changes to this page on GitHub',
     },
-    nav: [{ text: 'gureckislab.org', link: 'https://gureckislab.org' }],
+    nav: [
+      { text: 'gureckislab.org', link: 'https://gureckislab.org' },
+      {
+        text: `v${version}`,
+        items: [{ text: 'Release Notes', link: 'https://github.com/nyuccl/smile/releases' }],
+      },
+    ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/NYUCCL/smile' },
       { icon: 'twitter', link: 'https://twitter.com/todd_gureckis' },
