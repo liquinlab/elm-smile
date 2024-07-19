@@ -207,7 +207,7 @@ The `.env.github.local` file contains information about the latest git commit
 for this project. The purpose of this file is so that your Javascript
 application can keep track of which version of the code it is running. One key
 principle of <SmileText/> is that
-[data must always be linked to the code that created it](principles.html#data-must-always-be-linked-to-the-code-that-created-it).
+[data must always be linked to the code that created it](/research/principles.html#data-must-always-be-linked-to-the-code-that-created-it).
 
 This file is generated automatically using a
 [post commit hook](https://www.atlassian.com/git/tutorials/git-hooks) which

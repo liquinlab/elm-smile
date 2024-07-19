@@ -10,7 +10,7 @@ code (e.g., real-time multiplayer games). But in most cases that cover
 "experimental cognitive science on individuals", <SmileText/> provides a robust
 solution that requires little to no configuration or code. Dealing with data is
 so important,
-[it isn't something you should even have to think about](/principles#no-code-is-the-best-code)!
+[it isn't something you should even have to think about](/research/principles#no-code-is-the-best-code)!
 
 This document describes the basics of <SmileText/> data storage including how to
 configure the system, how to use the data storage techniques manually in your

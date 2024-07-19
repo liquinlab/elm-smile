@@ -13,9 +13,9 @@ fun to develop rich and interactive online experiments.
   and [Bulma CSS](https://bulma.io). Make complex games, animations, and surveys
   with ease using
   [declarative programming and reactive data binding](/components#declarative-rendering-and-reactivity).
-- Built-in support for [common experiment elements](/builtins) like consent
-  forms, captchas, instructions, and surveys. Just add your custom experiment
-  logic and start collecting data.
+- Built-in support for [common experiment elements](/views#built-in-views) like
+  consent forms, captchas, instructions, and surveys. Just add your custom
+  experiment logic and start collecting data.
 - Participant-friendly features include the ability to withdraw from the
   experiment (while providing feedback), incremental data saving, optimized load
   times, graceful error handling, and a responsive design that works on most/all
