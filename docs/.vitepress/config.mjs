@@ -91,7 +91,7 @@ export default defineConfig({
       },
       {
         text: 'APIs and Advanced Documentation',
-        items: [],
+        items: [{ text: '📚 API', link: '/api' }],
       },
 
       {
