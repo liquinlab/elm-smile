@@ -41,8 +41,8 @@ discuss specific features of Vue.js components (e.g.,
 [reactivity](/components#declarative-rendering-and-reactivity)) that help make
 web development code more compact and error-free.
 
-**A large part of designing your own experiment will be implementing a custom
-component for your task, or borrowing from an existing one.**
+==A large part of designing your own experiment will be implementing a custom
+component for your task, or borrowing from an existing one.==
 
 ## :building_construction: Views
 
@@ -72,7 +72,7 @@ appear. In addition the design is used to specify randomization across
 conditions, preloading of content, and other important features of your
 experiment.
 
-**You almost certainly will need to edit this file for your experiment**.
+==You almost certainly will need to edit this file for your experiment.==
 
 ## :ladder: Stepping trials
 
@@ -84,9 +84,9 @@ and how to programmatically advance through a sequence of trials within a
 particular View. The same concept is also used to add sequential build to any
 type of view (e.g., a sequence of instructions or a multi-part form).
 
-**Critically by using the built-in <SmileText/> step feature if a participant
+==Critically by using the built-in <SmileText/> step feature if a participant
 refreshes the page or loses internet connection, they can pick up where they
-left off**.
+left off.==
 
 ## :writing_hand: Autofill
 

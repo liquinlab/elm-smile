@@ -565,3 +565,13 @@
   --vp-local-search-highlight-bg: var(--vp-c-brand-1);
   --vp-local-search-highlight-text: var(--vp-c-neutral-inverse);
 }
+
+mark {
+  background-color: var(--vp-c-brand-1);
+  color: var(--vp-c-neutral-inverse);
+  padding: 1px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 4px;
+  white-space: pre-wrap;
+}

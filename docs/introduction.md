@@ -5,7 +5,9 @@ outline: none
 # :wave: Welcome to Smile!
 
 The <SmileText/> project is a web-based platform designed to make it easy and
-fun to develop rich and interactive online experiments.
+fun to develop rich and interactive online experiments. ==Unlike tools that
+cater to novices and non-programmers, Smile is for reasonably competent
+programmers.==
 
 ### Key features:
 

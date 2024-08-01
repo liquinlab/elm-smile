@@ -1,4 +1,6 @@
 import footnote from 'markdown-it-footnote'
+import Mark from 'markdown-it-mark'
+import { sub } from '@mdit/plugin-sub'
 import { defineConfig } from 'vitepress'
 import { version } from '../../package.json'
 
@@ -13,7 +15,9 @@ export default defineConfig({
       listType: 'ol',
     },
     config: (md) => {
+      md.use(sub)
       md.use(footnote)
+      md.use(Mark)
     },
   },
   themeConfig: {
