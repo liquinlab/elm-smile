@@ -68,6 +68,7 @@ export default ({ mode }) => {
     },
     define: {
       'process.env': process.env,
+      __BUILD_TIME__: JSON.stringify(new Date().toLocaleDateString()),
     },
   })
 }
