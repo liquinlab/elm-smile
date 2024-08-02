@@ -80,7 +80,7 @@ export default defineConfig({
         text: 'Recruiting participants',
         items: [
           { text: '☁️ Deploying', link: '/deploying' },
-          { text: '🙋 Services', link: '/recruitment' },
+          { text: '🙋 Recruitment Services', link: '/recruitment' },
           { text: '📈 Dashboard', link: '/dashboard' },
           { text: '😇 Ethical considerations', link: '/ethics' },
         ],
