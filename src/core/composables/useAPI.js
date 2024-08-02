@@ -139,6 +139,15 @@ export default function useAPI() {
     error: (...message) => {
       log.error(message)
     },
+    getPublicUrl: (name) => {
+      return import.meta.env.VITE_DEPLOY_BASE_PATH + name
+    },
+    getCoreStaticUrl: (name) => {
+      return new URL(`../../assets/${name}`, import.meta.url).href
+    },
+    getStaticUrl: (name) => {
+      return new URL(`../../user/assets/${name}`, import.meta.url).href
+    },
     saveTrialData: (data) => {
       smilestore.saveTrialData(data)
       log.debug('SMILE API: data ', smilestore.data.study_data)

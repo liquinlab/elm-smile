@@ -69,6 +69,17 @@ available methods and their descriptions.
 - `getCurrentTrial()`: Gets the current trial information.
 - `getBrowserFingerprint()`: Retrieves the browser fingerprint.
 - `preloadAllImages()`: Preloads all images for the experiment.
+- `getPublicUrl(path)`: Returns the public URL for a file. See
+  [Images and Video](/imagesvideo#referring-to-static-assets-using-code) for
+  more information.
+- `getStaticUrl(path)`: Returns the URL for a user static file in
+  `src/user/assets/`. See
+  [Images and Video](/imagesvideo#referring-to-static-assets-using-code) for
+  more information.
+- `getCoreStaticUrl(path)`: Returns the public URL for a static asset provided
+  by the smile library in `src/assets`. See
+  [Images and Video](/imagesvideo#referring-to-static-assets-using-code) for
+  more information.
 
 ## Logging and Debugging
 
