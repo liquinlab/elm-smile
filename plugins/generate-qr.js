@@ -7,7 +7,6 @@ export default function generateQRCode() {
     configResolved(resolvedConfig) {
       // store the resolved config
       config = resolvedConfig
-      console.log(config.env.VITE_CODE_NAME_DEPLOY_URL)
 
       // create the QR code
       var qrcode = new QRCode({
