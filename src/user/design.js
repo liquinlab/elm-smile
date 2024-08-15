@@ -56,7 +56,7 @@ api.randomAssignCondition({
 // example, if you want twice as many participants to be assigned to instructions 
 // version 1 compared to versions 2 and 3, you can set the weights as follows:
 api.randomAssignCondition({
-  instructionsVersion: [1, 2, 3],
+  instructionsVersion: ["1", "2", "3"],
   weights: [2, 1, 1] // weights are automatically normalized, so [4, 2, 2] would be the same
 })
 

@@ -133,12 +133,12 @@ watch(
 
             <h1 class="title is-6">Random variables</h1>
             <p class="is-left">
-              Some text about this. Read more about randomization
+              Read more about randomization
               <a href="https://smile.gureckislab.org/randomization.html"> in the docs </a>.
             </p>
             <br />
             <table class="table is-fullwidth">
-              <template v-for="(value, key) in smilestore.getPossibleConditions" :key="key">
+              <template v-for="(value, key) in smilestore.local.possibleConditions" :key="key">
                 <tr>
                   <td width="30%">
                     <b>{{ key }}:</b>

@@ -7,13 +7,13 @@ const api = useAPI()
 const instText = computed(() => {
   // how do you know that instructions will exist because it
   // starts off empty?
-  if (api.data.conditions.instructions === 'version1') {
+  if (api.data.conditions.instructionsVersion === "1") {
     return 'instructions version 1'
   }
-  if (api.data.conditions.instructions === 'version2') {
+  if (api.data.conditions.instructionsVersion === "2") {
     return 'instructions version 2'
   }
-  if (api.data.conditions.instructions === 'version3') {
+  if (api.data.conditions.instructionsVersion === "3") {
     return 'instructions version 3'
   }
   return 'no condition set'
