@@ -164,33 +164,40 @@ export default function useAPI() {
 
       // get the rest of the keys
       const conditionname = keys.filter(key => key !== 'weights')
+      let randomCondition;
+      let weights = undefined;
 
       // if condition name is longer than one element, error
       if (conditionname.length > 1) {
         log.error('SMILE API: randomAssignCondition() only accepts one condition name at a time')
-      } else {
-        const possibleConditions = conditionobject[conditionname[0]]
-        smilestore.local.possibleConditions[conditionname[0]] = possibleConditions
-        if (hasweights) { // if weights are provided
-          const weights = conditionobject['weights']
-          // make sure weights is the same length as the condition possibilities
-          if (weights.length !== possibleConditions.length) {
-            log.error('SMILE API: randomAssignCondition() weights must be the same length as the condition possibilities')
-          }
-          // get random condition from conditionobject[conditionname[0]]
-          const randomCondition = sampleWithReplacement(possibleConditions, 1, weights)[0]
-          // set the condition in the store
-          smilestore.setCondition(conditionname[0], randomCondition)
-          log.log('SMILE API: assigned condition', conditionname[0], randomCondition)
-
-        } else {
-          // get random condition from conditionobject[conditionname[0]]
-          const randomCondition = sampleWithReplacement(possibleConditions, 1)[0]
-          // set the condition in the store
-          smilestore.setCondition(conditionname[0], randomCondition)
-          log.log('SMILE API: assigned condition', conditionname[0], randomCondition)
-        }
+        return;
+      } 
+      
+      const name = conditionname[0];
+      const currentCondition = smilestore.getConditionByName(name);
+      if (currentCondition != null) {
+        log.info('SMILE API: condition already assigned', name, currentCondition);
+        return;
       }
+
+      const possibleConditions = conditionobject[name]
+      smilestore.local.possibleConditions[name] = possibleConditions
+      
+      if (hasweights) { // if weights are provided
+        weights = conditionobject['weights']
+        // make sure weights is the same length as the condition possibilities
+        if (weights.length !== possibleConditions.length) {
+          log.error('SMILE API: randomAssignCondition() weights must be the same length as the condition possibilities')
+          return;
+        }
+      } 
+      // get random condition from conditionobject[name]
+      randomCondition = sampleWithReplacement(possibleConditions, 1, weights)[0]
+
+      // set the condition in the store
+      smilestore.setCondition(name, randomCondition)
+      log.log('SMILE API: assigned condition', name, randomCondition)
+      
 
     },
     preloadAllImages: () => {

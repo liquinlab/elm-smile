@@ -368,5 +368,8 @@ export default defineStore('smilestore', {
       // this.global.db_connected = false
       this.$reset()
     },
+    getConditionByName(name) {
+      return this.data.conditions[name]
+    },
   },
 })

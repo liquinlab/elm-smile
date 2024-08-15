@@ -69,7 +69,7 @@ export function RandomizeSubTimeline(subTimeline, router) {
     console.log('setting random route order based on condition and prespecified orders')
 
     // get condition from data, and then select route order specified for that condition
-    const cond = smilestore.getConditions[metaInfo.label]
+    const cond = smilestore.getConditionByName(metaInfo.label)
 
     if (!cond) {
       throw new Error(`ConditionError: Condition label ${metaInfo.label} not found in data`)
