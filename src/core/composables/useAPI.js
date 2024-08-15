@@ -175,10 +175,6 @@ export default function useAPI() {
       
       const name = conditionname[0];
       const currentCondition = smilestore.getConditionByName(name);
-      if (currentCondition != null) {
-        log.info('SMILE API: condition already assigned', name, currentCondition);
-        return;
-      }
 
       const possibleConditions = conditionobject[name]
       smilestore.local.possibleConditions[name] = possibleConditions
