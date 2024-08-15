@@ -256,12 +256,14 @@ router.beforeResolve((to) => {
     const seedID = smilestore.getSeedID
     const seed = `${seedID}-${to.name}`
     seedrandom(seed, { global: true })
+    log.log('ROUTER GUARD: Seed set to ' + seed)
   } else {
     // if inactive, generate a random string then re-seed
     const newseed = uuidv4()
     seedrandom(newseed, {
       global: true,
     })
+    log.log('ROUTER GUARD: Seed set to ' + newseed)
   }
   log.clear_page_history()
   smilestore.dev.page_provides_trial_stepper = false // by default

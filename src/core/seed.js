@@ -6,6 +6,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { pinia } from '@/core/createpinia'
 import useSmileStore from '@/core/stores/smilestore' // get access to the global store
+import seedrandom from 'seedrandom'
 
 const smilestore = useSmileStore(pinia)
 
@@ -33,10 +34,15 @@ if (!seedSet) {
   if (seed) {
     api.log(`Forcing seed id to ${seed}`)
     smilestore.setSeedID(seed)
+    seedrandom(seed, { global: true })
+    api.log('Set initial seed to ' + seed)
   } else {
     // otherwise, generate a random ID
     const participantID = uuidv4() // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
     api.log(`Set seed id to ${participantID}`)
     smilestore.setSeedID(participantID)
+    seedrandom(participantID, { global: true })
+    api.log('Set initial seed to ' + participantID)
   }
 }
+ 

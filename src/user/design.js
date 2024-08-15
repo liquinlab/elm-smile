@@ -41,7 +41,27 @@ const api = useAPI()
 import Timeline from '@/core/timeline'
 const timeline = new Timeline()
 
-// #4. Define some routes to the timeline
+// #4. Add between-subjects condition assignment
+// This is where you can define conditions to which each participant should be assigned
+
+// You can assign conditions by passing a javascript object to api.setConditions(), 
+// where the key is the condition name and the value is an array of possible condition values.
+// Each unique condition manipulation should be assigned via a separate call to setConditions.
+
+api.randomAssignCondition({
+  taskOrder: ['AB', 'BA'],
+})
+
+// you can also optionally set randomization weights for each condition. For
+// example, if you want twice as many participants to be assigned to instructions 
+// version 1 compared to versions 2 and 3, you can set the weights as follows:
+api.randomAssignCondition({
+  instructionsVersion: [1, 2, 3],
+  weights: [2, 1, 1] // weights are automatically normalized, so [4, 2, 2] would be the same
+})
+
+
+// #5. Define and add some routes to the timeline
 // Each route should map to a View component.
 // Each needs a name
 // but for most experiment they go in sequence from begining
