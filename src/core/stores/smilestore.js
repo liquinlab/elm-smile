@@ -14,6 +14,7 @@ import {
 import sizeof from 'firestore-size'
 
 import useLog from '@/core/stores/log'
+import { timeline } from 'motion'
 
 function initLastRoute(mode) {
   if (mode === 'development') {
@@ -67,6 +68,8 @@ const init_local = {
   seedSet: false,
   pageTracker: {},
   possibleConditions: {},
+  seqtimeline: [],
+  routes: [],
 }
 
 const init_global = {

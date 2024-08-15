@@ -73,12 +73,9 @@ class Timeline {
         log.error(`Registering two routes to timeline with same name.  DuplicatePathError:${route.name}`)
         throw new Error(`DuplicateNameError${route.name}`)
       }
-      // only check for duplicate paths if the route name is not an object (subtimeline)
-      if (typeof route.name !== 'object') {
-        if (this.seqtimeline[i].path === route.path) {
-          log.error(`Registering two routes to timeline with same path.  DuplicatePathError:${route.path}`)
-          throw new Error(`DuplicatePathError${route.path}`)
-        }
+      if (this.seqtimeline[i].path === route.path) {
+        log.error(`Registering two routes to timeline with same path.  DuplicatePathError:${route.path}`)
+        throw new Error(`DuplicatePathError${route.path}`)
       }
     }
     this.seqtimeline.push(route)
@@ -101,6 +98,7 @@ class Timeline {
     }
     newroute.meta.type = 'route'
     newroute.meta.sequential = true
+    newroute.meta.level = 0
 
     if (newroute.meta.requiresConsent == undefined) {
       newroute.meta.requiresConsent = true // default to require consent
@@ -142,6 +140,7 @@ class Timeline {
       throw new Error(`NonSequentialRouteError: Can't have meta.next or meta.prev defined for non-sequential route`)
     }
     newroute.meta.sequential = false
+    newroute.meta.level = 0
 
     if (newroute.meta.requiresConsent == undefined) {
       newroute.meta.requiresConsent = true // default to require consent
@@ -167,33 +166,82 @@ class Timeline {
     }
   }
 
-  pushRandomizedTimeline(timeline) {
-    if (timeline.name.type !== 'randomized_sub_timeline') {
-      throw new Error('Can only push randomized timelines to timelines')
-    }
-    const newtimeline = _.cloneDeep(timeline)
+  pushRandomizedNode(routeConfig) {
+    const newroute = _.cloneDeep(routeConfig)
+    // newroute should have name, options, and optional weights
 
-    // need to configure next and prev
-    if (!newtimeline.meta) {
-      newtimeline.meta = { next: undefined, prev: undefined, type: 'timeline' }
-    } else {
-      newtimeline.meta.next = undefined
-      newtimeline.meta.prev = undefined
-      newtimeline.meta.type = 'timeline'
-    }
+    // get options
+    const options = newroute.options
+    // get weights
+    let weights = undefined
+    if(newroute.weights){
+      weights = newroute.weights
 
-    // get all the routes inside the timeline and add them to routes
-    newtimeline.name.routes.forEach((route) => {
-      try {
-        this.pushToRoutes(route)
-      } catch (err) {
-        log.error('Smile FATAL ERROR: ', err)
-        throw err
+      // check that options and weights are the same length
+      if (options.length !== weights.length) {
+        log.error('Length of options and weights do not match for randomized node')
+        throw new Error('OptionsWeightsLengthMismatchError')
       }
-    })
+    }
+    
+    // randomly choose one of options based on weights
+    const randomOption = api.sampleWithReplacement(options, 1, weights)[0]
 
-    // add the timeline object itself to the timeline
-    this.pushToTimeline(newtimeline)
+    console.log(randomOption);
+
+    // now, pull entries from routes that match random Option names (for each random option)
+    for (let i = 0; i < randomOption.length; i += 1) {
+      const option = randomOption[i]
+      const route = this.routes.find((r) => r.name === option)
+      if (!route) {
+        log.error(`Randomized node option ${option} not found in routes. You must add randomized routes to the timeline using pushView() before adding a randomized node`)
+        throw new Error('RandomizedNodeOptionNotFoundError')
+      }
+
+      route.meta = { next: undefined, prev: undefined } // need to configure next/prev for sequential routes
+      route.meta.sequential = true
+      route.meta.level = 1
+      route.meta.parentRandomizer = newroute.name
+
+      // add the route to the sequential timeline
+      this.pushToTimeline(route)
+    
+    }
+  }
+
+  pushConditionalNode(routeConfig) {
+    const newroute = _.cloneDeep(routeConfig)
+    // newroute should have name and a condition name (user specified, has to match something in data.conditions)
+
+    // get condition name—anything that's not name
+    const conditionname = Object.keys(newroute).filter(key => key !== 'name')
+    if (conditionname.length > 1) {
+      log.error('Can only branch routes based on one condition at a time')
+      throw new Error('TooManyConditionNamesError')
+    } 
+    const name = conditionname[0]
+    const assignedCondition = api.getConditionByName(name)
+
+    // based on assigned condition, get the correct set of routes
+
+    const randomOption = newroute[name][assignedCondition]
+
+    randomOption.forEach((option) => {
+      const route = this.routes.find((r) => r.name === option)
+      if (!route) {
+        log.error(`Randomized node option ${option} not found in routes. You must add randomized routes to the timeline using pushView() before adding a randomized node`)
+        throw new Error('RandomizedNodeOptionNotFoundError')
+      }
+
+      route.meta = { next: undefined, prev: undefined } // need to configure next/prev for sequential routes
+      route.meta.sequential = true
+      route.meta.level = 1
+      route.meta.parentRandomizer = newroute.name
+
+      // add the route to the sequential timeline
+      this.pushToTimeline(route)
+    
+    })
   }
 
   build() {
@@ -207,6 +255,13 @@ class Timeline {
       this.buildDAG()
     }
     // this.buildProgress()
+    // save built timeline to local
+    console.log(this.seqtimeline)
+    console.log(this.routes)
+
+    smilestore.local.seqtimeline = this.seqtimeline
+    smilestore.local.routes = this.routes
+    
   }
 
   registerCounters() {
@@ -241,8 +296,8 @@ class Timeline {
       this.g_nonseq.setNode('recruit', { name: 'recruit', label: 'RecruitmentChooser.vue', class: 'node', shape: 'circle' })
       */
     for (let i = 0; i < this.seqtimeline.length; i += 1) {
-      if (this.seqtimeline[i].meta.type === 'timeline') {
-        // don't know whast to do about the subtimeline things
+      if (this.seqtimeline[i].meta.type === 'random_node') {
+        // don't know whast to do about the random nodes
       } else {
         this.g.setNode(this.seqtimeline[i].name, {
           name: this.seqtimeline[i].name,
@@ -260,8 +315,6 @@ class Timeline {
   // buildGraph builds
   buildGraph() {
     log.debug('DEV MODE: building DAG for timeline')
-    // keep track of which objects in sequential timeline are themselves timelines
-    const timelineIndices = []
 
     for (let i = 0; i < this.seqtimeline.length; i += 1) {
       if (this.seqtimeline[i].meta.next === undefined) {
@@ -287,21 +340,8 @@ class Timeline {
         this.seqtimeline[i].meta.prev = null
       }
 
-      if (this.seqtimeline[i].meta.type === 'timeline') {
-        timelineIndices.push(i)
-      }
     }
 
-    // propogate various meta fields to the routes within the timeline
-    // this is relevant for next, previous, label, and orders -- we need that meta info at the route level
-    timelineIndices.forEach((index) => {
-      this.seqtimeline[index].name.routes.forEach((route, i) => {
-        this.seqtimeline[index].name.routes[i].meta = {
-          ...this.seqtimeline[index].name.routes[i].meta,
-          ...this.seqtimeline[index].meta,
-        }
-      })
-    })
   }
 
   // this won't work with new system

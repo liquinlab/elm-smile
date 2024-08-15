@@ -130,75 +130,85 @@ timeline.pushSeqView({
   },
 })
 
-// demographic survey
-timeline.pushSeqView({
-  path: '/demograph',
-  name: 'demograph',
-  component: DemographicSurvey,
-})
+// // demographic survey
+// timeline.pushSeqView({
+//   path: '/demograph',
+//   name: 'demograph',
+//   component: DemographicSurvey,
+// })
 
-// windowsizer
-timeline.pushSeqView({
-  path: '/windowsizer',
-  name: 'windowsizer',
-  component: WindowSizer,
-})
+// // windowsizer
+// timeline.pushSeqView({
+//   path: '/windowsizer',
+//   name: 'windowsizer',
+//   component: WindowSizer,
+// })
 
-// captcha
-timeline.pushSeqView({
-  path: '/captcha',
-  name: 'captcha',
-  component: Captcha,
-})
+// // captcha
+// timeline.pushSeqView({
+//   path: '/captcha',
+//   name: 'captcha',
+//   component: Captcha,
+// })
 
-// instructions
-timeline.pushSeqView({
-  path: '/instructions',
-  name: 'instructions',
-  component: Instructions,
-})
+// // instructions
+// timeline.pushSeqView({
+//   path: '/instructions',
+//   name: 'instructions',
+//   component: Instructions,
+// })
 
-// main experiment
-timeline.pushSeqView({
-  path: '/exp',
-  name: 'exp',
-  component: Exp,
-})
+// // main experiment
+// timeline.pushSeqView({
+//   path: '/exp',
+//   name: 'exp',
+//   component: Exp,
+// })
 
-timeline.pushSeqView({
-  path: '/instruction_jumper',
-  name: 'instruction_jumper',
-  component: InstructionJumperView,
-})
+// timeline.pushSeqView({
+//   path: '/instruction_jumper',
+//   name: 'instruction_jumper',
+//   component: InstructionJumperView,
+// })
 
-// create subtimeline for randomization
-const randTimeline = new RandomSubTimeline()
 
-randTimeline.pushView({
+// initially pushed as non-sequential routes, to tell the timeline they exist
+timeline.pushView({
   path: '/task1',
   name: 'task1',
   component: Task1,
 })
 
-randTimeline.pushView({
+timeline.pushView({
   path: '/task2',
   name: 'task2',
   component: Task2,
 })
 
-// if you want fixed orders based on conditions, uncomment meta line
-// commented out, this will shuffle the routes at random
-timeline.pushRandomizedTimeline({
-  name: randTimeline, // TODDQ: why name is the carrier here?
-  // meta: { label: "taskOrder", orders: {AFirst: ["task1", "task2"], BFirst: ["task2", "task1"]} }
-})
+// timeline.pushRandomizedNode({
+//   name: 'TrueRandom',
+//   options: [
+//     ['task1', 'task2'],
+//     ['task2', 'task1']
+//   ]
+// });
+
+timeline.pushConditionalNode({
+  name: 'ConditionalRandom',
+  taskOrder: {
+    AB: ['task1', 'task2'],
+    BA: ['task2', 'task1'],
+  },
+});
+
+
 
 // stroop exp
-timeline.pushSeqView({
-  path: '/stroop',
-  name: 'stroop',
-  component: StroopExp,
-})
+// timeline.pushSeqView({
+//   path: '/stroop',
+//   name: 'stroop',
+//   component: StroopExp,
+// })
 
 // debriefing form
 timeline.pushSeqView({

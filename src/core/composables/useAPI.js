@@ -112,6 +112,9 @@ export default function useAPI() {
     getCurrentTrial: () => {
       return smilestore.getPage[route.name]
     },
+    getConditionByName: (name) => {
+      return smilestore.getConditionByName(name)
+    },
     getBrowserFingerprint: () => {
       return smilestore.getBrowserFingerprint()
     },
