@@ -9,18 +9,6 @@ import timeline from '@/user/design'
 import useLog from '@/core/stores/log'
 const log = useLog()
 
-// import all components for possible preloading
-const allComponents = import.meta.glob('/src/**/*.vue')
-
-// resolve particular component for preloading
-const resolveComponent = async (path) => {
-  const matchedComponent = allComponents[path]
-  if (!matchedComponent) {
-    log.error(`Component not found: ${path}`)
-  }
-  return await matchedComponent()
-}
-
 // 3. add navigation guards
 //    currently these check if user is known
 //    and if they are, they redirect to last route
@@ -279,22 +267,6 @@ router.beforeResolve((to) => {
   smilestore.dev.page_provides_trial_stepper = false // by default
   smilestore.dev.current_page_done = false // set the current page to done
   log.log('ROUTER GUARD: Router navigated to /' + to.name)
-})
-
-// Check if the next route should preload, and if so, run it asynchronously
-router.afterEach(async (to) => {
-  if (to.meta?.next) {
-    const fullTo = router.resolve({ name: to.meta.next })
-    // by default try to preload unless meta.preload == false
-    if (fullTo.meta?.preload ?? true) {
-      // strip everything from the path leading up to but not including /src/
-      const path = fullTo.matched[0].components.default.__file.replace(/.*(?=\/src\/)/, '')
-      const component = await resolveComponent(path)
-      // preload if such a function exists
-      component?.preload?.()
-      log.log(fullTo.matched[0].components.default.__name, component.preload ? " preloaded" : " didn't preload")
-    }
-  }
 })
 
 // they are defined in a function like this for the testing harness
