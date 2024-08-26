@@ -70,6 +70,8 @@ const init_local = {
   possibleConditions: {},
   seqtimeline: [],
   routes: [],
+  conditions: {}, // tracking conditions both locally and remotely
+  randomizedRoutes: {},  // tracking randomized route assignments both locally and remotely
 }
 
 const init_global = {
@@ -120,6 +122,7 @@ export default defineStore('smilestore', {
       withdrawn: false, // false
       route_order: [],
       conditions: {},
+      randomized_routes: {},
       smile_config: removeFirestore(appconfig), //  adding config info to firebase document
       study_data: [],
     },
@@ -141,12 +144,23 @@ export default defineStore('smilestore', {
     getSeedID: (state) => state.local.seedID,
     getLocal: (state) => state.local,
     getPage: (state) => state.local.pageTracker,
-    getConditions: (state) => state.data.conditions,
+    getConditions: (state) => state.local.conditions,
+    getRandomizedRoutes:  (state) => state.local.randomizedRoutes,
     verifiedVisibility: (state) => state.data.verified_visibility,
   },
 
   actions: {
+    manualSyncLocalToData() {
+      // sync conditions to remote
+      const log = useLog()
+      log.debug('SMILESTORE: syncing conditions, randomized routes to remote');
+      this.data.conditions = this.local.conditions;
+      this.data.randomized_routes = this.local.randomizedRoutes;
+    },
     setDBConnected() {
+      if (this.global.db_connected === false) {
+        this.manualSyncLocalToData();
+      }
       this.global.db_connected = true
     },
     setSearchParams(search_params) {
@@ -296,7 +310,16 @@ export default defineStore('smilestore', {
       this.data.verified_visibility = value
     },
     setCondition(name, cond) {
-      this.data.conditions[name] = cond
+      this.local.conditions[name] = cond
+      if (this.isDBConnected) {
+        this.data.conditions[name] = cond
+      }
+    },
+    setRandomizedRoute(name, route) {
+      this.local.randomizedRoutes[name] = route
+      if (this.isDBConnected) {
+        this.data.randomized_routes[name] = route
+      }
     },
     async setKnown() {
       const log = useLog()
@@ -372,7 +395,10 @@ export default defineStore('smilestore', {
       this.$reset()
     },
     getConditionByName(name) {
-      return this.data.conditions[name]
+      return this.local.conditions[name]
+    },
+    getRandomizedRouteByName(name) {
+      return this.local.randomizedRoutes[name]
     },
   },
 })

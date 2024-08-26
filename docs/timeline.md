@@ -213,13 +213,14 @@ the sequence. The second call will make it the second route in the sequence and
 so forth. The format of `route_obj` is what
 [VueRouter](https://router.vuejs.org/) allows.
 
-### `timeline.pushView(route_obj)`
+### `timeline.registerView(route_obj)`
 
-This pushes a new route (specified in `route_obj`) into a nonsequential
+This registers a new route (specified in `route_obj`) into a nonsequential
 timeline. This route will exist in the Vue router but will not be in the
 timeline sequence. This is useful for configuration and debugging routes as well
 as routes you want to define and even link to but not present in the regular
-timeline flow.
+timeline flow. The notation `registerView`, as opposed to the `push...` methods,
+is meant to indicate that the route is not part of the sequence. 
 
 ### `timeline.build()`
 
@@ -260,7 +261,7 @@ timeline.pushSeqView({
 })
 
 // a non sequential route available for debugging
-timeline.pushView({
+timeline.registerView({
   path: '/config',
   name: 'config',
   component: ConfigComponent,
@@ -367,13 +368,13 @@ timeline.pushSeqView({
 const randTimeline = new RandomSubTimeline()
 
 // push tasks into sub-timeline as "non-sequential" routes
-randTimeline.pushView({
+randTimeline.registerView({
   path: '/task1',
   name: 'task1',
   component: Task1,
 })
 
-randTimeline.pushView({
+randTimeline.registerView({
   path: '/task2',
   name: 'task2',
   component: Task2,
@@ -396,7 +397,7 @@ timeline.build()
 export default timeline
 ```
 
-Note that all sub-timelines routes are added with the `pushView` method, not the
+Note that all sub-timelines routes are added with the `registerView` method, not the
 `pushSeqView` method. There is no `pushSeqView` method for randomized
 sub-timelines.
 

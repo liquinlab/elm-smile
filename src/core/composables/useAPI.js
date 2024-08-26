@@ -158,32 +158,37 @@ export default function useAPI() {
       smilestore.saveTrialData(data)
       log.debug('SMILE API: data ', smilestore.data.study_data)
     },
-    randomAssignCondition(conditionobject){
+    randomAssignCondition(conditionObject) {
       // get conditionobject keys
-      const keys = Object.keys(conditionobject)
-      
-      // split up keys: does it include 'weights'?
-      const hasweights = keys.includes('weights')
+      const keys = Object.keys(conditionObject)
 
-      // get the rest of the keys
-      const conditionname = keys.filter(key => key !== 'weights')
+      // Try to find the condition name
+      const conditionNames = keys.filter(key => key !== 'weights')
       let randomCondition;
-      let weights = undefined;
 
       // if condition name is longer than one element, error
-      if (conditionname.length > 1) {
+      if (conditionNames.length > 1) {
         log.error('SMILE API: randomAssignCondition() only accepts one condition name at a time')
         return;
       } 
       
-      const name = conditionname[0];
+      const name = conditionNames[0];
       const currentCondition = smilestore.getConditionByName(name);
+      if (currentCondition) {
+        log.debug('SMILE API: condition already assigned', name, currentCondition)
+        return currentCondition;
+      }
 
-      const possibleConditions = conditionobject[name]
+      // if we haven't assigned the condition name, set the possible condition values
+      const possibleConditions = conditionObject[name]
       smilestore.local.possibleConditions[name] = possibleConditions
       
-      if (hasweights) { // if weights are provided
-        weights = conditionobject['weights']
+      // Check if we're doing weighted or unweighted randomization
+      const hasWeights = keys.includes('weights')
+      let weights = undefined;
+
+      if (hasWeights) { // if weights are provided
+        weights = conditionObject['weights']
         // make sure weights is the same length as the condition possibilities
         if (weights.length !== possibleConditions.length) {
           log.error('SMILE API: randomAssignCondition() weights must be the same length as the condition possibilities')
@@ -195,9 +200,10 @@ export default function useAPI() {
 
       // set the condition in the store
       smilestore.setCondition(name, randomCondition)
-      log.log('SMILE API: assigned condition', name, randomCondition)
+      log.debug('SMILE API: assigned condition', name, randomCondition)
       
-
+      // Returning to allow immediate use if assigned
+      return randomCondition;
     },
     preloadAllImages: () => {
       log.debug('Preloading images')

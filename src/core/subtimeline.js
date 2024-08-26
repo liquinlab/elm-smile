@@ -24,7 +24,7 @@ class RandomSubTimeline {
     this.routes.push(route)
   }
 
-  pushView(routeConfig) {
+  registerView(routeConfig) {
     const newroute = _.cloneDeep(routeConfig)
     // should NOT allow meta next/prev to exist
     if (!newroute.meta) {

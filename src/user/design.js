@@ -41,6 +41,12 @@ const api = useAPI()
 import Timeline from '@/core/timeline'
 const timeline = new Timeline()
 
+import useSmileStore from '@/core/stores/smilestore'
+const smilestore = useSmileStore()
+
+console.log('Logging smilestore')
+console.log(smilestore.getLocal)
+
 // #4. Add between-subjects condition assignment
 // This is where you can define conditions to which each participant should be assigned
 
@@ -50,6 +56,10 @@ const timeline = new Timeline()
 
 api.randomAssignCondition({
   taskOrder: ['AB', 'BA'],
+})
+
+api.randomAssignCondition({
+  variation: ['alpha', 'beta'],
 })
 
 // you can also optionally set randomization weights for each condition. For
@@ -104,7 +114,7 @@ timeline.pushSeqView({
 })
 
 // this is a the special page that loads in the iframe on mturk.com
-timeline.pushView({
+timeline.registerView({
   path: '/mturk',
   name: 'mturk',
   component: MTurk,
@@ -173,34 +183,63 @@ timeline.pushSeqView({
 
 
 // initially pushed as non-sequential routes, to tell the timeline they exist
-timeline.pushView({
-  path: '/task1',
+timeline.registerView({
   name: 'task1',
   component: Task1,
 })
 
-timeline.pushView({
-  path: '/task2',
+timeline.registerView({
   name: 'task2',
   component: Task2,
 })
 
-// timeline.pushRandomizedNode({
-//   name: 'TrueRandom',
-//   options: [
-//     ['task1', 'task2'],
-//     ['task2', 'task1']
-//   ]
-// });
+timeline.registerView({
+  name: 'task3',
+  component: Task1,
+})
+
+timeline.registerView({
+  name: 'task4',
+  component: Task2,
+})
+
+timeline.registerView({
+  name: 'task5',
+  component: Task1,
+})
+
+timeline.registerView({
+  name: 'task6',
+  component: Task2,
+})
+
+
+timeline.registerRandomizedNode({
+  name: 'TrueRandom',
+  options: [
+    ['task5', 'task6'],
+    ['task6', 'task5']
+  ]
+});
+
+timeline.registerConditionalNode({
+  name: 'InnerConditionalRandom',
+  variation: {
+    alpha: ['task3', 'TrueRandom'],
+    beta: ['task4', 'TrueRandom'],
+  },
+});
+
 
 timeline.pushConditionalNode({
   name: 'ConditionalRandom',
   taskOrder: {
-    AB: ['task1', 'task2'],
-    BA: ['task2', 'task1'],
+    AB: ['task1', 'task2', 'InnerConditionalRandom'],
+    BA: ['task2', 'task1', 'InnerConditionalRandom'],
+    // AB: ['task1', 'task2'],
+    // BA: ['task2', 'task1'],
   },
 });
-
 
 
 // stroop exp
@@ -233,7 +272,7 @@ timeline.pushSeqView({
 })
 
 // this is a special page that is for a withdraw
-timeline.pushView({
+timeline.registerView({
   path: '/withdraw',
   name: 'withdraw',
   meta: { requiresWithdraw: true },

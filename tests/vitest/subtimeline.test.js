@@ -44,7 +44,7 @@ describe('Subtimeline tests', () => {
   it('should add a route to subtimeline', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const subtimeline = new RandomSubTimeline()
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/',
       name: 'index',
       component: MockComponent,
@@ -55,7 +55,7 @@ describe('Subtimeline tests', () => {
   it('should leave next and prev undefined but meta defined', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const subtimeline = new RandomSubTimeline()
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/',
       name: 'index',
       component: MockComponent,
@@ -70,7 +70,7 @@ describe('Subtimeline tests', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const subtimeline = new RandomSubTimeline()
     const errorTrigger = () => {
-      subtimeline.pushView({
+      subtimeline.registerView({
         path: '/',
         name: 'index',
         component: MockComponent,
@@ -83,14 +83,14 @@ describe('Subtimeline tests', () => {
   it('should not allow the same route to be registered twice', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const subtimeline = new RandomSubTimeline()
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/thanks',
       name: 'thank',
       component: MockComponent,
     })
 
     const errorTrigger = () => {
-      subtimeline.pushView({
+      subtimeline.registerView({
         path: '/thanks',
         name: 'thanks',
         component: MockComponent,
@@ -105,12 +105,12 @@ describe('Subtimeline tests', () => {
     const MockComponent2 = { template: '<div>Mock Component</div>' }
     const subtimeline1 = new RandomSubTimeline()
     const subtimeline2 = new RandomSubTimeline()
-    subtimeline1.pushView({
+    subtimeline1.registerView({
       path: '/first',
       name: 'first',
       component: MockComponent1,
     })
-    subtimeline2.pushView({
+    subtimeline2.registerView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent2,
@@ -134,12 +134,12 @@ describe('Subtimeline tests', () => {
       name: 'first',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid2',
       name: 'mid2',
       component: MockComponent,
@@ -179,12 +179,12 @@ describe('Subtimeline tests', () => {
       name: 'first',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid2',
       name: 'mid2',
       component: MockComponent,
@@ -233,12 +233,12 @@ describe('Subtimeline tests', () => {
       name: 'first',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid2',
       name: 'mid2',
       component: MockComponent,
@@ -276,12 +276,12 @@ describe('Subtimeline tests', () => {
       name: 'first',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid2',
       name: 'mid2',
       component: MockComponent,
@@ -332,12 +332,12 @@ describe('Subtimeline tests', () => {
       name: 'first',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid2',
       name: 'mid2',
       component: MockComponent,
@@ -392,12 +392,12 @@ describe('Subtimeline tests', () => {
       name: 'first',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid2',
       name: 'mid2',
       component: MockComponent,

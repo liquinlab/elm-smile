@@ -37,7 +37,7 @@ describe('Timeline tests', () => {
   it('should add a nonsequential route', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const timeline = new Timeline()
-    timeline.pushView({
+    timeline.registerView({
       path: '/',
       name: 'index',
       component: MockComponent,
@@ -102,7 +102,7 @@ describe('Timeline tests', () => {
     const timeline = new Timeline()
 
     const errorTrigger = () => {
-      timeline.pushView({
+      timeline.registerView({
         path: '/',
         name: 'index',
         component: MockComponent,
@@ -121,7 +121,7 @@ describe('Timeline tests', () => {
       name: 'one',
       component: MockComponentOne,
     })
-    timeline.pushView({
+    timeline.registerView({
       path: '/two',
       name: 'two',
       component: MockComponentTwo,
@@ -154,13 +154,13 @@ describe('Timeline tests', () => {
   it('should not allow the same non-sequential route to be registered twice', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const timeline = new Timeline()
-    timeline.pushView({
+    timeline.registerView({
       path: '/thanks',
       name: 'thank',
       component: MockComponent,
     })
     const errorTrigger = () => {
-      timeline.pushView({
+      timeline.registerView({
         path: '/thanks',
         name: 'thanks',
         component: MockComponent,
@@ -180,7 +180,7 @@ describe('Timeline tests', () => {
       component: MockComponent,
     })
     const errorTrigger = () => {
-      timeline.pushView({
+      timeline.registerView({
         path: '/thanks',
         name: 'thanks',
         component: MockComponent,
@@ -200,7 +200,7 @@ describe('Timeline tests', () => {
       name: 'first',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
@@ -221,7 +221,7 @@ describe('Timeline tests', () => {
       name: 'first',
       component: MockComponent,
     })
-    timeline2.pushView({
+    timeline2.registerView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
@@ -243,7 +243,7 @@ describe('Timeline tests', () => {
       name: 'thank',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/thanks',
       name: 'thanks',
       component: MockComponent,
@@ -267,12 +267,12 @@ describe('Timeline tests', () => {
       name: 'first',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid2',
       name: 'mid2',
       component: MockComponent,
@@ -312,12 +312,12 @@ describe('Timeline tests', () => {
       name: 'first',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
     })
-    subtimeline.pushView({
+    subtimeline.registerView({
       path: '/mid2',
       name: 'mid2',
       component: MockComponent,
@@ -432,7 +432,7 @@ describe('Timeline tests', () => {
       meta: { next: 'two' },
     })
     // both flow into node two
-    timeline.pushView({
+    timeline.registerView({
       // this has not implicit successor
       path: '/two',
       name: 'two',
@@ -451,7 +451,7 @@ describe('Timeline tests', () => {
       component: MockComponent,
       meta: { next: 'one' },
     })
-    timeline.pushView({
+    timeline.registerView({
       // this has no implicit successor
       path: '/five',
       name: 'five',
@@ -469,7 +469,7 @@ describe('Timeline tests', () => {
       name: 'seven',
       component: MockComponent,
     })
-    timeline.pushView({
+    timeline.registerView({
       // this has no implicit successor
       path: '/eight',
       name: 'eight',
