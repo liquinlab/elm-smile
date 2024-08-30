@@ -14,7 +14,7 @@ import {
 import sizeof from 'firestore-size'
 
 import useLog from '@/core/stores/log'
-import { timeline } from 'motion'
+
 
 function initLastRoute(mode) {
   if (mode === 'development') {
@@ -193,6 +193,12 @@ export default defineStore('smilestore', {
       this.local.seedID = seed
       this.data.seedID = seed
       this.local.seedSet = true
+
+      // After setting a seed we should clear out randomized settings
+      this.local.conditions = {}
+      this.local.randomizedRoutes = {}
+      this.data.conditions = {}
+      this.data.randomized_routes = {}
     },
     registerPageTracker(page) {
       const log = useLog()

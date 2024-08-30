@@ -2,6 +2,8 @@
 import { ref, reactive, watch } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
+import { useRouter } from 'vue-router';
+const router = useRouter()
 import useSmileStore from '@/core/stores/smilestore'
 const smilestore = useSmileStore() // load the global store
 const seed = ref(smilestore.getSeedID)
@@ -26,6 +28,8 @@ function randomize_seed() {
   //seed = smilestore.randomizeSeed()
   api.debug('Setting seed to ', seed.value)
   smilestore.setSeedID(seed.value)
+  // Force a reload to resample conditions and variables
+  router.go(0);
 }
 
 // define selected condition in toolbar from current conditions
@@ -36,6 +40,8 @@ const selected = smilestore.getConditions
 function changeCond(key, event) {
   const cond = event.target.value 
   smilestore.setCondition(key, cond)
+  // Force a reload to resample conditions and variables
+  router.go(0);
 }
 
 // when condition is set in the data, update the toolbar conditions

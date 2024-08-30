@@ -169,10 +169,10 @@ export default function useAPI() {
       // if condition name is longer than one element, error
       if (conditionNames.length > 1) {
         log.error('SMILE API: randomAssignCondition() only accepts one condition name at a time')
-        return;
+        return null;
       } 
       
-      const name = conditionNames[0];
+      const [name] = conditionNames;
       const currentCondition = smilestore.getConditionByName(name);
       if (currentCondition) {
         log.debug('SMILE API: condition already assigned', name, currentCondition)
@@ -185,14 +185,14 @@ export default function useAPI() {
       
       // Check if we're doing weighted or unweighted randomization
       const hasWeights = keys.includes('weights')
-      let weights = undefined;
+      let weights;
 
       if (hasWeights) { // if weights are provided
-        weights = conditionObject['weights']
+        weights = conditionObject.weights
         // make sure weights is the same length as the condition possibilities
         if (weights.length !== possibleConditions.length) {
           log.error('SMILE API: randomAssignCondition() weights must be the same length as the condition possibilities')
-          return;
+          return null;
         }
       } 
       // get random condition from conditionobject[name]
