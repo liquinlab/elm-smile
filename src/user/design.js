@@ -100,42 +100,8 @@ timeline.pushSeqView({
   name: 'consent',
   component: Consent,
   meta: {
-    requiresConsent: false,
-    preload: async () => {
-      // can you figure that out yourself
-      console.log('PRELOADING DATA from AdvertisementPage.preload.js')
-      let data = await import('@/builtins/advertisement/AdvertisementView.preload.js')
-      console.log('DATA LOADED', data.default)
-    },
+    requiresConsent: false
   },
-})
-
-// demographic survey
-timeline.pushSeqView({
-  path: '/demograph',
-  name: 'demograph',
-  component: DemographicSurvey,
-})
-
-// windowsizer
-timeline.pushSeqView({
-  path: '/windowsizer',
-  name: 'windowsizer',
-  component: WindowSizer,
-})
-
-// captcha
-timeline.pushSeqView({
-  path: '/captcha',
-  name: 'captcha',
-  component: Captcha,
-})
-
-// instructions
-timeline.pushSeqView({
-  path: '/instructions',
-  name: 'instructions',
-  component: Instructions,
 })
 
 // main experiment
