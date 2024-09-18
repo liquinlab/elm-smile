@@ -4,7 +4,6 @@ import useSmileStore from '@/core/stores/smilestore'
 const smilestore = useSmileStore()
 import useLog from '@/core/stores/log'
 const log = useLog()
-import RandomSubTimeline from '@/core/subtimeline'
 import RecruitmentChooser from '@/dev/developer_mode/RecruitmentChooserView.vue'
 import PresentationMode from '@/dev/presentation_mode/PresentationModeView.vue'
 
@@ -369,9 +368,6 @@ class Timeline {
           class: 'node',
           shape: 'circle',
         })
-        if (!(this.seqtimeline[i].meta.next instanceof RandomSubTimeline) && this.seqtimeline[i].meta.next !== null) {
-          this.g.setEdge(this.seqtimeline[i].name, this.seqtimeline[i].meta.next)
-        }
       }
     }
   }

@@ -12,7 +12,6 @@
 // Preloading: https://smile.gureckislab.org/imagesvideo.html#preloading
 
 import { processQuery } from '@/core/utils'
-import RandomSubTimeline from '@/core/subtimeline'
 
 // 1. Import main built-in View components
 import Advertisement from '@/builtins/advertisement/AdvertisementView.vue'
