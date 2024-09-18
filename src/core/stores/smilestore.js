@@ -190,6 +190,10 @@ export default defineStore('smilestore', {
       this.local.completionCode = code
     },
     setSeedID(seed) {
+      if (seed === this.local.seedID) {
+        console.debug('SMILESTORE: seed already set to', seed);
+        return
+      }
       this.local.seedID = seed
       this.data.seedID = seed
       this.local.seedSet = true
