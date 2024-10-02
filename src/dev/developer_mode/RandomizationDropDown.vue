@@ -100,7 +100,7 @@ watch(
                       type="checkbox"
                       name="switchRoundedDefault"
                       class="switch is-rounded is-rtl is-small"
-                      v-model="smilestore.local.seedActive"
+                      v-model="smilestore.local.useSeed"
                     />
                     <label for="switchRoundedDefault"></label>
                   </div>

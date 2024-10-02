@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 import axios from 'axios'
 import appconfig from '@/core/config'
+import { v4 as uuidv4 } from 'uuid'
+import seedrandom from 'seedrandom'
 
 import {
   createDoc,
@@ -15,6 +17,54 @@ import sizeof from 'firestore-size'
 
 import useLog from '@/core/stores/log'
 
+
+////////////  SET THE SEED FOR RANDOMIZATION //////////
+
+// note: we only need to run this on page load (not every time smilestore.js is imported in another file)
+// it seems like it doesn't re-run when we move to a new component that imports smilestore, 
+// so it's doing what we want apparently
+
+
+
+// get local storage
+const existingLocalStorage = JSON.parse(localStorage.getItem(appconfig.local_storage_key))
+console.log(existingLocalStorage)
+
+let seed
+// if there is no local storage, then definitely have to set seed
+if (!existingLocalStorage) {
+  seed = uuidv4()
+} else {
+  // if there is local storage, check if we have seed usage turned on
+  if (existingLocalStorage.useSeed) {
+    // does seed already exist?
+    const seedSet = existingLocalStorage.seedSet
+    if (seedSet) {
+      // if seed already exists, get seedID
+      seed = existingLocalStorage.seedID
+    } else {
+      // if seed is not set, generate a new seed
+      seed = uuidv4()
+    }
+  } else {
+    // if seed usage is turned off, don't set seed
+    seed = null
+  }
+}
+
+// if seed is not null
+if (seed) {
+  // set the seed
+  seedrandom(seed, { global: true })
+  console.log('Set global seed to ' + seed)
+
+  // save to local storage
+  localStorage.setItem(appconfig.local_storage_key, JSON.stringify({ ...existingLocalStorage, seedID: seed, seedSet: true }))
+}
+
+
+
+/////// continue with setting up smilestore ///////
 
 function initLastRoute(mode) {
   if (mode === 'development') {
@@ -63,7 +113,7 @@ const init_local = {
   totalWrites: 0,
   lastWrite: null,
   approx_data_size: 0,
-  seedActive: true, // do you want to use a random seed based on the participant's ID?
+  useSeed: false, // do you want to use a random seed based on the participant's ID?
   seedID: '',
   seedSet: false,
   pageTracker: {},

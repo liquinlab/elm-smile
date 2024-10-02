@@ -1,7 +1,8 @@
 import _ from 'lodash'
 import * as dagre from '@dagrejs/dagre'
+import { pinia } from '@/core/createpinia'
 import useSmileStore from '@/core/stores/smilestore'
-const smilestore = useSmileStore()
+const smilestore = useSmileStore(pinia)
 import useLog from '@/core/stores/log'
 const log = useLog()
 import RecruitmentChooser from '@/dev/developer_mode/RecruitmentChooserView.vue'

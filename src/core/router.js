@@ -1,5 +1,3 @@
-// import { ref } from 'vue'
-import '@/core/seed'
 import seedrandom from 'seedrandom'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { v4 as uuidv4 } from 'uuid'
@@ -9,6 +7,7 @@ import timeline from '@/user/design'
 
 import useLog from '@/core/stores/log'
 const log = useLog()
+
 // 3. add navigation guards
 //    currently these check if user is known
 //    and if they are, they redirect to last route
@@ -237,18 +236,18 @@ log.log('Vue Router initialized')
 // add additional guard to set global seed before
 router.beforeResolve((to) => {
   const smilestore = useSmileStore()
-  if (smilestore.local.seedActive) {
+  if (smilestore.local.useSeed) { // if we're using a seed
     const seedID = smilestore.getSeedID
     const seed = `${seedID}-${to.name}`
     seedrandom(seed, { global: true })
     log.log('ROUTER GUARD: Seed set to ' + seed)
   } else {
-    // if inactive, generate a random string then re-seed
+    // if inactive, just re-seed with a random seed on every route entry
     const newseed = uuidv4()
     seedrandom(newseed, {
       global: true,
     })
-    log.log('ROUTER GUARD: Seed set to ' + newseed)
+    log.log('ROUTER GUARD: Not using participant-specific seed; seed set randomly to ' + newseed)
   }
   log.clear_page_history()
   smilestore.dev.page_provides_trial_stepper = false // by default
