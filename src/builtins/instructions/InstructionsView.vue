@@ -3,20 +3,19 @@ import { computed } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
-console.log(api.getConditionByName('instructionsVersion'))
-console.log(api.data.conditions.instructionsVersion)
+const cond = api.getConditionByName('instructionsVersion')
 
 // computed property based on condition in data
 const instText = computed(() => {
   // how do you know that instructions will exist because it
   // starts off empty?
-  if (api.data.conditions.instructionsVersion === "1") {
+  if (cond === "1") {
     return 'instructions version 1'
   }
-  if (api.data.conditions.instructionsVersion === "2") {
+  if (cond === "2") {
     return 'instructions version 2'
   }
-  if (api.data.conditions.instructionsVersion === "3") {
+  if (cond === "3") {
     return 'instructions version 3'
   }
   return 'no condition set'
