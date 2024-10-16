@@ -160,12 +160,12 @@ timeline.pushSeqView({
 //   component: Captcha,
 // })
 
-// // instructions
-// timeline.pushSeqView({
-//   path: '/instructions',
-//   name: 'instructions',
-//   component: Instructions,
-// })
+// instructions
+timeline.pushSeqView({
+  path: '/instructions',
+  name: 'instructions',
+  component: Instructions,
+})
 
 // // main experiment
 // timeline.pushSeqView({
@@ -181,7 +181,7 @@ timeline.pushSeqView({
 // })
 
 
-// initially pushed as non-sequential routes, to tell the timeline they exist
+// routes must be initially registered, to tell the timeline they exist
 timeline.registerView({
   name: 'task1',
   component: Task1,

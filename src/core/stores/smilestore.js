@@ -113,7 +113,7 @@ const init_local = {
   totalWrites: 0,
   lastWrite: null,
   approx_data_size: 0,
-  useSeed: false, // do you want to use a random seed based on the participant's ID?
+  useSeed: true, // do you want to use a random seed based on the participant's ID?
   seedID: '',
   seedSet: false,
   pageTracker: {},
@@ -371,15 +371,11 @@ export default defineStore('smilestore', {
     },
     setCondition(name, cond) {
       this.local.conditions[name] = cond
-      if (this.isDBConnected) {
-        this.data.conditions[name] = cond
-      }
+      this.data.conditions[name] = cond
     },
     setRandomizedRoute(name, route) {
       this.local.randomizedRoutes[name] = route
-      if (this.isDBConnected) {
-        this.data.randomized_routes[name] = route
-      }
+      this.data.randomized_routes[name] = route
     },
     async setKnown() {
       const log = useLog()

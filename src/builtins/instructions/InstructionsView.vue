@@ -3,6 +3,9 @@ import { computed } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
+console.log(api.getConditionByName('instructionsVersion'))
+console.log(api.data.conditions.instructionsVersion)
+
 // computed property based on condition in data
 const instText = computed(() => {
   // how do you know that instructions will exist because it
