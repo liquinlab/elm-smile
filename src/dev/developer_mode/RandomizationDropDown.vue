@@ -42,7 +42,6 @@ function changeCond(key, event) {
   smilestore.setCondition(key, cond)
   // Force a reload to resample conditions and variables
   router.go(0);
-    // this works for re randomizing routes, but breaks within-page randomization
 }
 
 // when condition is set in the data, update the toolbar conditions
