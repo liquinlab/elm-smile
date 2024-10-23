@@ -206,6 +206,7 @@ export default defineStore('smilestore', {
       log.debug('SMILESTORE: syncing conditions, randomized routes to remote');
       this.data.conditions = this.local.conditions;
       this.data.randomized_routes = this.local.randomizedRoutes;
+      this.data.seedID = this.local.seedID;
     },
     setDBConnected() {
       if (this.global.db_connected === false) {
