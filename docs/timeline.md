@@ -1,8 +1,8 @@
 # :twisted_rightwards_arrows: Timeline and Design
 
 Web experiments are often composed of several parts presented in sequence. For
-example, first, we might show a welcome page &rarr; informed consent
-&rarr;instructions &rarr; etc... <SmileText /> provides a central "sequencing"
+example, we might show a welcome page &rarr; informed consent
+&rarr; instructions &rarr; etc. <SmileText /> provides a central "sequencing"
 or timeline feature which makes it easy to configure, customize, and move
 through different stages of an experiment.
 
@@ -31,9 +31,7 @@ of this file which is short, self-explanatory, and well commented.
 
 The design file sets up the sequence of [Views](/views) that the participant
 will encounter, and can configure randomized branching if needed to create
-different experimental conditions. It also is where you configure
-[preloading](/imagesvideo#preloading) of content and other project-specific
-features. **It is very likely you will need to edit this file to create your
+different experimental conditions. **It is very likely you will need to edit this file to create your
 experiment**!
 
 The following sections of this page describe the technical details of the
@@ -41,8 +39,8 @@ Timeline object and how to configure your design file.
 
 ## Single-page Applications and Routing
 
-Modern apps such as <SmileText/> are known as **Single-page Applications
-(SPAs)**. These apps load a single HTML page and then use a Javascript framework
+Moany modern apps such as <SmileText/> are what are known as **Single-page Applications
+(SPAs)**. Rather than having content spread across multiple HTML pages, these apps load a single HTML page and then use a Javascript framework
 to control the dynamic interactions of the page including showing and hiding
 different elements, handling events like clicks, loading data to or from a
 server, etc... However, it is often useful to be able to directly access
@@ -54,7 +52,7 @@ Because SPAs load the entire app from a single URL, the solution to this for
 SPAs is known as a **router**. A router is a piece of software running in the
 browser which interprets URL requests and programmatically changes the visible
 content on the webpage, mimicking normal browser requests for specific pages. In
-Smile, routing is handled by the [Vue Router](https://router.vuejs.org) which is
+<SmileText/>, routing is handled by the [Vue Router](https://router.vuejs.org) which is
 a powerful open-source project built for routing in [Vue](https://vuejs.org)
 applications.
 
@@ -91,7 +89,7 @@ this code snippet, `/` on the server is mapped to the `Welcome` component and
 You can read this as saying "When the user requests the `/` URL on this
 application, display the `Welcome` component". Specifically, it renders the
 template of your component in your app in place of where the `<router-view>` tag
-appears. In Smile, that tag appears in `src/App.vue` which is the starting
+appears. In Smile, that tag appears in `src/core/App.vue` which is the starting
 component for the application.
 
 ## URLs and Routes
@@ -153,7 +151,7 @@ for routes that are not part of a sequence:
 
 <img src="/images/timeline.png" width="500" alt="timeline example" style="margin: auto;">
 
-Sequential routes are accessed in a chain/timeline. Non-sequential ruotes are
+Sequential routes are accessed in a timeline. Non-sequential routes are
 not part of that timeline.
 
 ### The route object
@@ -199,7 +197,7 @@ The `meta` field specifies additional optional information about the route:
 A timeline is created like this:
 
 ```js
-import { Timeline } from '@/timeline' // @ resolves to /src in Smile
+import Timeline  from '@/core/timeline' // note that the '@' resolves to /src in Smile
 const timeline = new Timeline()
 ```
 
@@ -215,8 +213,7 @@ so forth. The format of `route_obj` is what
 
 ### `timeline.registerView(route_obj)`
 
-This registers a new route (specified in `route_obj`) into a nonsequential
-timeline. This route will exist in the Vue router but will not be in the
+This registers a new route (specified in `route_obj`) without adding it to the timeline. This route will exist in the Vue router but will not be in the
 timeline sequence. This is useful for configuration and debugging routes as well
 as routes you want to define and even link to but not present in the regular
 timeline flow. The notation `registerView`, as opposed to the `push...` methods,
@@ -236,7 +233,7 @@ Here is an example configuring three sequential routes and one non-sequential
 route:
 
 ```js
-import { Timeline } from '@/timeline' // @ resolves to /src in Smile
+import Timeline from '@/core/timeline'
 const timeline = new Timeline()
 
 // first route
@@ -260,7 +257,7 @@ timeline.pushSeqView({
   component: ThanksComponent,
 })
 
-// a non sequential route available for debugging
+// a non-sequential route available for debugging
 timeline.registerView({
   path: '/config',
   name: 'config',
@@ -335,21 +332,21 @@ The `timeline.build()` method steps through all nodes pushed using
 the previous route. If this is not what you want (because your routes need more
 complex flows) you can simply omit the `build` step.
 
-### Randomized flows and branching
+### Alternative flows and branching
 
 Sometimes you want to randomize the order or presentation of routes. For
 example, your experiment might have two tasks, which are presented in a
 randomized order. Or, you might have four tasks, and you want one group of
 participants to see two of the tasks and the other group to see the other two
-tasks. We call these "randomized flows":
+tasks. We call these "alternative flows":
 
-<img src="/images/randomizedflows.png" width="500" alt="timeline example" style="margin: auto;">
+<!-- <img src="/images/randomizedflows.png" width="500" alt="timeline example" style="margin: auto;"> -->
 
-These randomized flows can be accomplished by creating a <b>randomized
-sub-timeline</b>.
+These alternative flows can be accomplished by adding <b>nodes</b>, which you can think of as containing several paths of views and guiding participants along one of those paths. There are two types of nodes: <i>randomized</i> and <i>conditional</i>. 
 
-Let's say you want two tasks to be presented in a random order, following a
-route called `/exp`. After the two tasks, you want to show the debrief route.
+#### Randomized nodes
+
+Let's say you want participants to see a page of instructions and then complete two tasks, which should be presented in a random order across participants. After the two tasks, you want to show the debrief route.
 Here's what your `src/design.js` file might look like:
 
 ```js
@@ -357,17 +354,14 @@ import RandomSubTimeline from '@/core/subtimeline'
 import Timeline from '@/core/timeline'
 const timeline = new Timeline()
 
-// exp route
+// push instructions
 timeline.pushSeqView({
-  path: '/exp',
-  name: 'exp',
-  component: Exp,
+  path: '/instructions',
+  name: 'instructions',
+  component: Instructions,
 })
 
-// create randomized sub-timeline
-const randTimeline = new RandomSubTimeline()
-
-// push tasks into sub-timeline as "non-sequential" routes
+// register tasks
 randTimeline.registerView({
   path: '/task1',
   name: 'task1',
@@ -380,12 +374,16 @@ randTimeline.registerView({
   component: Task2,
 })
 
-// push sub-timeline itself into main timeline
-timeline.pushRandomizedTimeline({
-  name: randTimeline,
+// push randomized node with the two orderings
+timeline.pushRandomizedNode({
+  name: 'randomOrder',
+  options: [
+    ['task1', 'task2'],
+    ['task2', 'task1']
+  ]
 })
 
-// debriefing form
+// push debriefing form
 timeline.pushSeqView({
   path: '/debrief',
   name: 'debrief',
@@ -393,78 +391,130 @@ timeline.pushSeqView({
 })
 
 timeline.build()
-
-export default timeline
 ```
 
-Note that all sub-timelines routes are added with the `registerView` method, not the
-`pushSeqView` method. There is no `pushSeqView` method for randomized
-sub-timelines.
+Note that the views that make up the node are <i>registered</i> (added with the `registerView` method), not <i>pushed</i> (with the
+`pushSeqView` method). The node that contains them <i>is</i> pushed (with the `pushRandomizedNode` method).
 
-The randomized sub-timeline can contain any number of routes. Any routes
-contained in a sub-timeline get added to the main router. Initially, the `next`
-and `prev` meta fields for each sub-timeline route automatically point to the
-routes that come directly before and directly after the sub-timeline. For
-example, in the router above, both task 1 and task 2 will have `next` set to the
-`/debrief` route, and `prev` set to the `/exp` route.
-
-However, these meta fields are changed when the
-[timeline stepper](#timelinestepper)'s `next()` function is used to enter the
-sub-timeline. When the sub-timeline is identified as the next step in the
-timeline (for example, when the next button is pressed on the `/exp` route), the
-sub-timeline's routes are shuffled and the `next` and `prev` meta fields are
-configured accordingly (e.g., the `next` field for task 2 points to task 1, if
-task 2 comes first in the shuffled sub-timeline). This is controlled by the
-function `RandomizeSubTimeline` in `subtimeline.js`, so you can check it out if
-you're curious. Or you can call the function somewhere else directly if you
-don't want to shuffle the randomized sub-timeline using the timeline stepper.
-
-By default, all the routes in the randomized sub-timeline will be shuffled using
-a special random seed set within `RandomizeSubTimeline` (see
-[Randomization](/randomization) for more on seeded random number generation).
-However, you can instead optionally specify several fixed route orders based on
-assigned conditions. For example, if you have two tasks, you might want to
-assign participants to one of two conditions: `task1_first` and `task2_first`.
-You can assign participants to these conditions using the procedure documented
-in [Randomization](/randomization). In the router, you can push the randomized
-sub-timeline to the main timeline like this:
+You can adjust the probabilities of the paths by specifying weights—if you want the first path to be twice as likely as the second path, for example, you could do that like this:
 
 ```js
-timeline.pushRandomizedTimeline({
-  name: randTimeline,
-  meta: {
-    label: 'taskOrder',
-    orders: {
-      task1_first: ['task1', 'task2'],
-      task2_first: ['task2', 'task1'],
-    },
-  },
+timeline.pushRandomizedNode({
+  name: 'randomOrder',
+  options: [
+    ['task1', 'task2'],
+    ['task2', 'task1']
+  ],
+  weights: [2, 1]
 })
 ```
 
-In this case, the timeline stepper will look at the entry in <SmileText />'s
-global store called `conditions`, and will find the value assigned to the
-property called `taskOrder` (where the value is either `task1_first` or
-`task2_first`). Then, rather than shuffling task 1 and task 2 at random, it will
-show them in the order specified by the participant's assigned value.
+Note that the weights are automatically normalized, so [2/3, 1/3] or [4, 2] would generate the same distribution. 
 
-This technique can also be used to show only a subset of the possible tasks to
-each participant. For example, you might specify:
+#### Conditional nodes
+
+The view order can be set by which condition the participant is in. This can be more useful than a simple randomized node if other aspects of the experiment will depend on the condition. Here's an example:
 
 ```js
-timeline.pushRandomizedTimeline({
-  name: randTimeline,
-  meta: {
-    label: 'taskCondition',
-    orders: { task1: ['task1'], task2: ['task2'] },
+import Timeline from '@/core/timeline'
+const timeline = new Timeline()
+
+// assign participants to condition specifying task order
+api.randomAssignCondition({
+  taskOrder: ['AB', 'BA'],
+})
+
+// push instructions
+timeline.pushSeqView({
+  path: '/instructions',
+  name: 'instructions',
+  component: Instructions,
+})
+
+// push tasks into timeline as "non-sequential" routes
+randTimeline.registerView({
+  path: '/taskA',
+  name: 'taskA',
+  component: TaskA,
+})
+
+randTimeline.registerView({
+  path: '/taskB',
+  name: 'taskB',
+  component: TaskB,
+})
+
+timeline.pushConditionalNode({
+  name: 'ConditionalRandom',
+  taskOrder: {
+    AB: ['taskA', 'taskB'],
+    BA: ['taskB', 'taskA'],
   },
 })
+
+timeline.build()
 ```
 
-In this case, the participant will only see task 1 (between the `/exp` and
-`/debrief` routes) if their assigned `taskCondition` is `task1`, and will only
-see task 2 (between the `/exp` and `/debrief` routes) if their assigned
-`taskCondition` is `task2`.
+And to access the value of the condition elsewhere (e.g., in the instructions component), you can do:
+
+```js
+api.getConditionByName(taskOrder)
+```
+
+It's also possible to have nested nodes. In the example below, participants are counterbalanced—half are assigned to taskorder AB vs BA, and half are assigned to see task C vs D afterward:
+
+```js
+import Timeline from '@/core/timeline'
+const timeline = new Timeline()
+
+api.randomAssignCondition({
+  taskOrder: ['AB', 'BA'],
+})
+
+api.randomAssignCondition({
+  variation: ['C', 'D'],
+})
+
+// the tasks (registered)
+timeline.registerView({
+  name: 'taskA',
+  component: TaskA,
+})
+
+timeline.registerView({
+  name: 'taskB',
+  component: TaskB,
+})
+
+timeline.registerView({
+  name: 'taskC',
+  component: TaskC,
+})
+
+timeline.registerView({
+  name: 'taskD',
+  component: TaskD,
+})
+
+timeline.registerConditionalNode({
+  name: 'InnerConditionalRandom',
+  variation: {
+    C: ['taskC'],
+    D: ['taskD'],
+  },
+});
+
+// the outer node (pushed)
+timeline.pushConditionalNode({
+  name: 'ConditionalRandom',
+  taskOrder: {
+    AB: ['taskA', 'taskB', 'InnerConditionalRandom'],
+    BA: ['taskB', 'taskA', 'InnerConditionalRandom'],
+  },
+})
+
+timeline.build()
+```
 
 ## Using the Timeline
 
@@ -545,7 +595,7 @@ might look like this (note the `meta: {allowAlways: true}` on the instructions
 route, to allow to return to it from any place in the timeline):
 
 ```js
-import { Timeline } from '@/timeline' // @ resolves to /src in Smile
+import Timeline from '@/core/timeline'
 const timeline = new Timeline()
 
 timeline.pushSeqView({

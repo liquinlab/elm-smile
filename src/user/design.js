@@ -2,14 +2,12 @@
 // This file configures the overall logic of your experiment.
 // The critical part is the timeline, which is a list of phases
 // the experiment goes through.  This file configues which phase
-// occurs in the sequence.  In addition, this can configure things like
-// preloading images, etc...
+// occurs in the sequence. 
 
 // The key documentation for this file
 // Views: https://smile.gureckislab.org/views.html
 // Timeline: https://smile.gureckislab.org/timeline.html
 // Randomization: https://smile.gureckislab.org/randomization.html
-// Preloading: https://smile.gureckislab.org/imagesvideo.html#preloading
 
 import { processQuery } from '@/core/utils'
 
@@ -49,7 +47,7 @@ console.log(smilestore.getLocal)
 // #4. Add between-subjects condition assignment
 // This is where you can define conditions to which each participant should be assigned
 
-// You can assign conditions by passing a javascript object to api.setConditions(), 
+// You can assign conditions by passing a javascript object to api.randomAssignCondition(), 
 // where the key is the condition name and the value is an array of possible condition values.
 // Each unique condition manipulation should be assigned via a separate call to setConditions.
 
@@ -73,14 +71,14 @@ api.randomAssignCondition({
 // #5. Define and add some routes to the timeline
 // Each route should map to a View component.
 // Each needs a name
-// but for most experiment they go in sequence from begining
+// but for most experiments they go in sequence from the begining
 // to the end of this list
 
-// by default routes have meta.requiresConsent = true (so you need to manually override it)
-// by default routes have meta.requiresDone = false (so you need to manually override it)
+// by default routes have meta.requiresConsent = true (unless you manually override it)
+// by default routes have meta.requiresDone = false (unless you manually override it)
 
 // IMPORTANT: A least one route needs to be called 'welcome_anonymous'
-// to handle the landing case for someone not coming from a recruitment services
+// to handle the landing case for someone not coming from a recruitment service
 
 // First welcome screen for non-referral
 timeline.pushSeqView({
@@ -129,13 +127,7 @@ timeline.pushSeqView({
   name: 'consent',
   component: Consent,
   meta: {
-    requiresConsent: false,
-    preload: async () => {
-      // can you figure that out yourself
-      console.log('PRELOADING DATA from AdvertisementPage.preload.js')
-      let data = await import('@/builtins/advertisement/AdvertisementView.preload.js')
-      console.log('DATA LOADED', data.default)
-    },
+    requiresConsent: false
   },
 })
 
