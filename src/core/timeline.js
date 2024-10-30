@@ -54,7 +54,7 @@ class Timeline {
     const newroute = _.cloneDeep(route)
 
     if (newroute.path == null) {
-      const nameAsPath = `/${newroute.name.toLowerCase().replace(/\s/g, '_')}`;
+      const nameAsPath = `/${encodeURIComponent(newroute.name.toLowerCase().replace(/\s/g, '_'))}`;
       log.debug(`Assigning path by name for route ${newroute.name}: ${nameAsPath}`)
       newroute.path = nameAsPath;
     }
