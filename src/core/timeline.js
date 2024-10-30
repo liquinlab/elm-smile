@@ -50,6 +50,18 @@ class Timeline {
     }
   }
 
+  cloneRouteAndFillDefaults(route) {
+    const newroute = _.cloneDeep(route)
+
+    if (newroute.path == null) {
+      const nameAsPath = `/${newroute.name.toLowerCase().replace(/\s/g, '_')}`;
+      log.debug(`Assigning path by name for route ${newroute.name}: ${nameAsPath}`)
+      newroute.path = nameAsPath;
+    }
+
+    return newroute;
+  }
+
   pushToRoutes(route) {
     // check that an existing route doesn't exist with same
     // path and/or name
@@ -83,7 +95,7 @@ class Timeline {
   }
 
   pushSeqView(routeConfig) {
-    const newroute = _.cloneDeep(routeConfig)
+    const newroute = this.cloneRouteAndFillDefaults(routeConfig)
     if (!newroute.meta) {
       newroute.meta = { next: undefined, prev: undefined } // need to configure it
     } else {
@@ -133,7 +145,7 @@ class Timeline {
   }
 
   registerView(routeConfig) {
-    const newroute = _.cloneDeep(routeConfig)
+    const newroute = this.cloneRouteAndFillDefaults(routeConfig)
     // should NOT allow meta next/prev to exist
     if (!newroute.meta) {
       newroute.meta = { prev: null, next: null, type: 'route' }
@@ -155,11 +167,6 @@ class Timeline {
       newroute.meta.requiresWithdraw = false // default to not require done
     }
 
-    if (newroute.path == null) {
-      log.debug(`Assigning path by name for route ${newroute.name}: /${newroute.name}`)
-      newroute.path = `/${newroute.name}`
-    }
-
     try {
       this.pushToRoutes(newroute)
     } catch (err) {
@@ -173,7 +180,7 @@ class Timeline {
   }
 
   pushRandomizedNode(routeConfig, push = true) {
-    const newroute = _.cloneDeep(routeConfig)
+    const newroute = this.cloneRouteAndFillDefaults(routeConfig)
     // newroute should have name, options, and optional weights
 
     if (!push) {
@@ -268,7 +275,7 @@ class Timeline {
 
   pushConditionalNode(routeConfig, push = true) {
     // newroute should have name and a condition name (user specified, has to match something in data.conditions)
-    const newroute = _.cloneDeep(routeConfig)
+    const newroute = this.cloneRouteAndFillDefaults(routeConfig)
     
     // Check if already registered if not pushing
     if (!push) {
