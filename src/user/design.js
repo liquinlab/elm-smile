@@ -112,7 +112,6 @@ timeline.pushSeqView({
 
 // this is a the special page that loads in the iframe on mturk.com
 timeline.registerView({
-  path: '/mturk',
   name: 'mturk',
   component: MTurk,
   meta: { allowAlways: true, requiresConsent: false },
@@ -123,7 +122,6 @@ timeline.registerView({
 
 // consent
 timeline.pushSeqView({
-  path: '/consent',
   name: 'consent',
   component: Consent,
   meta: {
@@ -131,47 +129,49 @@ timeline.pushSeqView({
   },
 })
 
-// // demographic survey
-// timeline.pushSeqView({
-//   path: '/demograph',
-//   name: 'demograph',
-//   component: DemographicSurvey,
-// })
+// demographic survey
+timeline.pushSeqView({
+  name: 'demograph',
+  component: DemographicSurvey,
+})
 
-// // windowsizer
-// timeline.pushSeqView({
-//   path: '/windowsizer',
-//   name: 'windowsizer',
-//   component: WindowSizer,
-// })
+// windowsizer
+timeline.pushSeqView({
+  name: 'windowsizer',
+  component: WindowSizer,
+})
 
-// // captcha
-// timeline.pushSeqView({
-//   path: '/captcha',
-//   name: 'captcha',
-//   component: Captcha,
-// })
+// captcha
+timeline.pushSeqView({
+  name: 'captcha',
+  component: Captcha,
+})
 
 // instructions
 timeline.pushSeqView({
-  path: '/instructions',
   name: 'instructions',
   component: Instructions,
 })
 
-// // main experiment
-// timeline.pushSeqView({
-//   path: '/exp',
-//   name: 'exp',
-//   component: Exp,
-// })
+// main experiment
+// note: by default, the path will be set to the name of the view
+// however, you can override this by setting the path explicitly
+timeline.pushSeqView({
+  name: 'exp',
+  path: '/experiment',
+  component: Exp,
+})
+
+// instruction jumper
 
 // timeline.pushSeqView({
-//   path: '/instruction_jumper',
 //   name: 'instruction_jumper',
 //   component: InstructionJumperView,
 // })
 
+
+////// example of randomized branching routes
+// (you can also have conditional branching based on conditions -- see docs)
 
 // routes must be initially registered, to tell the timeline they exist
 timeline.registerView({
@@ -184,79 +184,35 @@ timeline.registerView({
   component: Task2,
 })
 
-timeline.registerView({
-  name: 'task3',
-  component: Task1,
-})
-
-timeline.registerView({
-  name: 'task4',
-  component: Task2,
-})
-
-timeline.registerView({
-  name: 'task5',
-  component: Task1,
-})
-
-timeline.registerView({
-  name: 'task6',
-  component: Task2,
-})
-
-
-timeline.registerRandomizedNode({
-  name: 'TrueRandom',
+timeline.pushRandomizedNode({
+  name: 'RandomSplit',
   options: [
-    ['task5', 'task6'],
-    ['task6', 'task5']
+    ['task1'],
+    ['task2']
   ]
-});
-
-timeline.registerConditionalNode({
-  name: 'InnerConditionalRandom',
-  variation: {
-    alpha: ['task3', 'TrueRandom'],
-    beta: ['task4', 'TrueRandom'],
-  },
-});
-
-
-timeline.pushConditionalNode({
-  name: 'ConditionalRandom',
-  taskOrder: {
-    AB: ['task1', 'task2', 'InnerConditionalRandom'],
-    BA: ['task2', 'task1', 'InnerConditionalRandom'],
-    // AB: ['task1', 'task2'],
-    // BA: ['task2', 'task1'],
-  },
 });
 
 
 // stroop exp
-// timeline.pushSeqView({
-//   path: '/stroop',
-//   name: 'stroop',
-//   component: StroopExp,
-// })
+timeline.pushSeqView({
+  name: 'stroop',
+  component: StroopExp,
+})
 
 // debriefing form
 timeline.pushSeqView({
-  path: '/debrief',
   name: 'debrief',
   component: Debrief,
 })
 
 // device survey
 timeline.pushSeqView({
-  path: '/device',
   name: 'device',
   component: DeviceSurvey,
 })
 
 // thanks/submit page
 timeline.pushSeqView({
-  path: '/thanks',
   name: 'thanks',
   component: Thanks,
   meta: { requiresDone: true },
@@ -264,7 +220,6 @@ timeline.pushSeqView({
 
 // this is a special page that is for a withdraw
 timeline.registerView({
-  path: '/withdraw',
   name: 'withdraw',
   meta: { requiresWithdraw: true },
   component: Withdraw,
