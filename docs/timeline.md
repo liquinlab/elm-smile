@@ -1,10 +1,10 @@
 # :twisted_rightwards_arrows: Timeline and Design
 
 Web experiments are often composed of several parts presented in sequence. For
-example, we might show a welcome page &rarr; informed consent
-&rarr; instructions &rarr; etc. <SmileText /> provides a central "sequencing"
-or timeline feature which makes it easy to configure, customize, and move
-through different stages of an experiment.
+example, we might show a welcome page &rarr; informed consent &rarr;
+instructions &rarr; etc. <SmileText /> provides a central "sequencing" or
+timeline feature which makes it easy to configure, customize, and move through
+different stages of an experiment.
 
 The timeline feature is more than just a way to control the presentation order
 of different phases. It also acts as a way to prevent subjects from doing things
@@ -31,17 +31,18 @@ of this file which is short, self-explanatory, and well commented.
 
 The design file sets up the sequence of [Views](/views) that the participant
 will encounter, and can configure randomized branching if needed to create
-different experimental conditions. **It is very likely you will need to edit this file to create your
-experiment**!
+different experimental conditions. **It is very likely you will need to edit
+this file to create your experiment**!
 
 The following sections of this page describe the technical details of the
 Timeline object and how to configure your design file.
 
 ## Single-page Applications and Routing
 
-Moany modern apps such as <SmileText/> are what are known as **Single-page Applications
-(SPAs)**. Rather than having content spread across multiple HTML pages, these apps load a single HTML page and then use a Javascript framework
-to control the dynamic interactions of the page including showing and hiding
+Moany modern apps such as <SmileText/> are what are known as **Single-page
+Applications (SPAs)**. Rather than having content spread across multiple HTML
+pages, these apps load a single HTML page and then use a Javascript framework to
+control the dynamic interactions of the page including showing and hiding
 different elements, handling events like clicks, loading data to or from a
 server, etc... However, it is often useful to be able to directly access
 different content in an app using URLs. For example, users might want to
@@ -52,9 +53,9 @@ Because SPAs load the entire app from a single URL, the solution to this for
 SPAs is known as a **router**. A router is a piece of software running in the
 browser which interprets URL requests and programmatically changes the visible
 content on the webpage, mimicking normal browser requests for specific pages. In
-<SmileText/>, routing is handled by the [Vue Router](https://router.vuejs.org) which is
-a powerful open-source project built for routing in [Vue](https://vuejs.org)
-applications.
+<SmileText/>, routing is handled by the [Vue Router](https://router.vuejs.org)
+which is a powerful open-source project built for routing in
+[Vue](https://vuejs.org) applications.
 
 A simple example of using the Vue router is visible here (adapted from the Vue
 Router [documentation](https://router.vuejs.org/guide/#javascript)):
@@ -151,8 +152,8 @@ for routes that are not part of a sequence:
 
 <img src="/images/timeline.png" width="500" alt="timeline example" style="margin: auto;">
 
-Sequential routes are accessed in a timeline. Non-sequential routes are
-not part of that timeline.
+Sequential routes are accessed in a timeline. Non-sequential routes are not part
+of that timeline.
 
 ### The route object
 
@@ -161,19 +162,31 @@ the following fields:
 
 ```js
 {
-  path: '/my_name',
   name: 'my_name',
   component: MyViewComponent,
   meta: { ... },  // optional
 }
 ```
 
-The `path` specifies the client-side route, as described above. The `name`
-offers another way to specify the route for navigation, which can be easier than
-using the path (see details in the `vue-router`
-[documentation](https://router.vuejs.org/guide/essentials/named-routes.html)).
-The `component` field specifies the [View component](/views) that should be
-loaded when the route is requested.
+By default, if you do not provide a `path` in the object (as in the example
+above), the client-side route will be automatically set to match the name. For
+example, the path in the example above would be set to `/my_name`. See details
+in the `vue-router`
+[documentation](https://router.vuejs.org/guide/essentials/named-routes.html) for
+more information on `name` vs. `path`. The `component` field specifies the
+[View component](/views) that should be loaded when the route is requested.
+
+If you'd like to specify a different path (that doesn't match the name), you can
+do that:
+
+```js
+{
+  name: 'my_name',
+  path: '/testcomponent'
+  component: MyViewComponent,
+  meta: { ... },  // optional
+}
+```
 
 The `meta` field specifies additional optional information about the route:
 
@@ -197,7 +210,7 @@ The `meta` field specifies additional optional information about the route:
 A timeline is created like this:
 
 ```js
-import Timeline  from '@/core/timeline' // note that the '@' resolves to /src in Smile
+import Timeline from '@/core/timeline' // note that the '@' resolves to /src in Smile
 const timeline = new Timeline()
 ```
 
@@ -213,11 +226,12 @@ so forth. The format of `route_obj` is what
 
 ### `timeline.registerView(route_obj)`
 
-This registers a new route (specified in `route_obj`) without adding it to the timeline. This route will exist in the Vue router but will not be in the
+This registers a new route (specified in `route_obj`) without adding it to the
+timeline. This route will exist in the Vue router but will not be in the
 timeline sequence. This is useful for configuration and debugging routes as well
 as routes you want to define and even link to but not present in the regular
 timeline flow. The notation `registerView`, as opposed to the `push...` methods,
-is meant to indicate that the route is not part of the sequence. 
+is meant to indicate that the route is not part of the sequence.
 
 ### `timeline.build()`
 
@@ -342,12 +356,17 @@ tasks. We call these "alternative flows":
 
 <!-- <img src="/images/randomizedflows.png" width="500" alt="timeline example" style="margin: auto;"> -->
 
-These alternative flows can be accomplished by adding <b>nodes</b>, which you can think of as containing several paths of views and guiding participants along one of those paths. There are two types of nodes: <i>randomized</i> and <i>conditional</i>. 
+These alternative flows can be accomplished by adding <b>nodes</b>, which you
+can think of as containing several paths of views and guiding participants along
+one of those paths. There are two types of nodes: <i>randomized</i> and
+<i>conditional</i>.
 
 #### Randomized nodes
 
-Let's say you want participants to see a page of instructions and then complete two tasks, which should be presented in a random order across participants. After the two tasks, you want to show the debrief route.
-Here's what your `src/design.js` file might look like:
+Let's say you want participants to see a page of instructions and then complete
+two tasks, which should be presented in a random order across participants.
+After the two tasks, you want to show the debrief route. Here's what your
+`src/design.js` file might look like:
 
 ```js
 import RandomSubTimeline from '@/core/subtimeline'
@@ -379,8 +398,8 @@ timeline.pushRandomizedNode({
   name: 'randomOrder',
   options: [
     ['task1', 'task2'],
-    ['task2', 'task1']
-  ]
+    ['task2', 'task1'],
+  ],
 })
 
 // push debriefing form
@@ -393,27 +412,33 @@ timeline.pushSeqView({
 timeline.build()
 ```
 
-Note that the views that make up the node are <i>registered</i> (added with the `registerView` method), not <i>pushed</i> (with the
-`pushSeqView` method). The node that contains them <i>is</i> pushed (with the `pushRandomizedNode` method).
+Note that the views that make up the node are <i>registered</i> (added with the
+`registerView` method), not <i>pushed</i> (with the `pushSeqView` method). The
+node that contains them <i>is</i> pushed (with the `pushRandomizedNode` method).
 
-You can adjust the probabilities of the paths by specifying weights—if you want the first path to be twice as likely as the second path, for example, you could do that like this:
+You can adjust the probabilities of the paths by specifying weights—if you want
+the first path to be twice as likely as the second path, for example, you could
+do that like this:
 
 ```js
 timeline.pushRandomizedNode({
   name: 'randomOrder',
   options: [
     ['task1', 'task2'],
-    ['task2', 'task1']
+    ['task2', 'task1'],
   ],
-  weights: [2, 1]
+  weights: [2, 1],
 })
 ```
 
-Note that the weights are automatically normalized, so [2/3, 1/3] or [4, 2] would generate the same distribution. 
+Note that the weights are automatically normalized, so [2/3, 1/3] or [4, 2]
+would generate the same distribution.
 
 #### Conditional nodes
 
-The view order can be set by which condition the participant is in. This can be more useful than a simple randomized node if other aspects of the experiment will depend on the condition. Here's an example:
+The view order can be set by which condition the participant is in. This can be
+more useful than a simple randomized node if other aspects of the experiment
+will depend on the condition. Here's an example:
 
 ```js
 import Timeline from '@/core/timeline'
@@ -455,13 +480,16 @@ timeline.pushConditionalNode({
 timeline.build()
 ```
 
-And to access the value of the condition elsewhere (e.g., in the instructions component), you can do:
+And to access the value of the condition elsewhere (e.g., in the instructions
+component), you can do:
 
 ```js
 api.getConditionByName(taskOrder)
 ```
 
-It's also possible to have nested nodes. In the example below, participants are counterbalanced—half are assigned to taskorder AB vs BA, and half are assigned to see task C vs D afterward:
+It's also possible to have nested nodes. In the example below, participants are
+counterbalanced—half are assigned to taskorder AB vs BA, and half are assigned
+to see task C vs D afterward:
 
 ```js
 import Timeline from '@/core/timeline'
@@ -502,7 +530,7 @@ timeline.registerConditionalNode({
     C: ['taskC'],
     D: ['taskD'],
   },
-});
+})
 
 // the outer node (pushed)
 timeline.pushConditionalNode({
