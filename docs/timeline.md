@@ -307,7 +307,6 @@ successor using `meta: {next: 'some_name'}` (or predecessor using
 ```js
 // first route
 timeline.pushSeqView({
-  path: '/first',
   name: 'first',
   meta: { next: 'second' }, // this should jump to a specific route (by name)
   component: FirstComponent,
@@ -315,7 +314,6 @@ timeline.pushSeqView({
 
 // alternative first route
 timeline.pushSeqView({
-  path: '/first_alt',
   name: 'first_alternate',
   meta: { next: 'second' }, // this should jump to a specific route (by name)
   component: AlternativeFirstCompomnet,
@@ -323,14 +321,12 @@ timeline.pushSeqView({
 
 // second route
 timeline.pushSeqView({
-  path: '/second',
   name: 'second',
   component: SecondComponent,
 })
 
 // third route
 timeline.pushSeqView({
-  path: '/third',
   name: 'third',
   component: ThirdComponent,
 })
@@ -354,7 +350,7 @@ randomized order. Or, you might have four tasks, and you want one group of
 participants to see two of the tasks and the other group to see the other two
 tasks. We call these "alternative flows":
 
-<!-- <img src="/images/randomizedflows.png" width="500" alt="timeline example" style="margin: auto;"> -->
+<img src="/images/randomizedflows.png" width="500" alt="timeline example" style="margin: auto;">
 
 These alternative flows can be accomplished by adding <b>nodes</b>, which you
 can think of as containing several paths of views and guiding participants along
@@ -375,20 +371,17 @@ const timeline = new Timeline()
 
 // push instructions
 timeline.pushSeqView({
-  path: '/instructions',
   name: 'instructions',
   component: Instructions,
 })
 
 // register tasks
 randTimeline.registerView({
-  path: '/task1',
   name: 'task1',
   component: Task1,
 })
 
 randTimeline.registerView({
-  path: '/task2',
   name: 'task2',
   component: Task2,
 })
@@ -404,7 +397,6 @@ timeline.pushRandomizedNode({
 
 // push debriefing form
 timeline.pushSeqView({
-  path: '/debrief',
   name: 'debrief',
   component: Debrief,
 })
@@ -458,13 +450,11 @@ timeline.pushSeqView({
 
 // push tasks into timeline as "non-sequential" routes
 randTimeline.registerView({
-  path: '/taskA',
   name: 'taskA',
   component: TaskA,
 })
 
 randTimeline.registerView({
-  path: '/taskB',
   name: 'taskB',
   component: TaskB,
 })
