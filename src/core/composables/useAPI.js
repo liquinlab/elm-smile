@@ -1,3 +1,4 @@
+import { reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
 import useSmileStore from '@/core/stores/smilestore'
 import useTimeline from '@/core/composables/useTimeline'
@@ -17,7 +18,7 @@ export default function useAPI() {
   const router = useRouter()
   const smilestore = useSmileStore()
   const log = useLog()
-  const api = {
+  const api = reactive({
     config: smilestore.config,
     data: smilestore.data,
     local: smilestore.local,
@@ -170,7 +171,7 @@ export default function useAPI() {
       if (conditionNames.length > 1) {
         log.error('SMILE API: randomAssignCondition() only accepts one condition name at a time')
         return null;
-      } 
+      }
       
       const [name] = conditionNames;
       const currentCondition = smilestore.getConditionByName(name);
@@ -194,7 +195,7 @@ export default function useAPI() {
           log.error('SMILE API: randomAssignCondition() weights must be the same length as the condition possibilities')
           return null;
         }
-      } 
+      }
       // get random condition from conditionobject[name]
       randomCondition = sampleWithReplacement(possibleConditions, 1, weights)[0]
 
@@ -226,7 +227,7 @@ export default function useAPI() {
       }
       api.setConsented()
     },
-  }
+  });
 
   return api
 }
