@@ -105,6 +105,10 @@ is necessary because some configuration options which go in those files are
 considered "secret" and we don't want them easily searched in GitHub when/if
 your project repository becomes publically shared.
 
+Note that if you change the value of any configuration options, you must stop your 
+development  server and start it again (running `npm run dev`) to see changes update. 
+Unlike code changes, Vite cannot update reload these while the server is running. 
+
 Let's consider the files one by one.
 
 #### Experiment Options (`.env`)
@@ -421,6 +425,10 @@ Adding new configuration options should mostly happen in `.env.local`. You
 simply make up a new `VITE_SOMETHING` variable. Then add it to the object in
 `src/core/config.js` to expose it to your web application! The configuration is
 available as `smileconfig` anywhere in your Vue app. It's pretty easy.
+
+If you add any new configuration options, you must stop your 
+development  server and start it again (running `npm run dev`) to see changes update. 
+Unlike code changes, Vite cannot update reload these while the server is running. 
 
 Note: if you add new configuration options, you need to also update them on
 GitHub for those to sync to deployments. Run `npm run upload_config` as
