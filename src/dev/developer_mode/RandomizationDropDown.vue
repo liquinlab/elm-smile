@@ -2,6 +2,8 @@
 import { ref, reactive, watch } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
+import { useRouter } from 'vue-router';
+const router = useRouter()
 import useSmileStore from '@/core/stores/smilestore'
 const smilestore = useSmileStore() // load the global store
 const seed = ref(smilestore.getSeedID)
@@ -26,6 +28,8 @@ function randomize_seed() {
   //seed = smilestore.randomizeSeed()
   api.debug('Setting seed to ', seed.value)
   smilestore.setSeedID(seed.value)
+  // Force a reload to resample conditions and variables
+  router.go(0);
 }
 
 // define selected condition in toolbar from current conditions
@@ -36,6 +40,8 @@ const selected = smilestore.getConditions
 function changeCond(key, event) {
   const cond = event.target.value 
   smilestore.setCondition(key, cond)
+  // Force a reload to resample conditions and variables
+  router.go(0);
 }
 
 // when condition is set in the data, update the toolbar conditions
@@ -94,7 +100,7 @@ watch(
                       type="checkbox"
                       name="switchRoundedDefault"
                       class="switch is-rounded is-rtl is-small"
-                      v-model="smilestore.local.seedActive"
+                      v-model="smilestore.local.useSeed"
                     />
                     <label for="switchRoundedDefault"></label>
                   </div>
@@ -133,12 +139,12 @@ watch(
 
             <h1 class="title is-6">Random variables</h1>
             <p class="is-left">
-              Some text about this. Read more about randomization
+              Read more about randomization
               <a href="https://smile.gureckislab.org/randomization.html"> in the docs </a>.
             </p>
             <br />
             <table class="table is-fullwidth">
-              <template v-for="(value, key) in smilestore.getPossibleConditions" :key="key">
+              <template v-for="(value, key) in smilestore.local.possibleConditions" :key="key">
                 <tr>
                   <td width="30%">
                     <b>{{ key }}:</b>

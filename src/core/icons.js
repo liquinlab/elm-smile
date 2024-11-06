@@ -65,6 +65,7 @@ import { faCodeBranch } from '@fortawesome/free-solid-svg-icons'
 import { faMagnifyingGlassArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons'
 import { faClock as farClock } from '@fortawesome/free-regular-svg-icons'
+import { faDiamond as faDiamond } from '@fortawesome/free-solid-svg-icons'
 
 /* add icons to the library */
 library.add(
@@ -127,5 +128,6 @@ library.add(
   faRotateRight,
   faAnglesRight,
   faAnglesLeft,
-  faHammer
+  faHammer,
+  faDiamond,
 )

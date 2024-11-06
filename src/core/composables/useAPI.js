@@ -3,7 +3,7 @@ import useSmileStore from '@/core/stores/smilestore'
 import useTimeline from '@/core/composables/useTimeline'
 // import seeded randomization function for this component/route
 // random seeding is unique to each component/route
-import { shuffle } from '@/core/randomization'
+import { randomInt, shuffle, sampleWithReplacement, sampleWithoutReplacement  } from '@/core/randomization'
 
 // import the trial stepper functionality which advances linearly through
 // a set of trials
@@ -30,7 +30,10 @@ export default function useAPI() {
     gotoView: gotoView,
     hasNextView: () => route.meta.next && route.meta.sequential,
     hasPrevView: () => route.meta.prev && route.meta.sequential,
+    randomInt: randomInt,
     shuffle: shuffle,
+    sampleWithReplacement: sampleWithReplacement,
+    sampleWithoutReplacement: sampleWithoutReplacement,
     useStepper: useStepper,
     // isKnownUser: smilestore.local.knownUser,
     // isDone: smilestore.local.done,
@@ -109,6 +112,9 @@ export default function useAPI() {
     getCurrentTrial: () => {
       return smilestore.getPage[route.name]
     },
+    getConditionByName: (name) => {
+      return smilestore.getConditionByName(name)
+    },
     getBrowserFingerprint: () => {
       return smilestore.getBrowserFingerprint()
     },
@@ -151,6 +157,53 @@ export default function useAPI() {
     saveTrialData: (data) => {
       smilestore.saveTrialData(data)
       log.debug('SMILE API: data ', smilestore.data.study_data)
+    },
+    randomAssignCondition(conditionObject) {
+      // get conditionobject keys
+      const keys = Object.keys(conditionObject)
+
+      // Try to find the condition name
+      const conditionNames = keys.filter(key => key !== 'weights')
+      let randomCondition;
+
+      // if condition name is longer than one element, error
+      if (conditionNames.length > 1) {
+        log.error('SMILE API: randomAssignCondition() only accepts one condition name at a time')
+        return null;
+      } 
+      
+      const [name] = conditionNames;
+      const currentCondition = smilestore.getConditionByName(name);
+      if (currentCondition) {
+        log.debug('SMILE API: condition already assigned', name, currentCondition)
+        return currentCondition;
+      }
+
+      // if we haven't assigned the condition name, set the possible condition values
+      const possibleConditions = conditionObject[name]
+      smilestore.local.possibleConditions[name] = possibleConditions
+      
+      // Check if we're doing weighted or unweighted randomization
+      const hasWeights = keys.includes('weights')
+      let weights;
+
+      if (hasWeights) { // if weights are provided
+        weights = conditionObject.weights
+        // make sure weights is the same length as the condition possibilities
+        if (weights.length !== possibleConditions.length) {
+          log.error('SMILE API: randomAssignCondition() weights must be the same length as the condition possibilities')
+          return null;
+        }
+      } 
+      // get random condition from conditionobject[name]
+      randomCondition = sampleWithReplacement(possibleConditions, 1, weights)[0]
+
+      // set the condition in the store
+      smilestore.setCondition(name, randomCondition)
+      log.debug('SMILE API: assigned condition', name, randomCondition)
+      
+      // Returning to allow immediate use if assigned
+      return randomCondition;
     },
     preloadAllImages: () => {
       log.debug('Preloading images')

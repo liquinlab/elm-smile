@@ -4,6 +4,8 @@ const api = useAPI()
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
+
+
 </script>
 
 <template>
@@ -11,7 +13,7 @@ const router = useRouter()
     <p class="control" v-if="api.hasPrevView()">
       <button
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
-        v-on:click="router.go(-1)"
+        v-on:click="api.gotoView(route?.meta?.prev)"
         data-tooltip="Previous page"
       >
         <span>
