@@ -197,6 +197,11 @@ export default defineStore('smilestore', {
     getConditions: (state) => state.local.conditions,
     getRandomizedRoutes:  (state) => state.local.randomizedRoutes,
     verifiedVisibility: (state) => state.data.verified_visibility,
+    getShortId: (state) => {
+      if (state.local.docRef == null) return 'N/A';
+      const lastDashIndex = state.local.docRef.lastIndexOf('-');
+      return `${state.local.docRef.substring(lastDashIndex - 6, lastDashIndex)}-${state.local.docRef.substring(lastDashIndex + 1)}`
+    }
   },
 
   actions: {
