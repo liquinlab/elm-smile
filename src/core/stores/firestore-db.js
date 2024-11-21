@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app'
+import { getAuth, signInAnonymously } from 'firebase/auth'
 import {
   getFirestore,
   collection,
@@ -23,6 +24,7 @@ import useLog from '@/core/stores/log'
 // since this is a module these will run once at the start
 
 const firebaseApp = initializeApp(appconfig.firebaseConfig)
+const auth = getAuth(firebaseApp)
 let db
 
 if (appconfig.mode === 'testing') {
@@ -42,6 +44,19 @@ if (appconfig.mode === 'development' || appconfig.mode === 'testing') {
 
 export const fsnow = () => Timestamp.now()
 
+// handle anonymous authentication
+export const anonymousAuth = async () => {
+  const log = useLog()
+  try {
+    const userCredential = await signInAnonymously(auth)
+    log.log('FIRESTORE-DB: Anonymous auth successful')
+    return userCredential.user
+  } catch (error) {
+    log.error('FIRESTORE-DB: Error in anonymous authentication:', error)
+    return null
+  }
+}
+
 // create a collection
 export const updateSubjectDataRecord = async (data, docid) => {
   const log = useLog()
@@ -52,7 +67,7 @@ export const updateSubjectDataRecord = async (data, docid) => {
       merge: true,
     })
   } catch (e) {
-    log.error('Error updating document', e)
+    log.error('FIRESTORE-DB: Error updating document', e)
   }
 }
 
@@ -65,21 +80,37 @@ export const updatePrivateSubjectDataRecord = async (data, docid) => {
       merge: true,
     })
   } catch (e) {
-    log.error('Error updating document', e)
+    log.error('FIRESTORE-DB: Error updating document', e)
   }
 }
 
 export const loadDoc = async (docid) => {
   const log = useLog()
-  const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/`, docid)
-  const docSnap = await getDoc(docRef)
-  if (docSnap.exists()) {
-    const data = docSnap.data()
-    // console.log('Document data:', data)
-    return data
+
+  try {
+    const user = await anonymousAuth()
+    if (!user) throw new Error('Authentication failed')
+
+    const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/`, docid)
+    const docSnap = await getDoc(docRef)
+    if (docSnap.exists()) {
+      const data = docSnap.data()
+      // console.log('Document data:', data)
+      if (data.userUID === user.uid) {
+        return data
+      } else {
+        log.error('FIRESTORE-DB: User does not have access to this document')
+        return undefined
+      }
+    }
+    log.error('FIRESTORE-DB: No such document!')
+    return undefined
+  } catch (e) {
+    log.error('FIRESTORE-DB: Error updating document', e)
+    return undefined
   }
   // doc.data() will be undefined in this case
-  log.error('No such document!')
+  log.error('FIRESTORE-DB: No such document!')
   return undefined
 }
 
@@ -87,6 +118,9 @@ export const createDoc = async (data) => {
   const log = useLog()
   log.log(`FIRESTORE-DB: trying to create a main document.`)
   try {
+    const user = await anonymousAuth()
+    if (!user) throw new Error('Authentication failed')
+
     const expRef = doc(db, mode, appconfig.project_ref)
     await setDoc(
       expRef,
@@ -98,11 +132,16 @@ export const createDoc = async (data) => {
       },
       { merge: true }
     )
-    console.log('Document written with ID: ', `${mode}/${appconfig.project_ref}`)
+    console.log('FIRESTORE-DB: Document written with ID: ', `${mode}/${appconfig.project_ref}`)
 
     // Add a new document with a generated id.
-    const docRef = await addDoc(collection(db, `${mode}/${appconfig.project_ref}/data`), data)
-    log.log(`FIRESTORE-DB: Document written with ID: `, docRef.id)
+    const docRef = await addDoc(collection(db, `${mode}/${appconfig.project_ref}/data`), {
+      ...data,
+      userUID: user.uid,
+    })
+
+    data.userUID = user.uid
+    log.log(`FIRESTORE-DB: Document written with ID: ${docRef.id} for user ${user.uid})`)
     return docRef.id
   } catch (e) {
     log.error('FIRESTORE-DB: Error adding document: ', e)
@@ -114,9 +153,15 @@ export const createPrivateDoc = async (data, docId) => {
   const log = useLog()
   log.log(`FIRESTORE-DB: trying to create a private document in ${docId}`)
   try {
+    const user = await anonymousAuth()
+    if (!user) throw new Error('Authentication failed')
+
     // Add a new document with a generated id.
     const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/${docId}/private/`, 'private_data')
-    await setDoc(docRef, data)
+    await setDoc(docRef, {
+      ...data,
+      userUID: user.uid,
+    })
     log.log(`FIRESTORE-DB: Private document written with ID: `, docRef.id)
     return docRef.id
   } catch (e) {

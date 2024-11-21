@@ -105,6 +105,7 @@ export default defineStore('smilestore', {
     data: {
       // syncs with firestore
       seedID: '',
+      userUID: '',
       trial_num: 0, // not being updated correctly
       consented: false,
       verified_visibility: false,
