@@ -41,3 +41,45 @@ export function expandProduct(...arr) {
   }
   return arr.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())))
 }
+
+// distributions.js
+export const faker_distributions = {
+  rnorm: (mean, sd) => {
+    let u = 0,
+      v = 0
+    while (u === 0) u = Math.random()
+    while (v === 0) v = Math.random()
+    return {
+      val: mean + sd * Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v),
+      type: 'fake',
+    }
+  },
+  runif: (min, max) => ({
+    val: Math.random() * (max - min) + min,
+    type: 'fake',
+  }),
+  rbinom: (n, p) => ({
+    val: Array(n)
+      .fill(0)
+      .reduce((acc) => acc + (Math.random() < p ? 1 : 0), 0),
+    type: 'fake',
+  }),
+  rexGaussian: (mu, sigma, tau) => {
+    const x = distributions.rnorm(0, 1).val
+    const z = distributions.runif(0, 1).val
+    return {
+      val: mu + sigma * x + tau * -Math.log(z),
+      type: 'fake',
+    }
+  },
+  rchoice: (options) => {
+    if (!Array.isArray(options) || options.length === 0) {
+      throw new Error('rchoice requires a non-empty array of options')
+    }
+    const index = Math.floor(Math.random() * options.length)
+    return {
+      val: options[index],
+      type: 'fake',
+    }
+  },
+}

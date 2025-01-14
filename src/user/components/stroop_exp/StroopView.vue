@@ -18,7 +18,7 @@ import { ref, computed } from 'vue'
 
 // do you need keyboard or mouse for your experiment?
 import { onKeyDown } from '@vueuse/core'
-import { useMouse } from '@vueuse/core'
+//import { useMouse } from '@vueuse/core'
 
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
@@ -34,8 +34,9 @@ const api = useAPI()
    For example here we define a stroop experiment and so we mention
    the word to display, the color of the word, and the condition of the
    trial for later analysis.
+
 */
-var trials = [
+const trialTypes = [
   { word: 'SHIP', color: 'red', condition: 'unrelated' },
   { word: 'MONKEY', color: 'green', condition: 'unrelated' },
   { word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
@@ -47,8 +48,32 @@ var trials = [
   { word: 'RED', color: 'blue', condition: 'incongruent' },
 ]
 
+var trials = []
+
+// add the data fields
+for (let trialType of trialTypes) {
+  trials.push({
+    ...trialType,
+    reactionTime: () => api.faker.rnorm(500, 50),
+    accuracy: () => api.faker.rbinom(1, 0.8),
+    response: () => api.faker.rchoice(['r', 'g', 'b']),
+  })
+}
+
 // next we shuffle the trials
 trials = api.shuffle(trials)
+
+function autofill() {
+  api.log('running autofill')
+  while (step_index.value < trials.length) {
+    api.log('auto stepping')
+    nextStep()
+  }
+  // autofil trial data
+  // step to where we want to go
+}
+
+api.setPageAutofill(autofill)
 
 //const index = smilestore.getPage[route.name]
 // now we create the trial stepper which will advance through the trials.

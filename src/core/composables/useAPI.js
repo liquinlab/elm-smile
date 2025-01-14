@@ -3,7 +3,7 @@ import useSmileStore from '@/core/stores/smilestore'
 import useTimeline from '@/core/composables/useTimeline'
 // import seeded randomization function for this component/route
 // random seeding is unique to each component/route
-import { shuffle } from '@/core/randomization'
+import { shuffle, faker_distributions } from '@/core/randomization'
 
 // import the trial stepper functionality which advances linearly through
 // a set of trials
@@ -28,6 +28,7 @@ export default function useAPI() {
     stepNextView: stepNextView,
     stepPrevView: stepPrevView,
     gotoView: gotoView,
+    faker: faker_distributions,
     hasNextView: () => route.meta.next && route.meta.sequential,
     hasPrevView: () => route.meta.prev && route.meta.sequential,
     shuffle: shuffle,
@@ -81,7 +82,7 @@ export default function useAPI() {
       return val
     },
     setPageAutofill: (autofill) => {
-      log.debug('SMILEAPI: setting autofill')
+      log.debug('SMILEAPI: registering autofill function')
       if (smilestore.config.mode === 'development') smilestore.setPageAutofill(autofill)
     },
     removePageAutofill: () => {
