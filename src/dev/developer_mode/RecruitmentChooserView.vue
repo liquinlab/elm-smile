@@ -5,6 +5,12 @@
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
+
+// if in dev mode (which should always be true on this page), set known
+// if not a known user
+if(!api.local.knownUser)
+  api.setKnown()
+
 </script>
 
 <template>

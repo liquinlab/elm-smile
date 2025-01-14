@@ -25,6 +25,10 @@ function createLink(option) {
       return `<a href='${option}' target='_new'>${option}</a>`
     }
   }
+  if (typeof option === 'object') {
+    const name = option?.name || option?.meta?.name;
+    if (name) return String(name)
+  }
   return String(option)
 }
 

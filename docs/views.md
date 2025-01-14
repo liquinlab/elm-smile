@@ -182,7 +182,7 @@ experiment in a new browser window.
 // put this at the top of the file
 import MTurk from '@/builtins/mturk/MTurkRecruitView.vue'
 
-this.pushView({
+this.registerView({
   path: '/mturk',
   name: 'mturk',
   component: MTurk,
