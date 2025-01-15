@@ -9,6 +9,27 @@ export default function useTimeline() {
   const router = useRouter()
   const log = useLog()
 
+  const lookupNext = (routeName) => {
+    // Get all routes from the router
+    const routes = router.getRoutes()
+
+    // Find the specified route
+    const currentRoute = routes.find((r) => r.name === routeName)
+    if (!currentRoute) return null
+
+    // If the route has a next property, find that route
+    if (currentRoute.meta?.next) {
+      const nextRoute = routes.find((r) => r.name === currentRoute.meta.next)
+      if (nextRoute) {
+        return {
+          name: nextRoute.name,
+          query: route.query,
+        }
+      }
+    }
+    return null
+  }
+
   const nextView = () => {
     if (route.meta.next) {
       return { name: route.meta.next, query: route.query }
@@ -58,5 +79,5 @@ export default function useTimeline() {
     navigateTo(prevView())
   }
 
-  return { stepNextView, stepPrevView, gotoView }
+  return { stepNextView, stepPrevView, gotoView, lookupNext }
 }
