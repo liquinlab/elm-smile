@@ -35,12 +35,12 @@ const database_tooltip = computed(() => {
 })
 
 const alt_tooltip = computed(() => {
-  return 'Force connect to database'
+  return 'Create connection to Firestore database'
 })
 </script>
 
 <template>
-  <div v-if="altKeyState">
+  <div v-if="altKeyState && api.global.db_connected == false">
     <button
       class="button devbar-button has-tooltip-arrow has-tooltip-bottom"
       :data-tooltip="alt_tooltip"
