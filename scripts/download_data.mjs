@@ -142,7 +142,11 @@ const getData = async (path, completeOnly, filename, saveRecruitmentInfo = false
     data.push({ id: doc.id, data: docData })
   }
 
-  return storeData(data, filename)
+  if (saveRecruitmentInfo) {
+    return storeData(data, filename, 'data/private')
+  } else {
+    return storeData(data, filename, 'data/raw')
+  }
 }
 
 const success = (filename) => {
