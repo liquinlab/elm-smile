@@ -128,14 +128,19 @@ const getData = async (path, completeOnly, filename, saveRecruitmentInfo = false
     querySnapshot = await getDocs(q)
   }
   const data = []
-  querySnapshot.forEach((doc) => {
+  for (const doc of querySnapshot.docs) {
     const docData = doc.data()
     docData.smile_config.firebaseConfig = {}
-    if (!saveRecruitmentInfo) {
-      docData.recruitment_info = {}
+    if (saveRecruitmentInfo) {
+      const privateData = []
+      const privateQuerySnapshot = await getDocs(collection(db, path + '/' + doc.id + '/private'))
+      for (const privateDoc of privateQuerySnapshot.docs) {
+        privateData.push(privateDoc.data())
+      }
+      docData.private_data = privateData
     }
     data.push({ id: doc.id, data: docData })
-  })
+  }
 
   return storeData(data, filename)
 }
