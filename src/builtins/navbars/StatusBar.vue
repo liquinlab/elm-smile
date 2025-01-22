@@ -64,7 +64,7 @@ function submitWithdraw() {
             appconfig.mode === 'testing' || appconfig.mode === 'development' || appconfig.mode === 'presentation'
               ? '-' + appconfig.mode
               : ''
-          }}
+          }}<br />User ID: {{ smilestore.getShortId }}
         </p>
       </div>
     </div>
