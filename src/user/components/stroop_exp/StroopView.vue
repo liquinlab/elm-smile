@@ -151,7 +151,6 @@ function finalize() {
 
 function finish() {
   // do stuff if you want
-  api.removePageAutofill() // you are responsible for removing the autofill
   api.stepNextView()
 }
 </script>

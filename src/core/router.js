@@ -236,7 +236,9 @@ log.log('Vue Router initialized')
 // add additional guard to set global seed before
 router.beforeResolve((to) => {
   const smilestore = useSmileStore()
-  if (smilestore.local.useSeed) { // if we're using a seed
+  smilestore.removePageAutofill()
+  if (smilestore.local.useSeed) {
+    // if we're using a seed
     const seedID = smilestore.getSeedID
     const seed = `${seedID}-${to.name}`
     seedrandom(seed, { global: true })
