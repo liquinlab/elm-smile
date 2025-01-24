@@ -8,11 +8,21 @@ import timeline from '@/user/design'
 import useLog from '@/core/stores/log'
 const log = useLog()
 
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 // 3. add navigation guards
 //    currently these check if user is known
 //    and if they are, they redirect to last route
 function addGuards(r) {
   r.beforeEach((to, from) => {
+    // check if status change on previous
+    if (from.meta !== undefined && from.meta.setConsented !== undefined && from.meta.setConsented) {
+      api.completeConsent()
+    }
+    if (from.meta !== undefined && from.meta.setDone !== undefined && from.meta.setDone) {
+      api.setDone()
+    }
+
     // Set queries to be combination of from queries and to queries
     // (TO overwrites FROM if there is one with the same key)
     // Also add queries that come before the URL -- this later
@@ -258,7 +268,7 @@ router.beforeResolve((to) => {
 })
 
 // Check if the next route has a preload function, and if so, run it asynchronously
-router.afterEach(async (to) => {
+router.afterEach(async (to, from) => {
   if (to.meta !== undefined && to.meta.next !== undefined) {
     const fullTo = router.resolve({ name: to.meta.next })
 

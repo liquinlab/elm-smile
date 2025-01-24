@@ -9,7 +9,6 @@ import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
 function finish() {
-  api.completeConsent()
   api.stepNextView()
 }
 

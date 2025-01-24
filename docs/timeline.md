@@ -202,6 +202,24 @@ The `meta` field specifies additional optional information about the route:
   content when the user is "done" with the experiment (`requiresDone: true`).
   Another option (`requiresWithdraw: true`) requires the participant to have
   withdrawn from the page before showing.
+- It can be used to set a particular state when leaving a route (e.g.
+  `meta: { setDone: true },` will set the `done` state to `true` before entering
+  the next route). Similarly `meta: { setConsented: true }` will set the
+  `consented` state before entering the next route. These are provided in the
+  timeline to make it more obvious when consent or completion has occurred in
+  your timeline.
+
+::: warning IMPORTANT
+
+It is important that your timeline (`design.js`) actually uses
+`meta: { setDone: true }` and `meta: { setConsented: true }` so that other
+aspects of your experiment work correctly. For instance the `setConsented` is
+used to create an initial database record for the subject. If this step is
+passed the data will not be created. Similarly repeat participation is
+controlled by the `done` state. If this is not set correctly the subject be
+prevented from starting the experiment again or not access the final page.
+
+:::
 
 ### Navigation permissions
 

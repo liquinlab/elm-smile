@@ -4,8 +4,6 @@ import DebriefText from '@/builtins/debrief/DebriefText.vue' // get access to th
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
-api.setDone()
-
 function finish() {
   // do stuff if you want
   api.stepNextView()

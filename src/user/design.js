@@ -2,7 +2,7 @@
 // This file configures the overall logic of your experiment.
 // The critical part is the timeline, which is a list of phases
 // the experiment goes through.  This file configues which phase
-// occurs in the sequence. 
+// occurs in the sequence.
 
 // The key documentation for this file
 // Views: https://smile.gureckislab.org/views.html
@@ -39,6 +39,7 @@ import Timeline from '@/core/timeline'
 const timeline = new Timeline()
 
 import useSmileStore from '@/core/stores/smilestore'
+import { onBeforeRouteLeave } from 'vue-router'
 const smilestore = useSmileStore()
 
 console.log('Logging smilestore')
@@ -47,7 +48,7 @@ console.log(smilestore.getLocal)
 // #4. Add between-subjects condition assignment
 // This is where you can define conditions to which each participant should be assigned
 
-// You can assign conditions by passing a javascript object to api.randomAssignCondition(), 
+// You can assign conditions by passing a javascript object to api.randomAssignCondition(),
 // where the key is the condition name and the value is an array of possible condition values.
 // Each unique condition manipulation should be assigned via a separate call to setConditions.
 
@@ -60,13 +61,12 @@ api.randomAssignCondition({
 })
 
 // you can also optionally set randomization weights for each condition. For
-// example, if you want twice as many participants to be assigned to instructions 
+// example, if you want twice as many participants to be assigned to instructions
 // version 1 compared to versions 2 and 3, you can set the weights as follows:
 api.randomAssignCondition({
-  instructionsVersion: ["1", "2", "3"],
-  weights: [2, 1, 1] // weights are automatically normalized, so [4, 2, 2] would be the same
+  instructionsVersion: ['1', '2', '3'],
+  weights: [2, 1, 1], // weights are automatically normalized, so [4, 2, 2] would be the same
 })
-
 
 // #5. Define and add some routes to the timeline
 // Each route should map to a View component.
@@ -125,7 +125,8 @@ timeline.pushSeqView({
   name: 'consent',
   component: Consent,
   meta: {
-    requiresConsent: false
+    requiresConsent: false,
+    setConsented: true,
   },
 })
 
@@ -169,7 +170,6 @@ timeline.pushSeqView({
 //   component: InstructionJumperView,
 // })
 
-
 ////// example of randomized branching routes
 // (you can also have conditional branching based on conditions -- see docs)
 
@@ -186,12 +186,8 @@ timeline.registerView({
 
 timeline.pushRandomizedNode({
   name: 'RandomSplit',
-  options: [
-    ['task1'],
-    ['task2']
-  ]
-});
-
+  options: [['task1'], ['task2']],
+})
 
 // stroop exp
 timeline.pushSeqView({
@@ -209,6 +205,7 @@ timeline.pushSeqView({
 timeline.pushSeqView({
   name: 'device',
   component: DeviceSurvey,
+  meta: { setDone: true },
 })
 
 // thanks/submit page

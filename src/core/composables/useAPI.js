@@ -61,8 +61,8 @@ export default function useAPI() {
       const url = window.location.href
       window.location.href = url.substring(0, url.lastIndexOf('#/'))
     },
-    setKnown: () => {
-      smilestore.setKnown()
+    setKnown: async () => {
+      await smilestore.setKnown()
     },
     setDone: () => {
       smilestore.setDone()
@@ -230,11 +230,11 @@ export default function useAPI() {
         })
       }, 1)
     },
-    completeConsent: () => {
-      if (!api.local.knownUser) {
-        api.setKnown() // set new user and add document, then assign conditions
-      }
+    completeConsent: async () => {
       api.setConsented()
+      if (!api.local.knownUser) {
+        await api.setKnown() // set new user and add document, then assign conditions
+      }
     },
   })
 
