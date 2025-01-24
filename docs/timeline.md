@@ -205,6 +205,47 @@ The `meta` field specifies additional optional information about the route:
 
 ### Navigation permissions
 
+In developer mode any view can be accessed in any order. However, in live mode,
+the timeline enforces a strict order of views. This is to prevent participants
+from re-starting the experiment or skipping ahead to the end. However, there are
+some exceptions to this rule. For example, it is possible to configure any
+particular view to the reachable from any other view using the `meta` field
+(`allowAlways: true`).
+
+In addition, certain programmatic navigations are always allowed. For example,
+if the subject had already read the instructions then if a button or link was
+provided like this:
+
+```vue
+<a href="/#instructions" class="button">Instructions</a>
+```
+
+It would be disallowed in live mode because the subject would be skipping back
+using a browser navigation event (it appears the same as if the subject modified
+the URL in the browser). However, if the same link was implemented using the
+internal API navigation method it would be always allowed:
+
+```js
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
+
+function go_to_instructions() {
+  console.log('go')
+  api.gotoView('instructions')
+}
+```
+
+```vue
+<button class="button" @click="go_to_instructions()">
+  Jump to instructions
+</button>
+```
+
+The premise here is that if the programmer set up a situation where navigation
+was requested progamatically it should be allowed. The first link type means
+that either the programmer or the participant constructed the request and so it
+is disallowed.
+
 ### Creating a timeline
 
 A timeline is created like this:
