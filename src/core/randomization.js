@@ -21,7 +21,7 @@ export function sampleWithoutReplacement(array, sampleSize) {
   return shuffle(array).slice(0, sampleSize)
 }
 
-export function sampleWithReplacement(array, sampleSize, weights=undefined) {
+export function sampleWithReplacement(array, sampleSize, weights = undefined) {
   // if weights are not provided, normal sample with replacement
   if (!weights) {
     const sample = []
@@ -37,7 +37,7 @@ export function sampleWithReplacement(array, sampleSize, weights=undefined) {
   // normalize weights array -- get sum of all weights
   const sumOfWeights = weights.reduce((a, b) => a + b, 0)
   // divide each weight by the sum of all weights
-  const normalizedWeights = weights.map(weight => weight / sumOfWeights)
+  const normalizedWeights = weights.map((weight) => weight / sumOfWeights)
 
   const sample = []
   let s = sampleSize
@@ -53,7 +53,6 @@ export function sampleWithReplacement(array, sampleSize, weights=undefined) {
     s -= 1
   }
   return sample
-
 }
 
 export function expandProduct(...arr) {
@@ -106,5 +105,14 @@ export const faker_distributions = {
       val: options[index],
       type: 'fake',
     }
+  },
+  render: (trial) => {
+    let rendered = { ...trial }
+    for (let [key, value] of Object.entries(trial)) {
+      if (typeof value === 'function') {
+        rendered[key] = value()
+      }
+    }
+    return rendered
   },
 }

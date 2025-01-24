@@ -67,22 +67,12 @@ api.debug(trials)
 // next we shuffle the trials
 trials = api.shuffle(trials)
 
-function renderTrial(trial) {
-  let rendered = { ...trial }
-  for (let [key, value] of Object.entries(trial)) {
-    if (typeof value === 'function') {
-      rendered[key] = value()
-    }
-  }
-  return rendered
-}
-
 function autofill() {
   api.debug('running autofill')
   while (step_index.value < trials.length) {
     api.debug('auto stepping')
 
-    var t = renderTrial(trials[step_index.value])
+    var t = api.faker.render(trials[step_index.value])
     api.debug(t)
     api.saveTrialData(t)
 
