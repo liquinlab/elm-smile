@@ -60,16 +60,34 @@ for (let trialType of trialTypes) {
   })
 }
 
+console.log('raw trials', trials)
+
+api.debug(trials)
+
 // next we shuffle the trials
 trials = api.shuffle(trials)
 
+function renderTrial(trial) {
+  let rendered = { ...trial }
+  for (let [key, value] of Object.entries(trial)) {
+    if (typeof value === 'function') {
+      rendered[key] = value()
+    }
+  }
+  return rendered
+}
+
 function autofill() {
-  api.log('running autofill')
+  api.debug('running autofill')
   while (step_index.value < trials.length) {
-    api.log('auto stepping')
+    api.debug('auto stepping')
+
+    var t = renderTrial(trials[step_index.value])
+    api.debug(t)
+    api.saveTrialData(t)
+
     nextStep()
   }
-  // autofil trial data
   // step to where we want to go
 }
 
@@ -133,6 +151,7 @@ function finalize() {
 
 function finish() {
   // do stuff if you want
+  api.removePageAutofill() // you are responsible for removing the autofill
   api.stepNextView()
 }
 </script>
