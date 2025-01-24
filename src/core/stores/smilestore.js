@@ -446,6 +446,8 @@ export default defineStore('smilestore', {
         //this.global.snapshot = { ...smilestore.$state.data }
         this.global.db_changes = false // reset the changes flag
         log.success('SMILESTORE: saveData() Request to firebase successful (force = ' + force + ')')
+      } else if (!this.data.consented && !this.local.consented) {
+        log.log('SMILESTORE: not saving because not consented')
       } else {
         log.error("SMILESTORE: can't save data, not connected to firebase")
       }
