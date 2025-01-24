@@ -163,6 +163,7 @@ export default function useAPI() {
       return new URL(`../../user/assets/${name}`, import.meta.url).href
     },
     saveTrialData: (data) => {
+      smilestore.data.trial_num += 1
       smilestore.saveTrialData(data)
       log.debug('SMILE API: data ', smilestore.data.study_data)
     },
