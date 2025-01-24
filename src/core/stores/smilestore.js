@@ -17,14 +17,11 @@ import sizeof from 'firestore-size'
 
 import useLog from '@/core/stores/log'
 
-
 ////////////  SET THE SEED FOR RANDOMIZATION //////////
 
 // note: we only need to run this on page load (not every time smilestore.js is imported in another file)
-// it seems like it doesn't re-run when we move to a new component that imports smilestore, 
+// it seems like it doesn't re-run when we move to a new component that imports smilestore,
 // so it's doing what we want apparently
-
-
 
 // get local storage
 const existingLocalStorage = JSON.parse(localStorage.getItem(appconfig.local_storage_key))
@@ -59,10 +56,11 @@ if (seed) {
   console.log('Set global seed to ' + seed)
 
   // save to local storage
-  localStorage.setItem(appconfig.local_storage_key, JSON.stringify({ ...existingLocalStorage, seedID: seed, seedSet: true }))
+  localStorage.setItem(
+    appconfig.local_storage_key,
+    JSON.stringify({ ...existingLocalStorage, seedID: seed, seedSet: true })
+  )
 }
-
-
 
 /////// continue with setting up smilestore ///////
 
@@ -121,7 +119,7 @@ const init_local = {
   seqtimeline: [],
   routes: [],
   conditions: {}, // tracking conditions both locally and remotely
-  randomizedRoutes: {},  // tracking randomized route assignments both locally and remotely
+  randomizedRoutes: {}, // tracking randomized route assignments both locally and remotely
 }
 
 const init_global = {
@@ -195,27 +193,27 @@ export default defineStore('smilestore', {
     getLocal: (state) => state.local,
     getPage: (state) => state.local.pageTracker,
     getConditions: (state) => state.local.conditions,
-    getRandomizedRoutes:  (state) => state.local.randomizedRoutes,
+    getRandomizedRoutes: (state) => state.local.randomizedRoutes,
     verifiedVisibility: (state) => state.data.verified_visibility,
     getShortId: (state) => {
-      if (state.local.docRef == null) return 'N/A';
-      const lastDashIndex = state.local.docRef.lastIndexOf('-');
+      if (state.local.docRef == null) return 'N/A'
+      const lastDashIndex = state.local.docRef.lastIndexOf('-')
       return `${state.local.docRef.substring(lastDashIndex - 6, lastDashIndex)}-${state.local.docRef.substring(lastDashIndex + 1)}`
-    }
+    },
   },
 
   actions: {
     manualSyncLocalToData() {
       // sync conditions to remote
       const log = useLog()
-      log.debug('SMILESTORE: syncing conditions, randomized routes to remote');
-      this.data.conditions = this.local.conditions;
-      this.data.randomized_routes = this.local.randomizedRoutes;
-      this.data.seedID = this.local.seedID;
+      log.debug('SMILESTORE: syncing conditions, randomized routes to remote')
+      this.data.conditions = this.local.conditions
+      this.data.randomized_routes = this.local.randomizedRoutes
+      this.data.seedID = this.local.seedID
     },
     setDBConnected() {
       if (this.global.db_connected === false) {
-        this.manualSyncLocalToData();
+        this.manualSyncLocalToData()
       }
       this.global.db_connected = true
     },
@@ -247,7 +245,7 @@ export default defineStore('smilestore', {
     },
     setSeedID(seed) {
       if (seed === this.local.seedID) {
-        console.debug('SMILESTORE: seed already set to', seed);
+        console.debug('SMILESTORE: seed already set to', seed)
         return
       }
       this.local.seedID = seed
