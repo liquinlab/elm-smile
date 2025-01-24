@@ -5,6 +5,16 @@ const api = useAPI()
 
 import CircleProgress from '@/dev/developer_mode/CircleProgress.vue'
 
+import { useKeyModifier } from '@vueuse/core'
+const altKeyState = useKeyModifier('Alt')
+
+// if in dev mode (which should always be true on this page), set known
+// if not a known user
+
+function connectDB() {
+  if (!api.local.knownUser) api.setKnown()
+}
+
 const database_tooltip = computed(() => {
   var msg = 'Toggle data panel | '
   if (api.global.db_connected == true) {
@@ -23,47 +33,70 @@ const database_tooltip = computed(() => {
   }
   return msg
 })
+
+const alt_tooltip = computed(() => {
+  return 'Create connection to Firestore database'
+})
 </script>
 
 <template>
-  <button
-    class="button devbar-button has-tooltip-arrow has-tooltip-bottom"
-    :data-tooltip="database_tooltip"
-    @click="api.dev.show_data_bar = !api.dev.show_data_bar"
-  >
-    <FAIcon icon="fa-solid fa-database" class="disconnected" :class="{ connected: api.global.db_connected == true }" />
-    &nbsp;&nbsp;|&nbsp;&nbsp;
-    <template v-if="!api.global.db_connected">
-      <FAIcon icon="fa-solid fa-rotate" class="has-text-grey" />
-    </template>
-    <template v-else-if="api.global.db_changes && api.global.db_connected">
-      <FAIcon icon="fa-solid fa-rotate" class="outofsync" />
-    </template>
-    <template v-else>
-      <FAIcon icon="fa-solid fa-rotate" class="insync" />
-    </template>
-    <template v-if="!api.global.db_connected">
-      &nbsp;&nbsp;|&nbsp;&nbsp;
-      <CircleProgress
-        :percentage="Math.round(api.local.approx_data_size / 1048576) * 100"
-        :size="12"
-        :strokeWidth="40"
-        slicecolor="#aaa"
-        basecolor="#aaa"
+  <div v-if="altKeyState && api.global.db_connected == false">
+    <button
+      class="button devbar-button has-tooltip-arrow has-tooltip-bottom"
+      :data-tooltip="alt_tooltip"
+      @click="connectDB"
+    >
+      <FAIcon
+        icon="fa-solid fa-cloud-arrow-up"
+        class="notconnected"
+        :class="{ connected: api.global.db_connected == true }"
       />
-    </template>
-    <template v-else>
+    </button>
+  </div>
+  <div v-else>
+    <button
+      class="button devbar-button has-tooltip-arrow has-tooltip-bottom"
+      :data-tooltip="database_tooltip"
+      @click="api.dev.show_data_bar = !api.dev.show_data_bar"
+    >
+      <FAIcon
+        icon="fa-solid fa-database"
+        class="disconnected"
+        :class="{ connected: api.global.db_connected == true }"
+      />
       &nbsp;&nbsp;|&nbsp;&nbsp;
+      <template v-if="!api.global.db_connected">
+        <FAIcon icon="fa-solid fa-rotate" class="has-text-grey" />
+      </template>
+      <template v-else-if="api.global.db_changes && api.global.db_connected">
+        <FAIcon icon="fa-solid fa-rotate" class="outofsync" />
+      </template>
+      <template v-else>
+        <FAIcon icon="fa-solid fa-rotate" class="insync" />
+      </template>
+      <template v-if="!api.global.db_connected">
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        <CircleProgress
+          :percentage="Math.round(api.local.approx_data_size / 1048576) * 100"
+          :size="12"
+          :strokeWidth="40"
+          slicecolor="#aaa"
+          basecolor="#aaa"
+        />
+      </template>
+      <template v-else>
+        &nbsp;&nbsp;|&nbsp;&nbsp;
 
-      <CircleProgress
-        :percentage="Math.round(api.local.approx_data_size / 1048576) * 100"
-        :size="12"
-        :strokeWidth="40"
-        slicecolor="hsl(var(--bulma-button-h), var(--bulma-button-s), calc(var(--bulma-button-background-l) + var(--bulma-button-background-l-delta)))"
-        basecolor="var(--status-green)"
-      />
-    </template>
-  </button>
+        <CircleProgress
+          :percentage="Math.round(api.local.approx_data_size / 1048576) * 100"
+          :size="12"
+          :strokeWidth="40"
+          slicecolor="hsl(var(--bulma-button-h), var(--bulma-button-s), calc(var(--bulma-button-background-l) + var(--bulma-button-background-l-delta)))"
+          basecolor="var(--status-green)"
+        />
+      </template>
+    </button>
+  </div>
 </template>
 
 <style scoped>
@@ -78,5 +111,8 @@ const database_tooltip = computed(() => {
 }
 .insync {
   color: var(--status-green);
+}
+.notconnected {
+  color: var(--darker-grey);
 }
 </style>

@@ -371,8 +371,12 @@ Next, create a `gpg` RSA key pair for yourself (e.g., lab manager/pi) see
 type:
 
 ```
-gpg --gen-key
+gpg --full-generate-key
 ```
+
+In the prompts just choose the default options and make sure to remember the
+passphrase you use. You also will want to set the expiration of the key to 0
+(never expire).
 
 Next, add the first user to your repo:
 

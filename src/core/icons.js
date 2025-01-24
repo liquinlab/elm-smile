@@ -12,6 +12,7 @@ import { faDownload } from '@fortawesome/free-solid-svg-icons'
 import { faGear } from '@fortawesome/free-solid-svg-icons'
 import { faBook } from '@fortawesome/free-solid-svg-icons'
 import { faClock } from '@fortawesome/free-solid-svg-icons'
+import { faCloudArrowUp } from '@fortawesome/free-solid-svg-icons'
 import { faArrowsTurnToDots } from '@fortawesome/free-solid-svg-icons'
 import { faArrowRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { faExplosion } from '@fortawesome/free-solid-svg-icons'
@@ -73,6 +74,7 @@ library.add(
   farCircle,
   faQrcode,
   faDownload,
+  faCloudArrowUp,
   faClock,
   farClock,
   faCodeBranch,
@@ -129,5 +131,5 @@ library.add(
   faAnglesRight,
   faAnglesLeft,
   faHammer,
-  faDiamond,
+  faDiamond
 )

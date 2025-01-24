@@ -58,13 +58,13 @@ function submitWithdraw() {
         <img src="@/user/assets/universitylogo.png" width="90" />
       </a>
       <div class="infobar-item">
-        <p class="is-size-7 studyinfo">
+        <p class="is-size-7 studyinfo pt-2">
           Study: {{ smilestore.config.code_name }}<br />Version: {{ smilestore.config.github.last_commit_hash
           }}{{
             appconfig.mode === 'testing' || appconfig.mode === 'development' || appconfig.mode === 'presentation'
               ? '-' + appconfig.mode
               : ''
-          }}
+          }}<br />User ID: {{ smilestore.getShortId }}
         </p>
       </div>
     </div>
