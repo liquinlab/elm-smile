@@ -30,9 +30,6 @@ const filteredRoutes = routes.filter((r) => {
 
 // now append seqtimeline and filteredRoutes
 const allRoutes = seqtimeline.concat(filteredRoutes)
-console.log('allRoutes', allRoutes)
-console.log(routerRoutes)
-
 
 const forceMode = ref(true)
 
@@ -74,12 +71,13 @@ function navigate(route) {
       >
         <span class="is-size-7">
           <!-- fa icon arrow down -->
-          
-          <div class="routename"> 
-            <span v-if="r.meta.level > 0" v-for="i in r.meta.level" style="margin-left: 5px;">&nbsp;</span>
-            <FAIcon v-if="r.meta.sequential" icon="fa-solid fa-arrow-down" /> 
-            <FAIcon v-else icon="fa-solid fa-diamond" /> 
-            /{{ r.name }}</div>
+
+          <div class="routename">
+            <span v-if="r.meta.level > 0" v-for="i in r.meta.level" style="margin-left: 5px">&nbsp;</span>
+            <FAIcon v-if="r.meta.sequential" icon="fa-solid fa-arrow-down" />
+            <FAIcon v-else icon="fa-solid fa-diamond" />
+            /{{ r.name }}
+          </div>
           <div class="forcebutton forcemode" v-if="altKeyState && hoverRoute === r.name">
             <FAIcon icon="fa-solid fa-square-caret-right" />
           </div>
