@@ -15,12 +15,22 @@ const api = useAPI()
 //    and if they are, they redirect to last route
 function addGuards(r) {
   r.beforeEach((to, from) => {
+    if (api.isResetApp()) {
+      log.warn('ROUTER GUARD: Resetting app')
+      api.resetLocalState()
+    }
+
     // check if status change on previous
     if (from.meta !== undefined && from.meta.setConsented !== undefined && from.meta.setConsented) {
       api.completeConsent()
     }
+
     if (from.meta !== undefined && from.meta.setDone !== undefined && from.meta.setDone) {
       api.setDone()
+    }
+
+    if (to.meta !== undefined && to.meta.resetApp !== undefined && to.meta.resetApp) {
+      api.resetApp() // set reset app on next load
     }
 
     // Set queries to be combination of from queries and to queries
@@ -247,6 +257,7 @@ log.log('Vue Router initialized')
 router.beforeResolve((to) => {
   const smilestore = useSmileStore()
   smilestore.removePageAutofill()
+
   if (smilestore.local.useSeed) {
     // if we're using a seed
     const seedID = smilestore.getSeedID

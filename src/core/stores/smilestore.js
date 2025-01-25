@@ -108,6 +108,7 @@ const init_local = {
   consented: false,
   withdrawn: false,
   done: false,
+  reset: false,
   totalWrites: 0,
   lastWrite: null,
   approx_data_size: 0,
@@ -242,6 +243,9 @@ export default defineStore('smilestore', {
     },
     setCompletionCode(code) {
       this.local.completionCode = code
+    },
+    resetApp() {
+      this.local.reset = true
     },
     setSeedID(seed) {
       if (seed === this.local.seedID) {

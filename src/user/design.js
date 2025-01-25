@@ -212,13 +212,19 @@ timeline.pushSeqView({
 timeline.pushSeqView({
   name: 'thanks',
   component: Thanks,
-  meta: { requiresDone: true },
+  meta: {
+    requiresDone: true,
+    resetApp: smilestore.config.allow_repeats,
+  },
 })
 
 // this is a special page that is for a withdraw
 timeline.registerView({
   name: 'withdraw',
-  meta: { requiresWithdraw: true },
+  meta: {
+    requiresWithdraw: true,
+    resetApp: smilestore.config.allow_repeats,
+  },
   component: Withdraw,
 })
 

@@ -48,6 +48,12 @@ export default function useAPI() {
     // isConsented: smilestore.local.consented,
     // isWithdrawn: smilestore.local.withdrawn,
     urls: smilestore.global.urls,
+    resetApp: () => {
+      smilestore.resetApp()
+    },
+    isResetApp: () => {
+      return smilestore.local.reset
+    },
     resetStore: () => {
       smilestore.resetLocal()
     },

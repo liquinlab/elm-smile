@@ -264,6 +264,32 @@ was requested progamatically it should be allowed. The first link type means
 that either the programmer or the participant constructed the request and so it
 is disallowed.
 
+### Repeating a task more than once
+
+The route permissions mean that participants move through the phases of your
+study in a predictable and determined way. However, at the end of a study they
+might be allowed to repeat the task. If you want to allow repeats then you can
+set the `VITE_ALLOW_REPEATS` variable in the `env/.env`.
+
+Then, in the last route of your experiment you can set the `resetApp` field.
+
+```js
+// thanks/submit page
+timeline.pushSeqView({
+  name: 'thanks',
+  component: Thanks,
+  meta: {
+    requiresDone: true,
+    resetApp: smilestore.config.allow_repeats,
+  },
+})
+```
+
+When this is set, the _next_ request to the app will reset the app to the start
+deleting the local storage and allowing the participant to start the experiment
+again. If `VITE_ALLOW_REPEATS` is not set then the app will not allow a
+participant to repeat any part of the task again.
+
 ### Creating a timeline
 
 A timeline is created like this:
