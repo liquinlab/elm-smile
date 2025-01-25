@@ -18,7 +18,7 @@ code, the overall logic behind how it works, and how to set it up for a new lab.
 
 ## Getting started quickly
 
-If you start your project using the <SmileText /> github template, and are in
+If you start your project using the <SmileText /> Github template, and are in
 the gureckislab and follow the [starting a new project](/starting) guide then
 there's nothing else for you to do. Your application already has the ability to
 save data to a password protected lab database and will begin saving the data
@@ -202,41 +202,28 @@ information. In addition, <SmileText/>'s global storage state provides methods
 for easily persisting values of the state by writing them either to Google
 Firebase/Firestore or the LocalStorage in the browser.
 
-### Data is recorded in the global app store
+## Writing Data to the Global Store
 
-To access this global "store" within any other component or script simply import
-the `useSmileStore` method and create a reference to the store instance:
+The preferred way write write data to the store is to use the [Smile API](/api):
 
 ```vue
 <script setup>
-import { useSmileStore } from '@/core/stores/smilestore'
-const smilestore = useSmileStore()
-<script>
+import SmileAPI from '@/core/composables/useAPI'
+const api = SmileAPI()
+
+api.saveTrialData({
+        trialnum: step_index.value,
+        word: step.value.word,
+        color: step.value.color,
+        condition: step.value.condition,
+        response: e.key,
+      })
 ```
 
-Typically this would happen in the `<script setup>` section of your component
-(assuming you are using the Vue 3 Composition API). To see an example of how you
-use the store, consider the consent form page
-(`src/components/pages/ConsentPage.vue`). This page displays informed consent
-and then provides a button that when clicked advances to the next part of the
-experiment (a method called `finish(goto)`).
+The API provides several useful methods for saving data to the store (see the
+[full docs](/api)).
 
-```js
-function finish(goto) {
-  smilestore.setConsented()
-  smilestore.saveData()
-  router.push(goto)
-}
-```
-
-The first line of this function sets the user as "consented." Consenting is a
-property of the global state/store that is accessible to other components which
-might want to check if the user has consented yet. In addition, it is made
-persistent via the `smilestore.saveData()` method which makes a copy of the
-current application state in the Firebase database.
-
-## Writing Data to the Global Store
-
+An alternative way to write data to the store is to use the `smilestore` object
 Writing to the global store is as simple as updating a Javascript object in
 memory. In any Vue component simple write
 
@@ -250,21 +237,16 @@ smilestore.data.something = true
 <script>
 ```
 
-A more preferred way is to modify `src/stores/smilestore.js` to add new setter
-and getter methods for your data type. Setters are function defined under the
-`actions` property that can be called via `smilestore.action()` (if the method
-was named `action`). You can use these to modify the state.
-
-Similarly under `getters` you can define new properties that 'get' the value of
-the state. For example, consider one getter:
+You can also add custom setter and getter methods for your data type in
+`src/core/stores/smilestore.js`. For example, in that file
 
 ```js
 isConsented: (state) => state.data.consented
 ```
 
-returns the value of `state.data.consented`. In your component code then you
-call `smilestore.isConsented()` to check if the use has agreed to the consent
-form yet.
+which returns the value of `state.data.consented`. In your component code then
+you call `smilestore.isConsented()` to check if the use has agreed to the
+consent form yet.
 
 ## Automatically recorded data
 
@@ -285,8 +267,7 @@ TimelineStepper using `env/.env` using option `VITE_AUTO_SAVE_DATA`.
 :::warning
 
 This only works if you use the `TimelineStepper` to move between pages. If you
-advance to new pages on your own you need to call `smilestore.saveData()`
-manually.
+advance to new pages on your own you need to call `api.saveData()` manually.
 
 :::
 
