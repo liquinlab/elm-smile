@@ -228,9 +228,8 @@ function finish() {
                 </div>
                 <div class="column">
                   <div class="has-text-right">
-                    <button class="button is-warning" id="finish" v-if="page_two_complete" @click="finish()">
-                      Continue &nbsp;
-                      <FAIcon icon="fa-solid fa-arrow-right" />
+                    <button class="button is-success" id="finish" v-if="page_two_complete" @click="finish()">
+                      I'm done! &nbsp;
                     </button>
                   </div>
                 </div>
