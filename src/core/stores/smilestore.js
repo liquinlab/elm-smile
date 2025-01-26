@@ -199,7 +199,7 @@ export default defineStore('smilestore', {
     getShortId: (state) => {
       if (state.local.docRef == null) return 'N/A'
       const lastDashIndex = state.local.docRef.lastIndexOf('-')
-      return `${state.local.docRef.substring(lastDashIndex - 6, lastDashIndex)}-${state.local.docRef.substring(lastDashIndex + 1)}`
+      return `${state.local.docRef.substring(0, 10)}`
     },
   },
 
