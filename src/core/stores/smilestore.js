@@ -157,6 +157,7 @@ export default defineStore('smilestore', {
     },
     data: {
       // syncs with firestore
+      app_start_time: Date.now(),
       seedID: '',
       trial_num: 0, // not being updated correctly
       consented: false,
@@ -418,7 +419,26 @@ export default defineStore('smilestore', {
       // }
     },
     recordRoute(route) {
-      this.data.route_order.push(route)
+      const currentTime = Date.now()
+
+      // If there's a previous route, update its delta
+      if (this.data.route_order.length > 0) {
+        const lastIndex = this.data.route_order.length - 1
+        const lastRoute = this.data.route_order[lastIndex]
+
+        // Calculate and update the delta for the previous route
+        this.data.route_order[lastIndex] = {
+          ...lastRoute,
+          timeDelta: currentTime - lastRoute.timestamp,
+        }
+      }
+
+      // Add the new route without a delta (will be calculated on next route change)
+      this.data.route_order.push({
+        route,
+        timestamp: currentTime,
+        timeDelta: null, // Delta will be set when next route is recorded
+      })
     },
     async saveData(force = false) {
       const log = useLog()
