@@ -64,7 +64,8 @@ function submitWithdraw() {
             appconfig.mode === 'testing' || appconfig.mode === 'development' || appconfig.mode === 'presentation'
               ? '-' + appconfig.mode
               : ''
-          }}<br />User ID: {{ smilestore.getShortId }}
+          }}<br />
+          <template v-if="smilestore.getShortId != 'N/A'"> User ID: {{ smilestore.getShortId }} </template>
         </p>
       </div>
     </div>
