@@ -14,7 +14,7 @@ const api = useAPI()
 //    currently these check if user is known
 //    and if they are, they redirect to last route
 function addGuards(r) {
-  r.beforeEach((to, from) => {
+  r.beforeEach(async (to, from) => {
     if (api.isResetApp()) {
       log.warn('ROUTER GUARD: Resetting app')
       api.resetLocalState()
@@ -51,12 +51,11 @@ function addGuards(r) {
     // log.debug('allowAlways', to.meta.allowAlways)
 
     const smilestore = useSmileStore()
-    log.warn('ROUTER GUARD: Navigating to ', to)
     // on startup set the page to not autofill by default
 
     // if the database isn't connected and they're a known user, reload their data
     if (smilestore.isKnownUser && !smilestore.isDBConnected) {
-      smilestore.loadData()
+      const res = await smilestore.loadData()
     }
 
     // if withdrew
