@@ -6,7 +6,7 @@ import appconfig from '@/core/config'
 import useAPI from '@/core/composables/useAPI'
 // load sub-components used in this compomnents
 import WithdrawFormModal from '@/builtins/withdraw/WithdrawFormModal.vue'
-import InformedConsentModal from '@/builtins/simple-consent/InformedConsentModal.vue'
+import InformedConsentModal from '@/builtins/simple_consent/InformedConsentModal.vue'
 import ReportIssueModal from '@/builtins/report_issue/ReportIssueModal.vue'
 
 const router = useRouter()

@@ -197,7 +197,7 @@ this.registerView({
 
 **Base Component**: `@/builtins/consent/InformedConsentView.vue`  
 **Code**:
-[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/simple-consent/InformedConsentView.vue)  
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/simple_consent/InformedConsentView.vue)  
 **Side effects**: Yes, sets the `isConsented` key in the [API](/api) to true.  
 **Typical accessibility**: `{requiresConsent: false, requiresDone: false}`
 
