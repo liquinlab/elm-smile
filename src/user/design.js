@@ -14,7 +14,7 @@ import { processQuery } from '@/core/utils'
 // 1. Import main built-in View components
 import Advertisement from '@/builtins/advertisement/AdvertisementView.vue'
 import MTurk from '@/builtins/mturk/MTurkRecruitView.vue'
-import Consent from '@/builtins/simple-consent/InformedConsentView.vue'
+import Consent from '@/builtins/simple_consent/InformedConsentView.vue'
 import DemographicSurvey from '@/builtins/demographic_survey/DemographicSurveyView.vue'
 import DeviceSurvey from '@/builtins/device_survey/DeviceSurveyView.vue'
 import Captcha from '@/builtins/captcha/CaptchaView.vue'
@@ -29,7 +29,6 @@ import Exp from '@/builtins/tasks/ExpView.vue'
 import Task1 from '@/builtins/tasks/Task1View.vue'
 import Task2 from '@/builtins/tasks/Task2View.vue'
 import StroopExp from '@/user/components/stroop_exp/StroopView.vue'
-import InstructionJumperView from '@/user/components/InstructionJumperView.vue'
 
 // #3. Import smile API and timeline
 import useAPI from '@/core/composables/useAPI'
@@ -162,13 +161,6 @@ timeline.pushSeqView({
   path: '/experiment',
   component: Exp,
 })
-
-// instruction jumper
-
-// timeline.pushSeqView({
-//   name: 'instruction_jumper',
-//   component: InstructionJumperView,
-// })
 
 ////// example of randomized branching routes
 // (you can also have conditional branching based on conditions -- see docs)
