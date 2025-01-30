@@ -1,5 +1,5 @@
 <script setup>
-import DebriefText from '@/builtins/debrief/DebriefText.vue' // get access to the global store
+import DebriefText from '@/user/components/DebriefText.vue' // get access to the global store
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
