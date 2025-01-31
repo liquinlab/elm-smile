@@ -1,10 +1,12 @@
 <script setup>
 const emit = defineEmits(['nextPageCaptcha'])
 import { ref, reactive, onMounted } from 'vue'
-
+const props = defineProps({
+  timed_task: Boolean,
+})
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
-
+import { animate } from 'motion'
 // use SVG
 import { SVG } from '@svgdotjs/svg.js'
 
@@ -15,7 +17,8 @@ import { SVG } from '@svgdotjs/svg.js'
 // import and initalize smile API
 // import useAPI from '@/core/composables/useAPI'
 // const api = useAPI()
-const timed_task = false
+// set timed_task using props
+const timed_task = props.timed_task
 let MAX_TIME = 15000
 let start_time
 let timeout = ref(0)
@@ -32,8 +35,8 @@ const svg = reactive({
   bound: null,
   circleX: 0,
   circleY: 0,
-  radius: 3,
-  strokewidth: 10,
+  radius: 9,
+  strokewidth: 2,
 })
 // Reactive variables
 //const finished = ref(false)
@@ -103,6 +106,18 @@ onMounted(() => {
   timeout.value = ((MAX_TIME - (Date.now(0) - start_time)) / MAX_TIME) * 100
   api.debug(`${timeout}`)
 
+  // Add pulsing animation to the circle
+  const circle = document.querySelector('#circle')
+  animate(
+    circle,
+    { r: [svg.radius, svg.radius + 2, svg.radius] },
+    {
+      duration: 1.2,
+      easing: 'ease-in-out',
+      repeat: Infinity,
+    }
+  )
+
   if (timed_task) {
     var myInterval = setInterval(() => {
       timeout.value = ((MAX_TIME - (Date.now(0) - start_time)) / MAX_TIME) * 100
@@ -120,12 +135,14 @@ function finished_task() {
 }
 // Function to generate the grid
 function generateGrid() {
-  grid.value = Array.from({ length: rows.value }, () => Array.from({ length: cols.value }, () => 'black'))
+  grid.value = Array.from({ length: rows.value }, () => Array.from({ length: cols.value }, () => '#60d3af'))
   let y = 7 //Math.floor(Math.random() * rows.value) // Random starting row
   let path = [[0, y]]
 
   // Continue building the path until the rightmost column is reached
-  while (path[path.length - 1][0] < rows.value - 1) {
+  // choose a random integer between 2 and rows.value - 1
+  let stop = Math.max(4, Math.floor(Math.random() * (rows.value - 2)))
+  while (path[path.length - 1][0] < stop) {
     let x = path[path.length - 1][0]
     let y = path[path.length - 1][1]
     let possibleMoves = []
@@ -192,6 +209,14 @@ const flag_touch = () => {
   }
 }
 
+function getCellColor(color) {
+  if (color == 'white') {
+    return 'src/assets/captcha/maze/road.png'
+  } else {
+    return 'src/assets/captcha/maze/emptygrass.png'
+  }
+}
+
 /*
 
 */
@@ -200,44 +225,65 @@ const flag_touch = () => {
 </script>
 
 <template>
-  <div class="instructions prevent-select">
-    <h1 class="title">Don't touch the black squares</h1>
-    <p class="is-size-5 has-text-center">...while dragging the pink dot to the flag</p>
+  <div class="prevent-select">
+    <h1 class="title pb-0 mb-0">Don't walk on the grass!</h1>
+    <p class="is-size-5 has-text-center pb-4">
+      ...while dragging the pink dot to the flag <img id="flag" src="/src/assets/captcha/maze/flag.svg" width="30" />
+    </p>
     <svg class="maze" ref="svgCanvas" width="500px" height="500px" @mouseup="stopDragging" @mouseleave="stopDragging">
-      <template v-for="(row, rowIndex) in grid" :key="rowIndex">
-        <template v-for="(color, colIndex) in row" :key="colIndex">
+      <rect width="500" height="500" fill="#60d3af" />
+      <g v-for="(row, rowIndex) in grid" :key="rowIndex">
+        <g v-for="(color, colIndex) in row" :key="colIndex">
           <!-- Conditionally render flag image at specified location -->
+          <rect
+            v-if="rowIndex === flagLocation.row && colIndex === flagLocation.col"
+            :x="colIndex * rectWidth + startGrid"
+            :y="rowIndex * rectHeight"
+            :width="rectWidth"
+            :height="rectHeight"
+            fill="white"
+          />
           <image
             v-if="rowIndex === flagLocation.row && colIndex === flagLocation.col"
             :x="colIndex * rectWidth"
             :y="rowIndex * rectHeight"
             :width="rectWidth"
             :height="rectHeight"
-            fill="white"
-            xlink:href="/src/assets/captcha/flag.svg"
-            stroke="green"
+            xlink:href="/src/assets/captcha/maze/road.png"
+            stroke="black"
           />
-          <rect
+
+          <image
             v-else
             :x="colIndex * rectWidth + startGrid"
             :y="rowIndex * rectHeight"
             :width="rectWidth"
             :height="rectHeight"
-            :fill="color"
+            :xlink:href="getCellColor(color)"
           />
-        </template>
-      </template>
+        </g>
+      </g>
       <path id="mazewall" d="" />
       <path id="trace" ref="path" stroke="pink" stroke-width="3" :d="svg.pathString" fill="none" />
+      <image
+        id="flagg"
+        :x="flagLocation.col * rectWidth"
+        :y="flagLocation.row * rectHeight"
+        :width="rectWidth"
+        :height="rectHeight"
+        xlink:href="/src/assets/captcha/maze/flag.svg"
+        transform-origin="center center"
+        style="transform-box: fill-box; transform-origin: center"
+      />
       <circle
         id="circle"
         ref="circle"
-        :cx="svg.circleX"
-        :cy="svg.circleY"
+        :cx="svg.circleX + 6"
+        :cy="svg.circleY - 2"
         :r="svg.radius"
-        fill="salmon"
         :stroke-width="svg.strokewidth"
-        stroke="salmon"
+        stroke="#ED6B83"
+        fill="#F2BBBB"
         @mousedown="startDragging"
       />
     </svg>
@@ -250,13 +296,12 @@ const flag_touch = () => {
 </template>
 
 <style scoped>
-.instructions {
-  width: 60%;
-  margin: auto;
+.black {
+  background-color: #79f2cc;
 }
 .feedback {
-  width: 500px;
-  height: 500px;
+  width: 800px;
+  height: 800px;
   background-color: black;
   color: white;
   font-size: 50px;
@@ -266,6 +311,10 @@ const flag_touch = () => {
 }
 
 svg {
-  border: 3px solid v-bind(bordercolor);
+  border: 1px solid v-bind(bordercolor);
+  background-color: '#60d3af';
+  background: '#60d3af';
+  fill: '#60d3af';
+  margin: auto;
 }
 </style>
