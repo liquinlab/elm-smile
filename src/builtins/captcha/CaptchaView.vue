@@ -4,10 +4,11 @@ import { shallowRef, ref, computed } from 'vue'
 import CaptchaInstructionsText_01 from '@/builtins/captcha/CaptchaInstructionsText_01.vue'
 import CaptchaInstructionsText_02 from '@/builtins/captcha/CaptchaInstructionsText_02.vue'
 import CaptchaTrialImageCategorization from '@/builtins/captcha/CaptchaTrialImageCategorization.vue'
-import CaptchaTrialMotorControl from '@/builtins/captcha/CaptchaTrialMotorControl.vue'
+import CaptchaTrialMaze from '@/builtins/captcha/CaptchaTrialMaze.vue'
 import CaptchaTrialTextComprehension from '@/builtins/captcha/CaptchaTrialTextComprehension.vue'
 import CaptchaTrialStroop from '@/builtins/captcha/CaptchaTrialStroop.vue'
 import CaptchaRotateImage from '@/builtins/captcha/CaptchaRotateImage.vue'
+import CaptchaButtonPress from '@/builtins/captcha/CaptchaButtonPress.vue'
 
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
@@ -18,13 +19,21 @@ const api = useAPI()
 // possibly altered so that there is lots of substructure to it
 
 const pages = [
-  { component: CaptchaInstructionsText_01, props: { adjective: 'wonderful' }, data: [] },
-  { component: CaptchaTrialTextComprehension, props: {}, data: [] },
+  { component: CaptchaInstructionsText_01, props: { adjective: '' }, data: [] },
+  { component: CaptchaTrialTextComprehension, props: { timed_task: false }, data: [] },
   { component: CaptchaInstructionsText_02, props: {}, data: [] },
-  { component: CaptchaTrialImageCategorization, props: {}, data: [] },
-  { component: CaptchaTrialMotorControl, props: {}, data: [] },
+  //{ component: CaptchaTrialImageCategorization, props: {}, data: [] },
+  { component: CaptchaTrialMaze, props: { timed_task: false }, data: [] },
   { component: CaptchaRotateImage, props: {}, data: [] },
-  { component: CaptchaTrialMotorControl, props: {}, data: [] },
+  { component: CaptchaButtonPress, props: {}, data: [] },
+  { component: CaptchaRotateImage, props: {}, data: [] },
+  { component: CaptchaTrialMaze, props: { timed_task: false }, data: [] },
+  { component: CaptchaRotateImage, props: {}, data: [] },
+  { component: CaptchaButtonPress, props: {}, data: [] },
+  { component: CaptchaRotateImage, props: {}, data: [] },
+  { component: CaptchaTrialTextComprehension, props: { timed_task: false }, data: [] },
+  { component: CaptchaRotateImage, props: {}, data: [] },
+  { component: CaptchaTrialMaze, props: { timed_task: false }, data: [] },
 ]
 
 const currentTab = computed(() => {
@@ -87,7 +96,13 @@ function finish() {
     </div>
 
     <!-- Component changes when currentTab changes -->
-    <component :is="currentTab.component" v-bind="currentTab.props" @next-page-captcha="next_trial()" v-else>
+    <component
+      :is="currentTab.component"
+      v-bind="currentTab.props"
+      @next-page-captcha="next_trial()"
+      :key="api.getCurrentTrial()"
+      v-else
+    >
     </component>
   </div>
 </template>
