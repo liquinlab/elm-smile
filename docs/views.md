@@ -195,10 +195,10 @@ this.registerView({
 
 ### Simple Informed Consent
 
-**Base Component**: `@/builtins/consent/InformedConsentView.vue`  
+**Base Component**: `@/builtins/simple_consent/InformedConsentView.vue`  
 **Code**:
 [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/simple_consent/InformedConsentView.vue)  
-**Side effects**: Yes, sets the `isConsented` key in the [API](/api) to true.  
+**Side effects**: No  
 **Typical accessibility**: `{requiresConsent: false, requiresDone: false}`
 
 Most studies require some type of informed consent from participants. This is
@@ -207,27 +207,28 @@ and responsibilities. The Informed Consent View is a simple page that displays
 this text and asks the participant to agree to participate by clicking a
 checkbox. If the participant agrees, then the Informed Consent View sets a flag
 in the application state indicating that the participant has consented. Clicking
-a button continue to the next View in the timeline.
+a button continues to the next View in the timeline.
 
 The text of the informed consent should be updated for each study and placed in
-`@/builtins/consent/InformedConsentText.vue`.
+`@/user/components/InformedConsentText.vue`.
 
 After a participant accepts the informed consent (usually the first few steps of
 study) they will see a button in the [status bar](#status-bar) that will always
 be available allowing them to review the consent form in case they have
 questions. Click this button pops up a modal with the text of the informed
-consent (also `@/builtins/consent/InformedConsentText.vue`).
+consent (also `@/builtins/simple_consent/InformedConsentText.vue`).
 
 ```js
 // put this at the top of the file
-import Consent from '@/builtins/consent/InformedConsentView.vue'
+import Consent from '@/builtins/simple_consent/InformedConsentView.vue'
 
+// consent
 timeline.pushSeqView({
-  path: '/consent',
   name: 'consent',
   component: Consent,
   meta: {
     requiresConsent: false,
+    setConsented: true, // set the status to consented ater this route
   },
 })
 ```
@@ -372,6 +373,9 @@ default survey asks for the following information:
 - Did you use any tools to help you complete the task? (e.g., calculator, notes,
   browser extensions, AI tools, other)
 
+If you want this to be the last view in the study you can set the `setDone` meta
+field.
+
 ```js
 // put this at the top of the file
 import DeviceSurvey from '@/builtins/device_survey/DeviceSurveyView.vue'
@@ -380,6 +384,7 @@ timeline.pushSeqView({
   path: '/demograph',
   name: 'demograph',
   component: DeviceSurvey,
+  meta: { setDone: true }, // optional if this is the last form
 })
 ```
 
@@ -417,9 +422,35 @@ the participant.
 **Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
 **Typical accessibility**: Always
 
-### Feedback
+### Feedback Survey
 
-Coming soon
+**Component**: `src/builtins/task_survey/TaskFeedbackSurveyView.vue`  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/task_survey/TaskFeedbackSurveyView.vue.vue)  
+**Side effects**: Yes, saves the data from the form.  
+**Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
+
+The task survey asks some simple questions about the participant's experience in
+the task includeing
+
+- How enjoyable was the task?
+- How difficult was the task?
+- General comments
+- Comments about issues or improvements
+
+If you want this to be the last view in the study you can set the `setDone` meta
+field.
+
+```js
+// put this at the top of the file
+import TaskFeedbackSurvey from '@/builtins/device_survey/TaskFeedbackSurveyView.vue'
+
+timeline.pushSeqView({
+  name: 'feedback',
+  component: TaskFeedbackSurvey,
+  meta: { setDone: true }, // optional if this is the last form
+})
+```
 
 ### Report Issue
 
