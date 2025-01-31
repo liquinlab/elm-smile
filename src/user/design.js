@@ -20,6 +20,7 @@ import DeviceSurvey from '@/builtins/device_survey/DeviceSurveyView.vue'
 import Captcha from '@/builtins/captcha/CaptchaView.vue'
 import Instructions from '@/builtins/instructions/InstructionsView.vue'
 import Debrief from '@/builtins/debrief/DebriefView.vue'
+import TaskFeedbackSurvey from '@/builtins/task_survey/TaskFeedbackSurveyView.vue'
 import Thanks from '@/builtins/thanks/ThanksView.vue'
 import Withdraw from '@/builtins/withdraw/WithdrawView.vue'
 import WindowSizer from '@/builtins/window_sizer/WindowSizerView.vue'
@@ -197,7 +198,13 @@ timeline.pushSeqView({
 timeline.pushSeqView({
   name: 'device',
   component: DeviceSurvey,
-  meta: { setDone: true },
+})
+
+// debriefing form
+timeline.pushSeqView({
+  name: 'feedback',
+  component: TaskFeedbackSurvey,
+  meta: { setDone: true }, // this is the last form
 })
 
 // thanks/submit page
