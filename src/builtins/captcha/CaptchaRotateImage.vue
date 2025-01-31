@@ -1,50 +1,73 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, onUnmounted } from 'vue'
+import { useMouse } from '@vueuse/core'
 const emit = defineEmits(['nextPageCaptcha'])
 
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
-let MAX_TIME = 15000
+const MAX_TIME = 15000
 let start_time
 let timeout = ref(0)
 
-const imageURL = ref('cup.jpg') // Image Refs remains confusing -- need to sort this out
-const imageRef = ref()
-let initRotation = getRandomRotation() // chose this randomly
+// Use VueUse mouse composable for position
+const { x, y } = useMouse()
 
-function getRandomRotation() {
-  // Generate a random number between -9 and 9
-  const randomNum = Math.floor(Math.random() * 19) - 9
-  // Multiply the random number by 10 to get increments of 10
-  return randomNum * 10
+// Generate random image filename
+function getRandomImageFile() {
+  const index = String(Math.floor(Math.random() * 20)).padStart(3, '0')
+  const rotation = String(Math.floor(Math.random() * 24) * 15).padStart(3, '0')
+  return `${index}_${rotation}.jpg`
 }
 
-const rotateImage = (rotationAmount) => {
-  //const rotationAmount = direction === 'left' ? -90 : 90
-  if (imageRef.value) {
-    imageRef.value.style.transform = `rotate(${rotationAmount}deg)`
-  }
-}
+const imageFile = ref(null)
+const imageRef = ref(null)
+const containerRef = ref(null)
+let currentRotation = ref(0)
 
-const rotateImageDelta = (rotationAmount) => {
-  //const rotationAmount = direction === 'left' ? -90 : 90
-  if (imageRef.value) {
-    initRotation += rotationAmount
-    api.log(`${initRotation}`)
-    imageRef.value.style.transform = `rotate(${initRotation}deg)`
-  }
+// Watch for mouse position changes and update rotation
+watch(x, (newX) => {
+  if (!containerRef.value || !imageRef.value) return
+
+  // Get the center of the image
+  const rect = containerRef.value.getBoundingClientRect()
+  const centerX = rect.left + rect.width / 2
+
+  // Calculate rotation based on mouse position relative to center
+  const scaleFactor = 0.5
+  const rotationDegrees = (newX - centerX) * scaleFactor
+
+  currentRotation.value = rotationDegrees
+  imageRef.value.style.transform = `rotate(${rotationDegrees}deg)`
+})
+
+// Handle clicks directly through window event
+const handleClick = (e) => {
+  console.log('clicked', y.value)
+
+  if (y.value < 30) return
+
+  api.log(`Final rotation: ${currentRotation.value}`)
+  emit('nextPageCaptcha')
 }
 
 onMounted(() => {
-  rotateImage(initRotation)
+  // Add click handler
+  window.addEventListener('mousedown', handleClick)
+  console.log('randomizing image')
+  imageFile.value = getRandomImageFile()
   start_time = Date.now()
-  timeout.value = ((MAX_TIME - (Date.now(0) - start_time)) / MAX_TIME) * 100
-  api.log(`${timeout}`)
+  timeout.value = ((MAX_TIME - (Date.now() - start_time)) / MAX_TIME) * 100
 })
 
-var myInterval = setInterval(() => {
-  timeout.value = ((MAX_TIME - (Date.now(0) - start_time)) / MAX_TIME) * 100
+onUnmounted(() => {
+  console.log('unmounting')
+  // Clean up click handler
+  window.removeEventListener('mousedown', handleClick)
+})
+
+const myInterval = setInterval(() => {
+  timeout.value = ((MAX_TIME - (Date.now() - start_time)) / MAX_TIME) * 100
   if (timeout.value <= 0) {
     clearInterval(myInterval)
     emit('nextPageCaptcha')
@@ -54,28 +77,18 @@ var myInterval = setInterval(() => {
 
 <template>
   <div class="instructions prevent-select">
-    <div class="image-container">
-      <h1 class="title">Quickly rotate the object!</h1>
-      <p class="is-size-5">Click the arrows to rotate until it looks correct.</p>
+    <div ref="containerRef" class="image-container">
+      <h1 class="title">Quickly rotate the object into place!</h1>
+      <p class="is-size-5">Move your mouse left or right to rotate. Click anywhere when it looks correct!</p>
 
-      <table class="table">
-        <tr>
-          <td>
-            <button class="button" @click="rotateImageDelta(-10)">
-              Rotate Left&nbsp;&nbsp;<FAIcon icon="fa-solid fa-rotate-left" />
-            </button>
-          </td>
-          <td>
-            <img ref="imageRef" src="@/assets/captcha/cup.jpg" class="circular-image" alt="Circular Image" />
-          </td>
-          <td>
-            <button class="button" @click="rotateImageDelta(10)">
-              Rotate Right&nbsp;&nbsp;<FAIcon icon="fa-solid fa-rotate-right" />
-            </button>
-          </td>
-        </tr>
-      </table>
-      <button class="button is-success" id="finish" @click="$emit('nextPageCaptcha')">Looks good to me!</button>
+      <div class="image-wrapper">
+        <img
+          ref="imageRef"
+          :src="`src/assets/captcha/rotate/${imageFile}`"
+          class="circular-image"
+          alt="Circular Image"
+        />
+      </div>
     </div>
     <br />
     <br />
@@ -92,43 +105,24 @@ var myInterval = setInterval(() => {
 .instructions p {
   padding-bottom: 20px;
 }
-</style>
 
-<style>
 .image-container {
   margin: 0 auto;
+  cursor: pointer;
 }
 
-.rotator {
-  margin-top: 20px;
-  width: 50%;
-}
-
-.table {
-  margin: 0 auto;
-}
-
-.image-container td {
-  vertical-align: middle;
-  border: none;
+.image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
 }
 
 .circular-image {
-  display: block;
-  width: 200px; /* Adjust as needed */
+  width: 350px;
   border-radius: 50%;
   overflow: hidden;
   object-fit: cover;
-}
-
-.button-container {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.button-container button {
-  margin: 0 5px;
+  transition: transform 0.1s ease-out;
 }
 </style>
