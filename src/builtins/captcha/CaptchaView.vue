@@ -10,6 +10,17 @@ import CaptchaTrialStroop from '@/builtins/captcha/CaptchaTrialStroop.vue'
 import CaptchaRotateImage from '@/builtins/captcha/CaptchaRotateImage.vue'
 import CaptchaButtonPress from '@/builtins/captcha/CaptchaButtonPress.vue'
 
+// give feedback
+
+// listen to the music and tap on the beat
+// move slowly towards and object in order to sneak up on it but don't say that in instructions (let them figure it out)
+// intuitive physics - pat which looks like more natural
+// mental rotation - rotate the image to match the other image
+// maze
+// rotate image
+// don't press button
+// text comprehension
+
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
@@ -23,17 +34,17 @@ const pages = [
   { component: CaptchaTrialTextComprehension, props: { timed_task: false }, data: [] },
   { component: CaptchaInstructionsText_02, props: {}, data: [] },
   //{ component: CaptchaTrialImageCategorization, props: {}, data: [] },
-  { component: CaptchaTrialMaze, props: { timed_task: false }, data: [] },
+  { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
   { component: CaptchaRotateImage, props: {}, data: [] },
   { component: CaptchaButtonPress, props: {}, data: [] },
   { component: CaptchaRotateImage, props: {}, data: [] },
-  { component: CaptchaTrialMaze, props: { timed_task: false }, data: [] },
+  { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
   { component: CaptchaRotateImage, props: {}, data: [] },
   { component: CaptchaButtonPress, props: {}, data: [] },
   { component: CaptchaRotateImage, props: {}, data: [] },
   { component: CaptchaTrialTextComprehension, props: { timed_task: false }, data: [] },
   { component: CaptchaRotateImage, props: {}, data: [] },
-  { component: CaptchaTrialMaze, props: { timed_task: false }, data: [] },
+  { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
 ]
 
 const currentTab = computed(() => {

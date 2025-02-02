@@ -287,15 +287,19 @@ function getCellColor(color) {
         @mousedown="startDragging"
       />
     </svg>
-    <template v-if="timed_task">
+    <div v-if="timed_task" class="timer">
       <br />
       <br />
       Respond quickly: <progress class="progress is-large" :value="timeout" max="100"></progress>
-    </template>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.timer {
+  width: 60%;
+  margin: auto;
+}
 .black {
   background-color: #79f2cc;
 }
