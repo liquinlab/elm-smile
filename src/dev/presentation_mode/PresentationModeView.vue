@@ -51,7 +51,6 @@ const info = [
 ]
 
 const uniqueAffiliations = computed(() => {
-  if (!projectauthors) return []
   const affiliations = projectauthors.flatMap((author) =>
     Array.isArray(author.affiliation) ? author.affiliation : [author.affiliation]
   )
@@ -62,7 +61,7 @@ function getUniqueAffiliations(affiliation) {
   return Array.isArray(affiliation) ? affiliation : [affiliation]
 }
 function getAffiliationIndex(affiliation) {
-  return this.uniqueAffiliations.indexOf(affiliation) + 1
+  return uniqueAffiliations.value.indexOf(affiliation) + 1
 }
 </script>
 
