@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, onBeforeUnmount } from 'vue'
 import { animate } from 'motion'
+import appconfig from '@/core/config'
 
 import InformedConsentText from '@/user/components/InformedConsentText.vue'
 
@@ -10,6 +11,11 @@ const api = useAPI()
 
 function finish() {
   api.stepNextView()
+}
+
+if (appconfig.anonymousMode) {
+  // Skip the consent form if in anonymous mode
+  finish()
 }
 
 function wiggle() {

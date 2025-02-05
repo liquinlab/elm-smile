@@ -54,7 +54,7 @@ function submitWithdraw() {
 <template>
   <div class="infobar" role="navigation" aria-label="main navigation">
     <div class="infobar-brand">
-      <a class="infobar-item" :href="lab_url" target="_new">
+      <a class="infobar-item" :href="lab_url" target="_new" v-if="!appconfig.anonymousMode">
         <img src="@/user/assets/universitylogo.png" width="90" />
       </a>
       <div class="infobar-item">
@@ -71,7 +71,7 @@ function submitWithdraw() {
     </div>
     <div id="infobar" class="infobar-menu is-active">
       <div class="infobar-end">
-        <div class="infobar-item">
+        <div class="infobar-item" v-if="!appconfig.anonymousMode">
           <div class="buttons">
             <button class="button is-info is-small is-light" v-if="api.local.consented" @click="toggleConsent()">
               <FAIcon icon="magnifying-glass" />&nbsp;&nbsp;View consent
