@@ -9,6 +9,7 @@ import CaptchaTrialTextComprehension from '@/builtins/captcha/CaptchaTrialTextCo
 import CaptchaTrialStroop from '@/builtins/captcha/CaptchaTrialStroop.vue'
 import CaptchaRotateImage from '@/builtins/captcha/CaptchaRotateImage.vue'
 import CaptchaButtonPress from '@/builtins/captcha/CaptchaButtonPress.vue'
+import CaptchaShyDot from '@/builtins/captcha/CaptchaShyDot.vue'
 
 // give feedback
 
@@ -32,6 +33,7 @@ const api = useAPI()
 const pages = [
   { component: CaptchaInstructionsText_01, props: { adjective: '' }, data: [] },
   { component: CaptchaTrialTextComprehension, props: { timed_task: false }, data: [] },
+  { component: CaptchaShyDot, props: { timed_task: false }, data: [] },
   { component: CaptchaInstructionsText_02, props: {}, data: [] },
   //{ component: CaptchaTrialImageCategorization, props: {}, data: [] },
   { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
