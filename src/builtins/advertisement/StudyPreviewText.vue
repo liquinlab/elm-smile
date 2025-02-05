@@ -1,5 +1,6 @@
 <script setup>
 import useAPI from '@/core/composables/useAPI'
+import appconfig from '@/core/config'
 const api = useAPI()
 </script>
 
@@ -42,6 +43,7 @@ const api = useAPI()
                         </p>
                     </div>
                     <div class="message-body is-size-7 has-text-left">
+                        <div v-if="!appconfig.anonymousMode">
                         We are the <a href="http://gureckislab.org"
                             target="_blank">Computation
                             and Cognition Lab</a> at New York University under
@@ -60,7 +62,12 @@ const api = useAPI()
                             target="_new">code
                             of ethics</a> we strive to uphold in all our
                         studies.
+                        </div>
+                        <div v-else>
+                            You can try our experiment here.
+                        </div>
                     </div>
+                   
                 </article>
             </div>
         </div>
