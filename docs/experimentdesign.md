@@ -1,93 +1,139 @@
-# :artist: Designing Good Web Experiments
+# :artist: Overview
 
+The following sections describe how to design experiments using the <SmileText/>
+project. It covers the basic of programming new task elements, configuring the
+timeline/flow of your experiments, and customizing the look and feel of your
+experiments.
+
+## :woman_technologist: Developer mode
+
+When learning about <SmileText/> and later developing/debugging your experiment
+it is useful to interact with Smile using a web server running on your local
+computer (i.e., your laptop or desktop). <SmileText/> provides a special local
+developer mode that adds some interface elements to the page that help you debug
+and test your experiment. You can learn more about developer mode
+[here](/developermode). But the TL;DR is
 
 ```
-.
-├── LICENSE
-├── README.md
-├── css
-│   ├── main.css
-│   └── styles.css
-├── data
-├── docs
-├── env
-├── index.html            <-- main html page
-├── package-lock.json
-├── package.json
-├── public
-│   └── favicon.ico
-├── sass
-│   └── mystyles.scss
-├── scripts
-├── src
-│   ├── App.vue
-│   ├── assets
-│   ├── components/
-│   ├── composables/
-│   ├── config.js        <-- configuration object
-│   ├── icons.js
-│   ├── main.js          <-- javascript execution starts here
-│   ├── router.js        <-- configure timeline here
-│   ├── seed.js
-│   ├── stores
-│   ├── timeline.js
-│   └── utils.js
-├── tests
-│   ├── cypress
-│   ├── cypress.config.js
-│   └── vitest
-└── vite.config.js
+npm run dev
 ```
 
+in the project folder to get started.
 
-## Captcha
+## :gear: Configuring
 
-Very fast tasks, requiring human common sense, that are diverse, unpredictable, and have a large number of incorrect responses.
+Every experiment is different and requires different configurations options for
+things like the database credentials, etc... In <SmileText/>, configs are set
+using `.env` files. Some of these are automatically generated, some are pass
+from the [base repo](/labconfig) to child repos, and some need to be customize
+for each experiment. [This section](/configuration) of the documentation
+explains all the configuration settings avaialble.
 
+## :jigsaw: Components
 
-- view everyday photos and answer common sense reasoning question sby clicking on the image in a location (e.g., picture of two people one laughing and say "click on the happy one")
+<img src="/images/components.png" width="50%" align="right">
 
-100 images
-an interesting image -- click on the with masks that are appropriate
+This section introduces the concept of a [**component**](/components) and how
+components help organize code by making it more modular and reusable. Then we
+discuss specific features of Vue.js components (e.g.,
+[single-file components](/components#single-file-components),
+[declarative rendering](/components#declarative-rendering-and-reactivity), and
+[reactivity](/components#declarative-rendering-and-reactivity)) that help make
+web development code more compact and error-free.
 
-- show an image and record where you click on it
+==A large part of designing your own experiment will be implementing a custom
+component for your task, or borrowing from an existing one.==
 
-- move an object in a physics/phaser game to achieve something
+## :building_construction: Views
 
+Most experiments are made of of several phases (e.g., welcome, informed consent,
+instructions, debriefing, etc...). We call the phases "Views" and each major
+phase of an experiment is associated with its own Vue component. Learn about
+views [here](/views).
 
-- normal distorted text (type the word that you can see)
+Smile comes with several [built-in views](/views#built-in-views) for common
+phases of an experiment. This includes things like obtaining informed consent,
+presenting instructions, CAPTCHAs and presenting a thank you page. We describe
+these default built-in views and provide an overview of how to customize them
+for your own experiment.
 
-- move a slider slowly so that it doesn't wake up a bear (too fast == wake up, beat clock on time)
+## :twisted_rightwards_arrows: Timeline and Design
 
-- watch a crazy video and type the words it says
+Most experiments require participants to proceed through these phases in a
+particular order. For example, informed consent must be provided and agreed to
+before we perform the actual experiment. Smile provides a
+[timeline](/timeline#timeline) that you use to configure this behavior.
 
-## Informed Consent
+The timeline is configured in an important file in every <SmileText/> project
+called the [design file](/timeline#the-design-file-user-design-js) (located at
+`src/user/design.js`). This file is where you configure the timeline for your
+experiment, including which phases are included and the order in which they
+appear. In addition the design is used to specify randomization across
+conditions, preloading of content, and other important features of your
+experiment.
 
-The text of the informed consent should be updated for each study and placed in `src/components/atoms/InformedConsentText.vue`.  After participants accept the informed consent (usually the first few steps of study) they will see a button that will always be available allowing them to re-review the consent form in case they have questions.
+==You almost certainly will need to edit this file for your experiment.==
 
-## Withdraw
+## :ladder: Stepping trials
 
-As part of most IRB approved protocols participants should be eligible to withdraw from a study at any time for any reason.  Online this is as simple as closing the browser windows and moving onto something else.  However, <SmileText/> provides a simple way to withdraw at any time from a study.
+Many experiments are organized into a series of repeated events called "trials".
+Trials are different than views (see above) because they often repeat the same
+basic structure many times. Smile provides several features for
+[organizing and managing trials](/steps). We introduce the concept of a "trial"
+and how to programmatically advance through a sequence of trials within a
+particular View. The same concept is also used to add sequential build to any
+type of view (e.g., a sequence of instructions or a multi-part form).
 
-![Withdraw button](/images/withdraw.png)
+==Critically by using the built-in <SmileText/> step feature if a participant
+refreshes the page or loses internet connection, they can pick up where they
+left off.==
 
-When participants click this button (only appears after accepting the informed consent), then they are presented with a form with several optional questions about why they are withdrawing and also providing information about partial compensation.  If a participant is eligible for partial compensation depends on several things specific to each study.  When they submit this form they will be taken to a final page asking them to return the task/hit.  It is the responsibility of the experimenter to monitor withdraws and to try to contact the participant.
+## :writing_hand: Autofill
 
-## WindowSizerPage
+When developing and debugging your experiment it is useful to have a way to
+"fake" data from participants. This can be used to quickly advance through the
+experiment to test different parts of the code. Smile provides a way to
+[autofill forms](/autofill) with fake data. In addition, you can generate fake,
+but realistic data for your experiment. This can help later to test your data
+analysis scripts.
 
-The window sizer is a small component `src/components/pages/WindowSizerPage.vue` that will display a box with a configured size on the screen and asked the participant to adjust their browser window to that size so everything is visible.   It looks like this:
+## :game_die: Randomization
 
-![Window Sizer](/images/windowsizer.png)
+Almost all experiments require some form of randomization. This could be
+randomizing participants to a condition or randomizing the order of trials.
+Smile provides several mechanisms for [randomizing](/randomization) the order of
+the flow of experiments.
 
-The size of the box is configured in `env/.env` file using the `VITE_WINDOWSIZER_REQUEST` configuration option.  The default value is `800x600` which means 800 pixel wide and 600 pixels tall.  You can change these values as needed.  In development mode you will need to restart the development server since environment files are only read once on the loading of the application.
+## :framed_picture: Image and Videos
 
-To add it to the timeline just add this in the appropriate place inside `src/router.js`;
+Many experiments preset videos or images to participants. We describe how to
+distribute [images and videos](/imagesvideo) with your Smile project, how to
+preload them so that they appear immediately when needed, and how to display
+them in your experiment.
 
-```js
-// windowsizer
-timeline.pushSeqRoute({
-  path: '/windowsizer',
-  name: 'windowsizer',
-  component: WindowSizer,
-})
-```
+## :artist: Styling, CSS, and Icons
+
+Smile uses the Bulma CSS framework for help with styling interface elements.
+This provides nice looking buttons, tables, and other design elements.
+[Here](/style) we describe how to use Bulma to change the look and feel of your
+experiments. We also describe how to use icons in your experiments which add
+polish and help users understand the interface. Of course, you can style your
+components with custom CSS as well or overwrite Smile defaults for your entire
+project.
+
+## ::movie_camera:: Saving and Recording Data
+
+The most important function of any web experiment platform is securely saving
+data. Smile provides serveral ways to [save and record data](/datastorage). In
+addition the Smile API takes care of manny functions for you so you rarely have
+to think much about data storage and saving.
+
+## :sos: Dealing with Errors
+
+When running an experiment it is important to handle errors gracefully. Smile
+provides several helpful features to deal gracefully with errors.
+
+## :lady_beetle: Automated Testing
+
+When running an experiment it is important to handle errors gracefully. Smile
+provides several helpful features to deal gracefully with errors.

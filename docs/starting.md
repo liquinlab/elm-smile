@@ -21,6 +21,7 @@ const config = reactive({
     font-size: 1.1em;
     background-color: white;
     border: 1px solid #999;
+    padding: 5px;
     padding-left: 10px;
     color: rgb(84, 84, 84);
 }
@@ -33,7 +34,6 @@ const config = reactive({
 .label {
     text-align: right;
     border: none;
-   
 }
 .data {
     width: 60%;
@@ -50,19 +50,21 @@ const config = reactive({
 }
 </style>
 
-
 # :sparkles: Starting a new project
 
 When you start a new project, there are a few one-time steps you must take.
-These include copying the current version
-of the <SmileText/> project, adjusting the configuration settings for your project,
-and running a setup script.
+These include copying the current version of the <SmileText/> project, adjusting
+the configuration settings for your project, and running a setup script.
 
 **Don't worry it is easy and most of it you only do once!**
 
 :::details Customize this page!
-To prevent typo errors you can enter the key details of your project here and the example commands
-below will be adapted for your situation allowing you to simply cut and paste without modifying the commands.  This also give some recommendations.  Things throughout this page will update as you type, nothing is stored.
+
+To prevent typo errors you can enter the key details of your project here and
+the example commands below will be adapted for your situation allowing you to
+simply cut and paste without modifying the commands. This also give some
+recommendations. Things throughout this page will update as you type, nothing is
+stored.
 
 <table class="form">
     <tr>
@@ -104,12 +106,7 @@ the science (e.g., `question_asking`).
     </tr>
 </table>
 
-
-
 :::
-
-
-
 
 ## 1. Copy over the basic project
 
@@ -120,40 +117,45 @@ For example, on Mac this might be your desktop
 cd ~/Desktop
 ```
 
-Following the steps below, copy the Smile GitHub repo into a new project name and clone it locally.
-
+Following the steps below, copy the Smile GitHub repo into a new project name
+and clone it locally.
 
 In this example command, the new project will be named `{{config.projectname}}`:
 
-<div class="language-"><pre><code><span class="line"><span style="color:#A6ACCD">gh repo create {{config.projectname}} --private --template {{config.base_git}}</span></span></code></pre></div>
+<div class="language-js"><pre><code><span class="line">gh repo create {{config.projectname}} --private --template {{config.base_git}}</span></code></pre></div>
 
 Then clone that project to a local folder with the same name:
 
-<div class="language-"><pre><code><span class="line"><span style="color:#A6ACCD">gh repo clone {{config.username}}/{{config.projectname}}</span></span></code></pre></div>
+<div class="language-"><pre><code><span class="line">gh repo clone {{config.username}}/{{config.projectname}}</span></code></pre></div>
 
 Next, alter the Github description for your new repo:
 
-<div class="language-"><pre><code><span class="line"><span style="color:#A6ACCD">gh repo edit {{config.username}}/{{config.projectname}} --description "{{config.description}}"</span></span></code></pre></div>
+<div class="language-"><pre><code><span class="line">gh repo edit {{config.username}}/{{config.projectname}} --description "{{config.description}}"</span></code></pre></div>
 
+After this you can visit GitHub and you should see a new repo in your personal
+repositories list:
+[http://github.com/{{config.username}}/{{config.projectname}}](http://github.com/{{config.username}}/{{config.projectname}})
 
-After this you can visit GitHub and you should see a new repo in your personal repositories list: [http://github.com/{{config.username}}/{{config.projectname}}](http://github.com/{{config.username}}/{{config.projectname}})
+Finally change into the newly created project directory (assuming you called
+your project `{{config.projectname}}`):
 
-Finally change into the newly created project directory (assuming you called your project `{{config.projectname}}`):
-
-<div class="language-"><pre><code><span class="line"><span style="color:#A6ACCD">cd {{config.projectname}}</span></span></code></pre></div>
-
+<div class="language-"><pre><code><span class="line">cd {{config.projectname}}</span></code></pre></div>
 
 ## 2. Configure your project
 
-
-Information about the configuration setting is [here](/configuration) but if your lab has already been [set up](/labconfig) you will want to 
-simply decrypt the files provided in the repository.
+Information about the configuration setting is [here](/configuration) but if
+your lab has already been [set up](/labconfig) you will want to simply decrypt
+the files provided in the repository.
 
 ::: danger Warning!
-This will only work if you have first sent your lab coordinator your gpg key and waited for them to push a change to the <SmileText/> repo.  See instructions [here](/requirements#_3-request-access-to-the-shared-database-resources).
+
+This will only work if you have first sent your lab coordinator your gpg key and
+waited for them to push a change to the <SmileText/> repo. See instructions
+[here](/requirements#_3-request-access-to-the-shared-database-resources).
+
 :::
 
-To do this simply type: 
+To do this simply type:
 
 ```
 git secret reveal
@@ -161,13 +163,18 @@ git secret reveal
 
 this should create several `.env.*.local` files in your `env/` directory.
 
-**Only on first setup:** After all the necessary files are in the `env` folder run:
+**Only on first setup:** After all the necessary files are in the `env` folder
+run:
 
 ```
 npm run upload_config
 ```
 
-to configure your deployment process, remove some files you do not need, and create an initial deployment/commit.  The `npm run upload_config` command only needs to be run once in your project the first time you create it.  If you are collaborating with someone on an existing project you only need to run `git secret reveal`.
+to configure your deployment process, remove some files you do not need, and
+create an initial deployment/commit. The `npm run upload_config` command only
+needs to be run once in your project the first time you create it. If you are
+collaborating with someone on an existing project you only need to run
+`git secret reveal`.
 
 ## 3. Setup the project
 
@@ -179,22 +186,33 @@ npm run setup_project
 
 This will install the required node packages for local development and testing.
 
-
 ## 4. Verify the deployment
 
-If you have properly configured your application then you should be able to create an initial deployment.  Simply run
+If you have properly configured your application then you should be able to
+create an initial deployment. Simply run
 
 ```
 npm run force_deploy
 ```
 
-to create a deployment given the current code in github.  In the future, deployments will happen automatically anytime you make a push to your repo.
+to create a deployment given the current code in github. In the future,
+deployments will happen automatically anytime you make a push to your repo.
 
-If your lab coordinator set up the slack features of your [base project](/labconfig) then join the `#smile-deploy` slack channel for your lab.  A robot :robot: there will let you know that your project was deployed and provide you with a web link to live site.  
+If your lab coordinator set up the slack features of your
+[base project](/labconfig) then join the `#smile-deploy` slack channel for your
+lab. A robot :robot: there will let you know that your project was deployed and
+provide you with a web link to live site.
 
-If that didn't happen/work then continue reading to learn more about [deployments](/deploying) including [debugging tips](/deploying#debugging-deployment-issues).
+If that didn't happen/work then continue reading to learn more about
+[deployments](/deploying) including
+[debugging tips](/deploying#debugging-deployment-issues).
 
-From here on out any time you make a change to any file (except in the `docs/` folder or a [few specifically named branches](/deploying#what-commits-trigger-a-deployment)), commit it, and push that change to your project repository the Slack bot will confirm your code has been uploaded to the live webserver and is theoretically ready for participants. 
+From here on out any time you make a change to any file (except in the `docs/`
+folder or a
+[few specifically named branches](/deploying#what-commits-trigger-a-deployment)),
+commit it, and push that change to your project repository the Slack bot will
+confirm your code has been uploaded to the live webserver and is theoretically
+ready for participants.
 
 ## 5. Begin developing!
 
@@ -206,10 +224,5 @@ Simply type
 npm run dev
 ```
 
-to run the development server and see the current, default setup of the site.  More information about developing is available [here](/developing).
-
-
-
-
-
-
+to run the development server and see the current, default setup of the site.
+More information about developing is available [here](/developing).

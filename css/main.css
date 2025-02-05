@@ -1,18 +1,105 @@
-@import './styles.css';
-@import "../node_modules/@creativebulma/bulma-divider";
+@import './bulma.css'; /* import the bulma scheme */
 
-/* fixes a bug in Bulma */
-.navbar-menu {
-    background-color: inherit;
+@import '../node_modules/@creativebulma/bulma-divider';
+@import '../node_modules/@creativebulma/bulma-tooltip';
+@import '../node_modules/bulma-switch/dist/css/bulma-switch.min.css';
+@import '../node_modules/bulma-steps/dist/css/bulma-steps.min.css';
+
+/* Import a Google Font */
+/*@import url('https://fonts.googleapis.com/css?family=Nunito:400,700');*/
+@import url('https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500&display=swap');
+
+/* global fonts **/
+:root {
+  --vp-font-family-base: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --vp-font-family-mono: Menlo, Monaco, Consolas, 'Courier New', monospace;
+  /* fontkit overrides */
+  --fk-color-primary: #48c78e;
 }
 
-.config li {
-    padding-left: 35px;
+:root {
+  --purple: #8a4d76;
+  --pink: #e88f9e;
+  --brown: #84e69c;
+  --light-grey: #6c6c6c;
+  --darker-grey: #323232;
+  --beige-light: #d0d1cd;
+  --beige-lighter: #eff0eb;
+  --code: rgb(4, 4, 4);
+  --code-background: rgb(251, 251, 251);
+  --status-green: #23d160; /*rgb(13, 206, 13);*/
+  --status-yellow: #dab830;
+  --status-red: rgb(234, 8, 8);
+  --dev-bar-light-grey: #f7f7f7;
+  --dev-bar-mild-grey: #eeeeee;
+  --dev-bar-strong-grey: #dbdbdb;
+  --dev-bar-text: #000;
+  --dev-bar-lines: 0.01em solid #b5b5b5;
+
+  /* previously set by smilestore */
+  --page-bg-color: '#fff';
+  --page-text-color: '#000';
+  --status-bar-bg-color: '#fff';
+  --status-bar-text-color: '#000';
+
+  /* above from the out .scss file */
+  --bulma-input-arrow: var(--purple);
+  --bulma-primary: var(--purple);
+  --bulma-link: var(--darker-grey);
+  --bulma-link-text: var(--light-grey);
+  --bulma-link-text-hover: var(--pink);
+  --bulma-link-text-active: var(--darker-grey);
+}
+
+:root {
+  /* Your variables */
+  --header-height: 30px;
+  --container-padding: 10px;
+  --container-width: 100vw;
+
+  /* Set the maximum width of the stream */
+  --nv-root-width: var(--container-width);
+
+  /* Add the top padding and place it below the header */
+  --nv-root-top: calc(var(--header-height) + var(--container-padding));
+
+  /* Add the same left-right paddings of your app container */
+  --nv-root-left: var(--container-padding);
+  --nv-root-right: var(--container-padding);
+}
+
+/* Rules for mobile devices */
+@media (max-width: 768px) {
+  :root {
+    --header-height: 60px;
+    --container-padding: 20px;
+  }
 }
 
 .page {
-    padding-top: 40px;
-    height: 100vh;
+  padding-top: 40px;
+  height: 100vh;
+  width: 80vw;
+  margin: 0 auto;
 }
 
+.pagecontent {
+  padding-bottom: 100px;
+  margin-bottom: 20px;
+  margin: 0px;
+}
 
+@media screen and (max-width: 769px) {
+  .page {
+    width: 90vw;
+  }
+}
+
+/* globally provided to prevent selection on some pages */
+.prevent-select {
+  /* needed because selecting the outlines can give away the answer */
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}

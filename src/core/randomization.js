@@ -1,0 +1,118 @@
+// gets random integer between min (inclusive) and max (inclusive)
+export function randomInt(min, max) {
+  return Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min) + 1) + Math.ceil(min))
+}
+
+export function shuffle(array) {
+  const arrayCopy = array.slice(0)
+  for (let i = arrayCopy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const temp = arrayCopy[i]
+    arrayCopy[i] = arrayCopy[j]
+    arrayCopy[j] = temp
+  }
+  return arrayCopy
+}
+
+export function sampleWithoutReplacement(array, sampleSize) {
+  if (sampleSize > array.length) {
+    console.error('sample size larger than array length')
+  }
+  return shuffle(array).slice(0, sampleSize)
+}
+
+export function sampleWithReplacement(array, sampleSize, weights = undefined) {
+  // if weights are not provided, normal sample with replacement
+  if (!weights) {
+    const sample = []
+    let s = sampleSize
+    while (s > 0) {
+      sample.push(array[randomInt(0, array.length - 1)])
+      s -= 1
+    }
+    return sample
+  }
+
+  // if weights are provided, sample with replacement with weights
+  // normalize weights array -- get sum of all weights
+  const sumOfWeights = weights.reduce((a, b) => a + b, 0)
+  // divide each weight by the sum of all weights
+  const normalizedWeights = weights.map((weight) => weight / sumOfWeights)
+
+  const sample = []
+  let s = sampleSize
+  while (s > 0) {
+    const random = Math.random()
+    let i = 0
+    let sum = normalizedWeights[i]
+    while (random > sum) {
+      i += 1
+      sum += normalizedWeights[i]
+    }
+    sample.push(array[i])
+    s -= 1
+  }
+  return sample
+}
+
+export function expandProduct(...arr) {
+  // get length of each sub array in arr
+  const lengths = arr.map((x) => x.length)
+  // get product of lengths
+  const product = lengths.reduce((a, b) => a * b, 1)
+  if (product > 1000) {
+    console.warn("That's a whole lot of combinations! Are you sure you want to do that?")
+  }
+  return arr.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())))
+}
+
+// distributions.js
+export const faker_distributions = {
+  rnorm: (mean, sd) => {
+    let u = 0,
+      v = 0
+    while (u === 0) u = Math.random()
+    while (v === 0) v = Math.random()
+    return {
+      val: mean + sd * Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v),
+      type: 'fake',
+    }
+  },
+  runif: (min, max) => ({
+    val: Math.random() * (max - min) + min,
+    type: 'fake',
+  }),
+  rbinom: (n, p) => ({
+    val: Array(n)
+      .fill(0)
+      .reduce((acc) => acc + (Math.random() < p ? 1 : 0), 0),
+    type: 'fake',
+  }),
+  rexGaussian: (mu, sigma, tau) => {
+    const x = distributions.rnorm(0, 1).val
+    const z = distributions.runif(0, 1).val
+    return {
+      val: mu + sigma * x + tau * -Math.log(z),
+      type: 'fake',
+    }
+  },
+  rchoice: (options) => {
+    if (!Array.isArray(options) || options.length === 0) {
+      throw new Error('rchoice requires a non-empty array of options')
+    }
+    const index = Math.floor(Math.random() * options.length)
+    return {
+      val: options[index],
+      type: 'fake',
+    }
+  },
+  render: (trial) => {
+    let rendered = { ...trial }
+    for (let [key, value] of Object.entries(trial)) {
+      if (typeof value === 'function') {
+        rendered[key] = value()
+      }
+    }
+    return rendered
+  },
+}

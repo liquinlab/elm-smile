@@ -3,8 +3,8 @@ import { defineComponent, onMounted } from 'vue'
 import { createTestingPinia } from '@pinia/testing'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { mount } from '@vue/test-utils'
-import useTimelineStepper from '@/composables/timelinestepper'
-import { Timeline, processQuery } from '@/timeline'
+import useTimeline from '@/core/composables/useTimeline'
+import { Timeline, processQuery } from '@/core/timeline'
 
 let router
 let pinia
@@ -34,21 +34,21 @@ describe.skip('Stepper tests', () => {
     const TestComponent = defineComponent({
       template: `<h2>{{ next }}</h2>`,
       setup(props) {
-        const { nextFn, prevFn } = useTimeline()
-        const next = nextFn()
-        const prev = prevFn()
+        const { stepNextView, stepPrevView } = useTimeline()
+        const next = stepNextView()
+        const prev = stepPrevView()
         return { next, prev }
       },
     })
 
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'one',
       component: TestComponent,
     })
 
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/two',
       name: 'two',
       component: TestComponent,
@@ -67,7 +67,7 @@ describe.skip('Stepper tests', () => {
     const TestComponent = defineComponent({
       template: `<h2>{{ prev }}</h2>`,
       setup(props) {
-        const { nextFn, prevFn } = useTimeline()
+        const { stepNextView, stepPrevView } = useTimeline()
         const next = nextFn()
         const prev = prevFn()
         return { next, prev }
@@ -75,13 +75,13 @@ describe.skip('Stepper tests', () => {
     })
 
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'one',
       component: TestComponent,
     })
 
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/two',
       name: 'two',
       component: TestComponent,
@@ -100,7 +100,7 @@ describe.skip('Stepper tests', () => {
     const TestComponent = defineComponent({
       template: `<h2>{{ next }}</h2>`,
       setup(props) {
-        const { nextFn, prevFn } = useTimeline()
+        const { stepNextView, stepPrevView } = useTimeline()
         const next = nextFn()
         const prev = prevFn()
         return { next, prev }
@@ -108,14 +108,14 @@ describe.skip('Stepper tests', () => {
     })
 
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'one',
       component: TestComponent,
       meta: { next: 'consent' }, // override what is next
     })
 
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/two',
       name: 'two',
       component: TestComponent,

@@ -1,8 +1,21 @@
 /* eslint-disable no-undef */
-import Timeline from '@/timeline'
-import RandomSubTimeline from '@/subtimeline'
+
+import axios from 'axios'
+import { createTestingPinia, setActivePinia } from 'pinia'
+
+import Timeline from '@/core/timeline'
+
+vi.mock('axios', () => ({
+  get: vi.fn(() => Promise.resolve({ data: '127.0.0.1' })),
+}))
 
 describe('Timeline tests', () => {
+  beforeEach(() => {
+    // Create a new Pinia instance and set it as the active instance before each test
+    pinia = createTestingPinia({ stubActions: true })
+    setActivePinia(pinia)
+  })
+
   it('should be able to create a timeline', () => {
     const timeline = new Timeline()
     expect(timeline).toBeDefined()
@@ -11,7 +24,7 @@ describe('Timeline tests', () => {
   it('should add a sequential route', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'index',
       component: MockComponent,
@@ -23,7 +36,7 @@ describe('Timeline tests', () => {
   it('should add a nonsequential route', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const timeline = new Timeline()
-    timeline.pushRoute({
+    timeline.registerView({
       path: '/',
       name: 'index',
       component: MockComponent,
@@ -39,7 +52,7 @@ describe('Timeline tests', () => {
   it('should leave next and prev undefined but meta defined if a sequential route', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'index',
       component: MockComponent,
@@ -53,7 +66,7 @@ describe('Timeline tests', () => {
   it('should leave next or prev undefined if meta is configured for the other', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'index',
       component: MockComponent,
@@ -64,7 +77,7 @@ describe('Timeline tests', () => {
     expect(timeline.routes[0].meta.prev).toBe(undefined)
 
     const timeline2 = new Timeline()
-    timeline2.pushSeqRoute({
+    timeline2.pushSeqView({
       path: '/',
       name: 'index',
       component: MockComponent,
@@ -74,7 +87,7 @@ describe('Timeline tests', () => {
     expect(timeline2.routes[0].meta.prev).toBe('prev')
 
     const timeline3 = new Timeline()
-    timeline3.pushSeqRoute({
+    timeline3.pushSeqView({
       path: '/',
       name: 'index',
       component: MockComponent,
@@ -88,7 +101,7 @@ describe('Timeline tests', () => {
     const timeline = new Timeline()
 
     const errorTrigger = () => {
-      timeline.pushRoute({
+      timeline.registerView({
         path: '/',
         name: 'index',
         component: MockComponent,
@@ -102,12 +115,12 @@ describe('Timeline tests', () => {
     const MockComponentOne = { template: '<div>Mock Component One</div>' }
     const MockComponentTwo = { template: '<div>Mock Component Two</div>' }
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/one',
       name: 'one',
       component: MockComponentOne,
     })
-    timeline.pushRoute({
+    timeline.registerView({
       path: '/two',
       name: 'two',
       component: MockComponentTwo,
@@ -119,14 +132,14 @@ describe('Timeline tests', () => {
   it('should not allow the same sequential route to be registered twice', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/thanks',
       name: 'thank',
       component: MockComponent,
     })
 
     const errorTrigger = () => {
-      timeline.pushSeqRoute({
+      timeline.pushSeqView({
         path: '/thanks',
         name: 'thanks',
         component: MockComponent,
@@ -140,13 +153,13 @@ describe('Timeline tests', () => {
   it('should not allow the same non-sequential route to be registered twice', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const timeline = new Timeline()
-    timeline.pushRoute({
+    timeline.registerView({
       path: '/thanks',
       name: 'thank',
       component: MockComponent,
     })
     const errorTrigger = () => {
-      timeline.pushRoute({
+      timeline.registerView({
         path: '/thanks',
         name: 'thanks',
         component: MockComponent,
@@ -160,13 +173,13 @@ describe('Timeline tests', () => {
   it('should not allow the same route to be registered twice', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/thanks',
       name: 'thank',
       component: MockComponent,
     })
     const errorTrigger = () => {
-      timeline.pushRoute({
+      timeline.registerView({
         path: '/thanks',
         name: 'thanks',
         component: MockComponent,
@@ -177,37 +190,17 @@ describe('Timeline tests', () => {
     expect(timeline.seqtimeline.length).toBe(1) // only first one should work
   })
 
-  it('should add a subtimeline to sequential timeline', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-    const timeline = new Timeline()
-    const subtimeline = new RandomSubTimeline()
-    timeline.pushSeqRoute({
-      path: '/first',
-      name: 'first',
-      component: MockComponent,
-    })
-    subtimeline.pushRoute({
-      path: '/mid1',
-      name: 'mid1',
-      component: MockComponent,
-    })
-    timeline.pushRandomizedTimeline({
-      name: subtimeline,
-    })
-
-    expect(timeline.seqtimeline.length).toBe(2)
-  })
 
   it('cannot add a timeline to a timeline', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const timeline = new Timeline()
     const timeline2 = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/first',
       name: 'first',
       component: MockComponent,
     })
-    timeline2.pushRoute({
+    timeline2.registerView({
       path: '/mid1',
       name: 'mid1',
       component: MockComponent,
@@ -220,133 +213,27 @@ describe('Timeline tests', () => {
     expect(errorTrigger).toThrowError()
   })
 
-  it('should not allow the same route to be registered inside and outside a subtimeline', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-    const timeline = new Timeline()
-    const subtimeline = new RandomSubTimeline()
-    timeline.pushSeqRoute({
-      path: '/thanks',
-      name: 'thank',
-      component: MockComponent,
-    })
-    subtimeline.pushRoute({
-      path: '/thanks',
-      name: 'thanks',
-      component: MockComponent,
-    })
-    const errorTrigger = () => {
-      timeline.pushRandomizedTimeline({
-        name: subtimeline,
-      })
-    }
-    expect(errorTrigger).toThrowError()
-    expect(timeline.routes.length).toBe(1) // route won't get added
-  })
 
-  it('build method correctly configures meta and next fields of subtimeline/subtimeline routes', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-
-    const timeline = new Timeline()
-    const subtimeline = new RandomSubTimeline()
-    timeline.pushSeqRoute({
-      path: '/first',
-      name: 'first',
-      component: MockComponent,
-    })
-    subtimeline.pushRoute({
-      path: '/mid1',
-      name: 'mid1',
-      component: MockComponent,
-    })
-    subtimeline.pushRoute({
-      path: '/mid2',
-      name: 'mid2',
-      component: MockComponent,
-    })
-    timeline.pushRandomizedTimeline({
-      name: subtimeline,
-    })
-
-    timeline.pushSeqRoute({
-      path: '/last',
-      name: 'last',
-      component: MockComponent,
-    })
-
-    timeline.build()
-
-    // these are the prev and next fields for the first randomized route
-    expect(timeline.routes[1].meta.prev).toBe('first')
-    expect(timeline.routes[1].meta.next).toBe('last')
-
-    // these are the prev and next fields for the second randomized route
-    expect(timeline.routes[2].meta.prev).toBe('first')
-    expect(timeline.routes[2].meta.next).toBe('last')
-
-    // these are the prev and next fields for the subtimeline itself
-    expect(timeline.seqtimeline[1].meta.prev).toBe('first')
-    expect(timeline.seqtimeline[1].meta.next).toBe('last')
-  })
-
-  it('build method should propogate specified conditions to routes when set', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-
-    const timeline = new Timeline()
-    const subtimeline = new RandomSubTimeline()
-    timeline.pushSeqRoute({
-      path: '/first',
-      name: 'first',
-      component: MockComponent,
-    })
-    subtimeline.pushRoute({
-      path: '/mid1',
-      name: 'mid1',
-      component: MockComponent,
-    })
-    subtimeline.pushRoute({
-      path: '/mid2',
-      name: 'mid2',
-      component: MockComponent,
-    })
-    timeline.pushRandomizedTimeline({
-      name: subtimeline,
-      meta: { label: 'condition', orders: { cond1: ['mid1', 'mid2'], BFirst: ['mid2', 'mid1'] } },
-    })
-
-    timeline.pushSeqRoute({
-      path: '/last',
-      name: 'last',
-      component: MockComponent,
-    })
-
-    timeline.build()
-
-    expect(timeline.routes[1].meta.label).toBeDefined()
-    expect(timeline.routes[1].meta.orders).toBeDefined()
-
-    expect(timeline.routes[2].meta.label).toBeDefined()
-    expect(timeline.routes[2].meta.orders).toBeDefined()
-  })
 
   it('build method should correctly configure a doubly linked list', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'one',
       component: MockComponent,
     })
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/two',
       name: 'two',
       component: MockComponent,
     })
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/three',
       name: 'three',
       component: MockComponent,
     })
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/four',
       name: 'four',
       component: MockComponent,
@@ -366,22 +253,22 @@ describe('Timeline tests', () => {
   it('build method should configure a loop', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/',
       name: 'one',
       component: MockComponent,
     })
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/two',
       name: 'two',
       component: MockComponent,
     })
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/three',
       name: 'three',
       component: MockComponent,
     })
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/four',
       name: 'four',
       component: MockComponent,
@@ -405,20 +292,20 @@ describe('Timeline tests', () => {
   it('build method should allow complex routes, disconnect sequences', () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/one-a',
       name: 'one',
       component: MockComponent,
       meta: { next: 'two' },
     })
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/one-b',
       name: 'one-b',
       component: MockComponent,
       meta: { next: 'two' },
     })
     // both flow into node two
-    timeline.pushRoute({
+    timeline.registerView({
       // this has not implicit successor
       path: '/two',
       name: 'two',
@@ -426,18 +313,18 @@ describe('Timeline tests', () => {
     }) // leaving this node has to happen with logic inside the component
 
     // let hand branch
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/three',
       name: 'three',
       component: MockComponent,
     })
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/four',
       name: 'four',
       component: MockComponent,
       meta: { next: 'one' },
     })
-    timeline.pushRoute({
+    timeline.registerView({
       // this has no implicit successor
       path: '/five',
       name: 'five',
@@ -445,17 +332,17 @@ describe('Timeline tests', () => {
     })
 
     // right hand branch
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/six',
       name: 'six',
       component: MockComponent,
     })
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/seven',
       name: 'seven',
       component: MockComponent,
     })
-    timeline.pushRoute({
+    timeline.registerView({
       // this has no implicit successor
       path: '/eight',
       name: 'eight',
@@ -484,17 +371,17 @@ describe('Timeline tests', () => {
     const MockComponentFour = { template: '<div>Mock Component Four</div>' }
 
     const timeline = new Timeline()
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/one',
       name: 'one',
       component: MockComponentOne,
     })
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/two',
       name: 'two',
       component: MockComponentTwo,
     })
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/three',
       name: 'three',
       component: MockComponentThree,
@@ -504,7 +391,7 @@ describe('Timeline tests', () => {
     expect(timeline.seqtimeline[1].meta.progress).toBe((100 * 1) / (3 - 1)) // remaining is split
     expect(timeline.seqtimeline[2].meta.progress).toBe((100 * 2) / (3 - 1))
 
-    timeline.pushSeqRoute({
+    timeline.pushSeqView({
       path: '/four',
       name: 'four',
       component: MockComponentFour,

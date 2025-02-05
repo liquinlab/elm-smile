@@ -1,30 +1,63 @@
-# :wave: Introduction
+---
+outline: none
+---
 
-The goal of <SmileText/> is to make it easy and fun to collect behavioral data online.
+# :wave: Welcome to Smile!
 
-The project is currently in the development and planning stage. We are taking a "docs first" approach to this project by planning the development within the documentation and then working on implementation. 
+The <SmileText/> project is a web-based platform designed to make it easy and
+fun to develop rich and interactive online experiments. Unlike tools that cater
+to novices and non-programmers, ==Smile is designed to help reasonably competent
+programmers accomplish more in less time.==
 
-The current development is happening at [https://github.com/nyuccl/smile](https://github.com/nyuccl/smile).
+### Key features:
 
-There are two ways to get started with Smile: 
-- If you are already using Smile in your lab, install the [required software](/requirements) to get started developing your own experiments.
-- If you are setting up Smile for the first time use in your lab, jump to the [lab config](/labconfig) docs for configuring your services. 
+- Fast and fun front-end interface development with [Vue.js](https://vuejs.org)
+  and [Bulma CSS](https://bulma.io). Make complex games, animations, and surveys
+  with ease using
+  [declarative programming and reactive data binding](/components#declarative-rendering-and-reactivity).
+- Built-in support for [common experiment elements](/views#built-in-views) like
+  consent forms, captchas, instructions, and surveys. Just add your custom
+  experiment logic and start collecting data.
+- Participant-friendly features include the ability to withdraw from the
+  experiment (while providing feedback), incremental data saving, optimized load
+  times, graceful error handling, and a responsive design that works on most/all
+  devices.
+- Developer [mode](/developing) which makes it easier to debug and design
+  experiments. Jump quickly between phases and trials in your experiments,
+  [autofill forms and generate fake data for testing](/autofill), visualize the
+  flow through your project, [hot-reload](/developing#hot-module-replacement)
+  the code you are working on without restarting the entire experiment, and
+  more!
+- Presentation [mode](/presentation) which provides a beautiful and interactive
+  demo site you can share with reviewers and collaborators.
+- [Dashboard](/dashboard) for monitoring data collection, downloading and
+  analyzing data, and performing quality control to screen bots and other bad
+  actors.
+- Built-in support for multiple [recruitment services](/recruitment) including
+  Prolific, MTurk, CloudResearch, and more.
+- Secure data storage and retrieval using a flexible, but easy-to-use
+  [database](/datastorage) API based on
+  [Google Firestore and and Real-time Database ](https://firebase.google.com).
+- Automatic and highly reproducible [deployment](/deploying) of the latest code
+  to the web using [GitHub Actions](https://github.com/features/actions).
+- Automated [testing](/testing) framework including unit tests and end-to-end
+  tests using [Cypress.io](https://www.cypress.io/) helps experimenters ensure
+  code is reliable and bug-free.
+- Integrates with the rest of your research life including
+  [Slack notifications](/deploying#notifying-the-slack-bot), automatic
+  generation of QR codes for
+  [recruitment posters](/deploying#notifying-the-slack-bot) (or for
+  [presentations](/presentation#qr-code-download)),
+  [anonymized links](/deploying#what-url-do-you-send-participants-to), and more.
+- Data provenance features include an audit trail of which version of the code
+  was used to create each data file.
+- Great looking and detailed docs, if we do say so ourselves!
 
-The design choices in Smile were made so that it is relatively painless for developers to make new experiments after your lab performs the one-time setup.  This handy flow chart gives an overview of the process:
+The current development is happening at
+[https://github.com/nyuccl/smile](https://github.com/nyuccl/smile).
 
-![Starting pathway](/images/starting-pathways.png)
+Ready to get started? Continue [here](/requirements).
 
+Not sure? Let us walk you through an [example](/example).
 
---- 
-
-::: warning What we assume
-Generally this project assumes you have some familiarity with typing commands in a terminal program, git, [GitHub](https://github.com), and basic concepts about web servers and web design.  Some helpful websites to address deficiencies:
-
-- [The missing semester of your CS education](https://missing.csail.mit.edu) - how to use the shell/terminal program, git, security concepts/encryption
-- [Shell.how](https://www.shell.how) - helps you learn and interpret different shell/terminal commands
-- [Git for beginners](https://medium.com/dwarsoft/git-for-beginners-part-i-basic-git-concepts-a7beb5a136d)
-- [Interneting is hard](https://www.internetingishard.com) - Friendly web development tutorials for complete beginners
-- [Learn Vue](https://learnvue.co) - useful website for learning the Vue.js framework
-- [Vuejs tutorial](https://vuejs.org/tutorial/#step-1) 
-- [Vuejs docs](https://vuejs.org/guide/introduction.html)
-:::
+Need help? Go [here](/help).

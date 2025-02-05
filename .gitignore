@@ -26,3 +26,6 @@ dist-ssr
 .gitsecret/keys/random_seed
 !*.secret
 /css/styles.css
+/docs/.vitepress/cache
+/public/qr.svg
+/data/private/**

@@ -1,6 +1,6 @@
 # This is the workflow for deploying the smile docs
 
-name: DEPLOY_DOCS
+name: DOCS_DEPLOY
 
 # Controls when the workflow will run
 on:
@@ -9,10 +9,17 @@ on:
     branches:
       - main
     paths:
-      - "docs/**"
+      - 'docs/**'
+      - '.github/workflows/docs-deploy.yml'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: smile-docs
+  cancel-in-progress: false
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -25,23 +32,23 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout main branch
-        uses: actions/checkout@v3
-        with: 
+        uses: actions/checkout@v4
+        with:
           ref: main
-      
+
       # setup node.js
       - name: Setup node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16.15.1
-        
+          node-version: 20.11.1
+
       # install node packages
       - name: Install node dependencies
         run: npm install
 
       - name: Rebuild docs
         run: npm run docs:build
-        
+
       # Deploy files to web server
       - name: rsync to server
         uses: burnett01/rsync-deployments@5.2
@@ -52,4 +59,4 @@ jobs:
           remote_host: ${{ secrets.DOCS_DEPLOY_HOST }}
           remote_port: ${{ secrets.DOCS_DEPLOY_PORT }}
           remote_user: ${{ secrets.DOCS_DEPLOY_USER }}
-          remote_key:  ${{ secrets.DOCS_DEPLOY_KEY  }}
+          remote_key: ${{ secrets.DOCS_DEPLOY_KEY  }}

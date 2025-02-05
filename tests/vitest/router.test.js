@@ -5,15 +5,20 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { createTestingPinia } from '@pinia/testing'
 import { plugin, defaultConfig, reset } from '@formkit/vue'
-import '@/icons' // configure fontawesome
+import '@/core/icons' // configure fontawesome
 
 import App from '@/App.vue'
-import { routes, addGuards } from '@/router' // This import should point to your routes file declared above
-import useSmileStore from '@/stores/smiledata'
-import appconfig from '@/config'
+import { routes, addGuards } from '@/core/router' // This import should point to your routes file declared above
+import useSmileStore from '@/core/stores/smilestore'
+import appconfig from '@/core/config'
 
 let router
 let pinia
+
+import axios from 'axios'
+vi.mock('axios', () => ({
+  get: vi.fn(() => Promise.resolve({ data: '127.0.0.1' })),
+}))
 
 /* general purpose helper functions */
 // sets up app and the mock dom
