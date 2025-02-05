@@ -51,6 +51,7 @@ const info = [
 ]
 
 const uniqueAffiliations = computed(() => {
+  if (!projectauthors) return []
   const affiliations = projectauthors.flatMap((author) =>
     Array.isArray(author.affiliation) ? author.affiliation : [author.affiliation]
   )
