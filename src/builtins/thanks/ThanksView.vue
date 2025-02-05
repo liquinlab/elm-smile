@@ -7,6 +7,7 @@ import Base64url from 'crypto-js/enc-base64'
 import stringify from 'json-stable-stringify'
 
 import useAPI from '@/core/composables/useAPI'
+import appconfig from '@/core/config'
 const api = useAPI()
 
 
@@ -124,7 +125,7 @@ clipboard.on('success', (e) => {
                 This still needs to be implemented
             </p>
             <hr>
-            <a href="http://gureckislab.org" class="button is-info">Submit my
+            <a :href="!appconfig.anonymousMode ? 'http://gureckislab.org' : 'http://google.com'" class="button is-info">Submit my
                 work &nbsp;
                 <FAIcon icon="fa-solid fa-arrow-right" />
             </a>

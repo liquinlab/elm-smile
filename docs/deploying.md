@@ -313,3 +313,10 @@ says instead
 ```
     mode: "development",
 ```
+
+## Anonymous deployment
+
+You can deploy your experiment in anonymous mode. In this mode, all  <SmileText/>-default 
+references to the organization conducting the study are removed. You can then attach an 
+anonymous link to a paper submisison, either by registering another domain or by using
+an easy hosting solution such as [netlify](https://www.netlify.com/) or [vercel](https://vercel.com/).

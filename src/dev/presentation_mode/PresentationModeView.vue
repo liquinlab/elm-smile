@@ -61,7 +61,7 @@ function getUniqueAffiliations(affiliation) {
   return Array.isArray(affiliation) ? affiliation : [affiliation]
 }
 function getAffiliationIndex(affiliation) {
-  return this.uniqueAffiliations.indexOf(affiliation) + 1
+  return uniqueAffiliations.value.indexOf(affiliation) + 1
 }
 </script>
 

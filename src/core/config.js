@@ -49,4 +49,5 @@ export default {
     messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGINGSENDERID,
     appId: import.meta.env.VITE_FIREBASE_APPID,
   },
+  anonymousMode: import.meta.env.VITE_ANONYMOUS_MODE === 'true', 
 }
