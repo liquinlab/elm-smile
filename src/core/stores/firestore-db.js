@@ -96,7 +96,7 @@ export const loadDoc = async (docid) => {
     if (docSnap.exists()) {
       const data = docSnap.data()
       // console.log('Document data:', data)
-      if (data.userUID === user.uid) {
+      if (data.firebase_anon_auth_id === user.uid) {
         return data
       } else {
         log.error('FIRESTORE-DB: User does not have access to this document')
@@ -137,10 +137,10 @@ export const createDoc = async (data) => {
     // Add a new document with a generated id.
     const docRef = await addDoc(collection(db, `${mode}/${appconfig.project_ref}/data`), {
       ...data,
-      userUID: user.uid,
+      firebase_anon_auth_id: user.uid,
     })
 
-    data.userUID = user.uid
+    data.firebase_anon_auth_id = user.uid
     log.log(`FIRESTORE-DB: Document written with ID: ${docRef.id} for user ${user.uid})`)
     return docRef.id
   } catch (e) {
@@ -160,7 +160,7 @@ export const createPrivateDoc = async (data, docId) => {
     const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/${docId}/private/`, 'private_data')
     await setDoc(docRef, {
       ...data,
-      userUID: user.uid,
+      firebase_anon_auth_id: user.uid,
     })
     log.log(`FIRESTORE-DB: Private document written with ID: `, docRef.id)
     return docRef.id
@@ -169,7 +169,6 @@ export const createPrivateDoc = async (data, docId) => {
     return null
   }
 }
-
 
 // export default createDoc
 export default db
