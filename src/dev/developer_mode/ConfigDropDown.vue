@@ -26,7 +26,7 @@ function createLink(option) {
     }
   }
   if (typeof option === 'object') {
-    const name = option?.name || option?.meta?.name;
+    const name = option?.name || option?.meta?.name
     if (name) return String(name)
   }
   return String(option)

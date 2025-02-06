@@ -54,7 +54,7 @@ const handleClick = (e) => {
   emit('nextPageCaptcha')
 }
 
-function beingTask() {
+function beginTask() {
   // Add click handler
   window.addEventListener('mousedown', handleClick)
   console.log('randomizing image')
@@ -112,7 +112,7 @@ const myInterval = setInterval(() => {
             :stroke-width="5"
             stroke="#ED6B83"
             fill="#F2BBBB"
-            @click="beingTask()"
+            @click="beginTask()"
           />
         </svg>
       </div>

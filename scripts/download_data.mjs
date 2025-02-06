@@ -4,7 +4,6 @@
 import inquirer from 'inquirer'
 import chalk from 'chalk'
 import figlet from 'figlet'
-// import shell from 'shelljs'
 import { initializeApp } from 'firebase/app'
 import { getFirestore, collection, getDocs, query, where } from 'firebase/firestore'
 import * as dotenv from 'dotenv'
