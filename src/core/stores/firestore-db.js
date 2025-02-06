@@ -122,17 +122,18 @@ export const createDoc = async (data) => {
     if (!user) throw new Error('Authentication failed')
 
     const expRef = doc(db, mode, appconfig.project_ref)
-    await setDoc(
-      expRef,
-      {
+
+    // Check if document exists first
+    const docSnap = await getDoc(expRef)
+    if (!docSnap.exists()) {
+      await setDoc(expRef, {
         project_name: appconfig.project_name,
         project_ref: appconfig.project_ref,
         code_name: appconfig.code_name,
         code_name_url: appconfig.code_name_url,
-      },
-      { merge: true }
-    )
-    console.log('FIRESTORE-DB: Document written with ID: ', `${mode}/${appconfig.project_ref}`)
+      })
+      console.log('FIRESTORE-DB: New experiment registered with ID: ', `${mode}/${appconfig.project_ref}`)
+    }
 
     // Add a new document with a generated id.
     const docRef = await addDoc(collection(db, `${mode}/${appconfig.project_ref}/data`), {
@@ -140,8 +141,13 @@ export const createDoc = async (data) => {
       firebase_anon_auth_id: user.uid,
     })
 
+    // Update the document with its own ID
+    await updateDoc(docRef, {
+      firebase_doc_id: docRef.id,
+    })
+
     data.firebase_anon_auth_id = user.uid
-    log.log(`FIRESTORE-DB: Document written with ID: ${docRef.id} for user ${user.uid})`)
+    log.log(`FIRESTORE-DB: New document written with ID: ${docRef.id} for user ${user.uid})`)
     return docRef.id
   } catch (e) {
     log.error('FIRESTORE-DB: Error adding document: ', e)

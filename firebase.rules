@@ -16,6 +16,7 @@ service cloud.firestore {
     // Rules for testing collection
     match /testing/{studyID} {
       allow create: if isAuthenticated() && !exists(/databases/$(database)/documents/testing/$(studyID));
+      allow read: if isAuthenticated();  // Add this line
       match /data/{partID} {
         allow create: if isAuthenticated() && 
                         request.resource.data.firebase_anon_auth_id == request.auth.uid;
@@ -34,6 +35,7 @@ service cloud.firestore {
     // Rules for real collection (identical to testing)
     match /real/{studyID} {
       allow create: if isAuthenticated() && !exists(/databases/$(database)/documents/real/$(studyID));
+      allow read: if isAuthenticated();  // Add this line
       match /data/{partID} {
         allow create: if isAuthenticated() && 
                         request.resource.data.firebase_anon_auth_id  == request.auth.uid;

@@ -160,6 +160,7 @@ export default defineStore('smilestore', {
       app_start_time: Date.now(),
       seedID: '',
       firebase_anon_auth_id: '',
+      firebase_doc_id: '',
       trial_num: 0, // not being updated correctly
       consented: false,
       verified_visibility: false,
