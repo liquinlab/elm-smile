@@ -24,10 +24,10 @@ programmers accomplish more in less time.==
   devices.
 - Developer [mode](/developing) which makes it easier to debug and design
   experiments. Jump quickly between phases and trials in your experiments,
-  [autofill forms and generate fake data for testing](/developing#autofill-and-data-faking),
-  visualize the flow through your project,
-  [hot-reload](/developing#hot-module-replacement) the code you are working on
-  without restarting the entire experiment, and more!
+  [autofill forms and generate fake data for testing](/autofill), visualize the
+  flow through your project, [hot-reload](/developing#hot-module-replacement)
+  the code you are working on without restarting the entire experiment, and
+  more!
 - Presentation [mode](/presentation) which provides a beautiful and interactive
   demo site you can share with reviewers and collaborators.
 - [Dashboard](/dashboard) for monitoring data collection, downloading and

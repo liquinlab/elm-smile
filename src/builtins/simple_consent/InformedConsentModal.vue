@@ -1,5 +1,5 @@
 <script setup>
-import InformedConsentText from '@/builtins/simple-consent/InformedConsentText.vue'
+import InformedConsentText from '@/user/components/InformedConsentText.vue'
 </script>
 
 <template>

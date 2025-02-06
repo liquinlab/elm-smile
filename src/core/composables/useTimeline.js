@@ -1,6 +1,5 @@
 import { useRoute, useRouter } from 'vue-router'
 import _ from 'lodash'
-import { RandomizeSubTimeline } from '@/core/subtimeline'
 import useSmileStore from '@/core/stores/smilestore'
 import useLog from '@/core/stores/log'
 
@@ -10,20 +9,28 @@ export default function useTimeline() {
   const router = useRouter()
   const log = useLog()
 
-  const nextView = () => {
-    // HANDLE RANDOMIZATION OF SUBTIMELINES
-    // if the next thing has a type field of randomized_sub_timeline, then we want to randomize the subtimeline
+  const lookupNext = (routeName) => {
+    // Get all routes from the router
+    const routes = router.getRoutes()
 
-    if (route.meta.next.type === 'randomized_sub_timeline') {
-      // get shuffled routes -- have to just give it the whole router or else there are problems
-      const orderedRoutes = RandomizeSubTimeline(route.meta.next, router)
+    // Find the specified route
+    const currentRoute = routes.find((r) => r.name === routeName)
+    if (!currentRoute) return null
 
-      // return the next route
-      return { name: orderedRoutes[0].name, query: route.query }
+    // If the route has a next property, find that route
+    if (currentRoute.meta?.next) {
+      const nextRoute = routes.find((r) => r.name === currentRoute.meta.next)
+      if (nextRoute) {
+        return {
+          name: nextRoute.name,
+          query: route.query,
+        }
+      }
     }
+    return null
+  }
 
-    // HANDLE REGULAR ROUTES
-    // otherwise we're just doing the normal thing
+  const nextView = () => {
     if (route.meta.next) {
       return { name: route.meta.next, query: route.query }
     }
@@ -72,5 +79,5 @@ export default function useTimeline() {
     navigateTo(prevView())
   }
 
-  return { stepNextView, stepPrevView, gotoView }
+  return { stepNextView, stepPrevView, gotoView, lookupNext }
 }

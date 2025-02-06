@@ -1,5 +1,3 @@
-// import { ref } from 'vue'
-import '@/core/seed'
 import seedrandom from 'seedrandom'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { v4 as uuidv4 } from 'uuid'
@@ -9,11 +7,32 @@ import timeline from '@/user/design'
 
 import useLog from '@/core/stores/log'
 const log = useLog()
+
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 // 3. add navigation guards
 //    currently these check if user is known
 //    and if they are, they redirect to last route
 function addGuards(r) {
-  r.beforeEach((to, from) => {
+  r.beforeEach(async (to, from) => {
+    if (api.isResetApp()) {
+      log.warn('ROUTER GUARD: Resetting app')
+      api.resetLocalState()
+    }
+
+    // check if status change on previous
+    if (from.meta !== undefined && from.meta.setConsented !== undefined && from.meta.setConsented) {
+      api.completeConsent()
+    }
+
+    if (from.meta !== undefined && from.meta.setDone !== undefined && from.meta.setDone) {
+      api.setDone()
+    }
+
+    if (to.meta !== undefined && to.meta.resetApp !== undefined && to.meta.resetApp) {
+      api.resetApp() // set reset app on next load
+    }
+
     // Set queries to be combination of from queries and to queries
     // (TO overwrites FROM if there is one with the same key)
     // Also add queries that come before the URL -- this later
@@ -32,12 +51,11 @@ function addGuards(r) {
     // log.debug('allowAlways', to.meta.allowAlways)
 
     const smilestore = useSmileStore()
-    log.warn('ROUTER GUARD: Navigating to ', to)
     // on startup set the page to not autofill by default
 
     // if the database isn't connected and they're a known user, reload their data
     if (smilestore.isKnownUser && !smilestore.isDBConnected) {
-      smilestore.loadData()
+      const res = await smilestore.loadData()
     }
 
     // if withdrew
@@ -165,21 +183,6 @@ function addGuards(r) {
         replace: true,
       }
     }
-    // if the next route is a subtimeline and you're trying to go to a subtimeline route, allow it
-    // this is necessary because from.meta.next won't immediately get the subroute as next when the subtimeline is randomized
-    if (
-      from.meta !== undefined &&
-      from.meta.next !== undefined &&
-      from.meta.next.type === 'randomized_sub_timeline' &&
-      to.meta.subroute
-    ) {
-      log.log(
-        "ROUTER GUARD: if the next route is a subtimeline and you're trying to go to a subtimeline route, allow it"
-      )
-      smilestore.setLastRoute(to.name)
-      smilestore.recordRoute(to.name)
-      return true
-    }
 
     // if you're trying to go to the same route you're already on, allow it
     if (smilestore.lastRoute === to.name) {
@@ -252,25 +255,30 @@ log.log('Vue Router initialized')
 // add additional guard to set global seed before
 router.beforeResolve((to) => {
   const smilestore = useSmileStore()
-  if (smilestore.local.seedActive) {
+  smilestore.removePageAutofill()
+
+  if (smilestore.local.useSeed) {
+    // if we're using a seed
     const seedID = smilestore.getSeedID
     const seed = `${seedID}-${to.name}`
     seedrandom(seed, { global: true })
+    log.log('ROUTER GUARD: Seed set to ' + seed)
   } else {
-    // if inactive, generate a random string then re-seed
+    // if inactive, just re-seed with a random seed on every route entry
     const newseed = uuidv4()
     seedrandom(newseed, {
       global: true,
     })
+    log.log('ROUTER GUARD: Not using participant-specific seed; seed set randomly to ' + newseed)
   }
   log.clear_page_history()
   smilestore.dev.page_provides_trial_stepper = false // by default
-  smilestore.dev.current_page_done = false // set teh current page to done
+  smilestore.dev.current_page_done = false // set the current page to done
   log.log('ROUTER GUARD: Router navigated to /' + to.name)
 })
 
 // Check if the next route has a preload function, and if so, run it asynchronously
-router.afterEach(async (to) => {
+router.afterEach(async (to, from) => {
   if (to.meta !== undefined && to.meta.next !== undefined) {
     const fullTo = router.resolve({ name: to.meta.next })
 

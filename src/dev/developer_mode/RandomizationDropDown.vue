@@ -2,6 +2,8 @@
 import { ref, reactive, watch } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
+import { useRouter } from 'vue-router'
+const router = useRouter()
 import useSmileStore from '@/core/stores/smilestore'
 const smilestore = useSmileStore() // load the global store
 const seed = ref(smilestore.getSeedID)
@@ -26,16 +28,19 @@ function randomize_seed() {
   //seed = smilestore.randomizeSeed()
   api.debug('Setting seed to ', seed.value)
   smilestore.setSeedID(seed.value)
+  // Force a reload to resample conditions and variables
+  router.go(0)
 }
 
 // define selected condition in toolbar from current conditions
 const selected = smilestore.getConditions
 
-
 // when toolbar selection changes, change conditions in the data
 function changeCond(key, event) {
-  const cond = event.target.value 
+  const cond = event.target.value
   smilestore.setCondition(key, cond)
+  // Force a reload to resample conditions and variables
+  router.go(0)
 }
 
 // when condition is set in the data, update the toolbar conditions
@@ -81,80 +86,83 @@ watch(
             </p>
             <br />
             <table class="table is-fullwidth">
-              <tr>
-                <th width="30%"></th>
-                <th></th>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Fixed Seed</b>:</td>
-                <td class="has-text-left is-family-code is-size-7">
-                  <div class="field">
-                    <input
-                      id="switchRoundedDefault"
-                      type="checkbox"
-                      name="switchRoundedDefault"
-                      class="switch is-rounded is-rtl is-small"
-                      v-model="smilestore.local.seedActive"
-                    />
-                    <label for="switchRoundedDefault"></label>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Seed</b>:</td>
-                <td class="has-text-left is-family-code is-size-7">
-                  <div class="textinput">
-                    <input
-                      class="input is-small"
-                      type="text"
-                      placeholder="Current seed"
-                      size="15"
-                      width="10"
-                      v-model="seed"
-                    />
-                    <button
-                      class="button is-small is-light removeedge has-tooltip-arrow has-tooltip-top"
-                      data-tooltip="Set new seed"
-                      @click="randomize_seed()"
-                    >
-                      <FAIcon icon="fa-solid fa-arrow-right" />
-                    </button>
-                  </div>
-
-                  <!-- <TextInputWithButton :v-model="seed"
-                    :seed="seed"
-                    tooltip="Set new seed"
-                    @action="randomize_seed()"
-                  ></TextInputWithButton> -->
-                </td>
-              </tr>
+              <tbody>
+                <tr>
+                  <th width="30%"></th>
+                  <th></th>
+                </tr>
+                <tr>
+                  <td class="has-text-left"><b>Fixed Seed</b>:</td>
+                  <td class="has-text-left is-family-code is-size-7">
+                    <div class="field">
+                      <input
+                        id="switchRoundedDefault"
+                        type="checkbox"
+                        name="switchRoundedDefault"
+                        class="switch is-rounded is-rtl is-small"
+                        v-model="smilestore.local.useSeed"
+                      />
+                      <label for="switchRoundedDefault"></label>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="has-text-left"><b>Seed</b>:</td>
+                  <td class="has-text-left is-family-code is-size-7">
+                    <div class="textinput">
+                      <input
+                        class="input is-small"
+                        type="text"
+                        placeholder="Current seed"
+                        size="15"
+                        width="10"
+                        v-model="seed"
+                      />
+                      <button
+                        class="button is-small is-light removeedge has-tooltip-arrow has-tooltip-top"
+                        data-tooltip="Set new seed"
+                        @click="randomize_seed()"
+                      >
+                        <FAIcon icon="fa-solid fa-arrow-right" />
+                      </button>
+                    </div>
+                    <!-- <TextInputWithButton :v-model="seed"
+                      :seed="seed"
+                      tooltip="Set new seed"
+                      @action="randomize_seed()"
+                    ></TextInputWithButton> -->
+                  </td>
+                </tr>
+              </tbody>
             </table>
             <div class="field"></div>
 
             <h1 class="title is-6">Random variables</h1>
             <p class="is-left">
-              Some text about this. Read more about randomization
+              Read more about randomization
               <a href="https://smile.gureckislab.org/randomization.html"> in the docs </a>.
             </p>
             <br />
             <table class="table is-fullwidth">
-              <template v-for="(value, key) in smilestore.getPossibleConditions" :key="key">
-                <tr>
-                  <td width="30%">
-                    <b>{{ key }}:</b>
-                  </td>
-                  <td>
-                    <div class="select is-small">
-                      <select v-model="selected[key]" @change="changeCond(key, $event)">
-                        <option disabled value="">[not selected]</option>
-                        <option v-for="cond in value" :key="cond">
-                          {{ cond }}
-                        </option>
-                      </select>
-                    </div>
-                  </td>
-                </tr>
-              </template>
+              <tbody>
+                <template v-for="(value, key) in smilestore.local.possibleConditions" :key="key">
+                  <tr>
+                    <td width="30%">
+                      <b>{{ key }}:</b>
+                    </td>
+                    <td>
+                      <div class="select is-small">
+                        <select v-model="selected[key]" @change="changeCond(key, $event)">
+                          <option disabled value="">[not selected]</option>
+                          <option v-for="cond in value" :key="cond">
+                            {{ cond }}
+                          </option>
+                        </select>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
             </table>
           </div>
         </div>

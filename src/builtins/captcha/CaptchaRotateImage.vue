@@ -59,21 +59,23 @@ var myInterval = setInterval(() => {
       <p class="is-size-5">Click the arrows to rotate until it looks correct.</p>
 
       <table class="table">
-        <tr>
-          <td>
-            <button class="button" @click="rotateImageDelta(-10)">
-              Rotate Left&nbsp;&nbsp;<FAIcon icon="fa-solid fa-rotate-left" />
-            </button>
-          </td>
-          <td>
-            <img ref="imageRef" src="@/assets/captcha/cup.jpg" class="circular-image" alt="Circular Image" />
-          </td>
-          <td>
-            <button class="button" @click="rotateImageDelta(10)">
-              Rotate Right&nbsp;&nbsp;<FAIcon icon="fa-solid fa-rotate-right" />
-            </button>
-          </td>
-        </tr>
+        <tbody>
+          <tr>
+            <td>
+              <button class="button" @click="rotateImageDelta(-10)">
+                Rotate Left&nbsp;&nbsp;<FAIcon icon="fa-solid fa-rotate-left" />
+              </button>
+            </td>
+            <td>
+              <img ref="imageRef" src="@/assets/captcha/cup.jpg" class="circular-image" alt="Circular Image" />
+            </td>
+            <td>
+              <button class="button" @click="rotateImageDelta(10)">
+                Rotate Right&nbsp;&nbsp;<FAIcon icon="fa-solid fa-rotate-right" />
+              </button>
+            </td>
+          </tr>
+        </tbody>
       </table>
       <button class="button is-success" id="finish" @click="$emit('nextPageCaptcha')">Looks good to me!</button>
     </div>

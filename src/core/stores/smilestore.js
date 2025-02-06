@@ -2,19 +2,67 @@ import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 import axios from 'axios'
 import appconfig from '@/core/config'
+import { v4 as uuidv4 } from 'uuid'
+import seedrandom from 'seedrandom'
 
 import {
   createDoc,
   createPrivateDoc,
   updateSubjectDataRecord,
   updatePrivateSubjectDataRecord,
-  balancedAssignConditions,
   loadDoc,
   fsnow,
 } from './firestore-db'
 import sizeof from 'firestore-size'
 
 import useLog from '@/core/stores/log'
+
+////////////  SET THE SEED FOR RANDOMIZATION //////////
+
+// note: we only need to run this on page load (not every time smilestore.js is imported in another file)
+// it seems like it doesn't re-run when we move to a new component that imports smilestore,
+// so it's doing what we want apparently
+
+// get local storage
+const existingLocalStorage = JSON.parse(localStorage.getItem(appconfig.local_storage_key))
+console.log(existingLocalStorage)
+
+let seed
+// if there is no local storage, then definitely have to set seed
+if (!existingLocalStorage) {
+  seed = uuidv4()
+} else {
+  // if there is local storage, check if we have seed usage turned on
+  if (existingLocalStorage.useSeed) {
+    // does seed already exist?
+    const seedSet = existingLocalStorage.seedSet
+    if (seedSet) {
+      // if seed already exists, get seedID
+      seed = existingLocalStorage.seedID
+    } else {
+      // if seed is not set, generate a new seed
+      seed = uuidv4()
+    }
+  } else {
+    // if seed usage is turned off, don't set seed
+    seed = null
+  }
+}
+
+// if seed is not null
+if (seed) {
+  // set the seed
+  seedrandom(seed, { global: true })
+  console.log('Set global seed to ' + seed)
+
+  // save to local storage
+  localStorage.setItem(
+    appconfig.local_storage_key,
+    JSON.stringify({ ...existingLocalStorage, seedID: seed, seedSet: true })
+  )
+}
+
+/////// continue with setting up smilestore ///////
 
 function initLastRoute(mode) {
   if (mode === 'development') {
@@ -60,14 +108,19 @@ const init_local = {
   consented: false,
   withdrawn: false,
   done: false,
+  reset: false,
   totalWrites: 0,
   lastWrite: null,
   approx_data_size: 0,
-  seedActive: true, // do you want to use a random seed based on the participant's ID?
+  useSeed: true, // do you want to use a random seed based on the participant's ID?
   seedID: '',
   seedSet: false,
   pageTracker: {},
-  possibleConditions: { taskOrder: ['AFirst', 'BFirst'], instructions: ['version1', 'version2', 'version3'] },
+  possibleConditions: {},
+  seqtimeline: [],
+  routes: [],
+  conditions: {}, // tracking conditions both locally and remotely
+  randomizedRoutes: {}, // tracking randomized route assignments both locally and remotely
 }
 
 const init_global = {
@@ -104,6 +157,7 @@ export default defineStore('smilestore', {
     },
     data: {
       // syncs with firestore
+      app_start_time: Date.now(),
       seedID: '',
       userUID: '',
       trial_num: 0, // not being updated correctly
@@ -119,6 +173,7 @@ export default defineStore('smilestore', {
       withdrawn: false, // false
       route_order: [],
       conditions: {},
+      randomized_routes: {},
       smile_config: removeFirestore(appconfig), //  adding config info to firebase document
       study_data: [],
     },
@@ -140,13 +195,29 @@ export default defineStore('smilestore', {
     getSeedID: (state) => state.local.seedID,
     getLocal: (state) => state.local,
     getPage: (state) => state.local.pageTracker,
-    getPossibleConditions: (state) => state.local.possibleConditions,
-    getConditions: (state) => state.data.conditions,
+    getConditions: (state) => state.local.conditions,
+    getRandomizedRoutes: (state) => state.local.randomizedRoutes,
     verifiedVisibility: (state) => state.data.verified_visibility,
+    getShortId: (state) => {
+      if (state.local.docRef == null) return 'N/A'
+      const lastDashIndex = state.local.docRef.lastIndexOf('-')
+      return `${state.local.docRef.substring(0, 10)}`
+    },
   },
 
   actions: {
+    manualSyncLocalToData() {
+      // sync conditions to remote
+      const log = useLog()
+      log.debug('SMILESTORE: syncing conditions, randomized routes to remote')
+      this.data.conditions = this.local.conditions
+      this.data.randomized_routes = this.local.randomizedRoutes
+      this.data.seedID = this.local.seedID
+    },
     setDBConnected() {
+      if (this.global.db_connected === false) {
+        this.manualSyncLocalToData()
+      }
       this.global.db_connected = true
     },
     setSearchParams(search_params) {
@@ -175,10 +246,23 @@ export default defineStore('smilestore', {
     setCompletionCode(code) {
       this.local.completionCode = code
     },
+    resetApp() {
+      this.local.reset = true
+    },
     setSeedID(seed) {
+      if (seed === this.local.seedID) {
+        console.debug('SMILESTORE: seed already set to', seed)
+        return
+      }
       this.local.seedID = seed
       this.data.seedID = seed
       this.local.seedSet = true
+
+      // After setting a seed we should clear out randomized settings
+      this.local.conditions = {}
+      this.local.randomizedRoutes = {}
+      this.data.conditions = {}
+      this.data.randomized_routes = {}
     },
     registerPageTracker(page) {
       const log = useLog()
@@ -296,7 +380,12 @@ export default defineStore('smilestore', {
       this.data.verified_visibility = value
     },
     setCondition(name, cond) {
+      this.local.conditions[name] = cond
       this.data.conditions[name] = cond
+    },
+    setRandomizedRoute(name, route) {
+      this.local.randomizedRoutes[name] = route
+      this.data.randomized_routes[name] = route
     },
     async setKnown() {
       const log = useLog()
@@ -306,18 +395,11 @@ export default defineStore('smilestore', {
       this.data.seedID = this.local.seedID
       this.local.docRef = await createDoc(this.data)
       this.local.privateDocRef = await createPrivateDoc(this.private, this.local.docRef)
-      // if possible conditions are not empty, assign conditions
-      if (this.local.possibleConditions) {
-        this.data.conditions = await balancedAssignConditions(this.local.possibleConditions, this.data.conditions)
-      }
       if (this.local.docRef) {
         this.setDBConnected()
-        // force a data save so conditions get added to the data right away
-        this.saveData(true)
       } else {
         log.error('SMILESTORE: could not create document in firebase')
       }
-      return this.data.conditions
     },
     async loadData() {
       let data
@@ -338,7 +420,26 @@ export default defineStore('smilestore', {
       // }
     },
     recordRoute(route) {
-      this.data.route_order.push(route)
+      const currentTime = Date.now()
+
+      // If there's a previous route, update its delta
+      if (this.data.route_order.length > 0) {
+        const lastIndex = this.data.route_order.length - 1
+        const lastRoute = this.data.route_order[lastIndex]
+
+        // Calculate and update the delta for the previous route
+        this.data.route_order[lastIndex] = {
+          ...lastRoute,
+          timeDelta: currentTime - lastRoute.timestamp,
+        }
+      }
+
+      // Add the new route without a delta (will be calculated on next route change)
+      this.data.route_order.push({
+        route,
+        timestamp: currentTime,
+        timeDelta: null, // Delta will be set when next route is recorded
+      })
     },
     async saveData(force = false) {
       const log = useLog()
@@ -368,6 +469,8 @@ export default defineStore('smilestore', {
         //this.global.snapshot = { ...smilestore.$state.data }
         this.global.db_changes = false // reset the changes flag
         log.success('SMILESTORE: saveData() Request to firebase successful (force = ' + force + ')')
+      } else if (!this.data.consented && !this.local.consented) {
+        log.log('SMILESTORE: not saving because not consented')
       } else {
         log.error("SMILESTORE: can't save data, not connected to firebase")
       }
@@ -377,6 +480,12 @@ export default defineStore('smilestore', {
       // this.local.lastRoute = 'welcome'
       // this.global.db_connected = false
       this.$reset()
+    },
+    getConditionByName(name) {
+      return this.local.conditions[name]
+    },
+    getRandomizedRouteByName(name) {
+      return this.local.randomizedRoutes[name]
     },
   },
 })
