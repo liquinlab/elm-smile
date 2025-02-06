@@ -20,7 +20,7 @@ const header = computed(() => {
 const data_field = computed(() => {
   if (props.data !== undefined && props.data !== null) {
     var pieces = props.data.split('.')
-    var view_data = api.data
+    var view_data = api.all_data
     for (var i = 0; i < pieces.length; i++) {
       if (view_data[pieces[i]]) {
         view_data = view_data[pieces[i]]
@@ -38,7 +38,10 @@ function option_selected(option) {
 
 <template>
   <aside class="menu">
-    <div class="columnheader" v-if="header">{{ header }}</div>
+    <div class="columnheader" v-if="header">
+      <template v-if="header == '/'"><FAIcon icon="fa-solid fa-home" />&nbsp;</template>
+      <template v-else>{{ header }}</template>
+    </div>
 
     <ul class="menu-list">
       <div

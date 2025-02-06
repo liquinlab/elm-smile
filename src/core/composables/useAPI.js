@@ -27,6 +27,8 @@ export default function useAPI() {
   const api = reactive({
     config: smilestore.config,
     data: smilestore.data,
+    private: smilestore.private,
+    all_data: { private: smilestore.private, data: smilestore.data },
     local: smilestore.local,
     global: smilestore.global,
     dev: smilestore.dev,
