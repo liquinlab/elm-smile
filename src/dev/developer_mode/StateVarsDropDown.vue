@@ -42,82 +42,84 @@ function onDragCallback(x, y) {
             <p class="is-left">You can override or view certain user-relevant state variables for testing purposes.</p>
             <br />
             <table class="table is-hoverable is-striped is-fullwidth">
-              <tr>
-                <th width="40%"></th>
-                <th></th>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Is known:</b></td>
-                <td class="has-text-left is-family-code is-size-7">
-                  <div class="field">
-                    <input
-                      id="switchRoundedDefault1"
-                      type="checkbox"
-                      name="switchRoundedDefault1"
-                      class="switch is-rounded is-rtl is-small"
-                      v-model="smilestore.local.knownUser"
-                    />
-                    <label for="switchRoundedDefault1"></label>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Has consented:</b></td>
-                <td class="has-text-left is-family-code is-size-7">
-                  <div class="field">
-                    <input
-                      id="switchRoundedDefault3"
-                      type="checkbox"
-                      name="switchRoundedDefault3"
-                      class="switch is-rounded is-rtl is-small"
-                      v-model="smilestore.local.consented"
-                    />
-                    <label for="switchRoundedDefault3"></label>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Is done:</b></td>
-                <td class="has-text-left is-family-code is-size-7">
-                  <div class="field">
-                    <input
-                      id="switchRoundedDefault2"
-                      type="checkbox"
-                      name="switchRoundedDefault2"
-                      class="switch is-rounded is-rtl is-small"
-                      v-model="smilestore.local.done"
-                    />
-                    <label for="switchRoundedDefault2"></label>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Withdrew:</b></td>
-                <td class="has-text-left is-family-code is-size-7">
-                  <div class="field">
-                    <input
-                      id="switchRoundedDefault4"
-                      type="checkbox"
-                      name="switchRoundedDefault4"
-                      class="switch is-rounded is-rtl is-small"
-                      v-model="smilestore.local.withdrawn"
-                    />
-                    <label for="switchRoundedDefault4"></label>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Service:</b></td>
-                <td class="has-text-left is-family-code is-size-7">
-                  <div class="control select is-small">
-                    <select id="recruitment" v-model="smilestore.data.recruitment_service" class="select is-small">
-                      <option v-for="(cond, key) in smilestore.global.urls" :key="cond">
-                        {{ key }}
-                      </option>
-                    </select>
-                  </div>
-                </td>
-              </tr>
+              <tbody>
+                <tr>
+                  <th width="40%"></th>
+                  <th></th>
+                </tr>
+                <tr>
+                  <td class="has-text-left"><b>Is known:</b></td>
+                  <td class="has-text-left is-family-code is-size-7">
+                    <div class="field">
+                      <input
+                        id="switchRoundedDefault1"
+                        type="checkbox"
+                        name="switchRoundedDefault1"
+                        class="switch is-rounded is-rtl is-small"
+                        v-model="smilestore.local.knownUser"
+                      />
+                      <label for="switchRoundedDefault1"></label>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="has-text-left"><b>Has consented:</b></td>
+                  <td class="has-text-left is-family-code is-size-7">
+                    <div class="field">
+                      <input
+                        id="switchRoundedDefault3"
+                        type="checkbox"
+                        name="switchRoundedDefault3"
+                        class="switch is-rounded is-rtl is-small"
+                        v-model="smilestore.local.consented"
+                      />
+                      <label for="switchRoundedDefault3"></label>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="has-text-left"><b>Is done:</b></td>
+                  <td class="has-text-left is-family-code is-size-7">
+                    <div class="field">
+                      <input
+                        id="switchRoundedDefault2"
+                        type="checkbox"
+                        name="switchRoundedDefault2"
+                        class="switch is-rounded is-rtl is-small"
+                        v-model="smilestore.local.done"
+                      />
+                      <label for="switchRoundedDefault2"></label>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="has-text-left"><b>Withdrew:</b></td>
+                  <td class="has-text-left is-family-code is-size-7">
+                    <div class="field">
+                      <input
+                        id="switchRoundedDefault4"
+                        type="checkbox"
+                        name="switchRoundedDefault4"
+                        class="switch is-rounded is-rtl is-small"
+                        v-model="smilestore.local.withdrawn"
+                      />
+                      <label for="switchRoundedDefault4"></label>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="has-text-left"><b>Service:</b></td>
+                  <td class="has-text-left is-family-code is-size-7">
+                    <div class="control select is-small">
+                      <select id="recruitment" v-model="smilestore.data.recruitment_service" class="select is-small">
+                        <option v-for="(cond, key) in smilestore.global.urls" :key="cond">
+                          {{ key }}
+                        </option>
+                      </select>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>
