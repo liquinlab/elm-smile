@@ -40,9 +40,21 @@ const QUIZ_QUESTIONS = [
   },
 ]
 
+const num_q_per_page = Math.floor(QUIZ_QUESTIONS.length / 2)
+
 const quiz_complete = computed(() =>
   quizState.answers.every((answer, index) => answer === QUIZ_QUESTIONS[index].correctAnswer[0])
 )
+
+function autofill() {
+  quizState.answers = ['blue', '365', 'West', '49']
+}
+api.setPageAutofill(autofill)
+
+const pages = ['page1', 'page2']
+const { nextStep, prevStep, step_index } = api.useStepper(pages, () => {
+  finish()
+})
 
 function submitQuiz() {
   if (quiz_complete.value) {
@@ -71,7 +83,8 @@ function finish() {
         Using the information provided in the previous pages, please select the correct answer for each question.
       </p>
 
-      <div class="formstep" v-if="quizState.page === 'quiz'">
+      <!-- Page 1 of Quiz -->
+      <div class="formstep" v-if="quizState.page === 'quiz' && step_index === 0"> 
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -83,7 +96,11 @@ function finish() {
           </div>
           <div class="column">
             <div class="box is-shadowless formbox">
-              <div v-for="(question, index) in QUIZ_QUESTIONS" :key="index" class="mb-5">
+              <div 
+                v-for="(question, index) in QUIZ_QUESTIONS.slice(0, num_q_per_page)" 
+                :key="question.id" 
+                class="mb-5"
+              >
                 <FormKit
                   type="select"
                   :label="question.question"
@@ -98,10 +115,53 @@ function finish() {
               <div class="columns">
                 <div class="column">
                   <div class="has-text-right">
+                    <button class="button is-success" @click="nextStep()">
+                      Continue &nbsp;
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 2 of Quiz -->
+      <div class="formstep" v-if="quizState.page === 'quiz' && step_index === 1">
+        <div class="columns">
+          <div class="column is-one-third">
+            <div class="formsectionexplainer">
+              <h3 class="is-size-6 has-text-weight-bold">Test your understanding</h3>
+              <p class="is-size-6">
+                Do your best! If anything is unclear you can review again after you submit your response.
+              </p>
+            </div>
+          </div>
+          <div class="column">
+            <div class="box is-shadowless formbox">
+              <div 
+                v-for="(question, index) in QUIZ_QUESTIONS.slice(num_q_per_page, QUIZ_QUESTIONS.length)" 
+                :key="question.id" 
+                class="mb-5"
+              >
+                <FormKit
+                  type="select"
+                  :label="question.question"
+                  :name="'question' + (index + num_q_per_page)"
+                  placeholder="Select an option"
+                  v-model="quizState.answers[index + num_q_per_page]"
+                  :options="question.answers"
+                  validation="required"
+                />
+              </div>
+              <hr />
+              <div class="columns">
+                <div class="column">
+                  <div class="has-text-right">
                     <button
                       class="button is-success"
                       @click="submitQuiz"
-                      :disabled="quizState.answers.some((answer) => answer === null)"
+                      :disabled="quizState.answers.some(answer => answer === null)"
                     >
                       Submit
                     </button>
