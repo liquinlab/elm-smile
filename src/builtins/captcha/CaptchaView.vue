@@ -7,20 +7,24 @@ import CaptchaTrialImageCategorization from '@/builtins/captcha/CaptchaTrialImag
 import CaptchaTrialMaze from '@/builtins/captcha/CaptchaTrialMaze.vue'
 import CaptchaTrialTextComprehension from '@/builtins/captcha/CaptchaTrialTextComprehension.vue'
 import CaptchaTrialStroop from '@/builtins/captcha/CaptchaTrialStroop.vue'
-import CaptchaRotateImage from '@/builtins/captcha/CaptchaRotateImage.vue'
+import CaptchaTrialRotateImage from '@/builtins/captcha/CaptchaTrialRotateImage.vue'
 import CaptchaButtonPress from '@/builtins/captcha/CaptchaButtonPress.vue'
 import CaptchaShyDot from '@/builtins/captcha/CaptchaShyDot.vue'
 
 // give feedback
 
-// listen to the music and tap on the beat
+// rotate image -- good but need to scamble file names
+
+// in progress
 // move slowly towards and object in order to sneak up on it but don't say that in instructions (let them figure it out)
-// intuitive physics - pat which looks like more natural
-// mental rotation - rotate the image to match the other image
 // maze
-// rotate image
 // don't press button
 // text comprehension
+
+// planned
+// listen to the music and tap on the beat
+// intuitive physics - pat which looks like more natural
+// mental rotation - rotate the image to match the other image
 
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
@@ -32,21 +36,24 @@ const api = useAPI()
 
 const pages = [
   { component: CaptchaInstructionsText_01, props: { adjective: '' }, data: [] },
-  { component: CaptchaTrialTextComprehension, props: { timed_task: false }, data: [] },
-  { component: CaptchaShyDot, props: { timed_task: false }, data: [] },
-  { component: CaptchaInstructionsText_02, props: {}, data: [] },
-  //{ component: CaptchaTrialImageCategorization, props: {}, data: [] },
-  { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
-  { component: CaptchaRotateImage, props: {}, data: [] },
-  { component: CaptchaButtonPress, props: {}, data: [] },
-  { component: CaptchaRotateImage, props: {}, data: [] },
-  { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
-  { component: CaptchaRotateImage, props: {}, data: [] },
-  { component: CaptchaButtonPress, props: {}, data: [] },
-  { component: CaptchaRotateImage, props: {}, data: [] },
-  { component: CaptchaTrialTextComprehension, props: { timed_task: false }, data: [] },
-  { component: CaptchaRotateImage, props: {}, data: [] },
-  { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
+  { component: CaptchaTrialRotateImage, props: { timed_task: true, max_time: 50000 }, data: [] },
+  { component: CaptchaTrialMaze, props: { timed_task: false }, data: [] },
+
+  // { component: CaptchaTrialTextComprehension, props: { timed_task: false }, data: [] },
+  // { component: CaptchaShyDot, props: { timed_task: false }, data: [] },
+  // { component: CaptchaInstructionsText_02, props: {}, data: [] },
+  // //{ component: CaptchaTrialImageCategorization, props: {}, data: [] },
+  // { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
+  //
+  // { component: CaptchaButtonPress, props: {}, data: [] },
+  // { component: CaptchaRotateImage, props: {}, data: [] },
+  // { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
+  // { component: CaptchaRotateImage, props: {}, data: [] },
+  // { component: CaptchaButtonPress, props: {}, data: [] },
+  // { component: CaptchaRotateImage, props: {}, data: [] },
+  // { component: CaptchaTrialTextComprehension, props: { timed_task: false }, data: [] },
+  // { component: CaptchaRotateImage, props: {}, data: [] },
+  // { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
 ]
 
 const currentTab = computed(() => {
@@ -80,6 +87,7 @@ function next_trial() {
     finish()
   } else {
     ///api.incrementTrial()
+    api.saveData() // force a save
     nextStep()
   }
 }
