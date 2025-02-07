@@ -153,12 +153,11 @@ timeline.pushSeqView({
 timeline.pushSeqView({
   name: 'instructions',
   component: Instructions,
-  meta: {allowAlways: true,}
 })
 
-// instructions quiz 
+// instructions quiz
 timeline.pushSeqView({
-  name: 'instructions_quiz',
+  name: 'quiz',
   component: InstructionsQuiz,
 })
 // main experiment
