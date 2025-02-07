@@ -64,21 +64,20 @@ function finish() {
 <template>
   <div class="page prevent-select">
     <div class="formcontent">
-      <h3 class="is-size-4 has-text-weight-bold"><FAIcon icon="fa-solid fa-square-check" />&nbsp;Instruction Check</h3>
+      <h3 class="is-size-3 has-text-weight-bold">
+        <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
+      </h3>
       <p class="is-size-6">
-        To make sure you understand the instructions, please complete the quiz below. If you get all the answers
-        correct, you can proceed to the expriement.
+        Using the information provided in the previous pages, please select the correct answer for each question. If you
+        get the questions wrong we will give you a chance to re-review the instructions.
       </p>
 
       <div class="formstep" v-if="quizState.page === 'quiz'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
-              <h3 class="is-size-6 has-text-weight-bold">Check your understanding</h3>
-              <p class="is-size-7">
-                Using the information provided in the previous pages, please select the correct answer for each
-                question.
-              </p>
+              <h3 class="is-size-6 has-text-weight-bold">Test your understanding</h3>
+              <p class="is-size-6">Do your best, and if anything is unclear you can review!</p>
             </div>
           </div>
           <div class="column">

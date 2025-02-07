@@ -76,7 +76,7 @@ function finish() {
 <template>
   <div class="page prevent-select">
     <div class="formcontent">
-      <h3 class="is-size-4 has-text-weight-bold"><FAIcon icon="fa-solid fa-person" />&nbsp;Demographic Information</h3>
+      <h3 class="is-size-3 has-text-weight-bold"><FAIcon icon="fa-solid fa-person" />&nbsp;Demographic Information</h3>
       <p class="is-size-6">
         We request some information about you which we can use to understand aggregate differences between individuals.
         Your privacy will be maintained and the data will not be linked to your online identity (e.g., email).
