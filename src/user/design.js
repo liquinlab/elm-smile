@@ -19,6 +19,7 @@ import DemographicSurvey from '@/builtins/demographic_survey/DemographicSurveyVi
 import DeviceSurvey from '@/builtins/device_survey/DeviceSurveyView.vue'
 import Captcha from '@/builtins/captcha/CaptchaView.vue'
 import Instructions from '@/builtins/instructions/InstructionsView.vue'
+import InstructionsQuiz from './components/InstructionsQuiz.vue'
 import Debrief from '@/builtins/debrief/DebriefView.vue'
 import TaskFeedbackSurvey from '@/builtins/task_survey/TaskFeedbackSurveyView.vue'
 import Thanks from '@/builtins/thanks/ThanksView.vue'
@@ -152,8 +153,14 @@ timeline.pushSeqView({
 timeline.pushSeqView({
   name: 'instructions',
   component: Instructions,
+  meta: {allowAlways: true,}
 })
 
+// instructions quiz 
+timeline.pushSeqView({
+  name: 'instructionsQuiz',
+  component: InstructionsQuiz,
+})
 // main experiment
 // note: by default, the path will be set to the name of the view
 // however, you can override this by setting the path explicitly
