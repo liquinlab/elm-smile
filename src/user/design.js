@@ -158,7 +158,7 @@ timeline.pushSeqView({
 
 // instructions quiz 
 timeline.pushSeqView({
-  name: 'instructionsQuiz',
+  name: 'instructions_quiz',
   component: InstructionsQuiz,
 })
 // main experiment

@@ -11,32 +11,32 @@ const quizState = reactive({
 
 const QUIZ_QUESTIONS = [
   {
-    id: "ex1",
-    question: "Quiz Question 1",
+    id: "example1",
+    question: "What color is the sky?",
     multiSelect: false,
-    answers: ['a', 'b', 'c'],
-    correctAnswer: ['a']
+    answers: ['red', 'blue', 'yellow', "rainbow"],
+    correctAnswer: ['blue']
   },
   {
-    id: "ex1",
-    question: "Quiz Question 1",
+    id: "example2",
+    question: "How many days are in a non-leap year?",
     multiSelect: false,
-    answers: ['a', 'b', 'c', 'd', 'e'],
-    correctAnswer: ['a']
+    answers: ['365', '100', '12', '31', '60'],
+    correctAnswer: ['365']
   },
   {
-    id: "ex1",
-    question: "Quiz Question 1",
+    id: "example3",
+    question: "What comes next: North, South, East, ___",
     multiSelect: false,
-    answers: ['a', 'b'],
-    correctAnswer: ['a']
+    answers: ['Southeast', 'Left', 'West'],
+    correctAnswer: ['West']
   },
   {
-    id: "ex1",
-    question: "Quiz Question 1",
+    id: "example4",
+    question: "What's 7 x 7?",
     multiSelect: false,
-    answers: ['a', 'b', 'c', 'd'],
-    correctAnswer: ['a']
+    answers: ['63', '59', '49', '14'],
+    correctAnswer: ['49']
   }
 ]
 
@@ -67,7 +67,7 @@ function finish() {
       <div class="header-box mb-6">
         <h1 class="is-size-3 has-text-weight-bold">Instructions Quiz</h1>
         <div v-if="quizState.page === 'quiz'">
-          <p class="is-size-5 has-text-weight-medium">Complete the quiz to proceed (answer a for all)</p>
+          <p class="is-size-5 has-text-weight-medium">Complete the quiz to proceed</p>
         </div>
       </div>
 
