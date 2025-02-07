@@ -68,8 +68,7 @@ function finish() {
         <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
       </h3>
       <p class="is-size-6">
-        Using the information provided in the previous pages, please select the correct answer for each question. If you
-        get the questions wrong we will give you a chance to re-review the instructions.
+        Using the information provided in the previous pages, please select the correct answer for each question.
       </p>
 
       <div class="formstep" v-if="quizState.page === 'quiz'">
@@ -77,7 +76,9 @@ function finish() {
           <div class="column is-one-third">
             <div class="formsectionexplainer">
               <h3 class="is-size-6 has-text-weight-bold">Test your understanding</h3>
-              <p class="is-size-6">Do your best, and if anything is unclear you can review!</p>
+              <p class="is-size-6">
+                Do your best! If anything is unclear you can review again after you submit your response.
+              </p>
             </div>
           </div>
           <div class="column">
