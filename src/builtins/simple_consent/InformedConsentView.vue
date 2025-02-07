@@ -50,7 +50,7 @@ onBeforeUnmount(() => {
       <div class="has-background-light bumper">
         <div class="columns">
           <div class="column is-7">
-            <div class="consenttext">
+            <div class="consenttext pt-5">
               <InformedConsentText />
             </div>
           </div>
