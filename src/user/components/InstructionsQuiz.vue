@@ -60,7 +60,7 @@ const quizState = reactive({
   answers: QUIZ_QUESTIONS.map((page) => Array(page.questions.length).fill(null)),
 })
 
-const quiz_complete = computed(() =>
+const quizCorrect = computed(() =>
   QUIZ_QUESTIONS.every((page, pageIndex) =>
     page.questions.every(
       (question, questionIndex) => quizState.answers[pageIndex][questionIndex] === question.correctAnswer[0]
@@ -75,7 +75,13 @@ const currentPageComplete = computed(() => {
 })
 
 function submitQuiz() {
-  if (quiz_complete.value) {
+  // should we log someplace more direct the number of attempts here
+  api.saveTrialData({
+    phase: 'INSTRUCTIONS_QUIZ',
+    questions: QUIZ_QUESTIONS,
+    answers: quizState.answers,
+  })
+  if (quizCorrect.value) {
     quizState.page = 'start'
   } else {
     quizState.page = 'retry'
@@ -99,7 +105,8 @@ function finish() {
         <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
       </h3>
       <p class="is-size-6">
-        Using the information provided in the previous pages, please select the correct answer for each question.
+        Using the information provided in the previous pages, please select the correct answer for each question. Do
+        your best! If anything is unclear you can review the instructions again after you submit your response.
       </p>
 
       <!-- Replace the two quiz page sections with this single dynamic one -->
@@ -108,9 +115,7 @@ function finish() {
           <div class="column is-one-third">
             <div class="formsectionexplainer">
               <h3 class="is-size-6 has-text-weight-bold">Test your understanding</h3>
-              <p class="is-size-6">
-                Do your best! If anything is unclear you can review again after you submit your response.
-              </p>
+              <p class="is-size-6">You must answer all the questions in order to move on.</p>
             </div>
           </div>
           <div class="column">
