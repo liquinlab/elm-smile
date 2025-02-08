@@ -4,56 +4,74 @@ import useAPI from '@/core/composables/useAPI'
 
 const api = useAPI()
 
-const quizState = reactive({
-  page: 'quiz',
-  answers: Array(4).fill(null),
-})
-
 const QUIZ_QUESTIONS = [
   {
-    id: 'example1',
-    question: 'What color is the sky?',
-    multiSelect: false,
-    answers: ['red', 'blue', 'yellow', 'rainbow'],
-    correctAnswer: ['blue'],
+    page: 1,
+    questions: [
+      {
+        id: 'example1',
+        question: 'What color is the sky?',
+        multiSelect: false,
+        answers: ['red', 'blue', 'yellow', 'rainbow'],
+        correctAnswer: ['blue'],
+      },
+      {
+        id: 'example2',
+        question: 'How many days are in a non-leap year?',
+        multiSelect: false,
+        answers: ['365', '100', '12', '31', '60'],
+        correctAnswer: ['365'],
+      },
+    ],
   },
   {
-    id: 'example2',
-    question: 'How many days are in a non-leap year?',
-    multiSelect: false,
-    answers: ['365', '100', '12', '31', '60'],
-    correctAnswer: ['365'],
-  },
-  {
-    id: 'example3',
-    question: 'What comes next: North, South, East, ___',
-    multiSelect: false,
-    answers: ['Southeast', 'Left', 'West'],
-    correctAnswer: ['West'],
-  },
-  {
-    id: 'example4',
-    question: "What's 7 x 7?",
-    multiSelect: false,
-    answers: ['63', '59', '49', '14'],
-    correctAnswer: ['49'],
+    page: 2,
+    questions: [
+      {
+        id: 'example3',
+        question: 'What comes next: North, South, East, ___',
+        multiSelect: false,
+        answers: ['Southeast', 'Left', 'West'],
+        correctAnswer: ['West'],
+      },
+      {
+        id: 'example4',
+        question: "What's 7 x 7?",
+        multiSelect: false,
+        answers: ['63', '59', '49', '14'],
+        correctAnswer: ['49'],
+      },
+    ],
   },
 ]
 
-const num_q_per_page = Math.floor(QUIZ_QUESTIONS.length / 2)
-
-const quiz_complete = computed(() =>
-  quizState.answers.every((answer, index) => answer === QUIZ_QUESTIONS[index].correctAnswer[0])
-)
-
 function autofill() {
-  quizState.answers = ['blue', '365', 'West', '49']
+  quizState.answers = QUIZ_QUESTIONS.map((page) => page.questions.map((question) => question.correctAnswer[0]))
 }
 api.setPageAutofill(autofill)
 
-const pages = ['page1', 'page2']
-const { nextStep, prevStep, step_index } = api.useStepper(pages, () => {
+const pages = QUIZ_QUESTIONS.map((_, index) => `page${index + 1}`)
+const { nextStep, step_index, prevStep, resetStep } = api.useStepper(pages, () => {
   finish()
+})
+
+const quizState = reactive({
+  page: 'quiz',
+  answers: QUIZ_QUESTIONS.map((page) => Array(page.questions.length).fill(null)),
+})
+
+const quiz_complete = computed(() =>
+  QUIZ_QUESTIONS.every((page, pageIndex) =>
+    page.questions.every(
+      (question, questionIndex) => quizState.answers[pageIndex][questionIndex] === question.correctAnswer[0]
+    )
+  )
+)
+const currentPageComplete = computed(() => {
+  if (!quizState.answers || !quizState.answers[step_index.value]) {
+    return false
+  }
+  return quizState.answers[step_index.value].every((answer) => answer !== null)
 })
 
 function submitQuiz() {
@@ -65,6 +83,7 @@ function submitQuiz() {
 }
 
 function returnInstructions() {
+  resetStep() // reset the quiz
   api.gotoView('instructions')
 }
 
@@ -83,8 +102,8 @@ function finish() {
         Using the information provided in the previous pages, please select the correct answer for each question.
       </p>
 
-      <!-- Page 1 of Quiz -->
-      <div class="formstep" v-if="quizState.page === 'quiz' && step_index === 0"> 
+      <!-- Replace the two quiz page sections with this single dynamic one -->
+      <div class="formstep" v-if="quizState.page === 'quiz' && step_index < QUIZ_QUESTIONS.length">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -96,17 +115,13 @@ function finish() {
           </div>
           <div class="column">
             <div class="box is-shadowless formbox">
-              <div 
-                v-for="(question, index) in QUIZ_QUESTIONS.slice(0, num_q_per_page)" 
-                :key="question.id" 
-                class="mb-5"
-              >
+              <div v-for="question in QUIZ_QUESTIONS[step_index].questions" :key="question.id" class="mb-5">
                 <FormKit
                   type="select"
                   :label="question.question"
-                  :name="'question' + index"
+                  :name="question.id"
                   placeholder="Select an option"
-                  v-model="quizState.answers[index]"
+                  v-model="quizState.answers[step_index][QUIZ_QUESTIONS[step_index].questions.indexOf(question)]"
                   :options="question.answers"
                   validation="required"
                 />
@@ -114,56 +129,23 @@ function finish() {
               <hr />
               <div class="columns">
                 <div class="column">
-                  <div class="has-text-right">
-                    <button class="button is-success" @click="nextStep()">
-                      Continue &nbsp;
+                  <div class="has-text-left">
+                    <button v-if="step_index > 0" class="button is-warning" @click="prevStep">
+                      <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous
                     </button>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Page 2 of Quiz -->
-      <div class="formstep" v-if="quizState.page === 'quiz' && step_index === 1">
-        <div class="columns">
-          <div class="column is-one-third">
-            <div class="formsectionexplainer">
-              <h3 class="is-size-6 has-text-weight-bold">Test your understanding</h3>
-              <p class="is-size-6">
-                Do your best! If anything is unclear you can review again after you submit your response.
-              </p>
-            </div>
-          </div>
-          <div class="column">
-            <div class="box is-shadowless formbox">
-              <div 
-                v-for="(question, index) in QUIZ_QUESTIONS.slice(num_q_per_page, QUIZ_QUESTIONS.length)" 
-                :key="question.id" 
-                class="mb-5"
-              >
-                <FormKit
-                  type="select"
-                  :label="question.question"
-                  :name="'question' + (index + num_q_per_page)"
-                  placeholder="Select an option"
-                  v-model="quizState.answers[index + num_q_per_page]"
-                  :options="question.answers"
-                  validation="required"
-                />
-              </div>
-              <hr />
-              <div class="columns">
                 <div class="column">
                   <div class="has-text-right">
                     <button
-                      class="button is-success"
-                      @click="submitQuiz"
-                      :disabled="quizState.answers.some(answer => answer === null)"
+                      v-if="currentPageComplete"
+                      :class="['button', step_index === QUIZ_QUESTIONS.length - 1 ? 'is-success' : 'is-warning']"
+                      @click="step_index === QUIZ_QUESTIONS.length - 1 ? submitQuiz() : nextStep()"
                     >
-                      Submit
+                      {{ step_index === QUIZ_QUESTIONS.length - 1 ? 'Submit' : 'Continue' }}
+                      <template v-if="step_index !== QUIZ_QUESTIONS.length - 1">
+                        &nbsp;<FAIcon icon="fa-solid fa-arrow-right" />
+                      </template>
                     </button>
                   </div>
                 </div>
