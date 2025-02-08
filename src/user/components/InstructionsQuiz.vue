@@ -4,46 +4,8 @@ import useAPI from '@/core/composables/useAPI'
 
 const api = useAPI()
 
-const QUIZ_QUESTIONS = [
-  {
-    page: 1,
-    questions: [
-      {
-        id: 'example1',
-        question: 'What color is the sky?',
-        multiSelect: false,
-        answers: ['red', 'blue', 'yellow', 'rainbow'],
-        correctAnswer: ['blue'],
-      },
-      {
-        id: 'example2',
-        question: 'How many days are in a non-leap year?',
-        multiSelect: false,
-        answers: ['365', '100', '12', '31', '60'],
-        correctAnswer: ['365'],
-      },
-    ],
-  },
-  {
-    page: 2,
-    questions: [
-      {
-        id: 'example3',
-        question: 'What comes next: North, South, East, ___',
-        multiSelect: false,
-        answers: ['Southeast', 'Left', 'West'],
-        correctAnswer: ['West'],
-      },
-      {
-        id: 'example4',
-        question: "What's 7 x 7?",
-        multiSelect: false,
-        answers: ['63', '59', '49', '14'],
-        correctAnswer: ['49'],
-      },
-    ],
-  },
-]
+// import the quiz questions
+import { QUIZ_QUESTIONS } from './quizQuestions'
 
 function autofill() {
   quizState.answers = QUIZ_QUESTIONS.map((page) => page.questions.map((question) => question.correctAnswer[0]))
@@ -101,16 +63,17 @@ function finish() {
 <template>
   <div class="page prevent-select">
     <div class="formcontent">
-      <h3 class="is-size-3 has-text-weight-bold">
-        <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
-      </h3>
-      <p class="is-size-6">
-        Using the information provided in the previous pages, please select the correct answer for each question. Do
-        your best! If anything is unclear you can review the instructions again after you submit your response.
-      </p>
-
       <!-- Replace the two quiz page sections with this single dynamic one -->
       <div class="formstep" v-if="quizState.page === 'quiz' && step_index < QUIZ_QUESTIONS.length">
+        <div class="formheader">
+          <h3 class="is-size-3 has-text-weight-bold">
+            <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
+          </h3>
+          <p class="is-size-6">
+            Using the information provided in the previous pages, please select the correct answer for each question. Do
+            your best! If anything is unclear you can review the instructions again after you submit your response.
+          </p>
+        </div>
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -136,7 +99,7 @@ function finish() {
                 <div class="column">
                   <div class="has-text-left">
                     <button v-if="step_index > 0" class="button is-warning" @click="prevStep">
-                      <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous
+                      <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous page
                     </button>
                   </div>
                 </div>
@@ -147,7 +110,7 @@ function finish() {
                       :class="['button', step_index === QUIZ_QUESTIONS.length - 1 ? 'is-success' : 'is-warning']"
                       @click="step_index === QUIZ_QUESTIONS.length - 1 ? submitQuiz() : nextStep()"
                     >
-                      {{ step_index === QUIZ_QUESTIONS.length - 1 ? 'Submit' : 'Continue' }}
+                      {{ step_index === QUIZ_QUESTIONS.length - 1 ? 'Submit' : 'Next page' }}
                       <template v-if="step_index !== QUIZ_QUESTIONS.length - 1">
                         &nbsp;<FAIcon icon="fa-solid fa-arrow-right" />
                       </template>
@@ -161,28 +124,26 @@ function finish() {
       </div>
 
       <div class="formstep" v-else-if="quizState.page === 'start'">
-        <div class="columns">
-          <div class="column is-full">
-            <div class="has-text-centered">
-              <h3 class="is-size-4 has-text-weight-bold mb-4">You passed!</h3>
-              <p class="mb-4">Click here to start the experiment.</p>
-              <button class="button is-warning" @click="finish">Let's begin.</button>
-            </div>
-          </div>
+        <div class="formheader">
+          <h3 class="is-size-3 has-text-weight-bold has-text-centered">
+            <FAIcon icon="fa-solid fa-square-check" />&nbsp;Congrats! You passed.
+          </h3>
+          <p class="is-size-5 has-text-centered">Click here to begin the next phase of the experiment.</p>
+        </div>
+        <div class="has-text-centered">
+          <button class="button is-warning" @click="finish">Let's begin.</button>
         </div>
       </div>
 
       <div class="formstep" v-else-if="quizState.page === 'retry'">
-        <div class="columns">
-          <div class="column is-full">
-            <div class="has-text-centered">
-              <h3 class="is-size-4 has-text-weight-bold mb-4">Re-read the Instructions</h3>
-              <p class="mb-4">
-                Oops! You did not get all the answers correct. Please re-read the instructions and try again.
-              </p>
-              <button class="button is-warning" @click="returnInstructions">Back to Instructions</button>
-            </div>
-          </div>
+        <div class="formheader">
+          <h3 class="is-size-3 has-text-weight-bold has-text-centered">
+            <FAIcon icon="fa-solid fa-square-check" />&nbsp;Sorry! You did not get all the answers correct.
+          </h3>
+          <p class="is-size-5 has-text-centered">Please re-read the instructions and try again.</p>
+        </div>
+        <div class="has-text-centered">
+          <button class="button is-warning" @click="returnInstructions">Back to Instructions</button>
         </div>
       </div>
     </div>
@@ -200,7 +161,11 @@ function finish() {
 }
 
 .formstep {
-  margin-top: 20px;
+  margin-top: 0px;
+}
+
+.formheader {
+  margin-bottom: 40px;
 }
 
 .formbox {
