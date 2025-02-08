@@ -4,26 +4,36 @@ import useAPI from '@/core/composables/useAPI'
 
 const api = useAPI()
 
-// import the quiz questions
-import { QUIZ_QUESTIONS } from './quizQuestions'
+// read in props
+const props = defineProps({
+  quizQuestions: {
+    type: Object,
+    required: true,
+  },
+  returnTo: {
+    type: String,
+    required: false,
+    default: 'instructions',
+  },
+})
 
 function autofill() {
-  quizState.answers = QUIZ_QUESTIONS.map((page) => page.questions.map((question) => question.correctAnswer[0]))
+  quizState.answers = props.quizQuestions.map((page) => page.questions.map((question) => question.correctAnswer[0]))
 }
 api.setPageAutofill(autofill)
 
-const pages = QUIZ_QUESTIONS.map((_, index) => `page${index + 1}`)
+const pages = props.quizQuestions.map((_, index) => `page${index + 1}`)
 const { nextStep, step_index, prevStep, resetStep } = api.useStepper(pages, () => {
   finish()
 })
 
 const quizState = reactive({
   page: 'quiz',
-  answers: QUIZ_QUESTIONS.map((page) => Array(page.questions.length).fill(null)),
+  answers: props.quizQuestions.map((page) => Array(page.questions.length).fill(null)),
 })
 
 const quizCorrect = computed(() =>
-  QUIZ_QUESTIONS.every((page, pageIndex) =>
+  props.quizQuestions.every((page, pageIndex) =>
     page.questions.every(
       (question, questionIndex) => quizState.answers[pageIndex][questionIndex] === question.correctAnswer[0]
     )
@@ -40,7 +50,7 @@ function submitQuiz() {
   // should we log someplace more direct the number of attempts here
   api.saveTrialData({
     phase: 'INSTRUCTIONS_QUIZ',
-    questions: QUIZ_QUESTIONS,
+    questions: props.quizQuestions,
     answers: quizState.answers,
   })
   if (quizCorrect.value) {
@@ -52,7 +62,7 @@ function submitQuiz() {
 
 function returnInstructions() {
   resetStep() // reset the quiz
-  api.gotoView('instructions')
+  api.gotoView(props.returnTo)
 }
 
 function finish() {
@@ -62,9 +72,10 @@ function finish() {
 
 <template>
   <div class="page prevent-select">
+    {{ props.data }}
     <div class="formcontent">
       <!-- Replace the two quiz page sections with this single dynamic one -->
-      <div class="formstep" v-if="quizState.page === 'quiz' && step_index < QUIZ_QUESTIONS.length">
+      <div class="formstep" v-if="quizState.page === 'quiz' && step_index < props.quizQuestions.length">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
@@ -83,13 +94,13 @@ function finish() {
           </div>
           <div class="column">
             <div class="box is-shadowless formbox">
-              <div v-for="question in QUIZ_QUESTIONS[step_index].questions" :key="question.id" class="mb-5">
+              <div v-for="question in props.quizQuestions[step_index].questions" :key="question.id" class="mb-5">
                 <FormKit
                   type="select"
                   :label="question.question"
                   :name="question.id"
                   placeholder="Select an option"
-                  v-model="quizState.answers[step_index][QUIZ_QUESTIONS[step_index].questions.indexOf(question)]"
+                  v-model="quizState.answers[step_index][props.quizQuestions[step_index].questions.indexOf(question)]"
                   :options="question.answers"
                   validation="required"
                 />
@@ -107,11 +118,11 @@ function finish() {
                   <div class="has-text-right">
                     <button
                       v-if="currentPageComplete"
-                      :class="['button', step_index === QUIZ_QUESTIONS.length - 1 ? 'is-success' : 'is-warning']"
-                      @click="step_index === QUIZ_QUESTIONS.length - 1 ? submitQuiz() : nextStep()"
+                      :class="['button', step_index === props.quizQuestions.length - 1 ? 'is-success' : 'is-warning']"
+                      @click="step_index === props.quizQuestions.length - 1 ? submitQuiz() : nextStep()"
                     >
-                      {{ step_index === QUIZ_QUESTIONS.length - 1 ? 'Submit' : 'Next page' }}
-                      <template v-if="step_index !== QUIZ_QUESTIONS.length - 1">
+                      {{ step_index === props.quizQuestions.length - 1 ? 'Submit' : 'Next page' }}
+                      <template v-if="step_index !== props.quizQuestions.length - 1">
                         &nbsp;<FAIcon icon="fa-solid fa-arrow-right" />
                       </template>
                     </button>

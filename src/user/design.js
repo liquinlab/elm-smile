@@ -19,7 +19,7 @@ import DemographicSurvey from '@/builtins/demographic_survey/DemographicSurveyVi
 import DeviceSurvey from '@/builtins/device_survey/DeviceSurveyView.vue'
 import Captcha from '@/builtins/captcha/CaptchaView.vue'
 import Instructions from '@/builtins/instructions/InstructionsView.vue'
-import InstructionsQuiz from './components/InstructionsQuiz.vue'
+import InstructionsQuiz from '@/builtins/instructions_quiz/InstructionsQuiz.vue'
 import Debrief from '@/builtins/debrief/DebriefView.vue'
 import TaskFeedbackSurvey from '@/builtins/task_survey/TaskFeedbackSurveyView.vue'
 import Thanks from '@/builtins/thanks/ThanksView.vue'
@@ -155,10 +155,13 @@ timeline.pushSeqView({
   component: Instructions,
 })
 
+// import the quiz questions
+import { QUIZ_QUESTIONS } from './components/quizQuestions'
 // instructions quiz
 timeline.pushSeqView({
   name: 'quiz',
   component: InstructionsQuiz,
+  props: { quizQuestions: QUIZ_QUESTIONS, returnTo: 'instructions' },
 })
 // main experiment
 // note: by default, the path will be set to the name of the view
