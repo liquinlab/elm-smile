@@ -72,6 +72,7 @@ export default defineConfig({
           //{ text: '💰 Computing bonuses', link: '/bonuses' },
           { text: '🆘 Dealing with Errors', link: '/problems' },
           { text: '🐞 Automated Testing', link: '/testing' },
+          { text: '👩‍🏫 Presentation mode', link: '/presentation' },
 
           //{ text: '🔌 Server-side Computations', link: '/server' },
         ],
@@ -81,7 +82,7 @@ export default defineConfig({
         items: [
           { text: '☁️ Deploying', link: '/deploying' },
           { text: '🙋 Recruitment Services', link: '/recruitment' },
-          { text: '📈 Dashboard', link: '/dashboard' },
+          //{ text: '📈 Dashboard', link: '/dashboard' },
           { text: '😇 Ethical considerations', link: '/ethics' },
         ],
       },
@@ -89,8 +90,7 @@ export default defineConfig({
         text: 'Analyzing data',
         items: [
           { text: '🧐 Analyzing data', link: '/analysis' },
-          { text: '🤖 Quality control', link: '/qualitycontrol' },
-          { text: '👩‍🏫 Presentation mode', link: '/presentation' },
+          //{ text: '🤖 Quality control', link: '/qualitycontrol' },
         ],
       },
       {
