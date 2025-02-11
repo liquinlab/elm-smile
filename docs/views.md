@@ -73,7 +73,7 @@ In the docs for built-in view we will describe the side-effects of each view.
 | [CAPTCHA](#the-smile-captcha)                       | No                | Fun tasks to verify human-ness and attention                                                                                    |
 | [Window Sizer](#window-sizer)                       | Yes               | Verifies a given area of the screen is visible (with a more that agressively hides page content if window is resized too small) |
 | [Simple Instructions](#simple-instructions)         | No                | A simple sequence of pages for instructions                                                                                     |
-| [Instructions+Quiz](#instructions--quiz)            | No                | A simple sequence of pages for instructions                                                                                     |
+| [Instructions Quiz](#instructions-quiz)             | No                | A simple sequence of pages for instructions                                                                                     |
 | [Demographic Survey](#demographic-survey)           | No                | A survey which collects somedemographic info                                                                                    |
 | [Device Survey](#device-survey)                     | No                | A survey which collects some self-report about computer/device                                                                  |
 | [Withdraw](#withdraw)                               | Yes               | A survey which processes a subject request to withdraw from study                                                               |
@@ -91,9 +91,9 @@ short-hand for the src folder is '@' so for instance '@/builtins' refers to the
 ### Recruitment Advertisement
 
 **Base Component**: `@/builtins/recruitment/AdvertisementView.vue`  
-**Code**:
-[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/recruitment/AdvertisementView.vue)  
-**Side effects**: None  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/recruitment/AdvertisementView.vue)  
+**Side
+effects**: None  
 **Typical accessibility**: `{allowAlways: true}`
 
 Before a participant can begin a study they must first be recruited. The landing
@@ -155,9 +155,9 @@ timeline.pushSeqView({
 ### MTurk Recruitment
 
 **Base Component**: `@/builtins/mturk/MTurkRecruitView.vue`  
-**Code**:
-[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/mturk/MTurkRecruitView.vue)  
-**Side effects**: None  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/mturk/MTurkRecruitView.vue)  
+**Side
+effects**: None  
 **Typical accessibility**: `{allowAlways: true}`
 
 On the Mechanical Turk, the platform list possible HITs (Human Intelligence
@@ -196,9 +196,9 @@ this.registerView({
 ### Simple Informed Consent
 
 **Base Component**: `@/builtins/simple_consent/InformedConsentView.vue`  
-**Code**:
-[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/simple_consent/InformedConsentView.vue)  
-**Side effects**: No  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/simple_consent/InformedConsentView.vue)  
+**Side
+effects**: No  
 **Typical accessibility**: `{requiresConsent: false, requiresDone: false}`
 
 Most studies require some type of informed consent from participants. This is
@@ -236,9 +236,9 @@ timeline.pushSeqView({
 ### The Smile CAPTCHA
 
 **Base Component**: `@/builtins/captcha/CaptchaView.vue`  
-**Code**:
-[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/captcha/CaptchaView.vue)  
-**Side effects**: Yes, saves the data from the tasks.  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/captcha/CaptchaView.vue)  
+**Side
+effects**: Yes, saves the data from the tasks.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 CAPTHCAs (Completely Automated Public Turing test to tell Computers and Humans)
@@ -270,10 +270,9 @@ timeline.pushSeqView({
 ### Window Sizer
 
 **Base Component**: `@/builtins/window_sizer/WindowSizerView.vue`  
-**Code**:
-[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/window_sizer/WindowSizerView.vue)  
-**Side effects**: Yes, sets the is verifiedVisibility key in the [API](/api) to
-true.  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/window_sizer/WindowSizerView.vue)  
+**Side
+effects**: Yes, sets the is verifiedVisibility key in the [API](/api) to true.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The window sizer is a small component `src/components/pages/WindowSizerView.vue`
@@ -313,18 +312,98 @@ timeline.pushSeqView({
 **Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
 **Typical accessibility**: Always
 
-### Instructions + Quiz
+### Instructions Quiz
 
-**Component**: `src/components/AdvertisementView.vue`  
-**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
+**Component**: `@/builtins/instructions_quiz/InstructionsQuiz.vue`  
+**Side effects**: saves the data from the quiz  
 **Typical accessibility**: Always
+
+The instructions quiz is a simple quiz that asks the participant to answer a few
+questions about the instructions. The user has to answer all the questions
+correctly before they can continue. If they get any question wrong, they are
+asked to try again and are returned to the timeline at the location specified in
+the `returnTo` prop.
+
+The quiz questions are configured in `@/user/components/quizQuestions.js` and
+are imported and then passed to the `InstructionsQuiz` component as a prop
+(`quizQuestions`).
+
+The `randomizeQuestionsAndAnswers` prop is optional and defaults to `true`. If
+set to `false`, the questions will be randomized in the same way each time the
+quiz is taken. If `true`, the questions and answers will be randomized each time
+the page loads (meaning if the subject repeats the quiz multiple times the order
+of the questions and answers will be different each time).
+
+```js
+// import the quiz questions
+import { QUIZ_QUESTIONS } from './components/quizQuestions'
+// instructions quiz
+timeline.pushSeqView({
+  name: 'quiz',
+  component: InstructionsQuiz,
+  props: {
+    quizQuestions: QUIZ_QUESTIONS,
+    returnTo: 'instructions',
+    randomizeQuestionsAndAnswers: true,
+  },
+})
+```
+
+In the example above, the questions are configured in
+`@/user/components/quizQuestions.js`. This file is an array of objects, each
+representing a page of questions. Each page has an array of questions. Each
+question has an id, a question text, a list of answers, and the correct
+answer(s).
+
+```js
+export const QUIZ_QUESTIONS = [
+  {
+    page: 1,
+    questions: [
+      {
+        id: 'example1',
+        question: 'What color is the sky?',
+        multiSelect: false,
+        answers: ['red', 'blue', 'yellow', 'rainbow'],
+        correctAnswer: ['blue'],
+      },
+      {
+        id: 'example2',
+        question: 'How many days are in a non-leap year?',
+        multiSelect: false,
+        answers: ['365', '100', '12', '31', '60'],
+        correctAnswer: ['365'],
+      },
+    ],
+  },
+  {
+    page: 2,
+    questions: [
+      {
+        id: 'example3',
+        question: 'What comes next: North, South, East, ___',
+        multiSelect: false,
+        answers: ['Southeast', 'Left', 'West'],
+        correctAnswer: ['West'],
+      },
+      {
+        id: 'example4',
+        question: "What's 7 x 7?",
+        multiSelect: false,
+        answers: ['63', '59', '49', '14'],
+        correctAnswer: ['49'],
+      },
+    ],
+  },
+]
+```
 
 ### Demographic Survey
 
 **Base Component**: `@/builtins/demographic_survey/DemographicSurveyView.vue`  
-**Code**:
-[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/demographic_survey/DemographicSurveyView.vue)  
-**Side effects**: Yes, saves the data from the form.  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/demographic_survey/DemographicSurveyView.vue)  
+**Side
+effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The demographic survey is a simple survey that asks participants to provide some
@@ -348,9 +427,9 @@ timeline.pushSeqView({
 ### Device Survey
 
 **Base Component**: `@/builtins/device_survey/DeviceSurveyView.vue`  
-**Code**:
-[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/device_survey/DeviceSurveyView.vue)  
-**Side effects**: Yes, saves the data from the form.  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/device_survey/DeviceSurveyView.vue)  
+**Side
+effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The device survey askes participants to provide some information about their
@@ -425,9 +504,9 @@ the participant.
 ### Feedback Survey
 
 **Component**: `src/builtins/task_survey/TaskFeedbackSurveyView.vue`  
-**Code**:
-[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/task_survey/TaskFeedbackSurveyView.vue.vue)  
-**Side effects**: Yes, saves the data from the form.  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/task_survey/TaskFeedbackSurveyView.vue.vue)  
+**Side
+effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The task survey asks some simple questions about the participant's experience in
@@ -475,20 +554,18 @@ them as needed for your study.
 ### Status Bar
 
 **Base Component**: `@/builtins/navbars/StatusBar.vue`  
-**Code**:
-[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/navbars/StatusBar.vue)
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/navbars/StatusBar.vue)
 
 ### Progress Bar
 
 **Base Component**: `@/builtins/navbars/ProgressBar.vue`  
-**Code**:
-[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/navbars/ProgressBar.vue)
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/navbars/ProgressBar.vue)
 
 Not implemented fully.
 
 ### Withdraw Modal
 
 **Base Component**: `@/builtins/withdraw/WithdrawFormModal.vue`  
-**Code**:
-[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/withdraw/WithdrawFormModal)  
-**Side effects**: Yes
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/withdraw/WithdrawFormModal)  
+**Side
+effects**: Yes

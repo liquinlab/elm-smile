@@ -172,7 +172,11 @@ import { QUIZ_QUESTIONS } from './components/quizQuestions'
 timeline.pushSeqView({
   name: 'quiz',
   component: InstructionsQuiz,
-  props: { quizQuestions: QUIZ_QUESTIONS, returnTo: 'instructions' },
+  props: {
+    quizQuestions: QUIZ_QUESTIONS,
+    returnTo: 'instructions',
+    randomizeQuestionsAndAnswers: true,
+  },
 })
 // main experiment
 // note: by default, the path will be set to the name of the view

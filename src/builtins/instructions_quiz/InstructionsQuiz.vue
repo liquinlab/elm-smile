@@ -3,9 +3,6 @@ import { reactive, computed, ref, onMounted } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
-// randomize seed
-api.randomSeed()
-
 // read in props
 const props = defineProps({
   quizQuestions: {
@@ -17,7 +14,17 @@ const props = defineProps({
     required: false,
     default: 'instructions',
   },
+  randomizeQuestionsAndAnswers: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
 })
+
+if (props.randomizeQuestionsAndAnswers) {
+  // randomize seed
+  api.randomSeed()
+}
 
 const randomizedQuestions = ref(
   props.quizQuestions.map((page) => ({
