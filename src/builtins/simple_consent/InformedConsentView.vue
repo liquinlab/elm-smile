@@ -3,8 +3,13 @@ import { ref, watch, onBeforeUnmount } from 'vue'
 import { animate } from 'motion'
 import appconfig from '@/core/config'
 
-import InformedConsentText from '@/user/components/InformedConsentText.vue'
-
+//import InformedConsentText from '@/user/components/InformedConsentText.vue'
+const props = defineProps({
+  informedConsentText: {
+    type: Object,
+    required: true,
+  },
+})
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
@@ -51,7 +56,7 @@ onBeforeUnmount(() => {
         <div class="columns">
           <div class="column is-7">
             <div class="consenttext pt-5">
-              <InformedConsentText />
+              <component :is="informedConsentText" />
             </div>
           </div>
           <div class="column is-5">

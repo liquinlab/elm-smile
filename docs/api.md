@@ -41,6 +41,10 @@ available methods and their descriptions.
 - `saveForm(name, data)`: Saves form data.
 - `getVerifiedVisibility()`: Retrieves the verified visibility state.
 - `setCompletionCode(code)`: Sets the completion code for the experiment.
+- `setBrandLogo(logo_fn)`: Sets the logo of the app.
+- `getBrandLogo()`: Retrieves the current brand logo filename.
+- `resetApp()`: Resets the entire application state.
+- `isResetApp()`: Checks if the app has been reset.
 
 ## Data and Configuration Access
 
@@ -52,6 +56,8 @@ available methods and their descriptions.
 - `route`: Accesses the current route.
 - `router`: Accesses the router object.
 - `urls`: Accesses URL configurations.
+- `private`: Accesses private data store.
+- `all_data`: Accesses combined private and data stores.
 
 ## Utility Functions
 
@@ -80,6 +86,16 @@ available methods and their descriptions.
   by the smile library in `src/assets`. See
   [Images and Video](/imagesvideo#referring-to-static-assets-using-code) for
   more information.
+- `randomSeed(seed)`: Sets a new global random seed that will remain in use
+  until the next route.
+- `randomAssignCondition(conditionObject)`: Randomly assigns a condition based
+  on the provided condition object. Supports weighted randomization.
+- `getConditionByName(name)`: Retrieves a condition by its name.
+- `randomInt()`: Generates a random integer.
+- `sampleWithReplacement()`: Samples items from an array with replacement.
+- `sampleWithoutReplacement()`: Samples items from an array without replacement.
+- `setInformedConsentText(component)`: Sets the informed consent text component.
+- `getInformedConsentText()`: Retrieves the informed consent text component.
 
 ## Logging and Debugging
 

@@ -72,6 +72,19 @@ export default function useAPI() {
       const url = window.location.href
       window.location.href = url.substring(0, url.lastIndexOf('#/'))
     },
+    setBrandLogo: (logo_fn = 'universitylogo.png') => {
+      // sets the logo of the app
+      smilestore.setBrandLogo(logo_fn)
+    },
+    getBrandLogo: () => {
+      return smilestore.global.brand_logo_fn
+    },
+    setInformedConsentText: (component) => {
+      smilestore.setInformedConsentText(component)
+    },
+    getInformedConsentText: () => {
+      return smilestore.global.informed_consent_text
+    },
     setKnown: async () => {
       await smilestore.setKnown()
     },
