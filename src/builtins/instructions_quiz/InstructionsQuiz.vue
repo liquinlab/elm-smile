@@ -1,12 +1,10 @@
 <script setup>
 import { reactive, computed, ref, onMounted } from 'vue'
 import useAPI from '@/core/composables/useAPI'
-import seedrandom from 'seedrandom'
-
-const rng = seedrandom()
-rng()
-
 const api = useAPI()
+
+// randomize seed
+api.randomSeed()
 
 // read in props
 const props = defineProps({
@@ -111,9 +109,6 @@ function finish() {
 
 <template>
   <div class="page prevent-select">
-    {{ props.quizQuestions }}
-    <br />
-    {{ randomizedQuestions }}
     <div class="formcontent">
       <!-- Replace the two quiz page sections with this single dynamic one -->
       <div class="formstep" v-if="quizState.page === 'quiz' && step_index < randomizedQuestions.length">
