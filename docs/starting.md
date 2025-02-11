@@ -67,43 +67,45 @@ recommendations. Things throughout this page will update as you type, nothing is
 stored.
 
 <table class="form">
-    <tr>
-        <td class="label">
-            <label for="username">GitHub username</label><br>
-            Enter your GitHub user name here. 
-        </td>
-        <td class="data">
-            <input id="username" type="text" v-model="config.username" />
-        </td>
-    </tr>
-    <tr>
-        <td class="label">
-            <label for="base_git">Base Github repot</label><br>
-            If in gureckislab then default to `nyuccl/smile` otherwise, it is the base smile repo for your lab (e.g, `hartleylab/smile`).
-        </td>
-        <td class="data">
-            <input id="base_git" type="text" v-model="config.base_git" />
-        </td>
-    </tr>
-    <tr>
-        <td class="label">
-            <label for="projectname">Project name</label><br>
-            We highly recommend you use underscores for spaces and name your project based on 
-the science (e.g., `question_asking`).  
-        </td>
-        <td class="data">
-            <input id="projectname" type="text" v-model="config.projectname" />
-        </td>
-    </tr>
-    <tr>
-        <td class="label">
-            <label for="description">Description</label><br>
-            Provide a one sentence description of your experiment. 
-        </td>
-        <td class="data">
-            <input id="description" type="text" v-model="config.description" />
-        </td>
-    </tr>
+    <tbody>
+        <tr>
+            <td class="label">
+                <label for="username">GitHub username</label><br>
+                Enter your GitHub user name here.
+            </td>
+            <td class="data">
+                <input id="username" type="text" v-model="config.username" />
+            </td>
+        </tr>
+        <tr>
+            <td class="label">
+                <label for="base_git">Base Github repot</label><br>
+                If in gureckislab then default to `nyuccl/smile` otherwise, it is the base smile repo for your lab (e.g, `hartleylab/smile`).
+            </td>
+            <td class="data">
+                <input id="base_git" type="text" v-model="config.base_git" />
+            </td>
+        </tr>
+        <tr>
+            <td class="label">
+                <label for="projectname">Project name</label><br>
+                We highly recommend you use underscores for spaces and name your project based on 
+        the science (e.g., `question_asking`).
+            </td>
+            <td class="data">
+                <input id="projectname" type="text" v-model="config.projectname" />
+            </td>
+        </tr>
+        <tr>
+            <td class="label">
+                <label for="description">Description</label><br>
+                Provide a one sentence description of your experiment.
+            </td>
+            <td class="data">
+                <input id="description" type="text" v-model="config.description" />
+            </td>
+        </tr>
+    </tbody>
 </table>
 
 :::
