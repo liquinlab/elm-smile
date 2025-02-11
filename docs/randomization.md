@@ -187,16 +187,23 @@ It is possible to randomize the order of routes in the timeline. See
 
 In rare cases, it may be desirable to generate "true" or "unseeded" random
 numbers (by default `Math.random()` actually does set a seed, but it's set
-automatically using other random stuff). To do so, you can make a local instance
-of a random number generator using the `seedrandom` library:
+automatically using other random stuff). To do so, you can use the smile API:
 
 ```js
-import seedrandom from 'seedrandom'
+const api = useAPI()
 
-const rng = seedrandom()
+// randomize seed each time component is loaded
+api.randomSeed()
+```
 
-// number will not be reproducible
-rng()
+This will initialize the components with a random seed on each load of the View.
+You can also provide a fixed seed using the same function:
+
+```js
+const api = useAPI()
+
+// set to a known seed
+api.randomSeed(12344)
 ```
 
 ## Override randomization for debugging
