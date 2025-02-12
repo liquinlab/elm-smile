@@ -54,12 +54,12 @@ class Timeline {
     const newroute = _.cloneDeep(route)
 
     if (newroute.path == null) {
-      const nameAsPath = `/${encodeURIComponent(newroute.name.toLowerCase().replace(/\s/g, '_'))}`;
+      const nameAsPath = `/${encodeURIComponent(newroute.name.toLowerCase().replace(/\s/g, '_'))}`
       log.debug(`Assigning path by name for route ${newroute.name}: ${nameAsPath}`)
-      newroute.path = nameAsPath;
+      newroute.path = nameAsPath
     }
 
-    return newroute;
+    return newroute
   }
 
   pushToRoutes(route) {
@@ -186,9 +186,9 @@ class Timeline {
     if (!push) {
       if (this.registered[newroute.name]) {
         log.debug(`Randomized node ${newroute.name} already registered`)
-        return;
+        return
       } else {
-        this.registered[newroute.name] = [];
+        this.registered[newroute.name] = []
       }
     }
 
@@ -197,7 +197,7 @@ class Timeline {
 
     // get weights
     let weights = undefined
-    if(newroute.weights){
+    if (newroute.weights) {
       weights = newroute.weights
 
       // check that options and weights are the same length
@@ -210,12 +210,12 @@ class Timeline {
     // check if this route has already been assigned
     let randomOption = smilestore.getRandomizedRouteByName(newroute.name)
     if (randomOption != null) {
-      log.debug(`Randomized node ${newroute.name} already assigned option ${randomOption}`);
+      log.debug(`Randomized node ${newroute.name} already assigned option ${randomOption}`)
     } else {
       // randomly choose one of options based on weights
       randomOption = api.sampleWithReplacement(options, 1, weights)[0]
-      log.debug(`Randomized node ${newroute.name} selected option ${randomOption}`);
-      smilestore.setRandomizedRoute(newroute.name, randomOption);
+      log.debug(`Randomized node ${newroute.name} selected option ${randomOption}`)
+      smilestore.setRandomizedRoute(newroute.name, randomOption)
     }
 
     // now, pull entries from routes that match random Option names (for each random option)
@@ -229,10 +229,10 @@ class Timeline {
       if (!route) {
         if (option in this.registered) {
           // if the route(s) are in the registered list, pull it from there
-          const registeredRoutes = this.registered[option];
-          delete this.registered[option];
+          const registeredRoutes = this.registered[option]
+          delete this.registered[option]
           if (registeredRoutes) {
-            // TODO: Do we actually need to do this? 
+            // TODO: Do we actually need to do this?
             registeredRoutes.forEach((r) => {
               // TODO: should we also set something about the parent? meta-parent?
               r.meta.level += 1
@@ -247,9 +247,10 @@ class Timeline {
             }
           }
           continue
-
         } else {
-          log.error(`Randomized node option ${option} not found in routes. You must add randomized route options to the timeline using registerView() before adding a randomized node`)
+          log.error(
+            `Randomized node option ${option} not found in routes. You must add randomized route options to the timeline using registerView() before adding a randomized node`
+          )
           throw new Error('RandomizedNodeOptionNotFoundError')
         }
       }
@@ -270,49 +271,51 @@ class Timeline {
   }
 
   registerRandomizedNode(routeConfig) {
-    this.pushRandomizedNode(routeConfig, false);
+    this.pushRandomizedNode(routeConfig, false)
   }
 
   pushConditionalNode(routeConfig, push = true) {
     // newroute should have name and a condition name (user specified, has to match something in data.conditions)
     const newroute = this.cloneRouteAndFillDefaults(routeConfig)
-    
+
     // Check if already registered if not pushing
     if (!push) {
       if (this.registered[newroute.name]) {
         log.debug(`Randomized node ${newroute.name} already registered`)
-        return;
+        return
       } else {
-        this.registered[newroute.name] = [];
+        this.registered[newroute.name] = []
       }
     }
 
     // get condition name—anything that's not name
-    const conditionname = Object.keys(newroute).filter(key => key !== 'name')
+    const conditionname = Object.keys(newroute).filter((key) => key !== 'name')
     if (conditionname.length > 1) {
       log.error('Can only branch routes based on one condition at a time')
       throw new Error('TooManyConditionNamesError')
-    } 
+    }
     const name = conditionname[0]
     let assignedCondition = api.getConditionByName(name)
     if (!assignedCondition) {
-      const possibleConditions = Object.keys(newroute[name]);
-      log.warn(`Condition ${name} not found in data.conditions -- assigning uniformly from keys of condition object: ${possibleConditions}`)
-      
+      const possibleConditions = Object.keys(newroute[name])
+      log.warn(
+        `Condition ${name} not found in data.conditions -- assigning uniformly from keys of condition object: ${possibleConditions}`
+      )
+
       assignedCondition = api.randomAssignCondition({
         conditionname: possibleConditions,
-      });
+      })
     }
 
     // based on assigned condition, get the correct set of routes
 
     const randomOption = newroute[name][assignedCondition]
 
-    this._handleRandomizedOption(newroute, randomOption, push);
+    this._handleRandomizedOption(newroute, randomOption, push)
   }
 
   registerConditionalNode(routeConfig) {
-    this.pushConditionalNode(routeConfig, false);
+    this.pushConditionalNode(routeConfig, false)
   }
 
   build() {
@@ -320,6 +323,7 @@ class Timeline {
       log.error('No welcome_anonymous route defined in src/user/design.js  This is required.')
       throw new Error('NoWelcomeAnonymousRouteError')
     }
+
     this.buildGraph()
     this.registerCounters()
     if (smilestore.config.mode === 'development') {
@@ -332,7 +336,6 @@ class Timeline {
 
     smilestore.local.seqtimeline = this.seqtimeline
     smilestore.local.routes = this.routes
-    
   }
 
   registerCounters() {
@@ -407,9 +410,7 @@ class Timeline {
       } else {
         this.seqtimeline[i].meta.prev = null
       }
-
     }
-
   }
 
   // this won't work with new system
