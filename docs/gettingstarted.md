@@ -42,4 +42,4 @@ command-click the link on MacOS), it will load the respective website.
 Next steps:
 
 - Learn how to [contribute to the documentation](/contributing)
-- Understand the [design principles](/research/principles)
+- Understand the [design principles](/philosophy)

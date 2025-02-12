@@ -105,9 +105,10 @@ is necessary because some configuration options which go in those files are
 considered "secret" and we don't want them easily searched in GitHub when/if
 your project repository becomes publically shared.
 
-Note that if you change the value of any configuration options, you must stop your 
-development  server and start it again (running `npm run dev`) to see changes update. 
-Unlike code changes, Vite cannot update reload these while the server is running. 
+Note that if you change the value of any configuration options, you must stop
+your development server and start it again (running `npm run dev`) to see
+changes update. Unlike code changes, Vite cannot update reload these while the
+server is running.
 
 Let's consider the files one by one.
 
@@ -179,9 +180,9 @@ means they are made available to the web application/experiment.
 - `VITE_LAB_URL` is the URL of the lab website. This can be used to link to the
   lab website or university homepage so participants can learn more about the
   organization conducting the study.
-- `VITE_ANONYMOUS_MODE` is a boolean that configures if the experiment should
-  be deployed in anonymous mode. This mode is useful for submitting a link to
-  the study with a paper submission. In this mode, all  <SmileText/>-default 
+- `VITE_ANONYMOUS_MODE` is a boolean that configures if the experiment should be
+  deployed in anonymous mode. This mode is useful for submitting a link to the
+  study with a paper submission. In this mode, all <SmileText/>-default
   references to the organization conducting the study are removed.
 
 #### Web Services Options (`.env.local`)
@@ -216,7 +217,7 @@ The `.env.github.local` file contains information about the latest git commit
 for this project. The purpose of this file is so that your Javascript
 application can keep track of which version of the code it is running. One key
 principle of <SmileText/> is that
-[data must always be linked to the code that created it](/research/principles.html#data-must-always-be-linked-to-the-code-that-created-it).
+[data must always be linked to the code that created it](/philosophy.html#data-must-always-be-linked-to-the-code-that-created-it).
 
 This file is generated automatically using a
 [post commit hook](https://www.atlassian.com/git/tutorials/git-hooks) which
@@ -431,9 +432,9 @@ simply make up a new `VITE_SOMETHING` variable. Then add it to the object in
 `src/core/config.js` to expose it to your web application! The configuration is
 available as `smileconfig` anywhere in your Vue app. It's pretty easy.
 
-If you add any new configuration options, you must stop your 
-development  server and start it again (running `npm run dev`) to see changes update. 
-Unlike code changes, Vite cannot update reload these while the server is running. 
+If you add any new configuration options, you must stop your development server
+and start it again (running `npm run dev`) to see changes update. Unlike code
+changes, Vite cannot update reload these while the server is running.
 
 Note: if you add new configuration options, you need to also update them on
 GitHub for those to sync to deployments. Run `npm run upload_config` as

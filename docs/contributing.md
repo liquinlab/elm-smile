@@ -78,7 +78,7 @@ script runs which automatically builds the static website using VitePress and
 then syncs the files to the server. **Thus, simply pushing your changes to the
 master branch will update the website, there's nothing else to think about.**
 This is a core design principle of **🫠 Smile**:
-[don't sweat the dumb stuff](/research/principles.html#don-t-sweat-the-dumb-stuff).
+[don't sweat the dumb stuff](/philosophy.html#don-t-sweat-the-dumb-stuff).
 
 If the build fails on the Github Action the website will remain unchanged. You
 can get diagnostic information about the auto-deploy process on the
