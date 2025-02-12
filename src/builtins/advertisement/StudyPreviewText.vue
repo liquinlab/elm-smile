@@ -27,9 +27,9 @@ const props = defineProps({
           and make decisions similar to a video game. You may earn points for making good decisions that will convert to
           money
           <FAIcon icon="sack-dollar" />
-          that we will pay you at the end of the study ({{ props.payrate }}). The study should take about
-          {{ props.estimated_time }} of your time. You'll be asked to digitally sign a constent form and (optionally)
-          provide some non-identifiable demographic information during the study. Your data will be kept anonymous.
+          that we will pay you at the end of the study ({{ payrate }}). The study should take about
+          {{ estimated_time }} of your time. You'll be asked to digitally sign a constent form and (optionally) provide
+          some non-identifiable demographic information during the study. Your data will be kept anonymous.
         </p>
         <hr />
         <p>

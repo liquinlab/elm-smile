@@ -47,6 +47,8 @@ console.log('Logging smilestore')
 console.log(smilestore.getLocal)
 
 // #4.  set the branding logo filename.  assumed to be in the @/user/assets folder
+api.setConfig('estimated_time', '30-40 minutes')
+api.setConfig('payrate', '$15USD/hour prorated for estimated completition time + performance related bonus')
 
 // set the informed consent text on the menu bar
 import InformedConsentText from './components/InformedConsentText.vue'
@@ -126,6 +128,10 @@ timeline.pushSeqView({
 timeline.registerView({
   name: 'mturk',
   component: MTurk,
+  props: {
+    estimated_time: api.getConfig('estimated_time'),
+    payrate: api.getConfig('payrate'),
+  },
   meta: { allowAlways: true, requiresConsent: false },
   beforeEnter: (to) => {
     processQuery(to.query, 'mturk')
