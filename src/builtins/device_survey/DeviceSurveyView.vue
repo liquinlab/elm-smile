@@ -229,7 +229,7 @@ function finish() {
                 <div class="column">
                   <div class="has-text-right">
                     <button class="button is-success" id="finish" v-if="page_two_complete" @click="finish()">
-                      I'm done! &nbsp;
+                      I'm done!
                     </button>
                   </div>
                 </div>

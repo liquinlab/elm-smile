@@ -160,7 +160,7 @@ function finish() {
       <p id="prompt">Thanks! You are finished with this task and can move on.</p>
       <!-- display the final score -->
       <p>Your score was {{ final_score }}</p>
-      <button class="button is-success is-light" id="finish" @click="finish()">
+      <button class="button is-success" id="finish" @click="finish()">
         Continue &nbsp;
         <FAIcon icon="fa-solid fa-arrow-right" />
       </button>

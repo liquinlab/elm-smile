@@ -114,8 +114,7 @@ function finish() {
                 <div class="column">
                   <div class="has-text-right">
                     <button class="button is-success" id="finish" v-if="complete" @click="finish()">
-                      I'm finished &nbsp;
-                      <FAIcon icon="fa-solid fa-arrow-right" />
+                      I'm finished
                     </button>
                   </div>
                 </div>
