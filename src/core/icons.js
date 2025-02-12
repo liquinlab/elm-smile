@@ -47,6 +47,7 @@ import { faSackDollar } from '@fortawesome/free-solid-svg-icons'
 import { faFlask } from '@fortawesome/free-solid-svg-icons'
 import { faCircle } from '@fortawesome/free-solid-svg-icons'
 import { faCircleDot } from '@fortawesome/free-solid-svg-icons'
+import { faCircleChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import { faSquareXmark } from '@fortawesome/free-solid-svg-icons'
 import { faThumbtack } from '@fortawesome/free-solid-svg-icons'
 import { faPencil } from '@fortawesome/free-solid-svg-icons'
@@ -74,6 +75,7 @@ library.add(
   faSwatchbook,
   faDesktop,
   farCircle,
+  faCircleChevronLeft,
   faQrcode,
   faDownload,
   faCloudArrowUp,
