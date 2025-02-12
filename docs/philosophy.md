@@ -125,16 +125,6 @@ being more complex than the next. It'd make more sense if there was just a
 choice made and everyone lives with it. New users hate this complexity and you
 are just forcing it on them instead of making the hard decisions yourself.
 
-## Keep learning.
-
-Learning things is hard. It hurts your head and is an unpleasant feeling when
-you don't understand things 🙇. Also, it can be hard to know if the thing you
-are learning about is really what you need to know to solve your problem. My
-recommendation is to push through and always be learning. There's a good chance
-that the problem you think you have has already been solved and you just don't
-know the right words to put into Google to find the solution. Or there is an
-important concept you are missing that would make your life much easier.
-
 ## Documentation first.
 
 Documentation is often considered to be something you do after you finish
@@ -162,15 +152,6 @@ back and realize if a bug affected only a subset of participants. In
 code version history to datasets generated from that code. This should happen
 automatically so that users don't forget this important step.
 
-## Trust in useful third-party services but don't tie yourself to them.
-
-There are a lot of options on the web about how you host things or store data,
-etc... It makes sense to use these services but not to tie the code to them too
-closely. As one example of a lesson learned, it's ok to use fancy and specific
-GitHub or Google features in your application as long as you have some plan for
-what happens if those services are discontinued. Often time the principle of
-[abstraction](#abstraction-is-your-friend) can save you here.
-
 ## Automate testing.
 
 Having bugs in your experiment code is actually one of the worst things we can
@@ -191,15 +172,3 @@ scope) can be hard. It can be a matter of taste. psiTurk tried to do a lot
 pull these services together but made things somewhat complex. A better solution
 is to find the natural break points in how other people develop systems. Have
 pieces that are small and manageable that can be shared between projects.
-
-## Spend time setting up your development environment.
-
-Modern web development tools are outstanding. Become familiar with syntax
-highlighting, automatic code completion, linters, and other debugging packages
-to make your life better. These have a learning curve (see principle about
-[learning](#sometimes-learning-1-seemingly-complex-thing-makes-everything-you-do-10-faster)),
-but the payoff can be dramatic not only in productivity but in writing
-high-quality error-free code. For this project it is recommended you use
-[VS Code](https://code.visualstudio.com/) and the
-[Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) extension
-as your development environment.

@@ -70,9 +70,8 @@ export default defineConfig({
           { text: '🧑‍🎨 Styling, CSS, and icons', link: '/style' },
           { text: '📦 Data storage', link: '/datastorage' },
           //{ text: '💰 Computing bonuses', link: '/bonuses' },
-          { text: '🆘 Dealing with Errors', link: '/problems' },
-          { text: '🐞 Automated Testing', link: '/testing' },
-
+          //{ text: '🆘 Dealing with Errors', link: '/problems' },
+          //{ text: '🐞 Automated Testing', link: '/testing' },
           //{ text: '🔌 Server-side Computations', link: '/server' },
         ],
       },
@@ -81,15 +80,15 @@ export default defineConfig({
         items: [
           { text: '☁️ Deploying', link: '/deploying' },
           { text: '🙋 Recruitment Services', link: '/recruitment' },
-          { text: '📈 Dashboard', link: '/dashboard' },
-          { text: '😇 Ethical considerations', link: '/ethics' },
+          //{ text: '📈 Dashboard', link: '/dashboard' },
+          //{ text: '😇 Ethical considerations', link: '/ethics' },
         ],
       },
       {
         text: 'Analyzing data',
         items: [
           { text: '🧐 Analyzing data', link: '/analysis' },
-          { text: '🤖 Quality control', link: '/qualitycontrol' },
+          //{ text: '🤖 Quality control', link: '/qualitycontrol' },
           { text: '👩‍🏫 Presentation mode', link: '/presentation' },
         ],
       },
@@ -107,19 +106,9 @@ export default defineConfig({
       },
       {
         text: 'Misc',
-        items: [{ text: '📄 Cheat sheet', link: '/cheatsheet' }],
-      },
-      {
-        text: 'Notes',
-        collapsible: true,
-        collapsed: true,
         items: [
-          { text: 'Overview', link: '/research/overview' },
-          { text: 'Use-cases', link: '/research/usecases' },
-          { text: 'Backend research', link: '/research/backend' },
-          { text: 'Frontend research', link: '/research/frontend' },
-          { text: 'Setup', link: '/advanced/notes' },
-          { text: 'Philosophy', link: '/research/principles' },
+          { text: '📄 Cheat sheet', link: '/cheatsheet' },
+          { text: '🥸 Design philosophy', link: '/philosophy' },
         ],
       },
     ],

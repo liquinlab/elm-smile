@@ -2,18 +2,16 @@
 
 The <SmileText/> repo
 ([https://github.com/NYUCCL/smile](https://github.com/NYUCCL/smile)) includes
-both the code and documentation for the code. The repo is private so you need to
-be added as a member of the <GureckisLabText/> lab organization (contact Todd
-and give him your GitHub username).
+both the code and documentation for the code.
 
 Next, follow the guide on [required software](/requirements).
 
-The next step is to clone the project
-[github repo](https://github.com/NYUCCL/smile) and set your current terminal to
-the working copy. Then, install the required javascript dependencies using
-`npm`, the node package manager (similar to `pip` in python). This can be
-accomplished with three simple commands in your terminal program (you can also
-clone the repo using GUI tools if you prefer):
+The next step is to fork the project from
+[github repo](https://github.com/NYUCCL/smile), clone it on your machine, and
+set your current terminal to the working copy. Then, install the required
+javascript dependencies using `npm`, the node package manager (similar to `pip`
+in python). This can be accomplished with three simple commands in your terminal
+program (you can also clone the repo using GUI tools if you prefer):
 
 ```
 git clone https://github.com/nyuccl/smile.git

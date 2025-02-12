@@ -17,7 +17,7 @@ const config = reactive({
 }
 .vp-doc input {
     border: 1px;
-    width: 100%;
+    width: 90%;
     font-size: 1.1em;
     background-color: white;
     border: 1px solid #999;
@@ -48,6 +48,14 @@ const config = reactive({
     border: none;
     font-size: 1em;
 }
+.vp-doc table {
+    overflow-x: none;
+    width: 90%;
+    padding-left: 10px;
+    padding-right: 20px;
+    margin-right: 10px;
+    margin-left: 0px;
+}
 </style>
 
 # :sparkles: Starting a new project
@@ -66,44 +74,46 @@ simply cut and paste without modifying the commands. This also give some
 recommendations. Things throughout this page will update as you type, nothing is
 stored.
 
-<table class="form">
-    <tr>
-        <td class="label">
-            <label for="username">GitHub username</label><br>
-            Enter your GitHub user name here. 
-        </td>
-        <td class="data">
-            <input id="username" type="text" v-model="config.username" />
-        </td>
-    </tr>
-    <tr>
-        <td class="label">
-            <label for="base_git">Base Github repot</label><br>
-            If in gureckislab then default to `nyuccl/smile` otherwise, it is the base smile repo for your lab (e.g, `hartleylab/smile`).
-        </td>
-        <td class="data">
-            <input id="base_git" type="text" v-model="config.base_git" />
-        </td>
-    </tr>
-    <tr>
-        <td class="label">
-            <label for="projectname">Project name</label><br>
-            We highly recommend you use underscores for spaces and name your project based on 
-the science (e.g., `question_asking`).  
-        </td>
-        <td class="data">
-            <input id="projectname" type="text" v-model="config.projectname" />
-        </td>
-    </tr>
-    <tr>
-        <td class="label">
-            <label for="description">Description</label><br>
-            Provide a one sentence description of your experiment. 
-        </td>
-        <td class="data">
-            <input id="description" type="text" v-model="config.description" />
-        </td>
-    </tr>
+<table>
+    <tbody>
+        <tr>
+            <td class="label">
+                <label for="username">GitHub username</label><br>
+                Enter your GitHub user name here.
+            </td>
+            <td class="data">
+                <input id="username" type="text" v-model="config.username" />
+            </td>
+        </tr>
+        <tr>
+            <td class="label">
+                <label for="base_git">Base Github repot</label><br>
+                If in gureckislab then default to `nyuccl/smile` otherwise, it is the base smile repo for your lab (e.g, `hartleylab/smile`).
+            </td>
+            <td class="data">
+                <input id="base_git" type="text" v-model="config.base_git" />
+            </td>
+        </tr>
+        <tr>
+            <td class="label">
+                <label for="projectname">Project name</label><br>
+                We highly recommend you use underscores for spaces and name your project based on 
+        the science (e.g., `question_asking`).
+            </td>
+            <td class="data">
+                <input id="projectname" type="text" v-model="config.projectname" />
+            </td>
+        </tr>
+        <tr>
+            <td class="label">
+                <label for="description">Description</label><br>
+                Provide a one sentence description of your experiment.
+            </td>
+            <td class="data">
+                <input id="description" type="text" v-model="config.description" />
+            </td>
+        </tr>
+    </tbody>
 </table>
 
 :::
