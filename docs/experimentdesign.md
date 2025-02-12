@@ -127,13 +127,3 @@ The most important function of any web experiment platform is securely saving
 data. Smile provides serveral ways to [save and record data](/datastorage). In
 addition the Smile API takes care of manny functions for you so you rarely have
 to think much about data storage and saving.
-
-## :sos: Dealing with Errors
-
-When running an experiment it is important to handle errors gracefully. Smile
-provides several helpful features to deal gracefully with errors.
-
-## :lady_beetle: Automated Testing
-
-When running an experiment it is important to handle errors gracefully. Smile
-provides several helpful features to deal gracefully with errors.
