@@ -56,6 +56,7 @@ function submitWithdraw() {
     <div class="infobar-brand">
       <a class="infobar-item" :href="lab_url" target="_new" v-if="!appconfig.anonymousMode">
         <img :src="api.getStaticUrl(api.getBrandLogo())" width="90" />
+        <img :src="api.getStaticUrl(appconfig.brand_logo_fn)" width="90" />
       </a>
       <div class="infobar-item">
         <p class="is-size-7 studyinfo pt-2">

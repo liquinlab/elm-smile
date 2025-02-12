@@ -10,7 +10,7 @@ const api = useAPI()
       <p>Informed Consent</p>
     </div>
     <div class="message-body has-text-left mr-7 pb-8">
-      <component :is="api.getInformedConsentText()" />
+      <component :is="api.getConfig('informed_consent_text')" />
       <!-- load text of consent form -->
       <div class="has-text-right mt-5">
         <button class="button" aria-label="close" @click="$emit('toggleConsent')">

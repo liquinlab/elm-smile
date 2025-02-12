@@ -47,11 +47,10 @@ console.log('Logging smilestore')
 console.log(smilestore.getLocal)
 
 // #4.  set the branding logo filename.  assumed to be in the @/user/assets folder
-api.setBrandLogo('universitylogo.png')
 
 // set the informed consent text on the menu bar
 import InformedConsentText from './components/InformedConsentText.vue'
-api.setInformedConsentText(InformedConsentText)
+api.setConfig('informed_consent_text', InformedConsentText)
 
 // #5. Add between-subjects condition assignment
 // This is where you can define conditions to which each participant should be assigned
@@ -93,7 +92,12 @@ timeline.pushSeqView({
   path: '/welcome',
   name: 'welcome_anonymous',
   component: Advertisement,
-  meta: { prev: undefined, next: 'consent', allowAlways: true, requiresConsent: false }, // override what is next
+  meta: {
+    prev: undefined,
+    next: 'consent',
+    allowAlways: true,
+    requiresConsent: false,
+  }, // override what is next
   beforeEnter: (to) => {
     api.getBrowserFingerprint()
   },
@@ -241,7 +245,7 @@ timeline.pushSeqView({
   component: Thanks,
   meta: {
     requiresDone: true,
-    resetApp: smilestore.config.allow_repeats,
+    resetApp: api.getConfig('allow_repeats'),
   },
 })
 
@@ -250,7 +254,7 @@ timeline.registerView({
   name: 'withdraw',
   meta: {
     requiresWithdraw: true,
-    resetApp: smilestore.config.allow_repeats,
+    resetApp: api.getConfig('allow_repeats'),
   },
   component: Withdraw,
 })

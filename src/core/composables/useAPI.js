@@ -72,18 +72,25 @@ export default function useAPI() {
       const url = window.location.href
       window.location.href = url.substring(0, url.lastIndexOf('#/'))
     },
-    setBrandLogo: (logo_fn = 'universitylogo.png') => {
-      // sets the logo of the app
-      smilestore.setBrandLogo(logo_fn)
+    setConfig: (key, value) => {
+      if (!smilestore.config.runtime) {
+        smilestore.config.runtime = {}
+      }
+      smilestore.config.runtime[key] = value
+      api.saveConfig()
     },
-    getBrandLogo: () => {
-      return smilestore.global.brand_logo_fn
+    getConfig: (key) => {
+      if (key in smilestore.config) {
+        return smilestore.config[key]
+      } else if (key in smilestore.config.runtime) {
+        return smilestore.config.runtime[key]
+      } else {
+        log.error('SMILE API: getConfig() key not found', key)
+        return null
+      }
     },
-    setInformedConsentText: (component) => {
-      smilestore.setInformedConsentText(component)
-    },
-    getInformedConsentText: () => {
-      return smilestore.global.informed_consent_text
+    saveConfig: () => {
+      smilestore.data.smile_config = smilestore.config
     },
     setKnown: async () => {
       await smilestore.setKnown()

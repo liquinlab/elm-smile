@@ -129,8 +129,6 @@ const init_global = {
   forceNavigate: false,
   db_connected: false,
   db_changes: true,
-  brand_logo_fn: 'universitylogo.png',
-  informed_consent_text: null,
   urls: {
     prolific: '?PROLIFIC_PID=XXXX&STUDY_ID=XXXX&SESSION_ID=XXXXX#/welcome/prolific/',
     cloudresearch:
@@ -198,7 +196,6 @@ export default defineStore('smilestore', {
     getSeedID: (state) => state.local.seedID,
     getLocal: (state) => state.local,
     getPage: (state) => state.local.pageTracker,
-    brandLogo: (state) => state.global.logo_fn,
     getConditions: (state) => state.local.conditions,
     getRandomizedRoutes: (state) => state.local.randomizedRoutes,
     verifiedVisibility: (state) => state.data.verified_visibility,
@@ -249,12 +246,6 @@ export default defineStore('smilestore', {
     },
     setCompletionCode(code) {
       this.local.completionCode = code
-    },
-    setBrandLogo(logo_fn) {
-      this.global.brand_logo_fn = logo_fn
-    },
-    setInformedConsentText(component) {
-      this.global.informed_consent_text = component
     },
     resetApp() {
       this.local.reset = true

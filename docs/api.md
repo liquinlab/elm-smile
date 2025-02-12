@@ -41,8 +41,6 @@ available methods and their descriptions.
 - `saveForm(name, data)`: Saves form data.
 - `getVerifiedVisibility()`: Retrieves the verified visibility state.
 - `setCompletionCode(code)`: Sets the completion code for the experiment.
-- `setBrandLogo(logo_fn)`: Sets the logo of the app.
-- `getBrandLogo()`: Retrieves the current brand logo filename.
 - `resetApp()`: Resets the entire application state.
 - `isResetApp()`: Checks if the app has been reset.
 
@@ -94,8 +92,9 @@ available methods and their descriptions.
 - `randomInt()`: Generates a random integer.
 - `sampleWithReplacement()`: Samples items from an array with replacement.
 - `sampleWithoutReplacement()`: Samples items from an array without replacement.
-- `setInformedConsentText(component)`: Sets the informed consent text component.
-- `getInformedConsentText()`: Retrieves the informed consent text component.
+- `setConfig(key, value)`: Sets a configuration option.
+- `getConfig(key)`: Retrieves a configuration option.
+- `saveConfig()`: Saves the configuration.
 
 ## Logging and Debugging
 
