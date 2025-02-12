@@ -20,8 +20,8 @@ export function useStepper(trials, finishedCallback) {
       //index += 1
       smilestore.incrementPageTracker(page)
     } else {
-      finishedCallback()
       smilestore.incrementPageTracker(page)
+      finishedCallback()
     }
   }
 
