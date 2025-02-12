@@ -71,7 +71,7 @@ That's it. But if you need to customize your options keep reading.
 
 There are several configuration variables across different files. The first
 thing to be aware of is that some variables begin with `VITE_` (e.g.,
-`VITE_BUG_REPORTS`). These variables can be exported and made available to the
+`VITE_LAB_URL`). These variables can be exported and made available to the
 Javascript of your experiment.
 
 Variables that do not begin with `VITE_` are only available for other purposes
@@ -124,19 +124,14 @@ values (adjust for your situation):
 # configuration parameters for the experiment which
 # are critical for reproducibiliy
 
-VITE_BROWSER_EXCLUDE             = ie
 VITE_ALLOW_REPEATS               = true
 VITE_RANDOM_SEED                 = 100012
 VITE_AUTO_SAVE_DATA              = true
 VITE_MAX_WRITES                  = 1000
 VITE_MIN_WRITE_INTERVAL          = 2000
-VITE_SHOW_PROGRESS_BAR           = false
 
-VITE_VIEWPORT_REQUEST            = 800x600
+VITE_WINDOWSIZER_REQUEST            = 800x600
 VITE_WINDOWSIZER_AGGRESSIVE       = true
-
-VITE_ESTIMATED_TIME              = "30-40 minutes"
-VITE_PAYRATE_HOURLY              = "$15USD/hour + performance related bonus"
 
 VITE_LAB_URL                     = 'https://gureckislab.org'
 VITE_ANONYMOUS_MODE              = true
@@ -145,8 +140,6 @@ VITE_ANONYMOUS_MODE              = true
 Notice that the configuration options in this file begin with `VITE_`. This
 means they are made available to the web application/experiment.
 
-- `VITE_BROWSER_EXCLUDE` is a string that configures which types of browsers can
-  take your experiment.
 - `VITE_ALLOW_REPEATS` attempts to prevent participants from taking your task
   more than once.
 - `VITE_AUTO_SAVE_DATA` configures if smile attempts to automatically save data
@@ -159,8 +152,6 @@ means they are made available to the web application/experiment.
 - `VITE_MIN_WRITE_INTERVAL` configured the minimum time in milliseconds that
   should pass between writes to the Firestore. This respects Firestore's limit
   of 1 write per document per second. It defaults to 2000ms.
-- `VITE_SHOW_PROGRESS_BAR` configures if the progress bar should be visible at
-  the bottom of the screen.
 - `VITE_WINDOWSIZER_REQUEST` configures the requested size of the page for
   rendering content (used by WindowSizerView.vue component)
 - `VITE_WINDOWSIZER_AGGRESSIVE` if set to true and the user resizes the page,
@@ -170,13 +161,6 @@ means they are made available to the web application/experiment.
   agrees they made the window a given size.
 - `VITE_RANDOM_SEED` initializes the pseudo-random number generator in
   <SmileText />
-- `VITE_ESTIMATED_TIME` is text you can include in an ad for the study (e.g.,
-  mechanical turk) to let people know how long to expect the task to take. It
-  might need to be references several places so putting it in the config can be
-  helpful.
-- `VITE_PAYRATE` is text about the payrate for the study. Again, it is a
-  configuration option since it might need to be referenced in several
-  components and templates.
 - `VITE_LAB_URL` is the URL of the lab website. This can be used to link to the
   lab website or university homepage so participants can learn more about the
   organization conducting the study.
@@ -202,14 +186,14 @@ VITE_FIREBASE_STORAGEBUCKET      = project.appspot.com
 VITE_FIREBASE_MESSAGINGSENDERID  = msgid
 VITE_FIREBASE_APPID              = appid
 
-# configure your experiment here
-VITE_BUG_REPORTS                 = "http://smile.gureckislab.org/bugs"
+# enter google analytics id
+VITE_GOOGLE_ANALYTICS            = xxxx
 ```
 
 - There several `VITE_FIREBASE_` options for configuring Google's Firestore
   backend (see [data storage](/datastorage) for more info).
-- `VITE_BUG_REPORTS` is a URL you want participants to go to report a problem
-  with your experiment.
+- `VITE_GOOGLE_ANALYTICS` is the Google Analytics ID for your experiment
+  (optional)
 
 #### Code Version Options (`.env.github.local`)
 
@@ -404,9 +388,7 @@ export default {
         last_commit_hash: import.meta.env.VITE_GIT_HASH, // autocompute this all the time
         commit_url: 'https://github.com/' + import.meta.env.VITE_GIT_OWNER + '/' + import.meta.env.VITE_GIT_REPO_NAME + '/commit/' + import.meta.env.VITE_GIT_HASH
     },
-    browser_exclude: import.meta.env.VITE_BROWSER_EXCLUDE,
     allow_repeats: import.meta.env.VITE_ALLOW_REPEATS,
-    bug_reports: import.meta.env.VITE_BUG_REPORTS,
     deploy_url: import.meta.env.VITE_DEPLOY_URL, // auto compute this
     firebaseConfig : {
         apiKey: import.meta.env.VITE_FIREBASE_APIKEY,

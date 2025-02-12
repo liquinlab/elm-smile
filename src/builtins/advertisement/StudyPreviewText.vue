@@ -2,6 +2,16 @@
 import useAPI from '@/core/composables/useAPI'
 import appconfig from '@/core/config'
 const api = useAPI()
+const props = defineProps({
+  estimated_time: {
+    type: String,
+    required: true,
+  },
+  payrate: {
+    type: String,
+    required: true,
+  },
+})
 </script>
 
 <template>
@@ -17,10 +27,9 @@ const api = useAPI()
           and make decisions similar to a video game. You may earn points for making good decisions that will convert to
           money
           <FAIcon icon="sack-dollar" />
-          that we will pay you at the end of the study ({{ api.config.payrate }}). The study should take about
-          {{ api.config.estimated_time }} of your time. You'll be asked to digitally sign a constent form and
-          (optionally) provide some non-identifiable demographic information during the study. Your data will be kept
-          anonymous.
+          that we will pay you at the end of the study ({{ props.payrate }}). The study should take about
+          {{ props.estimated_time }} of your time. You'll be asked to digitally sign a constent form and (optionally)
+          provide some non-identifiable demographic information during the study. Your data will be kept anonymous.
         </p>
         <hr />
         <p>
