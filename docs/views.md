@@ -318,42 +318,16 @@ timeline.pushSeqView({
 **Side effects**: saves the data from the quiz  
 **Typical accessibility**: Always
 
-The instructions quiz is a simple quiz that asks the participant to answer a few
-questions about the instructions. The user has to answer all the questions
-correctly before they can continue. If they get any question wrong, they are
-asked to try again and are returned to the timeline at the location specified in
-the `returnTo` prop.
+The instructions quiz is a simple quiz that makes sure the participant has read
+and understood the experiment instructions. The user has to answer all the questions
+correctly before they can continue. If they get a question wrong, they are redirected 
+to the timeline at the location specified in the `returnTo` prop, which is by default
+the instructions page, and will be asked to try the quiz again.
 
-The quiz questions are configured in `@/user/components/quizQuestions.js` and
-are imported and then passed to the `InstructionsQuiz` component as a prop
-(`quizQuestions`).
-
-The `randomizeQuestionsAndAnswers` prop is optional and defaults to `true`. If
-set to `false`, the questions will be randomized in the same way each time the
-quiz is taken. If `true`, the questions and answers will be randomized each time
-the page loads (meaning if the subject repeats the quiz multiple times the order
-of the questions and answers will be different each time).
-
-```js
-// import the quiz questions
-import { QUIZ_QUESTIONS } from './components/quizQuestions'
-// instructions quiz
-timeline.pushSeqView({
-  name: 'quiz',
-  component: InstructionsQuiz,
-  props: {
-    quizQuestions: QUIZ_QUESTIONS,
-    returnTo: 'instructions',
-    randomizeQuestionsAndAnswers: true,
-  },
-})
-```
-
-In the example above, the questions are configured in
-`@/user/components/quizQuestions.js`. This file is an array of objects, each
-representing a page of questions. Each page has an array of questions. Each
-question has an id, a question text, a list of answers, and the correct
-answer(s).
+The quiz questions are configured in `@/user/components/quizQuestions.js` as an array 
+of dictionary objects, where each dictionary represents a page of multiple questions. 
+Each question has an id, a question text, a list of answers, and the correct answer(s). 
+The field `multiSelect` can be set to true if a question has multiple correct answers. 
 
 ```js
 export const QUIZ_QUESTIONS = [
@@ -396,6 +370,29 @@ export const QUIZ_QUESTIONS = [
     ],
   },
 ]
+```
+
+The questions from `@/user/components/quizQuestions.js` are then imported and 
+passed to `InstructionsQuiz` component as a prop (`quizQuestions`).
+The `randomizeQuestionsAndAnswers` prop is optional and defaults to `true`. 
+This will randomize the order of the questions and answers on each page at
+loading time (meaning if the subject repeats the quiz multiple times, the order
+of the questions and answers will be different each time). If set to `false`, 
+the questions will be randomized in the same way each time the quiz is taken.
+
+```js
+// import the quiz questions
+import { QUIZ_QUESTIONS } from './components/quizQuestions'
+// instructions quiz
+timeline.pushSeqView({
+  name: 'quiz',
+  component: InstructionsQuiz,
+  props: {
+    quizQuestions: QUIZ_QUESTIONS,
+    returnTo: 'instructions',
+    randomizeQuestionsAndAnswers: true,
+  },
+})
 ```
 
 ### Demographic Survey
