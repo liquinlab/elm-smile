@@ -38,6 +38,8 @@ export default {
   deploy_url: import.meta.env.VITE_DEPLOY_URL, // auto compute this
   estimated_time: import.meta.env.VITE_ESTIMATED_TIME,
   payrate: import.meta.env.VITE_PAYRATE,
+  lab_url: import.meta.env.VITE_LAB_URL,
+  brand_logo_fn: import.meta.env.VITE_BRAND_LOGO_FN,
   google_analytics_id: import.meta.env.VITE_GOOGLE_ANALYTICS,
   windowsizer_request: parse_w_h(import.meta.env.VITE_WINDOWSIZER_REQUEST),
   windowsizer_aggressive: import.meta.env.VITE_WINDOWSIZER_AGGRESSIVE === 'true',
@@ -49,5 +51,5 @@ export default {
     messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGINGSENDERID,
     appId: import.meta.env.VITE_FIREBASE_APPID,
   },
-  anonymousMode: import.meta.env.VITE_ANONYMOUS_MODE === 'true', 
+  anonymous_mode: import.meta.env.VITE_ANONYMOUS_MODE === 'true',
 }
