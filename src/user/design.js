@@ -8,7 +8,7 @@
 // Views: https://smile.gureckislab.org/views.html
 // Timeline: https://smile.gureckislab.org/timeline.html
 // Randomization: https://smile.gureckislab.org/randomization.html
-
+import { markRaw } from 'vue'
 import { processQuery } from '@/core/utils'
 
 // 1. Import main built-in View components
@@ -19,6 +19,7 @@ import DemographicSurvey from '@/builtins/demographic_survey/DemographicSurveyVi
 import DeviceSurvey from '@/builtins/device_survey/DeviceSurveyView.vue'
 import Captcha from '@/builtins/captcha/CaptchaView.vue'
 import Instructions from '@/builtins/instructions/InstructionsView.vue'
+import InstructionsQuiz from '@/builtins/instructions_quiz/InstructionsQuiz.vue'
 import Debrief from '@/builtins/debrief/DebriefView.vue'
 import TaskFeedbackSurvey from '@/builtins/task_survey/TaskFeedbackSurveyView.vue'
 import Thanks from '@/builtins/thanks/ThanksView.vue'
@@ -45,7 +46,14 @@ const smilestore = useSmileStore()
 console.log('Logging smilestore')
 console.log(smilestore.getLocal)
 
-// #4. Add between-subjects condition assignment
+// #4.  set the branding logo filename.  assumed to be in the @/user/assets folder
+api.setBrandLogo('universitylogo.png')
+
+// set the informed consent text on the menu bar
+import InformedConsentText from './components/InformedConsentText.vue'
+api.setInformedConsentText(InformedConsentText)
+
+// #5. Add between-subjects condition assignment
 // This is where you can define conditions to which each participant should be assigned
 
 // You can assign conditions by passing a javascript object to api.randomAssignCondition(),
@@ -68,7 +76,7 @@ api.randomAssignCondition({
   weights: [2, 1, 1], // weights are automatically normalized, so [4, 2, 2] would be the same
 })
 
-// #5. Define and add some routes to the timeline
+// #6. Define and add some routes to the timeline
 // Each route should map to a View component.
 // Each needs a name
 // but for most experiments they go in sequence from the begining
@@ -120,10 +128,14 @@ timeline.registerView({
   },
 })
 
+// import the consent text
 // consent
 timeline.pushSeqView({
   name: 'consent',
   component: Consent,
+  props: {
+    informedConsentText: markRaw(InformedConsentText), // provide the informed consent text
+  },
   meta: {
     requiresConsent: false,
     setConsented: true,
@@ -154,6 +166,18 @@ timeline.pushSeqView({
   component: Instructions,
 })
 
+// import the quiz questions
+import { QUIZ_QUESTIONS } from './components/quizQuestions'
+// instructions quiz
+timeline.pushSeqView({
+  name: 'quiz',
+  component: InstructionsQuiz,
+  props: {
+    quizQuestions: QUIZ_QUESTIONS,
+    returnTo: 'instructions',
+    randomizeQuestionsAndAnswers: true,
+  },
+})
 // main experiment
 // note: by default, the path will be set to the name of the view
 // however, you can override this by setting the path explicitly
@@ -189,9 +213,13 @@ timeline.pushSeqView({
 })
 
 // debriefing form
+import DebriefText from '@/user/components/DebriefText.vue' // get access to the global store
 timeline.pushSeqView({
   name: 'debrief',
   component: Debrief,
+  props: {
+    debriefText: markRaw(DebriefText),
+  },
 })
 
 // device survey

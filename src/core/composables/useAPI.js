@@ -2,6 +2,9 @@ import { reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import useSmileStore from '@/core/stores/smilestore'
 import useTimeline from '@/core/composables/useTimeline'
+import seedrandom from 'seedrandom'
+import { v4 as uuidv4 } from 'uuid'
+
 // import seeded randomization function for this component/route
 // random seeding is unique to each component/route
 import {
@@ -68,6 +71,19 @@ export default function useAPI() {
       // go back to the landing page (don't use router because it won't refresh the page and thus won't reset the app)
       const url = window.location.href
       window.location.href = url.substring(0, url.lastIndexOf('#/'))
+    },
+    setBrandLogo: (logo_fn = 'universitylogo.png') => {
+      // sets the logo of the app
+      smilestore.setBrandLogo(logo_fn)
+    },
+    getBrandLogo: () => {
+      return smilestore.global.brand_logo_fn
+    },
+    setInformedConsentText: (component) => {
+      smilestore.setInformedConsentText(component)
+    },
+    getInformedConsentText: () => {
+      return smilestore.global.informed_consent_text
     },
     setKnown: async () => {
       await smilestore.setKnown()
@@ -174,6 +190,10 @@ export default function useAPI() {
       smilestore.data.trial_num += 1
       smilestore.saveTrialData(data)
       log.debug('SMILE API: data ', smilestore.data.study_data)
+    },
+    randomSeed(seed = uuidv4()) {
+      // sets new global seed(will remain in use until next route)
+      seedrandom(seed, { global: true })
     },
     randomAssignCondition(conditionObject) {
       // get conditionobject keys

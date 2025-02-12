@@ -26,7 +26,7 @@ const config = reactive({
     color: rgb(84, 84, 84);
 }
 .form {
-    width: 100%;
+    width: 90%;
     border-collapse:collapse;
     border: 0px;
 }
@@ -74,7 +74,7 @@ simply cut and paste without modifying the commands. This also give some
 recommendations. Things throughout this page will update as you type, nothing is
 stored.
 
-<table>
+<table class="form">
     <tbody>
         <tr>
             <td class="label">

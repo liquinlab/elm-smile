@@ -53,7 +53,7 @@ function finish() {
 <template>
   <div class="page prevent-select">
     <div class="formcontent">
-      <h3 class="is-size-4 has-text-weight-bold"><FAIcon icon="fa-solid fa-desktop" /> Computer/Device Information</h3>
+      <h3 class="is-size-3 has-text-weight-bold"><FAIcon icon="fa-solid fa-desktop" /> Computer/Device Information</h3>
       <p class="is-size-6">
         We request some basic information about the computer you are using right now. We also can use this information
         to improve the quality of our experiments in the future.
