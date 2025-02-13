@@ -74,7 +74,7 @@ function autofill() {
 
     var t = api.faker.render(trials[step_index.value])
     api.debug(t)
-    api.saveTrialData(t)
+    api.recordTrialData(t)
 
     nextStep()
   }
@@ -116,7 +116,7 @@ onKeyDown(
         api.debug('blue')
       }
       api.debug(`${step.value}`)
-      api.saveTrialData({
+      api.recordTrialData({
         trialnum: step_index.value,
         word: step.value.word,
         color: step.value.color,

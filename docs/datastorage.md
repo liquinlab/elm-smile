@@ -211,7 +211,7 @@ The preferred way write write data to the store is to use the [Smile API](/api):
 import SmileAPI from '@/core/composables/useAPI'
 const api = SmileAPI()
 
-api.saveTrialData({
+api.recordTrialData({
         trialnum: step_index.value,
         word: step.value.word,
         color: step.value.color,

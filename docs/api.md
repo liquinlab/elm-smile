@@ -47,6 +47,7 @@ available methods and their descriptions.
 - `getAppComponent(key)`: Retrieves a global component configuration.
 - `setRuntimeConfig(key, value)`: Sets a runtime configuration option.
 - `getConfig(key)`: Retrieves a configuration option (first searches config then
+  runtime)
 
 ## Data and Configuration Access
 
@@ -114,7 +115,9 @@ available methods and their descriptions.
 - `decrementTrial()`: Decrements the trial counter.
 - `resetTrial()`: Resets the trial counter.
 - `saveData(force)`: Saves the current data (force save if specified).
-- `saveTrialData(data)`: Saves trial-specific data.
+- `recordTrialData(data)`: Records trial-specific data. This does not save the
+  data to the database, but it does record it in the local state. The next call
+  to `saveData()` will save the data to the database.
 
 ## Consent Management
 

@@ -91,7 +91,7 @@ const currentPageComplete = computed(() => {
 })
 
 function submitQuiz() {
-  api.saveTrialData({
+  api.recordTrialData({
     phase: 'INSTRUCTIONS_QUIZ',
     questions: randomizedQuestions.value, // Update to use randomized questions
     answers: quizState.answers,

@@ -206,9 +206,9 @@ export default function useAPI() {
     getStaticUrl: (name) => {
       return new URL(`../../user/assets/${name}`, import.meta.url).href
     },
-    saveTrialData: (data) => {
+    recordTrialData: (data) => {
       smilestore.data.trial_num += 1
-      smilestore.saveTrialData(data)
+      smilestore.recordTrialData(data)
       log.debug('SMILE API: data ', smilestore.data.study_data)
     },
     randomSeed(seed = uuidv4()) {
