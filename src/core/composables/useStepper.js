@@ -33,6 +33,10 @@ export function useStepper(trials, finishedCallback) {
     }
   }
 
+  function resetStep() {
+    smilestore.resetPageTracker(page)
+  }
+
   const step = computed(() => {
     return trials[smilestore.getPageTracker(page)]
   })
@@ -41,7 +45,7 @@ export function useStepper(trials, finishedCallback) {
     return smilestore.getPageTracker(page)
   })
 
-  return { nextStep, prevStep, step, step_index }
+  return { nextStep, prevStep, resetStep, step, step_index }
 }
 
 export function useStatelessStepper(trials, index, finishedCallback) {

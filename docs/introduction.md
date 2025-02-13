@@ -6,8 +6,8 @@ outline: none
 
 The <SmileText/> project is a web-based platform designed to make it easy and
 fun to develop rich and interactive online experiments. Unlike tools that cater
-to novices and non-programmers, ==Smile is designed to help reasonably competent
-programmers accomplish more in less time.==
+to non-programmers, Smile is designed to help reasonably competent programmers
+accomplish more in less time.
 
 ### Key features:
 
@@ -30,9 +30,6 @@ programmers accomplish more in less time.==
   more!
 - Presentation [mode](/presentation) which provides a beautiful and interactive
   demo site you can share with reviewers and collaborators.
-- [Dashboard](/dashboard) for monitoring data collection, downloading and
-  analyzing data, and performing quality control to screen bots and other bad
-  actors.
 - Built-in support for multiple [recruitment services](/recruitment) including
   Prolific, MTurk, CloudResearch, and more.
 - Secure data storage and retrieval using a flexible, but easy-to-use

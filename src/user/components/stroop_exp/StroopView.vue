@@ -74,7 +74,7 @@ function autofill() {
 
     var t = api.faker.render(trials[step_index.value])
     api.debug(t)
-    api.saveTrialData(t)
+    api.recordTrialData(t)
 
     nextStep()
   }
@@ -116,7 +116,7 @@ onKeyDown(
         api.debug('blue')
       }
       api.debug(`${step.value}`)
-      api.saveTrialData({
+      api.recordTrialData({
         trialnum: step_index.value,
         word: step.value.word,
         color: step.value.color,
@@ -160,7 +160,7 @@ function finish() {
       <p id="prompt">Thanks! You are finished with this task and can move on.</p>
       <!-- display the final score -->
       <p>Your score was {{ final_score }}</p>
-      <button class="button is-success is-light" id="finish" @click="finish()">
+      <button class="button is-success" id="finish" @click="finish()">
         Continue &nbsp;
         <FAIcon icon="fa-solid fa-arrow-right" />
       </button>

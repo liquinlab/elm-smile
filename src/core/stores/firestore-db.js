@@ -3,21 +3,14 @@ import { getAuth, signInAnonymously } from 'firebase/auth'
 import {
   getFirestore,
   collection,
-  getDocs,
   doc,
   addDoc,
   setDoc,
   updateDoc,
   getDoc,
   Timestamp,
-  runTransaction,
   connectFirestoreEmulator,
-  getAggregateFromServer,
-  writeBatch,
-  increment,
-  sum,
 } from 'firebase/firestore'
-import { split } from 'lodash'
 import appconfig from '@/core/config'
 import useLog from '@/core/stores/log'
 // initialize firebase connection
@@ -121,8 +114,9 @@ export const createDoc = async (data) => {
     const user = await anonymousAuth()
     if (!user) throw new Error('Authentication failed')
 
-    const expRef = doc(db, mode, appconfig.project_ref)
+    log.log(`FIRESTORE-DB: trying to create a main document.`, appconfig.project_ref)
 
+    const expRef = doc(db, mode, appconfig.project_ref)
     // Check if document exists first
     const docSnap = await getDoc(expRef)
     if (!docSnap.exists()) {
@@ -134,6 +128,8 @@ export const createDoc = async (data) => {
       })
       console.log('FIRESTORE-DB: New experiment registered with ID: ', `${mode}/${appconfig.project_ref}`)
     }
+
+    log.log(`FIRESTORE-DB: trying to create a main document.`, appconfig.project_ref)
 
     // Add a new document with a generated id.
     const docRef = await addDoc(collection(db, `${mode}/${appconfig.project_ref}/data`), {

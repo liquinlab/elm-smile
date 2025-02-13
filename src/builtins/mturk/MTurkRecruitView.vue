@@ -6,6 +6,17 @@ import StudyPreviewText from '@/builtins/advertisement/StudyPreviewText.vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
+const props = defineProps({
+  estimated_time: {
+    type: String,
+    required: true,
+  },
+  payrate: {
+    type: String,
+    required: true,
+  },
+})
+
 const mturkPreview = ref(true)
 const launched = ref(false)
 let redirectURL = ref('/#/welcome/mturk/?')
@@ -53,7 +64,7 @@ function submit() {
 
 <template>
   <div class="page">
-    <StudyPreviewText v-if="mturkPreview"></StudyPreviewText>
+    <StudyPreviewText :estimated_time="props.estimated_time" :payrate="payrate" v-if="mturkPreview"></StudyPreviewText>
     <div v-else>
       <h1 class="title is-3">Thanks for accepting our HIT</h1>
       <div class="submitform" v-if="launched">

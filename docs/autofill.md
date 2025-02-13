@@ -133,7 +133,7 @@ function autofill() {
 
     var t = api.faker.render(trials[step_index.value])
     api.debug(t)
-    api.saveTrialData(t)
+    api.recordTrialData(t)
 
     nextStep()
   }
@@ -148,8 +148,8 @@ is clicked after it is registered `api.setPageAutofill(autofill)`. Inside this
 function is steps through each trial, rendering the data for that trial, saving
 it to the smilestore database, then advancing to the next step. The rendering
 step calls the `api.faker.*()` methods as defined and makes "fake" data for the
-trial. This data is then [saved to the database](/datastorage) using
-`api.saveTrialData()`.
+trial. This data is then [recorded to the database](/datastorage) using
+`api.recordTrialData()`.
 
 ## The Autofill API
 

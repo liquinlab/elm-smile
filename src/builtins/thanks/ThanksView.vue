@@ -104,7 +104,7 @@ clipboard.on('success', (e) => {
       <h1 class="title is-3">Thanks, let's begin the payment process!</h1>
       <p class="has-text-left pb-5">This still needs to be implemented</p>
       <hr />
-      <a :href="!appconfig.anonymousMode ? 'http://gureckislab.org' : 'http://google.com'" class="button is-info"
+      <a :href="!appconfig.anonymous_mode ? 'http://gureckislab.org' : 'http://google.com'" class="button is-info"
         >Submit my work &nbsp;
         <FAIcon icon="fa-solid fa-arrow-right" />
       </a>

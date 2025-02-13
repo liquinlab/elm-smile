@@ -12,7 +12,7 @@ function finish() {
   <div class="page prevent-select">
     <h1 class="title is-3">Experiment</h1>
     <hr />
-    <button class="button is-success is-light" id="finish" @click="finish()">
+    <button class="button is-success" id="finish" @click="finish()">
       next &nbsp;
       <FAIcon icon="fa-solid fa-arrow-right" />
     </button>

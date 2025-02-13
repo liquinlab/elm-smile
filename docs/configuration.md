@@ -15,9 +15,11 @@ details on adding new configuration options specific for your project.
 
 ## Getting started quickly
 
-Configuration options in <SmileText/> are stored in various
-[dotenv](https://dotenv.org) files in the `env/` folder of the project.
-[dotenv](https://dotenv.org) files are simply plain text files that define
+Configuration options in <SmileText /> are either stored in the `env/` folder or
+or can be configured at runtime using the `api.setRuntimeConfig()` function (see
+the full API docs [here](/api)).
+
+[Dotenv](https://dotenv.org) files are simply plain text files that define
 configuration options in all caps along with values separated by an equals
 sign.[^wisdom]. For example:
 
@@ -35,15 +37,15 @@ ANOTHER_OPTION    = 33
 MY_CONFIG         = '${MY_CONFIG_OPTION}1234'
 ```
 
-If you are in the <GureckisLabText/>, the <SmileText/> repo contains encrypted
-versions of our lab configuration files. As described in the
+If you have set up a [base repo](/labconfig) it will contain encrypted versions
+of your lab's configuration files. As described in the
 [starting a new project](/starting) guide, you will want to simply decrypt the
 files provided in the repository.
 
 ::: danger Warning!
 
-This will only work if you have first sent Todd your gpg key and waited for him
-to push a change to the <SmileText/> repo. See instructions
+This will only work if you have signed and encrypted your lab's configurations.
+See instructions
 [here](/requirements#_3-request-access-to-the-shared-database-resources).
 
 :::
@@ -65,13 +67,73 @@ npm run upload_config
 
 to configure your deployment process.
 
-That's it. But if you need to customize your options keep reading.
+## Runtime configuration
+
+Runtime configuration is done using the `api.setRuntimeConfig()` function. This
+is useful for configuation options that are specific to the flow of your
+experiment but are not passwords or other sensitive information. The most common
+use case here is to set options in the `src/user/design.js` file.
+
+For example, the following code sets several options at the top of the design.js
+file. These override the default values in the `.env` file but can be a more
+clear and convenient way to set them (it is also easier to share the design.js
+file).
+
+```js
+api.setRuntimeConfig('allow_repeats', false)
+
+api.setRuntimeConfig('windowsizer_request', { width: 800, height: 600 })
+api.setRuntimeConfig('windowsizer_aggressive', true)
+
+api.setRuntimeConfig('anonymous_mode', false)
+api.setRuntimeConfig('lab_url', 'https://gureckislab.org')
+api.setRuntimeConfig('brand_logo_fn', 'universitylogo.png')
+
+api.setRuntimeConfig('max_writes', 1000)
+api.setRuntimeConfig('min_write_interval', 2000)
+api.setRuntimeConfig('auto_save', true)
+```
+
+::: danger Warning!
+
+Runtime configuration will **override** the values in the `.env` files. As a
+result it makes sense to treat the `.env` files as default values which can be
+modified in `design.js`.
+
+:::
+
+Runtime configuration also allows you to easily add new configuration options
+that might be specific for your study that you want to configure in a global
+place.
+
+For example, you might want to the pay rate for your study. You could add this
+to the `design.js` file as follows:
+
+```js
+api.setRuntimeConfig(
+  'payrate',
+  '$15USD/hour prorated for estimated completition time + performance related bonus'
+)
+```
+
+Then in your component you can access this configuration option as follows:
+
+```js
+const payrate = api.getRuntimeConfig('payrate')
+```
+
+Runtime configuration options override the values in the `.env` files if they
+have the same name. For example, if the `.env` file contains an option
+`VITE_LAB_URL` then setting `api.setRuntimeConfig('lab_url')` will override it
+(see below for the `VITE_` syntax). However, if you create a novel runtime
+config it will be stored separately (specifically `smile_config.runtime`) in
+your data file.
 
 ## Types of configuration variables
 
 There are several configuration variables across different files. The first
 thing to be aware of is that some variables begin with `VITE_` (e.g.,
-`VITE_BUG_REPORTS`). These variables can be exported and made available to the
+`VITE_LAB_URL`). These variables can be exported and made available to the
 Javascript of your experiment.
 
 Variables that do not begin with `VITE_` are only available for other purposes
@@ -105,9 +167,10 @@ is necessary because some configuration options which go in those files are
 considered "secret" and we don't want them easily searched in GitHub when/if
 your project repository becomes publically shared.
 
-Note that if you change the value of any configuration options, you must stop your 
-development  server and start it again (running `npm run dev`) to see changes update. 
-Unlike code changes, Vite cannot update reload these while the server is running. 
+Note that if you change the value of any configuration options, you must stop
+your development server and start it again (running `npm run dev`) to see
+changes update. Unlike code changes, Vite cannot update reload these while the
+server is running.
 
 Let's consider the files one by one.
 
@@ -120,34 +183,57 @@ values (adjust for your situation):
 
 ```
 # this file is tracked by github and contains
-# configuration parameters for the experiment which
-# are critical for reproducibiliy
+# default configuration parameters for the experiment
+# these can be overridden by the user in the design.js file
+# use the api.setRuntimeConfig() function
+# this is to provide defaults for the experiment in case the user
+# does not specify all the parameters in the design.js file
 
-VITE_BROWSER_EXCLUDE             = ie
-VITE_ALLOW_REPEATS               = true
+# allow repeats
+VITE_ALLOW_REPEATS               = false
+
+# window sizing
+VITE_WINDOWSIZER_REQUEST         = 800x600
+VITE_WINDOWSIZER_AGGRESSIVE      = true
+
+# branding
+VITE_ANONYMOUS_MODE              = false
+VITE_LAB_URL                     = 'https://mylab.edu'
+VITE_BRAND_LOGO_FN                = 'universitylogo.png'
+
+# randomization
 VITE_RANDOM_SEED                 = 100012
+
+# data saving
 VITE_AUTO_SAVE_DATA              = true
 VITE_MAX_WRITES                  = 1000
 VITE_MIN_WRITE_INTERVAL          = 2000
-VITE_SHOW_PROGRESS_BAR           = false
 
-VITE_VIEWPORT_REQUEST            = 800x600
-VITE_WINDOWSIZER_AGGRESSIVE       = true
-
-VITE_ESTIMATED_TIME              = "30-40 minutes"
-VITE_PAYRATE_HOURLY              = "$15USD/hour + performance related bonus"
-
-VITE_LAB_URL                     = 'https://gureckislab.org'
-VITE_ANONYMOUS_MODE              = true
 ```
 
 Notice that the configuration options in this file begin with `VITE_`. This
 means they are made available to the web application/experiment.
 
-- `VITE_BROWSER_EXCLUDE` is a string that configures which types of browsers can
-  take your experiment.
 - `VITE_ALLOW_REPEATS` attempts to prevent participants from taking your task
   more than once.
+- `VITE_WINDOWSIZER_REQUEST` configures the requested size of the page for
+  rendering content (used by WindowSizerView.vue component)
+- `VITE_WINDOWSIZER_AGGRESSIVE` if set to true and the user resizes the page,
+  this will hide the task and show a guide to resize the window. It is called
+  "aggressive" since it really stops the task moving forward when the user makes
+  their window too small. This is enabled only after the subject is told and
+  agrees they made the window a given size.
+- `VITE_ANONYMOUS_MODE` is a boolean that configures if the experiment should be
+  deployed in anonymous mode. This mode is useful for submitting a link to the
+  study with a paper submission. In this mode, all <SmileText/>-default
+  references to the organization conducting the study are removed.
+- `VITE_LAB_URL` is the URL of the lab website. This can be used to link to the
+  lab website or university homepage so participants can learn more about the
+  organization conducting the study.
+- `VITE_BRAND_LOGO_FN` is the filename of the logo for your lab. This is used in
+  the header of the experiment. The file should placed be in `src/user/assets/`.
+- `VITE_RANDOM_SEED` initializes the pseudo-random number generator in
+  <SmileText />
 - `VITE_AUTO_SAVE_DATA` configures if smile attempts to automatically save data
   when pages in the [TimelineStepper](timeline.html#timelinestepper) are
   advanced.
@@ -158,31 +244,6 @@ means they are made available to the web application/experiment.
 - `VITE_MIN_WRITE_INTERVAL` configured the minimum time in milliseconds that
   should pass between writes to the Firestore. This respects Firestore's limit
   of 1 write per document per second. It defaults to 2000ms.
-- `VITE_SHOW_PROGRESS_BAR` configures if the progress bar should be visible at
-  the bottom of the screen.
-- `VITE_WINDOWSIZER_REQUEST` configures the requested size of the page for
-  rendering content (used by WindowSizerView.vue component)
-- `VITE_WINDOWSIZER_AGGRESSIVE` if set to true and the user resizes the page,
-  this will hide the task and show a guide to resize the window. It is called
-  "aggressive" since it really stops the task moving forward when the user makes
-  their window too small. This is enabled only after the subject is told and
-  agrees they made the window a given size.
-- `VITE_RANDOM_SEED` initializes the pseudo-random number generator in
-  <SmileText />
-- `VITE_ESTIMATED_TIME` is text you can include in an ad for the study (e.g.,
-  mechanical turk) to let people know how long to expect the task to take. It
-  might need to be references several places so putting it in the config can be
-  helpful.
-- `VITE_PAYRATE` is text about the payrate for the study. Again, it is a
-  configuration option since it might need to be referenced in several
-  components and templates.
-- `VITE_LAB_URL` is the URL of the lab website. This can be used to link to the
-  lab website or university homepage so participants can learn more about the
-  organization conducting the study.
-- `VITE_ANONYMOUS_MODE` is a boolean that configures if the experiment should
-  be deployed in anonymous mode. This mode is useful for submitting a link to
-  the study with a paper submission. In this mode, all  <SmileText/>-default 
-  references to the organization conducting the study are removed.
 
 #### Web Services Options (`.env.local`)
 
@@ -201,14 +262,14 @@ VITE_FIREBASE_STORAGEBUCKET      = project.appspot.com
 VITE_FIREBASE_MESSAGINGSENDERID  = msgid
 VITE_FIREBASE_APPID              = appid
 
-# configure your experiment here
-VITE_BUG_REPORTS                 = "http://smile.gureckislab.org/bugs"
+# enter google analytics id
+VITE_GOOGLE_ANALYTICS            = xxxx
 ```
 
 - There several `VITE_FIREBASE_` options for configuring Google's Firestore
   backend (see [data storage](/datastorage) for more info).
-- `VITE_BUG_REPORTS` is a URL you want participants to go to report a problem
-  with your experiment.
+- `VITE_GOOGLE_ANALYTICS` is the Google Analytics ID for your experiment
+  (optional)
 
 #### Code Version Options (`.env.github.local`)
 
@@ -216,7 +277,7 @@ The `.env.github.local` file contains information about the latest git commit
 for this project. The purpose of this file is so that your Javascript
 application can keep track of which version of the code it is running. One key
 principle of <SmileText/> is that
-[data must always be linked to the code that created it](/research/principles.html#data-must-always-be-linked-to-the-code-that-created-it).
+[data must always be linked to the code that created it](/philosophy.html#data-must-always-be-linked-to-the-code-that-created-it).
 
 This file is generated automatically using a
 [post commit hook](https://www.atlassian.com/git/tutorials/git-hooks) which
@@ -403,9 +464,7 @@ export default {
         last_commit_hash: import.meta.env.VITE_GIT_HASH, // autocompute this all the time
         commit_url: 'https://github.com/' + import.meta.env.VITE_GIT_OWNER + '/' + import.meta.env.VITE_GIT_REPO_NAME + '/commit/' + import.meta.env.VITE_GIT_HASH
     },
-    browser_exclude: import.meta.env.VITE_BROWSER_EXCLUDE,
     allow_repeats: import.meta.env.VITE_ALLOW_REPEATS,
-    bug_reports: import.meta.env.VITE_BUG_REPORTS,
     deploy_url: import.meta.env.VITE_DEPLOY_URL, // auto compute this
     firebaseConfig : {
         apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
@@ -431,9 +490,9 @@ simply make up a new `VITE_SOMETHING` variable. Then add it to the object in
 `src/core/config.js` to expose it to your web application! The configuration is
 available as `smileconfig` anywhere in your Vue app. It's pretty easy.
 
-If you add any new configuration options, you must stop your 
-development  server and start it again (running `npm run dev`) to see changes update. 
-Unlike code changes, Vite cannot update reload these while the server is running. 
+If you add any new configuration options, you must stop your development server
+and start it again (running `npm run dev`) to see changes update. Unlike code
+changes, Vite cannot update reload these while the server is running.
 
 Note: if you add new configuration options, you need to also update them on
 GitHub for those to sync to deployments. Run `npm run upload_config` as

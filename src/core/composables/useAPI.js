@@ -2,6 +2,9 @@ import { reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import useSmileStore from '@/core/stores/smilestore'
 import useTimeline from '@/core/composables/useTimeline'
+import seedrandom from 'seedrandom'
+import { v4 as uuidv4 } from 'uuid'
+
 // import seeded randomization function for this component/route
 // random seeding is unique to each component/route
 import {
@@ -68,6 +71,39 @@ export default function useAPI() {
       // go back to the landing page (don't use router because it won't refresh the page and thus won't reset the app)
       const url = window.location.href
       window.location.href = url.substring(0, url.lastIndexOf('#/'))
+    },
+    setAppComponent: (key, value) => {
+      if (!smilestore.config.global_app_components) {
+        smilestore.config.global_app_components = {}
+      }
+      smilestore.config.global_app_components[key] = value
+    },
+    getAppComponent: (key) => {
+      return smilestore.config.global_app_components[key]
+    },
+    setRuntimeConfig: (key, value) => {
+      if (key in smilestore.config) {
+        smilestore.config[key] = value
+      } else {
+        if (!smilestore.config.runtime) {
+          smilestore.config.runtime = {}
+        }
+        smilestore.config.runtime[key] = value
+      }
+
+      // remove global_components from the config
+      const { global_app_components, ...configWithoutComponents } = smilestore.config
+      smilestore.data.smile_config = configWithoutComponents
+    },
+    getConfig: (key) => {
+      if (key in smilestore.config) {
+        return smilestore.config[key]
+      } else if (key in smilestore.config.runtime) {
+        return smilestore.config.runtime[key]
+      } else {
+        log.error('SMILE API: getConfig() key not found', key)
+        return null
+      }
     },
     setKnown: async () => {
       await smilestore.setKnown()
@@ -170,10 +206,14 @@ export default function useAPI() {
     getStaticUrl: (name) => {
       return new URL(`../../user/assets/${name}`, import.meta.url).href
     },
-    saveTrialData: (data) => {
+    recordTrialData: (data) => {
       smilestore.data.trial_num += 1
-      smilestore.saveTrialData(data)
+      smilestore.recordTrialData(data)
       log.debug('SMILE API: data ', smilestore.data.study_data)
+    },
+    randomSeed(seed = uuidv4()) {
+      // sets new global seed(will remain in use until next route)
+      seedrandom(seed, { global: true })
     },
     randomAssignCondition(conditionObject) {
       // get conditionobject keys
