@@ -265,10 +265,7 @@ router.beforeResolve((to) => {
     log.log('ROUTER GUARD: Seed set to ' + seed)
   } else {
     // if inactive, just re-seed with a random seed on every route entry
-    const newseed = uuidv4()
-    seedrandom(newseed, {
-      global: true,
-    })
+    api.randomSeed()
     log.log('ROUTER GUARD: Not using participant-specific seed; seed set randomly to ' + newseed)
   }
   log.clear_page_history()

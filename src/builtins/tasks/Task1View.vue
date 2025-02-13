@@ -27,7 +27,7 @@ function finish() {
       />
 
       <div class="formbutton">
-        <button class="button is-success is-light" id="finish" @click="finish()">
+        <button class="button is-success" id="finish" @click="finish()">
           next &nbsp;
           <FAIcon icon="fa-solid fa-arrow-right" />
         </button>

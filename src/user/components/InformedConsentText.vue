@@ -1,6 +1,6 @@
 <template>
   <div class="informedconsent">
-    <h1 class="is-size-5">Official Informed Consent Statement</h1>
+    <h1 class="is-size-4 has-text-weight-bold">Informed Consent Statement</h1>
     <hr />
     <p>
       If you agree to be in this study, you will be asked to look at pictures of objects or pictures presented on a
@@ -47,9 +47,10 @@
 <style scoped>
 .informedconsent {
   padding: 10px;
-  padding-top: 30px;
+  padding-top: 5px;
   text-align: left;
   font-size: 0.95em;
+  color: #717171;
 }
 
 .informedconsent hr {

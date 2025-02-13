@@ -371,7 +371,7 @@ export default defineStore('smilestore', {
         log.warn('DEV MODE: Page was autofilled by a user-provided component function')
       }
     },
-    saveTrialData(data) {
+    recordTrialData(data) {
       this.data.study_data.push(data)
     },
     saveForm(name, data) {

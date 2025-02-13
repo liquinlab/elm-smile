@@ -2,6 +2,16 @@
 import useAPI from '@/core/composables/useAPI'
 import appconfig from '@/core/config'
 const api = useAPI()
+const props = defineProps({
+  estimated_time: {
+    type: String,
+    required: true,
+  },
+  payrate: {
+    type: String,
+    required: true,
+  },
+})
 </script>
 
 <template>
@@ -17,10 +27,9 @@ const api = useAPI()
           and make decisions similar to a video game. You may earn points for making good decisions that will convert to
           money
           <FAIcon icon="sack-dollar" />
-          that we will pay you at the end of the study ({{ api.config.payrate }}). The study should take about
-          {{ api.config.estimated_time }} of your time. You'll be asked to digitally sign a constent form and
-          (optionally) provide some non-identifiable demographic information during the study. Your data will be kept
-          anonymous.
+          that we will pay you at the end of the study ({{ payrate }}). The study should take about
+          {{ estimated_time }} of your time. You'll be asked to digitally sign a constent form and (optionally) provide
+          some non-identifiable demographic information during the study. Your data will be kept anonymous.
         </p>
         <hr />
         <p>
@@ -35,7 +44,7 @@ const api = useAPI()
             <p><FAIcon icon="bahai" />&nbsp;&nbsp;Who are we?</p>
           </div>
           <div class="message-body is-size-7 has-text-left">
-            <div v-if="!appconfig.anonymousMode">
+            <div v-if="!appconfig.anonymous_mode">
               We are the <a href="http://gureckislab.org" target="_blank">Computation and Cognition Lab</a> at New York
               University under the direction to
               <a href="http://todd.gureckislab.org" target="_blank">Dr. Todd Gureckis</a>. Our lab uses games and other

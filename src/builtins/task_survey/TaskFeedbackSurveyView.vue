@@ -38,7 +38,7 @@ function finish() {
 <template>
   <div class="page prevent-select">
     <div class="formcontent">
-      <h3 class="is-size-4 has-text-weight-bold"><FAIcon icon="fa-solid fa-pencil" /> Give us feedback</h3>
+      <h3 class="is-size-3 has-text-weight-bold"><FAIcon icon="fa-solid fa-pencil" /> Give us feedback</h3>
       <p class="is-size-6">
         Please give us feedback about your experience with the study. Your feedback will help us improve our study and
         we appreciate your effort and thoughts.
@@ -114,8 +114,7 @@ function finish() {
                 <div class="column">
                   <div class="has-text-right">
                     <button class="button is-success" id="finish" v-if="complete" @click="finish()">
-                      I'm finished &nbsp;
-                      <FAIcon icon="fa-solid fa-arrow-right" />
+                      I'm finished
                     </button>
                   </div>
                 </div>

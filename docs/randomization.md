@@ -89,7 +89,7 @@ Generates a random integer between min and max (both inclusive). For example,
 this can be used to assign a participant to a (numbered) condition.
 
 ```js
-import * as random from '@/randomization'
+import * as random from '@/core/randomization'
 
 // generate a random integer: 1, 2, 3, 4, or 5
 const condition = random.randomInt(1, 5)
@@ -101,7 +101,7 @@ Randomly shuffles an array. For example, this can be used to present some fixed
 stimuli in a random order.
 
 ```js
-import * as random from '@/randomization'
+import * as random from '@/core/randomization'
 
 const stimuli = [
   'image1.png',
@@ -121,7 +121,7 @@ Samples **without** replacement from an array. For example, this can be used to
 randomly present 3 stimuli from a larger set.
 
 ```js
-import * as random from '@/randomization'
+import * as random from '@/core/randomization'
 
 const stimuli = [
   'image1.png',
@@ -142,7 +142,7 @@ randomly present 3 stimuli from a larger set (with the possibility of presenting
 the same stimulus twice).
 
 ```js
-import * as random from '@/randomization'
+import * as random from '@/core/randomization'
 
 const stimuli = [
   'image1.png',
@@ -162,7 +162,7 @@ Computes the cartesian product of any number of arrays. For example, this can be
 used to get all permutations of three condition variables.
 
 ```js
-import * as random from '@/randomization'
+import * as random from '@/core/randomization'
 
 const stimuli = [
   'image1.png',
@@ -187,16 +187,23 @@ It is possible to randomize the order of routes in the timeline. See
 
 In rare cases, it may be desirable to generate "true" or "unseeded" random
 numbers (by default `Math.random()` actually does set a seed, but it's set
-automatically using other random stuff). To do so, you can make a local instance
-of a random number generator using the `seedrandom` library:
+automatically using other random stuff). To do so, you can use the smile API:
 
 ```js
-import seedrandom from 'seedrandom'
+const api = useAPI()
 
-const rng = seedrandom()
+// randomize seed each time component is loaded
+api.randomSeed()
+```
 
-// number will not be reproducible
-rng()
+This will initialize the components with a random seed on each load of the View.
+You can also provide a fixed seed using the same function:
+
+```js
+const api = useAPI()
+
+// set to a known seed
+api.randomSeed(12344)
 ```
 
 ## Override randomization for debugging
