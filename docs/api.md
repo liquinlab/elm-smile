@@ -46,6 +46,7 @@ available methods and their descriptions.
 - `setAppComponent(key, value)`: Sets a global component configuration.
 - `getAppComponent(key)`: Retrieves a global component configuration.
 - `setRuntimeConfig(key, value)`: Sets a runtime configuration option.
+- `getConfig(key)`: Retrieves a configuration option (first searches config then
 
 ## Data and Configuration Access
 
@@ -98,7 +99,6 @@ available methods and their descriptions.
 - `setRuntimeConfig(key, value)`: Sets a runtime configuration option.
 - `getConfig(key)`: Retrieves a configuration option (first searches config then
   runtime)
-- `saveConfig()`: Saves the configuration.
 
 ## Logging and Debugging
 

@@ -46,7 +46,8 @@ const smilestore = useSmileStore()
 console.log('Logging smilestore')
 console.log(smilestore.getLocal)
 
-// #4.  set the branding logo filename.  assumed to be in the @/user/assets folder
+// #4.  Set runtime configuration options
+//      See http://smile.gureckislab.org/configuration.html#experiment-options-env
 api.setRuntimeConfig('allow_repeats', false)
 
 api.setRuntimeConfig('windowsizer_request', { width: 800, height: 600 })

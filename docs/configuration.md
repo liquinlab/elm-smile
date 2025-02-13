@@ -15,9 +15,11 @@ details on adding new configuration options specific for your project.
 
 ## Getting started quickly
 
-Configuration options in <SmileText/> are stored in various
-[dotenv](https://dotenv.org) files in the `env/` folder of the project.
-[dotenv](https://dotenv.org) files are simply plain text files that define
+Configuration options in <SmileText /> are either stored in the `env/` folder or
+or can be configured at runtime using the `api.setRuntimeConfig()` function (see
+the full API docs [here](/api)).
+
+[Dotenv](https://dotenv.org) files are simply plain text files that define
 configuration options in all caps along with values separated by an equals
 sign.[^wisdom]. For example:
 
@@ -35,15 +37,15 @@ ANOTHER_OPTION    = 33
 MY_CONFIG         = '${MY_CONFIG_OPTION}1234'
 ```
 
-If you are in the <GureckisLabText/>, the <SmileText/> repo contains encrypted
-versions of our lab configuration files. As described in the
+If you have set up a [base repo](/labconfig) it will contain encrypted versions
+of your lab's configuration files. As described in the
 [starting a new project](/starting) guide, you will want to simply decrypt the
 files provided in the repository.
 
 ::: danger Warning!
 
-This will only work if you have first sent Todd your gpg key and waited for him
-to push a change to the <SmileText/> repo. See instructions
+This will only work if you have signed and encrypted your lab's configurations.
+See instructions
 [here](/requirements#_3-request-access-to-the-shared-database-resources).
 
 :::
@@ -65,7 +67,67 @@ npm run upload_config
 
 to configure your deployment process.
 
-That's it. But if you need to customize your options keep reading.
+## Runtime configuration
+
+Runtime configuration is done using the `api.setRuntimeConfig()` function. This
+is useful for configuation options that are specific to the flow of your
+experiment but are not passwords or other sensitive information. The most common
+use case here is to set options in the `src/user/design.js` file.
+
+For example, the following code sets several options at the top of the design.js
+file. These override the default values in the `.env` file but can be a more
+clear and convenient way to set them (it is also easier to share the design.js
+file).
+
+```js
+api.setRuntimeConfig('allow_repeats', false)
+
+api.setRuntimeConfig('windowsizer_request', { width: 800, height: 600 })
+api.setRuntimeConfig('windowsizer_aggressive', true)
+
+api.setRuntimeConfig('anonymous_mode', false)
+api.setRuntimeConfig('lab_url', 'https://gureckislab.org')
+api.setRuntimeConfig('brand_logo_fn', 'universitylogo.png')
+
+api.setRuntimeConfig('max_writes', 1000)
+api.setRuntimeConfig('min_write_interval', 2000)
+api.setRuntimeConfig('auto_save', true)
+```
+
+::: danger Warning!
+
+Runtime configuration will **override** the values in the `.env` files. As a
+result it makes sense to treat the `.env` files as default values which can be
+modified in `design.js`.
+
+:::
+
+Runtime configuration also allows you to easily add new configuration options
+that might be specific for your study that you want to configure in a global
+place.
+
+For example, you might want to the pay rate for your study. You could add this
+to the `design.js` file as follows:
+
+```js
+api.setRuntimeConfig(
+  'payrate',
+  '$15USD/hour prorated for estimated completition time + performance related bonus'
+)
+```
+
+Then in your component you can access this configuration option as follows:
+
+```js
+const payrate = api.getRuntimeConfig('payrate')
+```
+
+Runtime configuration options override the values in the `.env` files if they
+have the same name. For example, if the `.env` file contains an option
+`VITE_LAB_URL` then setting `api.setRuntimeConfig('lab_url')` will override it
+(see below for the `VITE_` syntax). However, if you create a novel runtime
+config it will be stored separately (specifically `smile_config.runtime`) in
+your data file.
 
 ## Types of configuration variables
 
@@ -121,20 +183,32 @@ values (adjust for your situation):
 
 ```
 # this file is tracked by github and contains
-# configuration parameters for the experiment which
-# are critical for reproducibiliy
+# default configuration parameters for the experiment
+# these can be overridden by the user in the design.js file
+# use the api.setRuntimeConfig() function
+# this is to provide defaults for the experiment in case the user
+# does not specify all the parameters in the design.js file
 
-VITE_ALLOW_REPEATS               = true
+# allow repeats
+VITE_ALLOW_REPEATS               = false
+
+# window sizing
+VITE_WINDOWSIZER_REQUEST         = 800x600
+VITE_WINDOWSIZER_AGGRESSIVE      = true
+
+# branding
+VITE_ANONYMOUS_MODE              = false
+VITE_LAB_URL                     = 'https://mylab.edu'
+VITE_BRAND_LOGO_FN                = 'universitylogo.png'
+
+# randomization
 VITE_RANDOM_SEED                 = 100012
+
+# data saving
 VITE_AUTO_SAVE_DATA              = true
 VITE_MAX_WRITES                  = 1000
 VITE_MIN_WRITE_INTERVAL          = 2000
 
-VITE_WINDOWSIZER_REQUEST            = 800x600
-VITE_WINDOWSIZER_AGGRESSIVE       = true
-
-VITE_LAB_URL                     = 'https://gureckislab.org'
-VITE_ANONYMOUS_MODE              = true
 ```
 
 Notice that the configuration options in this file begin with `VITE_`. This
@@ -142,6 +216,24 @@ means they are made available to the web application/experiment.
 
 - `VITE_ALLOW_REPEATS` attempts to prevent participants from taking your task
   more than once.
+- `VITE_WINDOWSIZER_REQUEST` configures the requested size of the page for
+  rendering content (used by WindowSizerView.vue component)
+- `VITE_WINDOWSIZER_AGGRESSIVE` if set to true and the user resizes the page,
+  this will hide the task and show a guide to resize the window. It is called
+  "aggressive" since it really stops the task moving forward when the user makes
+  their window too small. This is enabled only after the subject is told and
+  agrees they made the window a given size.
+- `VITE_ANONYMOUS_MODE` is a boolean that configures if the experiment should be
+  deployed in anonymous mode. This mode is useful for submitting a link to the
+  study with a paper submission. In this mode, all <SmileText/>-default
+  references to the organization conducting the study are removed.
+- `VITE_LAB_URL` is the URL of the lab website. This can be used to link to the
+  lab website or university homepage so participants can learn more about the
+  organization conducting the study.
+- `VITE_BRAND_LOGO_FN` is the filename of the logo for your lab. This is used in
+  the header of the experiment. The file should placed be in `src/user/assets/`.
+- `VITE_RANDOM_SEED` initializes the pseudo-random number generator in
+  <SmileText />
 - `VITE_AUTO_SAVE_DATA` configures if smile attempts to automatically save data
   when pages in the [TimelineStepper](timeline.html#timelinestepper) are
   advanced.
@@ -152,22 +244,6 @@ means they are made available to the web application/experiment.
 - `VITE_MIN_WRITE_INTERVAL` configured the minimum time in milliseconds that
   should pass between writes to the Firestore. This respects Firestore's limit
   of 1 write per document per second. It defaults to 2000ms.
-- `VITE_WINDOWSIZER_REQUEST` configures the requested size of the page for
-  rendering content (used by WindowSizerView.vue component)
-- `VITE_WINDOWSIZER_AGGRESSIVE` if set to true and the user resizes the page,
-  this will hide the task and show a guide to resize the window. It is called
-  "aggressive" since it really stops the task moving forward when the user makes
-  their window too small. This is enabled only after the subject is told and
-  agrees they made the window a given size.
-- `VITE_RANDOM_SEED` initializes the pseudo-random number generator in
-  <SmileText />
-- `VITE_LAB_URL` is the URL of the lab website. This can be used to link to the
-  lab website or university homepage so participants can learn more about the
-  organization conducting the study.
-- `VITE_ANONYMOUS_MODE` is a boolean that configures if the experiment should be
-  deployed in anonymous mode. This mode is useful for submitting a link to the
-  study with a paper submission. In this mode, all <SmileText/>-default
-  references to the organization conducting the study are removed.
 
 #### Web Services Options (`.env.local`)
 
