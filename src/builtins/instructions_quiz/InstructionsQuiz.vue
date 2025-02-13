@@ -65,7 +65,7 @@ api.setPageAutofill(autofill)
 
 // Update the pages array to use randomizedQuestions length
 const pages = randomizedQuestions.value.map((_, index) => `page${index + 1}`)
-const { nextStep, step_index, prevStep, resetStep } = api.useStepper(pages, () => {
+const stepper = api.useStepper(pages, () => {
   finish()
 })
 
@@ -110,7 +110,7 @@ function returnInstructions() {
 }
 
 function finish() {
-  api.stepNextView()
+  api.goNextView()
 }
 </script>
 

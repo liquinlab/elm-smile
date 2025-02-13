@@ -64,7 +64,7 @@ function next_trial() {
 
 function finish() {
   // smilestore.saveData()
-  api.stepNextView()
+  api.goNextView()
 }
 </script>
 

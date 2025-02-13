@@ -21,8 +21,8 @@ available methods and their descriptions.
 
 ## Navigation
 
-- `stepNextView()`: Advances to the next view in the experiment.
-- `stepPrevView()`: Returns to the previous view in the experiment.
+- `goNextView()`: Advances to the next view in the experiment.
+- `goPrevView()`: Returns to the previous view in the experiment.
 - `gotoView(view)`: Navigates to a specific view.
 - `goBack()`: Returns to the previous page.
 - `hasNextView()`: Checks if there's a next view available.

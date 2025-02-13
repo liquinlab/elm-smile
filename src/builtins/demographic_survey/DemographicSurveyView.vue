@@ -69,7 +69,7 @@ const { nextStep, prevStep, step_index } = api.useStepper(pages, () => {
 
 function finish() {
   api.saveForm('demographic', forminfo)
-  api.stepNextView()
+  api.goNextView()
 }
 </script>
 

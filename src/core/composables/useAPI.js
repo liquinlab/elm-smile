@@ -22,7 +22,7 @@ import { useStepper } from '@/core/composables/useStepper'
 import useLog from '@/core/stores/log'
 
 export default function useAPI() {
-  const { stepNextView, stepPrevView, gotoView } = useTimeline()
+  const { goNextView, goPrevView, gotoView } = useTimeline()
   const route = useRoute()
   const router = useRouter()
   const smilestore = useSmileStore()
@@ -37,8 +37,8 @@ export default function useAPI() {
     dev: smilestore.dev,
     route: route,
     router: router,
-    stepNextView: stepNextView,
-    stepPrevView: stepPrevView,
+    goNextView: goNextView,
+    goPrevView: goPrevView,
     gotoView: gotoView,
     faker: faker_distributions,
     hasNextView: () => route.meta.next && route.meta.sequential,

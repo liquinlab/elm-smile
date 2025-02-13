@@ -22,7 +22,7 @@ const instText = computed(() => {
 })
 
 function finish(goto) {
-  api.stepNextView()
+  api.goNextView()
 }
 </script>
 

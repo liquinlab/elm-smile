@@ -173,7 +173,7 @@ function finalize() {
 
 function finish() {
   // do stuff if you want
-  api.stepNextView()
+  api.goNextView()
 }
 </script>
 

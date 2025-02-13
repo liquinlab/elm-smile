@@ -633,11 +633,11 @@ The way to import the useTimeline composable into your component is:
 
 ```js
 import useTimeline from '@/composables/useTimeline'
-const { stepNextView, stepPrevView, gotoView } = useTimeline()
+const { goNextView, goPrevView, gotoView } = useTimeline()
 ```
 
-This imports the composable, then import three methods (`stepNextView()`,
-`stepPrevView()`, and `gotoView`) which are functions that when they are called
+This imports the composable, then import three methods (`goNextView()`,
+`goPrevView()`, and `gotoView`) which are functions that when they are called
 provides the `name` of the next route (or `null` if there is no "next" either
 because you are at the end of the sequence or because it is a non-sequential
 route). To navigate to the next route just use the `push()` method of the
@@ -659,7 +659,7 @@ import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
 function finish(goto) {
-  api.stepNextView()
+  api.goNextView()
 }
 </script>
 
