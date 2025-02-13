@@ -40,7 +40,6 @@ export default {
   windowsizer_request: parse_w_h(import.meta.env.VITE_WINDOWSIZER_REQUEST),
   windowsizer_aggressive: import.meta.env.VITE_WINDOWSIZER_AGGRESSIVE === 'true',
   anonymous_mode: import.meta.env.VITE_ANONYMOUS_MODE === 'true',
-
   firebaseConfig: {
     apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
     authDomain: import.meta.env.VITE_FIREBASE_AUTHDOMAIN,
