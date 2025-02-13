@@ -73,13 +73,13 @@ export default function useAPI() {
       window.location.href = url.substring(0, url.lastIndexOf('#/'))
     },
     setAppComponent: (key, value) => {
-      if (!smilestore.config.global_components) {
-        smilestore.config.global_components = {}
+      if (!smilestore.config.global_app_components) {
+        smilestore.config.global_app_components = {}
       }
-      smilestore.config.global_components[key] = value
+      smilestore.config.global_app_components[key] = value
     },
     getAppComponent: (key) => {
-      return smilestore.config.global_components[key]
+      return smilestore.config.global_app_components[key]
     },
     setRuntimeConfig: (key, value) => {
       if (!smilestore.config.runtime) {
@@ -88,7 +88,7 @@ export default function useAPI() {
       smilestore.config.runtime[key] = value
 
       // remove global_components from the config
-      const { global_components, ...configWithoutComponents } = smilestore.config
+      const { global_app_components, ...configWithoutComponents } = smilestore.config
       smilestore.data.smile_config = configWithoutComponents
     },
     getConfig: (key) => {
