@@ -47,12 +47,12 @@ console.log('Logging smilestore')
 console.log(smilestore.getLocal)
 
 // #4.  set the branding logo filename.  assumed to be in the @/user/assets folder
-api.setConfig('estimated_time', '30-40 minutes')
-api.setConfig('payrate', '$15USD/hour prorated for estimated completition time + performance related bonus')
+api.setRuntimeConfig('estimated_time', '30-40 minutes')
+api.setRuntimeConfig('payrate', '$15USD/hour prorated for estimated completition time + performance related bonus')
 
 // set the informed consent text on the menu bar
 import InformedConsentText from './components/InformedConsentText.vue'
-api.setConfig('informed_consent_text', InformedConsentText)
+api.setAppComponent('informed_consent_text', InformedConsentText)
 
 // #5. Add between-subjects condition assignment
 // This is where you can define conditions to which each participant should be assigned

@@ -43,6 +43,9 @@ available methods and their descriptions.
 - `setCompletionCode(code)`: Sets the completion code for the experiment.
 - `resetApp()`: Resets the entire application state.
 - `isResetApp()`: Checks if the app has been reset.
+- `setAppComponent(key, value)`: Sets a global component configuration.
+- `getAppComponent(key)`: Retrieves a global component configuration.
+- `setRuntimeConfig(key, value)`: Sets a runtime configuration option.
 
 ## Data and Configuration Access
 
@@ -92,8 +95,9 @@ available methods and their descriptions.
 - `randomInt()`: Generates a random integer.
 - `sampleWithReplacement()`: Samples items from an array with replacement.
 - `sampleWithoutReplacement()`: Samples items from an array without replacement.
-- `setConfig(key, value)`: Sets a configuration option.
-- `getConfig(key)`: Retrieves a configuration option.
+- `setRuntimeConfig(key, value)`: Sets a runtime configuration option.
+- `getConfig(key)`: Retrieves a configuration option (first searches config then
+  runtime)
 - `saveConfig()`: Saves the configuration.
 
 ## Logging and Debugging

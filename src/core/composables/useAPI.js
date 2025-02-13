@@ -72,12 +72,24 @@ export default function useAPI() {
       const url = window.location.href
       window.location.href = url.substring(0, url.lastIndexOf('#/'))
     },
-    setConfig: (key, value) => {
+    setAppComponent: (key, value) => {
+      if (!smilestore.config.global_components) {
+        smilestore.config.global_components = {}
+      }
+      smilestore.config.global_components[key] = value
+    },
+    getAppComponent: (key) => {
+      return smilestore.config.global_components[key]
+    },
+    setRuntimeConfig: (key, value) => {
       if (!smilestore.config.runtime) {
         smilestore.config.runtime = {}
       }
       smilestore.config.runtime[key] = value
-      api.saveConfig()
+
+      // remove global_components from the config
+      const { global_components, ...configWithoutComponents } = smilestore.config
+      smilestore.data.smile_config = configWithoutComponents
     },
     getConfig: (key) => {
       if (key in smilestore.config) {
@@ -88,9 +100,6 @@ export default function useAPI() {
         log.error('SMILE API: getConfig() key not found', key)
         return null
       }
-    },
-    saveConfig: () => {
-      smilestore.data.smile_config = smilestore.config
     },
     setKnown: async () => {
       await smilestore.setKnown()
