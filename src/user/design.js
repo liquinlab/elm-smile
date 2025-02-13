@@ -47,6 +47,22 @@ console.log('Logging smilestore')
 console.log(smilestore.getLocal)
 
 // #4.  set the branding logo filename.  assumed to be in the @/user/assets folder
+api.setRuntimeConfig('allow_repeats', false)
+
+api.setRuntimeConfig('windowsizer_request', { width: 800, height: 600 })
+api.setRuntimeConfig('windowsizer_aggressive', true)
+
+api.setRuntimeConfig('anonymous_mode', false)
+api.setRuntimeConfig('lab_url', 'https://gureckislab.org')
+api.setRuntimeConfig('brand_logo_fn', 'universitylogo.png')
+
+api.setRuntimeConfig('max_writes', 1000)
+api.setRuntimeConfig('min_write_interval', 2000)
+api.setRuntimeConfig('auto_save', true)
+
+api.setRuntimeConfig('payrate', '$15USD/hour prorated for estimated completition time + performance related bonus')
+
+// get rid of these two?
 api.setRuntimeConfig('estimated_time', '30-40 minutes')
 api.setRuntimeConfig('payrate', '$15USD/hour prorated for estimated completition time + performance related bonus')
 

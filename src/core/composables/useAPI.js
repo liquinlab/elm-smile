@@ -82,10 +82,14 @@ export default function useAPI() {
       return smilestore.config.global_app_components[key]
     },
     setRuntimeConfig: (key, value) => {
-      if (!smilestore.config.runtime) {
-        smilestore.config.runtime = {}
+      if (key in smilestore.config) {
+        smilestore.config[key] = value
+      } else {
+        if (!smilestore.config.runtime) {
+          smilestore.config.runtime = {}
+        }
+        smilestore.config.runtime[key] = value
       }
-      smilestore.config.runtime[key] = value
 
       // remove global_components from the config
       const { global_app_components, ...configWithoutComponents } = smilestore.config

@@ -32,17 +32,15 @@ export default {
   auto_save: import.meta.env.VITE_AUTO_SAVE_DATA,
   max_writes: import.meta.env.VITE_MAX_WRITES,
   min_write_interval: import.meta.env.VITE_MIN_WRITE_INTERVAL,
-  //show_progress_bar: import.meta.env.VITE_SHOW_PROGRESS_BAR,
-  // bug_reports: import.meta.env.VITE_BUG_REPORTS,
   random_seed: import.meta.env.VITE_RANDOM_SEED,
   deploy_url: import.meta.env.VITE_DEPLOY_URL, // auto compute this
-  //estimated_time: import.meta.env.VITE_ESTIMATED_TIME,
-  //payrate: import.meta.env.VITE_PAYRATE,
   lab_url: import.meta.env.VITE_LAB_URL,
   brand_logo_fn: import.meta.env.VITE_BRAND_LOGO_FN,
   google_analytics_id: import.meta.env.VITE_GOOGLE_ANALYTICS,
   windowsizer_request: parse_w_h(import.meta.env.VITE_WINDOWSIZER_REQUEST),
   windowsizer_aggressive: import.meta.env.VITE_WINDOWSIZER_AGGRESSIVE === 'true',
+  anonymous_mode: import.meta.env.VITE_ANONYMOUS_MODE === 'true',
+
   firebaseConfig: {
     apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
     authDomain: import.meta.env.VITE_FIREBASE_AUTHDOMAIN,
@@ -51,5 +49,4 @@ export default {
     messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGINGSENDERID,
     appId: import.meta.env.VITE_FIREBASE_APPID,
   },
-  anonymous_mode: import.meta.env.VITE_ANONYMOUS_MODE === 'true',
 }
