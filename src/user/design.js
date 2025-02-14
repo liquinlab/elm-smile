@@ -43,9 +43,6 @@ import useSmileStore from '@/core/stores/smilestore'
 import { onBeforeRouteLeave } from 'vue-router'
 const smilestore = useSmileStore()
 
-console.log('Logging smilestore')
-console.log(smilestore.getLocal)
-
 // #4.  Set runtime configuration options
 //      See http://smile.gureckislab.org/configuration.html#experiment-options-env
 api.setRuntimeConfig('allow_repeats', false)
