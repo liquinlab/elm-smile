@@ -13,8 +13,8 @@ accomplish more in less time.
 
 - Fast and fun front-end interface development with [Vue.js](https://vuejs.org)
   and [Bulma CSS](https://bulma.io). Make complex games, animations, and surveys
-  with ease using
-  [declarative programming and reactive data binding](/components#declarative-rendering-and-reactivity).
+  with ease.
+
 - Built-in support for [common experiment elements](/views#built-in-views) like
   consent forms, captchas, instructions, and surveys. Just add your custom
   experiment logic and start collecting data.
@@ -24,12 +24,18 @@ accomplish more in less time.
   devices.
 - Developer [mode](/developing) which makes it easier to debug and design
   experiments. Jump quickly between phases and trials in your experiments,
-  [autofill forms and generate fake data for testing](/autofill), visualize the
-  flow through your project, [hot-reload](/developing#hot-module-replacement)
-  the code you are working on without restarting the entire experiment, and
-  more!
+  [autofill forms and generate fake data for testing](/autofill),
+  [hot-reload](/developing#hot-module-replacement) the code you are working on
+  without restarting the entire experiment, and more!
+- Use Vue's
+  [declarative programming and reactive data binding](/components#declarative-rendering-and-reactivity)
+  to simplify your coding.
+- Code writing can be greatly accelerated using AI tools like
+  [Cursor](https://www.cursor.com/) because LLMs are trained on extensive
+  codebases covering VueJS, Bulma, and other popular web standards used by the
+  project.
 - Presentation [mode](/presentation) which provides a beautiful and interactive
-  demo site you can share with reviewers and collaborators.
+  demo website you can share with reviewers and collaborators.
 - Built-in support for multiple [recruitment services](/recruitment) including
   Prolific, MTurk, CloudResearch, and more.
 - Secure data storage and retrieval using a flexible, but easy-to-use

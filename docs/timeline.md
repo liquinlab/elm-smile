@@ -1,4 +1,4 @@
-# :twisted_rightwards_arrows: Timeline and Design
+# :twisted_rightwards_arrows: Timeline and Design File
 
 Web experiments are often composed of several parts presented in sequence. For
 example, we might show a welcome page &rarr; informed consent &rarr;
@@ -815,12 +815,3 @@ Note that Vue Router provides a variety of lifecycle hooks that you can
 customize for all or individual routes. See the documentation
 [here](https://router.vuejs.org/guide/advanced/navigation-guards.html#the-full-navigation-resolution-flow)
 for a full accounting of the order in which things occur.
-
-## Testing the Timeline
-
-The timeline has a full coverage test in `tests/vitest/timeline.test.js`. You
-can run that test in isolation with
-
-```
-npx vitest timeline
-```

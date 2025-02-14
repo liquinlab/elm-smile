@@ -65,10 +65,8 @@ Data from your experiment is stored, long-term, in a
 more of the details about this below. However, in terms of looking at this data
 and monitoring it during development, Google provides a web-based console that
 allows you to view the data from your experiment in real-time. To access the
-console, you first need to ask Todd (if you are in the gureckislab) for
-permission to access the lab Firestore from your Google Account (contact him
-with your preferred Google account name). Once he verifies you are added to the
-project go to
+console, you first need permission to access your project/labs Firestore from
+your Google Account. Once you are added to the project go to
 [https://console.firebase.google.com/](https://console.firebase.google.com/) and
 you should see something similar to this:
 
