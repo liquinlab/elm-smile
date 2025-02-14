@@ -60,8 +60,6 @@ for (let trialType of trialTypes) {
   })
 }
 
-console.log('raw trials', trials)
-
 api.debug(trials)
 
 // next we shuffle the trials
@@ -69,14 +67,14 @@ trials = api.shuffle(trials)
 
 function autofill() {
   api.debug('running autofill')
-  while (step_index.value < trials.length) {
+  while (step.index() < trials.length) {
     api.debug('auto stepping')
 
-    var t = api.faker.render(trials[step_index.value])
+    var t = api.faker.render(trials[step.index()])
     api.debug(t)
     api.recordTrialData(t)
 
-    nextStep()
+    step.next()
   }
   // step to where we want to go
 }
@@ -90,10 +88,8 @@ api.setPageAutofill(autofill)
 // or analysis (e.g., if you are showing the subject performance feedback about
 // their performance on the task).  it called the finalize() function which is
 // defined below
-const { nextStep, prevStep, step, step_index } = api.useStepper(trials, () => {
-  finalize()
-})
-
+const step = api.useStepper(trials)
+var final_score = ref(0)
 // const trial = computed(() => {
 //   return trials[api.getCurrentTrial()]
 // })
@@ -102,45 +98,42 @@ const { nextStep, prevStep, step, step_index } = api.useStepper(trials, () => {
 // onKeyDown is a composable from the VueUse package
 // it takes a list of keys to list for each time a key
 // is pressed runs the provided function.
-onKeyDown(
+const stop = onKeyDown(
   ['r', 'R', 'g', 'G', 'b', 'B'],
   (e) => {
-    if (step_index.value < trials.length) {
+    if (step.index() < trials.length) {
       e.preventDefault()
       api.debug('pressed ${e}')
       if (['r', 'R'].includes(e.key)) {
+        // handle Red
         api.debug('red')
       } else if (['g', 'G'].includes(e.key)) {
+        // handle Green
         api.debug('green')
       } else if (['b', 'B'].includes(e.key)) {
+        // handle Blue
         api.debug('blue')
       }
-      api.debug(`${step.value}`)
       api.recordTrialData({
-        trialnum: step_index.value,
-        word: step.value.word,
-        color: step.value.color,
-        condition: step.value.condition,
+        trialnum: step.index(),
+        word: step.current().word,
+        color: step.current().color,
+        condition: step.current().condition,
         response: e.key,
       })
-      nextStep()
+      step.next()
+
+      // if we are at the end of the trials, compute a final score
+      if (step.index() >= trials.length) {
+        final_score.value = 100
+        stop() // This removes the keydown listener
+      }
     }
   },
   { dedupe: true }
 )
 
-// load up the trials including any randomization based on the random see
-// initialize the state of the component
-// set up the call backs that take you through the task
-var final_score = ref(0)
-function finalize() {
-  // sort out what data you are putting in the smile store here?
-  api.debug('finished, so will save data and stuff')
-  final_score.value = 100 // compute a final score here
-}
-
 function finish() {
-  // do stuff if you want
   api.goNextView()
 }
 </script>
@@ -148,9 +141,9 @@ function finish() {
 <template>
   <div class="page prevent-select">
     <!-- Show this for each trial -->
-    <div class="strooptrial" v-if="step_index < trials.length">
-      {{ step_index + 1 }} / {{ trials.length }}
-      <h1 class="title is-1 is-huge" :class="step.color">{{ step.word }}</h1>
+    <div class="strooptrial" v-if="step.index() < trials.length">
+      {{ step.index() }} / {{ trials.length }}
+      <h1 class="title is-1 is-huge" :class="step.current().color">{{ step.current().word }}</h1>
       <p id="prompt">Type "R" for Red, "B" for blue, "G" for green.</p>
     </div>
 

@@ -43,14 +43,7 @@ const currentTab = computed(() => {
 // 5 - human brain should show stroop interference
 // 6 -
 
-const { nextStep } = api.useStepper(pages, () => {
-  finalize()
-})
-
-function finalize() {
-  // sort out what data you are putting in the smile store here?
-  api.log('finished, so will save data and stuff')
-}
+const step = api.useStepper(pages)
 
 function next_trial() {
   if (api.getCurrentTrial() >= pages.length - 1) {
@@ -58,7 +51,7 @@ function next_trial() {
     finish()
   } else {
     ///api.incrementTrial()
-    nextStep()
+    step.next()
   }
 }
 
@@ -70,7 +63,7 @@ function finish() {
 
 <template>
   <div class="page">
-    <div class="instructions" v-if="api.getCurrentTrial() >= pages.length">
+    <div class="instructions" v-if="step.index() >= pages.length">
       <div class="formstep">
         <article class="message is-danger">
           <div class="message-header">

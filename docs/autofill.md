@@ -128,14 +128,14 @@ template and return the result. For example:
 trials = api.shuffle(trials)
 
 function autofill() {
-  while (step_index.value < trials.length) {
+  while (step.index() < trials.length) {
     api.debug('auto stepping')
 
-    var t = api.faker.render(trials[step_index.value])
+    var t = api.faker.render(trials[step.index()])
     api.debug(t)
     api.recordTrialData(t)
 
-    nextStep()
+    step.next()
   }
 }
 

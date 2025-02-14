@@ -25,9 +25,7 @@ var trials = [
 // next we shuffle the trials
 trials = api.shuffle(trials)
 
-const { nextStep, prevStep, step, step_index } = api.useStepper(trials, api.currentRouteName(), () => {
-  finalize()
-})
+const step = api.useStepper(trials)
 
 // const index = ref(0)
 // trials = shuffle(trials) // shuffle is not "in place"
@@ -36,28 +34,17 @@ const { nextStep, prevStep, step, step_index } = api.useStepper(trials, api.curr
 // initialize the state of the component
 // set up the call backs that take you through the task
 
-function finalize() {
-  // sort out what data you are putting in the smile store here?
-  api.debug('finished ')
-  finish()
-}
-
-function finish() {
-  // do stuff if you want
-  api.goNextView()
-}
-
 function next() {
-  if (step_index < trials.length - 1) {
-    nextStep()
+  if (step.index() < trials.length - 1) {
+    step.next()
   } else {
     api.goNextView()
   }
 }
 
 function prev() {
-  if (step_index > 0) {
-    prevStep()
+  if (step.index() > 0) {
+    step.prev()
   }
 }
 // custom advance to next route when we finish showing all the trials
@@ -73,8 +60,8 @@ function prev() {
 <template>
   <div class="page prevent-select">
     <h1 class="title is-3">Task 2</h1>
-    {{ step.sentence }}/{{ step_index }}<br /><br />
-    <button class="button is-success is-light" id="finish" @click="prev()" v-if="step_index > 0">
+    {{ step.current().sentence }}/{{ step.index() }}<br /><br />
+    <button class="button is-success is-light" id="finish" @click="prev()" v-if="step.index() > 0">
       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; prev
     </button>
     &nbsp;&nbsp;&nbsp;

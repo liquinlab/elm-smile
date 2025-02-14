@@ -65,9 +65,7 @@ api.setPageAutofill(autofill)
 
 // Update the pages array to use randomizedQuestions length
 const pages = randomizedQuestions.value.map((_, index) => `page${index + 1}`)
-const stepper = api.useStepper(pages, () => {
-  finish()
-})
+const step = api.useStepper(pages)
 
 // Update quizState to use randomizedQuestions length
 const quizState = reactive({
@@ -84,10 +82,10 @@ const quizCorrect = computed(() =>
   )
 )
 const currentPageComplete = computed(() => {
-  if (!quizState.answers || !quizState.answers[step_index.value]) {
+  if (!quizState.answers || !quizState.answers[step.index()]) {
     return false
   }
-  return quizState.answers[step_index.value].every((answer) => answer !== null)
+  return quizState.answers[step.index()].every((answer) => answer !== null)
 })
 
 function submitQuiz() {
@@ -104,7 +102,7 @@ function submitQuiz() {
 }
 
 function returnInstructions() {
-  resetStep() // reset the quiz
+  step.reset() // reset the quiz
   randomizeQuestions() // re-randomize questions
   api.gotoView(props.returnTo)
 }
@@ -118,7 +116,7 @@ function finish() {
   <div class="page prevent-select">
     <div class="formcontent">
       <!-- Replace the two quiz page sections with this single dynamic one -->
-      <div class="formstep" v-if="quizState.page === 'quiz' && step_index < randomizedQuestions.length">
+      <div class="formstep" v-if="quizState.page === 'quiz' && step.index() < randomizedQuestions.length">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
@@ -137,13 +135,15 @@ function finish() {
           </div>
           <div class="column">
             <div class="box is-shadowless formbox">
-              <div v-for="question in randomizedQuestions[step_index].questions" :key="question.id" class="mb-5">
+              <div v-for="question in randomizedQuestions[step.index()].questions" :key="question.id" class="mb-5">
                 <FormKit
                   type="select"
                   :label="question.question"
                   :name="question.id"
                   placeholder="Select an option"
-                  v-model="quizState.answers[step_index][randomizedQuestions[step_index].questions.indexOf(question)]"
+                  v-model="
+                    quizState.answers[step.index()][randomizedQuestions[step.index()].questions.indexOf(question)]
+                  "
                   :options="question.answers"
                   validation="required"
                 />
@@ -152,7 +152,7 @@ function finish() {
               <div class="columns">
                 <div class="column">
                   <div class="has-text-left">
-                    <button v-if="step_index > 0" class="button is-warning" @click="prevStep">
+                    <button v-if="step.index() > 0" class="button is-warning" @click="step.prev">
                       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous page
                     </button>
                   </div>
@@ -161,11 +161,11 @@ function finish() {
                   <div class="has-text-right">
                     <button
                       v-if="currentPageComplete"
-                      :class="['button', step_index === randomizedQuestions.length - 1 ? 'is-success' : 'is-warning']"
-                      @click="step_index === randomizedQuestions.length - 1 ? submitQuiz() : nextStep()"
+                      :class="['button', step.index() === randomizedQuestions.length - 1 ? 'is-success' : 'is-warning']"
+                      @click="step.index() === randomizedQuestions.length - 1 ? submitQuiz() : step.next()"
                     >
-                      {{ step_index === randomizedQuestions.length - 1 ? 'Submit' : 'Next page' }}
-                      <template v-if="step_index !== randomizedQuestions.length - 1">
+                      {{ step.index() === randomizedQuestions.length - 1 ? 'Submit' : 'Next page' }}
+                      <template v-if="step.index() !== randomizedQuestions.length - 1">
                         &nbsp;<FAIcon icon="fa-solid fa-arrow-right" />
                       </template>
                     </button>

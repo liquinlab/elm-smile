@@ -4,7 +4,7 @@ import useSmileStore from '@/core/stores/smilestore'
 import useLog from '@/core/stores/log'
 import { useRoute } from 'vue-router'
 
-export function useStepper(trials, finishedCallback) {
+export function useStepper(trials) {
   const smilestore = useSmileStore()
   const log = useLog()
   const route = useRoute()
@@ -21,7 +21,7 @@ export function useStepper(trials, finishedCallback) {
       smilestore.incrementPageTracker(page)
     } else {
       smilestore.incrementPageTracker(page)
-      finishedCallback()
+      //finishedCallback()
     }
   }
 
@@ -37,15 +37,22 @@ export function useStepper(trials, finishedCallback) {
     smilestore.resetPageTracker(page)
   }
 
-  const step = computed(() => {
-    return trials[smilestore.getPageTracker(page)]
-  })
-
   const step_index = computed(() => {
     return smilestore.getPageTracker(page)
   })
 
-  return { nextStep, prevStep, resetStep, step, step_index }
+  const step = computed(() => {
+    return trials[step_index.value]
+  })
+
+  return {
+    next: nextStep,
+    prev: prevStep,
+    reset: resetStep,
+    // Simple getters for reactive versions
+    index: () => step_index.value,
+    current: () => step.value,
+  }
 }
 
 export function useStatelessStepper(trials, index, finishedCallback) {
