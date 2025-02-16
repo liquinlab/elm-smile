@@ -6,7 +6,7 @@ basic structure many times. Smile provides several features for organizing and
 managing trials or other sequenced elements _within_ a View (the
 [Timeline](/timeline) is used to sequence across Views).
 
-<img src="/images/steps.png" width="550" alt="timeline example" style="margin: auto;">
+<img src="/images/steps.png" width="600" alt="steps example" style="margin: auto;">
 
 Here, we introduce the concept of a "step" and how to programmatically advance
 through a sequence of steps within a particular View. The same concept is also

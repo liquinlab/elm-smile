@@ -90,7 +90,7 @@ by using the built-in <SmileText/> stepped Views feature if a participant
 refreshes the page or loses internet connection, they can pick up where they
 left off.
 
-<img src="/images/steps.png" width="500" alt="timeline example" style="margin: auto;">
+<img src="/images/steps.png" width="600" alt="steps example" style="margin: auto;">
 
 ## :writing_hand: Autofill
 
