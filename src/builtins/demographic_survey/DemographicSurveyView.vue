@@ -68,7 +68,6 @@ const { nextStep, prevStep, step_index } = api.useStepper(pages, () => {
 })
 
 function finish() {
-  api.removePageAutofill() // you are responsible for removing the autofill
   api.saveForm('demographic', forminfo)
   api.stepNextView()
 }
@@ -77,7 +76,7 @@ function finish() {
 <template>
   <div class="page prevent-select">
     <div class="formcontent">
-      <h3 class="is-size-4 has-text-weight-bold">Demographic Information</h3>
+      <h3 class="is-size-3 has-text-weight-bold"><FAIcon icon="fa-solid fa-person" />&nbsp;Demographic Information</h3>
       <p class="is-size-6">
         We request some information about you which we can use to understand aggregate differences between individuals.
         Your privacy will be maintained and the data will not be linked to your online identity (e.g., email).
@@ -88,7 +87,7 @@ function finish() {
           <div class="column is-one-third">
             <div class="formsectionexplainer">
               <h3 class="is-size-6 has-text-weight-bold">Basic Info</h3>
-              <p class="is-size-7">First, we need some basic, generic information about you.</p>
+              <p class="is-size-6">First, we need some basic, generic information about you.</p>
             </div>
           </div>
           <div class="column">
@@ -170,7 +169,7 @@ function finish() {
           <div class="column is-one-third">
             <div class="formsectionexplainer">
               <h3 class="is-size-6 has-text-weight-bold">Psychological Information</h3>
-              <p class="is-size-7">Next, we need some basic information about your ability to perceive this study.</p>
+              <p class="is-size-6">Next, we need some basic information about your ability to perceive this study.</p>
             </div>
           </div>
           <div class="column">
@@ -253,7 +252,7 @@ function finish() {
           <div class="column is-one-third">
             <div class="formsectionexplainer">
               <h3 class="is-size-6 has-text-weight-bold">Household Info</h3>
-              <p class="is-size-7">Finally we need some basic household information.</p>
+              <p class="is-size-6">Finally we need some basic household information.</p>
             </div>
           </div>
           <div class="column">

@@ -16,10 +16,10 @@ There are two main places to put static content in a <SmileText/> project.
 
 The first place is the assets folder (specifically, `/src/user/assets/` folders
 in the project directory). Files in the assets folders are preprocessed in a
-slightly helpful way. In particular, when your Smile project is "built" for
-deployment images and other files in the assets folder are copied to the `/dist`
-folder with a unique hash code appended to the filename (e.g., `logo.png` might
-be renamed `logo-139efdf89.png`) and the references to those images are
+helpful way. In particular, when your Smile project is "built" for deployment
+images and other files in the assets folder are copied to the `/dist` folder
+with a unique hash code appended to the filename (e.g., `logo.png` might be
+renamed `logo-139efdf89.png`) and the references to those images are
 automatically updated in your code. This is done to ensure that the browser does
 not cache the previous version of the image. ==This can be really helpful== to
 ensure that participants (and yourself) do not see old versions of images that
@@ -49,17 +49,13 @@ you want to use the public folder.
 You could then be able to link to this image on another website like this:
 
 ```html
-<img
-  src="https://exps.gureckislab.org/e/something-something-something/logo.png"
-  alt="logo"
-/>
+<img src="https://exps.gureckislab.org/e/xx-xx-xx/logo.png" alt="logo" />
 ```
 
 where the specific link depends on the final build destination of your
-experiment (see
-[this](http://localhost:5173/deploying.html#what-url-do-you-send-participants-to)).
-(If you tried linking to content in the assets folder, it might change the
-filename from one build to the next).
+experiment (see [this](/deploying#what-url-do-you-send-participants-to)). (If
+you tried linking to content in the assets folder, it might change the filename
+from one build to the next).
 
 ## Referring to static assets using code
 

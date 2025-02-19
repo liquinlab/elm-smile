@@ -1,6 +1,10 @@
 <script setup>
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
+
+import { useKeyModifier } from '@vueuse/core'
+const altKeyState = useKeyModifier('Alt')
+
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
@@ -11,7 +15,7 @@ const router = useRouter()
     <p class="control" v-if="api.hasPrevView()">
       <button
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
-        v-on:click="router.go(-1)"
+        v-on:click="api.gotoView(route?.meta?.prev)"
         data-tooltip="Previous page"
       >
         <span>
@@ -28,6 +32,18 @@ const router = useRouter()
     </p>
     <p class="control">
       <button
+        v-if="altKeyState"
+        class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
+        v-on:click="api.resetTrial()"
+        data-tooltip="Reset trial to 0"
+        :disabled="api.dev.page_provides_trial_stepper == false"
+      >
+        <span>
+          <FAIcon icon="fa-solid fa-circle-chevron-left" />
+        </span>
+      </button>
+      <button
+        v-else
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
         v-on:click="api.decrementTrial()"
         data-tooltip="Step trial back"

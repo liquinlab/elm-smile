@@ -19,9 +19,7 @@ function finish() {
   <div class="page prevent-select">
     <h1 class="title is-3">Experiment</h1>
     <hr />
-    <video id="cat" width="200px" playsinline autoplay muted loop preload="auto"></video>
-    <br>
-    <button class="button is-success is-light" id="finish" @click="finish()">
+    <button class="button is-success" id="finish" @click="finish()">
       next &nbsp;
       <FAIcon icon="fa-solid fa-arrow-right" />
     </button>

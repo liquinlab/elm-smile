@@ -41,6 +41,13 @@ available methods and their descriptions.
 - `saveForm(name, data)`: Saves form data.
 - `getVerifiedVisibility()`: Retrieves the verified visibility state.
 - `setCompletionCode(code)`: Sets the completion code for the experiment.
+- `resetApp()`: Resets the entire application state.
+- `isResetApp()`: Checks if the app has been reset.
+- `setAppComponent(key, value)`: Sets a global component configuration.
+- `getAppComponent(key)`: Retrieves a global component configuration.
+- `setRuntimeConfig(key, value)`: Sets a runtime configuration option.
+- `getConfig(key)`: Retrieves a configuration option (first searches config then
+  runtime)
 
 ## Data and Configuration Access
 
@@ -52,6 +59,8 @@ available methods and their descriptions.
 - `route`: Accesses the current route.
 - `router`: Accesses the router object.
 - `urls`: Accesses URL configurations.
+- `private`: Accesses private data store.
+- `all_data`: Accesses combined private and data stores.
 
 ## Utility Functions
 
@@ -80,6 +89,17 @@ available methods and their descriptions.
   by the smile library in `src/assets`. See
   [Images and Video](/imagesvideo#referring-to-static-assets-using-code) for
   more information.
+- `randomSeed(seed)`: Sets a new global random seed that will remain in use
+  until the next route.
+- `randomAssignCondition(conditionObject)`: Randomly assigns a condition based
+  on the provided condition object. Supports weighted randomization.
+- `getConditionByName(name)`: Retrieves a condition by its name.
+- `randomInt()`: Generates a random integer.
+- `sampleWithReplacement()`: Samples items from an array with replacement.
+- `sampleWithoutReplacement()`: Samples items from an array without replacement.
+- `setRuntimeConfig(key, value)`: Sets a runtime configuration option.
+- `getConfig(key)`: Retrieves a configuration option (first searches config then
+  runtime)
 
 ## Logging and Debugging
 
@@ -95,7 +115,9 @@ available methods and their descriptions.
 - `decrementTrial()`: Decrements the trial counter.
 - `resetTrial()`: Resets the trial counter.
 - `saveData(force)`: Saves the current data (force save if specified).
-- `saveTrialData(data)`: Saves trial-specific data.
+- `recordTrialData(data)`: Records trial-specific data. This does not save the
+  data to the database, but it does record it in the local state. The next call
+  to `saveData()` will save the data to the database.
 
 ## Consent Management
 

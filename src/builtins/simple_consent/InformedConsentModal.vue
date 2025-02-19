@@ -1,5 +1,7 @@
 <script setup>
-import InformedConsentText from '@/builtins/simple-consent/InformedConsentText.vue'
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
+//import InformedConsentText from '@/user/components/InformedConsentText.vue'
 </script>
 
 <template>
@@ -8,7 +10,7 @@ import InformedConsentText from '@/builtins/simple-consent/InformedConsentText.v
       <p>Informed Consent</p>
     </div>
     <div class="message-body has-text-left mr-7 pb-8">
-      <InformedConsentText />
+      <component :is="api.getAppComponent('informed_consent_text')" />
       <!-- load text of consent form -->
       <div class="has-text-right mt-5">
         <button class="button" aria-label="close" @click="$emit('toggleConsent')">

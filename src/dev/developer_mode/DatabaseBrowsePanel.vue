@@ -4,7 +4,7 @@ import DatabaseList from '@/dev/developer_mode/DatabaseList.vue'
 import SmileAPI from '@/core/composables/useAPI'
 const api = SmileAPI()
 
-const browse_panels = reactive({ path: ['data', null, null] })
+const browse_panels = reactive({ path: ['/', null, null] })
 
 onMounted(() => {
   if (api.dev.data_path !== null) {
@@ -83,7 +83,8 @@ function panel_jump(index) {
         <template v-for="(option, index) in browse_panels.path">
           <li v-if="option !== null" :class="{ 'is-active': index == n_active_panels - 1 }">
             <a @click="panel_jump(index)">
-              <template v-if="option == 'data'"><FAIcon icon="fa-solid fa-home" />&nbsp;&nbsp;</template>{{ option }}
+              <template v-if="option == '/'"><FAIcon icon="fa-solid fa-home" />&nbsp;</template>
+              <template v-else>{{ option }}</template>
             </a>
           </li>
         </template>

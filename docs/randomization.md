@@ -5,9 +5,7 @@ in a random order, stimuli are randomly selected from a large pool of possible
 stimuli, participants are randomly assigned to conditions, etc.
 
 This page shows how to generate random numbers in <SmileText />, and how to use
-random numbers to accomplish each of the above tasks. This page also shows how
-to assign participants to conditions in a <i>balanced</i> way, so you end up
-with roughly the same number of participants in each condition.
+random numbers to accomplish each of the above tasks.
 
 ## Seeded random number generation
 
@@ -91,7 +89,7 @@ Generates a random integer between min and max (both inclusive). For example,
 this can be used to assign a participant to a (numbered) condition.
 
 ```js
-import * as random from '@/randomization'
+import * as random from '@/core/randomization'
 
 // generate a random integer: 1, 2, 3, 4, or 5
 const condition = random.randomInt(1, 5)
@@ -103,7 +101,7 @@ Randomly shuffles an array. For example, this can be used to present some fixed
 stimuli in a random order.
 
 ```js
-import * as random from '@/randomization'
+import * as random from '@/core/randomization'
 
 const stimuli = [
   'image1.png',
@@ -123,7 +121,7 @@ Samples **without** replacement from an array. For example, this can be used to
 randomly present 3 stimuli from a larger set.
 
 ```js
-import * as random from '@/randomization'
+import * as random from '@/core/randomization'
 
 const stimuli = [
   'image1.png',
@@ -144,7 +142,7 @@ randomly present 3 stimuli from a larger set (with the possibility of presenting
 the same stimulus twice).
 
 ```js
-import * as random from '@/randomization'
+import * as random from '@/core/randomization'
 
 const stimuli = [
   'image1.png',
@@ -164,7 +162,7 @@ Computes the cartesian product of any number of arrays. For example, this can be
 used to get all permutations of three condition variables.
 
 ```js
-import * as random from '@/randomization'
+import * as random from '@/core/randomization'
 
 const stimuli = [
   'image1.png',
@@ -189,142 +187,24 @@ It is possible to randomize the order of routes in the timeline. See
 
 In rare cases, it may be desirable to generate "true" or "unseeded" random
 numbers (by default `Math.random()` actually does set a seed, but it's set
-automatically using other random stuff). To do so, you can make a local instance
-of a random number generator using the `seedrandom` library:
+automatically using other random stuff). To do so, you can use the smile API:
 
 ```js
-import seedrandom from 'seedrandom'
+const api = useAPI()
 
-const rng = seedrandom()
-
-// number will not be reproducible
-rng()
+// randomize seed each time component is loaded
+api.randomSeed()
 ```
 
-## Balanced condition assignment
-
-Sometimes, it is desirable to <i>balance</i> condition assignment, so that
-roughly even numbers of participants are assigned to each condition. Note that
-balanced condition assignment is <b>NOT</b> (completely) random. In addition, it
-doesn't take into account whether participants leave the experiment
-early&mdash;so each condition will have an equal number of participants who
-<i>start</i> the experiment, but not necessarily who <i>finish</i> the
-experiment.
-
-### Assigning conditions
-
-To balance condition assignment, all you need to do is add a field called
-`possibleConditions` to the local state (in `src/smilestore.js`):
+This will initialize the components with a random seed on each load of the View.
+You can also provide a fixed seed using the same function:
 
 ```js
-export default defineStore('smilestore', {
-state: () => ({
-    local: useStorage(appconfig.local_storage_key, {
-      // other fields here,
-      possibleConditions: {cond2: ["X", "Y"]},
-    }
+const api = useAPI()
+
+// set to a known seed
+api.randomSeed(12344)
 ```
-
-`possibleConditions` should include any named conditions that you want to
-balance. For example, the above experiment will balance condition assignment
-between two conditions: `X` and `Y`. This distinction between `X` and `Y` is
-named `cond2`.
-
-You can also balance assignment between multiple conditions. For example, let's
-say you want to assign two conditions: the order in which some tasks are
-presented, and which instructions are presented. You can set
-`possibleConditions` as follows:
-
-```js
-export default defineStore('smilestore', {
-state: () => ({
-    local: useStorage(appconfig.local_storage_key, {
-      // other fields here,
-      possibleConditions: {taskOrder: ["AFirst", "BFirst"], instructions: ["version1", "version2", "version3"]},
-    }
-```
-
-When you have multiple condition variables, assignment will be balanced across
-all combinations of all variables. In the above example, that means equal
-numbers of participants will be assigned to AFirst-version1, AFirst-version2,
-AFirst-version3, BFirst-version1, BFirst-version2, and BFirst-verstion3.
-
-Random condition assignment occurs when the global data store is first connected
-to the Firestore database. By default, this occurs after the participant signs
-the consent form, in `src/ConsentPage.vue`, using the `smilestore.setKnown()`
-function. If you need access to the assigned condition before the consent page
-(or immediately after, since condition assignment happens asynchronously), you
-may need to adjust when this function is called.
-
-### How does it work?
-
-In the Firestore database, <SmileText /> maintains a collection called
-`counters` for each experiment. One of the counters is a document called
-`conditions`, which stores the number of participants assigned to each condition
-(or combination of conditions).
-
-![ConditionCounter](/images/conditioncounter.png)
-
-Every time a new participant connects to the Firestore database, <SmileText />
-looks at these condition counts and finds which condition(s) have the lowest
-count. If there is only one condition/combination with the lowest count, the
-participant is assigned to that condition/combination. If there are multiple
-conditions/combinations with the lowest count, the participant is assigned at
-random to one of those conditions/combinations.
-
-**WARNING**: If the local store `possibleConditions` is changed (e.g., if you
-add a condition, rename one of the conditions, or even switch the order of
-multiple named condition groups), the condition counter in Firestore will
-completely reset when the next participant begins the study. All existing counts
-will be set to zero, and any conditions that are no longer in
-`possibleConditions` will be erased from the counter.
-
-### Accessing the assigned conditions
-
-By default, the assigned conditions will be saved to the global store, in a
-field called `conditions`. They can be accessed within a component using a
-getter called `getConditions`.
-
-```js
-import useSmileStore from '@/core/stores/smilestore' // get access to the global store
-
-const smilestore = useSmileStore()
-
-const conds = smilestore.getConditions
-console.log(conds.taskOrder)
-```
-
-If you want to use these conditions in a component (for example, displaying
-different instructions based on the assigned condition), you need to use a
-[Vue computed property](https://vuejs.org/guide/essentials/computed.html). This
-is because the conditions are reactive. If you just try to access
-`smilestore.getConditions` directly, the component will not update when the
-conditions change. Here is an example of defining a computed property based on
-the conditions:
-
-```js
-import { computed } from 'vue'
-import useSmileStore from '@/core/stores/smilestore'
-
-const smilestore = useSmileStore()
-
-const instText = computed(() => {
-  if (smilestore.getConditions.instructions === 'version1') {
-    return 'instructions version 1'
-  }
-  if (smilestore.getConditions.instructions === 'version2') {
-    return 'instructions version 2'
-  }
-  if (smilestore.getConditions.instructions === 'version3') {
-    return 'instructions version 3'
-  }
-  return 'no condition set'
-})
-```
-
-If you then refer to `instText` in your `<template>` section, the component will
-display the correct instructions based on the assigned condition (or "no
-condition set" if no condition has been assigned yet).
 
 ## Override randomization for debugging
 

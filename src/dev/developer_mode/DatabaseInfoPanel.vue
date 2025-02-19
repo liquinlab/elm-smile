@@ -83,22 +83,24 @@ onBeforeUnmount(() => {
           <p v-else>User <b>has</b> been seen before.</p>
           <br />
           <table class="table is-hoverable is-striped is-fullwidth">
-            <tr>
-              <th width="55%"></th>
-              <th></th>
-            </tr>
-            <tr>
-              <td class="has-text-left"><b>Last route:</b></td>
-              <td class="has-text-left is-family-code is-size-7">{{ '/' + api.local.lastRoute }}</td>
-            </tr>
-            <tr>
-              <td class="has-text-left"><b>Is done:</b></td>
-              <td class="has-text-left is-family-code is-size-7">{{ api.local.done }}</td>
-            </tr>
-            <tr>
-              <td class="has-text-left"><b>Allow repeat:</b></td>
-              <td class="has-text-left is-family-code is-size-7">{{ api.config.allow_repeats }}</td>
-            </tr>
+            <tbody>
+              <tr>
+                <th width="55%"></th>
+                <th></th>
+              </tr>
+              <tr>
+                <td class="has-text-left"><b>Last route:</b></td>
+                <td class="has-text-left is-family-code is-size-7">{{ '/' + api.local.lastRoute }}</td>
+              </tr>
+              <tr>
+                <td class="has-text-left"><b>Is done:</b></td>
+                <td class="has-text-left is-family-code is-size-7">{{ api.local.done }}</td>
+              </tr>
+              <tr>
+                <td class="has-text-left"><b>Allow repeat:</b></td>
+                <td class="has-text-left is-family-code is-size-7">{{ api.config.allow_repeats }}</td>
+              </tr>
+            </tbody>
           </table>
 
           <!--
@@ -124,30 +126,32 @@ onBeforeUnmount(() => {
           <p v-else>Database is connected.</p>
           <br />
           <table class="table is-hoverable is-striped is-fullwidth">
-            <tr>
-              <th width="40%"></th>
-              <th></th>
-            </tr>
-            <tr>
-              <td class="has-text-left"><b>Mode:</b></td>
-              <td class="has-text-left is-family-code is-size-7">
-                {{ api.config.mode == 'development' ? 'testing' : 'live' }}
-              </td>
-            </tr>
-            <tr>
-              <td class="has-text-left"><b>Project:</b></td>
-              <td class="has-text-left is-family-code is-size-7">{{ api.config.firebaseConfig.projectId }}</td>
-            </tr>
-            <tr>
-              <td class="has-text-left"><b>DocRef:</b></td>
-              <td class="has-text-left is-family-code is-size-7">
-                {{ api.local.docRef }}&nbsp;&nbsp;<a
-                  v-if="api.local.docRef"
-                  @click.prevent="open_firebase_console(firebase_url)"
-                  ><FAIcon icon="fa-solid fa-square-up-right"
-                /></a>
-              </td>
-            </tr>
+            <tbody>
+              <tr>
+                <th width="40%"></th>
+                <th></th>
+              </tr>
+              <tr>
+                <td class="has-text-left"><b>Mode:</b></td>
+                <td class="has-text-left is-family-code is-size-7">
+                  {{ api.config.mode == 'development' ? 'testing' : 'live' }}
+                </td>
+              </tr>
+              <tr>
+                <td class="has-text-left"><b>Project:</b></td>
+                <td class="has-text-left is-family-code is-size-7">{{ api.config.firebaseConfig.projectId }}</td>
+              </tr>
+              <tr>
+                <td class="has-text-left"><b>DocRef:</b></td>
+                <td class="has-text-left is-family-code is-size-7">
+                  {{ api.local.docRef }}&nbsp;&nbsp;<a
+                    v-if="api.local.docRef"
+                    @click.prevent="open_firebase_console(firebase_url)"
+                    ><FAIcon icon="fa-solid fa-square-up-right"
+                  /></a>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>
@@ -165,33 +169,35 @@ onBeforeUnmount(() => {
 
           <br />
           <table class="table is-hoverable is-striped is-fullwidth">
-            <tr>
-              <th width="40%"></th>
-              <th></th>
-            </tr>
-            <tr>
-              <td class="has-text-left"><b>Writes:</b></td>
-              <td class="has-text-left is-family-code is-size-7">
-                {{ api.local.totalWrites }} out of {{ api.config.max_writes }} max
-              </td>
-            </tr>
-            <tr>
-              <td class="has-text-left"><b>Last write:</b></td>
-              <td class="has-text-left is-family-code is-size-7">
-                {{ last_write_time_string }}
-              </td>
-            </tr>
-            <tr>
-              <td class="has-text-left"><b>Auto save:</b></td>
-              <td class="has-text-left is-family-code is-size-7">{{ api.config.auto_save }}</td>
-            </tr>
-            <tr>
-              <td class="has-text-left"><b>Approx size:</b></td>
-              <td class="has-text-left is-family-code is-size-7">
-                {{ api.local.approx_data_size }} / 1,048,576 max<br />
-                ({{ Math.round((api.local.approx_data_size / 1048576) * 1000) / 1000 }}%)
-              </td>
-            </tr>
+            <tbody>
+              <tr>
+                <th width="40%"></th>
+                <th></th>
+              </tr>
+              <tr>
+                <td class="has-text-left"><b>Writes:</b></td>
+                <td class="has-text-left is-family-code is-size-7">
+                  {{ api.local.totalWrites }} out of {{ api.config.max_writes }} max
+                </td>
+              </tr>
+              <tr>
+                <td class="has-text-left"><b>Last write:</b></td>
+                <td class="has-text-left is-family-code is-size-7">
+                  {{ last_write_time_string }}
+                </td>
+              </tr>
+              <tr>
+                <td class="has-text-left"><b>Auto save:</b></td>
+                <td class="has-text-left is-family-code is-size-7">{{ api.config.auto_save }}</td>
+              </tr>
+              <tr>
+                <td class="has-text-left"><b>Approx size:</b></td>
+                <td class="has-text-left is-family-code is-size-7">
+                  {{ api.local.approx_data_size }} / 1,048,576 max<br />
+                  ({{ Math.round((api.local.approx_data_size / 1048576) * 1000) / 1000 }}%)
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>

@@ -78,7 +78,7 @@ function prev() {
       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; prev
     </button>
     &nbsp;&nbsp;&nbsp;
-    <button class="button is-success is-light" id="finish" @click="next()">
+    <button class="button is-success" id="finish" @click="next()">
       next &nbsp;
       <FAIcon icon="fa-solid fa-arrow-right" />
     </button>

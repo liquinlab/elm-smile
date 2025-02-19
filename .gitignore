@@ -28,3 +28,4 @@ dist-ssr
 /css/styles.css
 /docs/.vitepress/cache
 /public/qr.svg
+/data/private/**

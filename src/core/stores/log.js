@@ -76,7 +76,6 @@ export default defineStore('log', {
     warn(...args) {
       const api = useAPI()
       const message = argsToString(args)
-      console.warn(message)
       const msg = {
         type: 'warn',
         time: new Date().toLocaleTimeString('en-US', { timeZoneName: 'short' }),

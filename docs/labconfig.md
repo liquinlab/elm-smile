@@ -28,11 +28,12 @@ developing and launching experiments relatively painless.
   there are some technical limits, see [here](/datastorage) for more info).
 
 - **Slack** (weakly required).  
-   In order notify you and your other lab members when certain tasks are complete
-  or if there are errors, Smile uses a slack bot. You need to have a Slack account
-  and get API keys to enable this. If you don't want to use Slack it is possible
-  to modify the scripts to provide notifications another way (e.g., email) but currently,
-  that is not implemented and you'd have to research that yourself.
+   In order notify you and your other lab members when certain tasks are
+  complete or if there are errors, Smile uses a slack bot. You need to have a
+  Slack account and get API keys to enable this. If you don't want to use Slack
+  it is possible to modify the scripts to provide notifications another way
+  (e.g., email) but currently, that is not implemented and you'd have to
+  research that yourself.
 
   ::: info Slack alternatives
 
@@ -287,8 +288,6 @@ VITE_FIREBASE_APPID              = xxxx
 # enter google analytics id
 VITE_GOOGLE_ANALYTICS            = xxxx
 
-# configure your experiment here
-VITE_BUG_REPORTS                 = ""
 ```
 
 You will want to replace the values for the entires that contain the word
@@ -371,8 +370,12 @@ Next, create a `gpg` RSA key pair for yourself (e.g., lab manager/pi) see
 type:
 
 ```
-gpg --gen-key
+gpg --full-generate-key
 ```
+
+In the prompts just choose the default options and make sure to remember the
+passphrase you use. You also will want to set the expiration of the key to 0
+(never expire).
 
 Next, add the first user to your repo:
 

@@ -512,53 +512,55 @@ official recommendation of the
 Second, components should be organized into folders based on the type of role
 the component plays. For this, <SmileText /> borrows sensibly from the
 organization of a typical experiment in psychology. In <SmileText />, the
-components are organized in the `src/components` directly which has the
-following layout:
+components are organized in the `src/builtins` directly which has the following
+layout:
 
 ```
-src/components
+src/builtins
+├── advertisement
+│   ├── AdvertisementView.preload.js
+│   ├── AdvertisementView.vue
+│   └── StudyPreviewText.vue
 ├── captcha
-│   ├── CaptchaInstructionsText.vue
-│   ├── CaptchaPage.vue
+│   ├── CaptchaInstructionsText_01.vue
+│   ├── CaptchaInstructionsText_02.vue
+│   ├── CaptchaRotateImage.vue
 │   ├── CaptchaTrialImageCategorization.vue
 │   ├── CaptchaTrialMotorControl.vue
 │   ├── CaptchaTrialStroop.vue
-│   └── CaptchaTrialTextComprehension.vue
-├── consent
-│   ├── ConsentPage.vue
-│   ├── InformedConsentModal.vue
-│   └── InformedConsentText.vue
+│   ├── CaptchaTrialTextComprehension.vue
+│   └── CaptchaView.vue
 ├── debrief
-│   ├── DebriefPage.vue
-│   └── DebriefText.vue
-├── errors_withdraw
-│   ├── ReportIssueModal.vue
-│   ├── WithdrawFormModal.vue
-│   └── WithdrawPage.vue
+│   └── DebriefView.vue
+├── demographic_survey
+│   └── DemographicSurveyView.vue
+├── device_survey
+│   └── DeviceSurveyView.vue
 ├── instructions
-│   └── InstructionsPage.vue
+│   └── InstructionsView.vue
+├── mturk
+│   └── MTurkRecruitView.vue
 ├── navbars
-│   ├── DeveloperNavBar.vue
-│   ├── PresentationNavBar.vue
 │   ├── ProgressBar.vue
 │   └── StatusBar.vue
-├── presentation_mode
-│   └── PresentationModeHomePage.vue
-├── recruitment
-│   ├── AdvertisementPage.vue
-│   ├── MTurkRecruitPage.vue
-│   ├── RecruitmentChooserPage.vue
-│   └── StudyPreviewText.vue
-├── screen_adjust
-│   └── WindowSizerView.vue
-├── surveys
-│   └── DemographicSurveyPage.vue
+├── report_issue
+│   └── ReportIssueModal.vue
+├── simple_consent
+│   ├── InformedConsentModal.vue
+│   └── InformedConsentView.vue
+├── task_survey
+│   └── TaskFeedbackSurveyView.vue
 ├── tasks
-│   ├── ExpPage.vue
-│   ├── Task1Page.vue
-│   └── Task2Page.vue
-└── thanks
-    └── ThanksPage.vue
+│   ├── ExpView.vue
+│   ├── Task1View.vue
+│   └── Task2View.vue
+├── thanks
+│   └── ThanksView.vue
+├── window_sizer
+│   └── WindowSizerView.vue
+└── withdraw
+    ├── WithdrawFormModal.vue
+    └── WithdrawView.vue
 ```
 
 The following sections describe which types of components go in each folder.

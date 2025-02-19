@@ -6,7 +6,7 @@ import { ref, computed } from 'vue'
 
 // do you need keyboard or mouse for your experiment?
 import { onKeyDown } from '@vueuse/core'
-import { useMouse } from '@vueuse/core'
+//import { useMouse } from '@vueuse/core'
 
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
@@ -22,8 +22,9 @@ const api = useAPI()
    For example here we define a stroop experiment and so we mention
    the word to display, the color of the word, and the condition of the
    trial for later analysis.
+
 */
-var trials = [
+const trialTypes = [
   { word: 'SHIP', color: 'red', condition: 'unrelated' },
   { word: 'MONKEY', color: 'green', condition: 'unrelated' },
   { word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
@@ -35,8 +36,40 @@ var trials = [
   { word: 'RED', color: 'blue', condition: 'incongruent' },
 ]
 
+var trials = []
+
+// add the data fields
+for (let trialType of trialTypes) {
+  trials.push({
+    ...trialType,
+    reactionTime: () => api.faker.rnorm(500, 50),
+    accuracy: () => api.faker.rbinom(1, 0.8),
+    response: () => api.faker.rchoice(['r', 'g', 'b']),
+  })
+}
+
+console.log('raw trials', trials)
+
+api.debug(trials)
+
 // next we shuffle the trials
 trials = api.shuffle(trials)
+
+function autofill() {
+  api.debug('running autofill')
+  while (step_index.value < trials.length) {
+    api.debug('auto stepping')
+
+    var t = api.faker.render(trials[step_index.value])
+    api.debug(t)
+    api.recordTrialData(t)
+
+    nextStep()
+  }
+  // step to where we want to go
+}
+
+api.setPageAutofill(autofill)
 
 //const index = smilestore.getPage[route.name]
 // now we create the trial stepper which will advance through the trials.
@@ -71,7 +104,7 @@ onKeyDown(
         api.debug('blue')
       }
       api.debug(`${step.value}`)
-      api.saveTrialData({
+      api.recordTrialData({
         trialnum: step_index.value,
         word: step.value.word,
         color: step.value.color,
@@ -115,7 +148,7 @@ function finish() {
       <p id="prompt">Thanks! You are finished with this task and can move on.</p>
       <!-- display the final score -->
       <p>Your score was {{ final_score }}</p>
-      <button class="button is-success is-light" id="finish" @click="finish()">
+      <button class="button is-success" id="finish" @click="finish()">
         Continue &nbsp;
         <FAIcon icon="fa-solid fa-arrow-right" />
       </button>

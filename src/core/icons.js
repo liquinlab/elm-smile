@@ -6,12 +6,14 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 /* to limit the size of the final project you import individal icons */
 /* NOTE: you also have to load them below by adding to the library */
 import { faSwatchbook } from '@fortawesome/free-solid-svg-icons'
+import { faDesktop } from '@fortawesome/free-solid-svg-icons'
 import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
 import { faQrcode } from '@fortawesome/free-solid-svg-icons'
 import { faDownload } from '@fortawesome/free-solid-svg-icons'
 import { faGear } from '@fortawesome/free-solid-svg-icons'
 import { faBook } from '@fortawesome/free-solid-svg-icons'
 import { faClock } from '@fortawesome/free-solid-svg-icons'
+import { faCloudArrowUp } from '@fortawesome/free-solid-svg-icons'
 import { faArrowsTurnToDots } from '@fortawesome/free-solid-svg-icons'
 import { faArrowRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { faExplosion } from '@fortawesome/free-solid-svg-icons'
@@ -45,6 +47,7 @@ import { faSackDollar } from '@fortawesome/free-solid-svg-icons'
 import { faFlask } from '@fortawesome/free-solid-svg-icons'
 import { faCircle } from '@fortawesome/free-solid-svg-icons'
 import { faCircleDot } from '@fortawesome/free-solid-svg-icons'
+import { faCircleChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import { faSquareXmark } from '@fortawesome/free-solid-svg-icons'
 import { faThumbtack } from '@fortawesome/free-solid-svg-icons'
 import { faPencil } from '@fortawesome/free-solid-svg-icons'
@@ -65,13 +68,17 @@ import { faCodeBranch } from '@fortawesome/free-solid-svg-icons'
 import { faMagnifyingGlassArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons'
 import { faClock as farClock } from '@fortawesome/free-regular-svg-icons'
-
+import { faDiamond as faDiamond } from '@fortawesome/free-solid-svg-icons'
+import { faPerson } from '@fortawesome/free-solid-svg-icons'
 /* add icons to the library */
 library.add(
   faSwatchbook,
+  faDesktop,
   farCircle,
+  faCircleChevronLeft,
   faQrcode,
   faDownload,
+  faCloudArrowUp,
   faClock,
   farClock,
   faCodeBranch,
@@ -106,6 +113,7 @@ library.add(
   faBahai,
   faFaceGrinWide,
   faShapes,
+  faPerson,
   faImage,
   faRainbow,
   faHouse,
@@ -127,5 +135,6 @@ library.add(
   faRotateRight,
   faAnglesRight,
   faAnglesLeft,
-  faHammer
+  faHammer,
+  faDiamond
 )

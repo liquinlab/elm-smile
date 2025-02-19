@@ -5,9 +5,9 @@ import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import handlebars from 'vite-plugin-handlebars'
 import Inspect from 'vite-plugin-inspect'
-//import preLoaderPlugin from './scripts/preloader'
-import stripDevToolPlugin from './scripts/strip-devtool'
-import generateQRCode from './scripts/generate-qr.js'
+//import preLoaderPlugin from './plugins/preloader'
+import stripDevToolPlugin from './plugins/strip-devtool'
+import generateQRCode from './plugins/generate-qr.js'
 
 // https://vitejs.dev/config/
 export default ({ mode }) => {

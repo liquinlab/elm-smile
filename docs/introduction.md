@@ -5,9 +5,9 @@ outline: none
 # :wave: Welcome to Smile!
 
 The <SmileText/> project is a web-based platform designed to make it easy and
-fun to develop rich and interactive online experiments. ==Unlike tools that
-cater to novices and non-programmers, Smile is for reasonably competent
-programmers.==
+fun to develop rich and interactive online experiments. Unlike tools that cater
+to non-programmers, Smile is designed to help reasonably competent programmers
+accomplish more in less time.
 
 ### Key features:
 
@@ -24,15 +24,12 @@ programmers.==
   devices.
 - Developer [mode](/developing) which makes it easier to debug and design
   experiments. Jump quickly between phases and trials in your experiments,
-  [autofill forms and generate fake data for testing](/developing#autofill-and-data-faking),
-  visualize the flow through your project,
-  [hot-reload](/developing#hot-module-replacement) the code you are working on
-  without restarting the entire experiment, and more!
+  [autofill forms and generate fake data for testing](/autofill), visualize the
+  flow through your project, [hot-reload](/developing#hot-module-replacement)
+  the code you are working on without restarting the entire experiment, and
+  more!
 - Presentation [mode](/presentation) which provides a beautiful and interactive
   demo site you can share with reviewers and collaborators.
-- [Dashboard](/dashboard) for monitoring data collection, downloading and
-  analyzing data, and performing quality control to screen bots and other bad
-  actors.
 - Built-in support for multiple [recruitment services](/recruitment) including
   Prolific, MTurk, CloudResearch, and more.
 - Secure data storage and retrieval using a flexible, but easy-to-use

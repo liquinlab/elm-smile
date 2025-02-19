@@ -3,17 +3,19 @@ import { computed } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
+const cond = api.getConditionByName('instructionsVersion')
+
 // computed property based on condition in data
 const instText = computed(() => {
   // how do you know that instructions will exist because it
   // starts off empty?
-  if (api.data.conditions.instructions === 'version1') {
+  if (cond === '1') {
     return 'instructions version 1'
   }
-  if (api.data.conditions.instructions === 'version2') {
+  if (cond === '2') {
     return 'instructions version 2'
   }
-  if (api.data.conditions.instructions === 'version3') {
+  if (cond === '3') {
     return 'instructions version 3'
   }
   return 'no condition set'
@@ -29,7 +31,7 @@ function finish(goto) {
     <h1 class="title is-3">Instructions</h1>
     <p class="has-text-center is-size-5">{{ instText }}</p>
     <hr />
-    <button class="button is-success is-light" id="finish" @click="finish()">
+    <button class="button is-success" id="finish" @click="finish()">
       next &nbsp;
       <FAIcon icon="fa-solid fa-arrow-right" />
     </button>

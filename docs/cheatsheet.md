@@ -54,5 +54,5 @@ npm run serve
 Replace `XXXXX` with the git hash for the version you want to deploy
 
 ```
-gh workflow run deploy-hash.yml -f github_sha=XXXXX
+gh workflow run deploy.yml -f github_sha=XXXXX
 ```

@@ -18,7 +18,7 @@ You will need to install Node.js on your computer if you haven't already. You
 can download the latest version [here](https://nodejs.org/en/download/). After
 the install completes, verify that you have the `npm` command in your terminal
 program of choice. If you already have Node installed verify that the version of
-npm is greater than or equal to 8.1.2. You can check your installed version by
+npm is greater than or equal to 10.9.2. You can check your installed version by
 typing `npm -v`.
 
 ## 2. Create a GitHub account if you haven't and install the command-line tool
@@ -62,13 +62,16 @@ brew install git-secret
 Next create a RSA key-pair for your email address:
 
 ```
-gpg --gen-key
+gpg --full-generate-key
 ```
 
-There will be a sequence of questions you answer. Use your preferred email
-address e.g., the one linked to GitHub. Send the main Smile coordinator for your
-lab your public key by sending the output of this command to them on slack or
-via email (replace example@gmail.com with the address you provided to `gpg`):
+There will be a sequence of questions you answer. In the prompts just choose the
+default options. You also will want to set the expiration of the key to 0 (never
+expire). Use your preferred email address e.g., the one linked to GitHub. Make
+sure to write down or remember the passphrase you use. Send the main Smile
+coordinator for your lab your public key by sending the output of this command
+to them on slack or via email (replace example@gmail.com with the address you
+provided to `gpg`):
 
 <div class="language-"><pre><code><span class="line">gpg --armor --export example@gmail.com</span></code></pre></div>
 

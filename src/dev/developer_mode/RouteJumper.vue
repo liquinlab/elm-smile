@@ -17,6 +17,20 @@ const hoverRoute = ref('')
 const router = useRouter() // this is needed in composition API because this.$router not availabel
 const route = useRoute()
 
+// construct routes in order we want to display them
+const routerRoutes = router.getRoutes()
+// get seqtimeline and routes from local storage
+const seqtimeline = api.local.seqtimeline
+const routes = api.local.routes
+
+// filter routes - only those that aren't in seqtimeline
+const filteredRoutes = routes.filter((r) => {
+  return !seqtimeline.find((s) => s.name === r.name)
+})
+
+// now append seqtimeline and filteredRoutes
+const allRoutes = seqtimeline.concat(filteredRoutes)
+
 const forceMode = ref(true)
 
 // watch route -- if route changes, update value of current query. This will get carried forward when you jump routes
@@ -47,7 +61,7 @@ function navigate(route) {
 </script>
 <template>
   <div class="dropdown-content has-text-left">
-    <template v-for="r in router.getRoutes()">
+    <template v-for="r in allRoutes">
       <div
         class="routelabel"
         @mouseover="hoverRoute = r.name"
@@ -56,7 +70,14 @@ function navigate(route) {
         @click="navigate(r.name)"
       >
         <span class="is-size-7">
-          <div class="routename">/{{ r.name }}</div>
+          <!-- fa icon arrow down -->
+
+          <div class="routename">
+            <span v-if="r.meta.level > 0" v-for="i in r.meta.level" style="margin-left: 5px">&nbsp;</span>
+            <FAIcon v-if="r.meta.sequential" icon="fa-solid fa-arrow-down" />
+            <FAIcon v-else icon="fa-solid fa-diamond" />
+            /{{ r.name }}
+          </div>
           <div class="forcebutton forcemode" v-if="altKeyState && hoverRoute === r.name">
             <FAIcon icon="fa-solid fa-square-caret-right" />
           </div>

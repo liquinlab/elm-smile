@@ -148,7 +148,7 @@ onKeyDown(
         api.debug('blue')
       }
       api.debug(`${step.value}`)
-      api.saveTrialData({
+      api.recordTrialData({
         trialnum: api.getCurrentTrial(),
         word: step.value.word,
         color: step.value.color,
