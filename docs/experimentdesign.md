@@ -51,6 +51,8 @@ instructions, debriefing, etc...). We call the phases "Views" and each major
 phase of an experiment is associated with its own Vue component. Learn about
 views [here](/views).
 
+<img src="/images/viewstimeline.png" width="800" alt="timeline example" style="margin: auto;">
+
 Smile comes with several [built-in views](/views#built-in-views) for common
 phases of an experiment. This includes things like obtaining informed consent,
 presenting instructions, CAPTCHAs and presenting a thank you page. We describe
@@ -74,19 +76,21 @@ experiment.
 
 ==You almost certainly will need to edit this file for your experiment.==
 
-## :ladder: Stepping trials
+## :ladder: Stepping Views
 
 Many experiments are organized into a series of repeated events called "trials".
-Trials are different than views (see above) because they often repeat the same
-basic structure many times. Smile provides several features for
-[organizing and managing trials](/steps). We introduce the concept of a "trial"
-and how to programmatically advance through a sequence of trials within a
+Trials are different than Views because they often repeat the same basic
+structure many times (analogous to the difference between a 'slide' and a 'build
+step' in a Keynote/Powerpoint presentation). Smile provides several features for
+[stepping views through a series of states](/steps). We introduce the concept of
+a steps and how to programmatically advance through a sequence of steps within a
 particular View. The same concept is also used to add sequential build to any
-type of view (e.g., a sequence of instructions or a multi-part form).
-
-==Critically by using the built-in <SmileText/> step feature if a participant
+type of view (e.g., a sequence of instructions or a multi-part form). Critically
+by using the built-in <SmileText/> stepped Views feature if a participant
 refreshes the page or loses internet connection, they can pick up where they
-left off.==
+left off.
+
+<img src="/images/steps.png" width="600" alt="steps example" style="margin: auto;">
 
 ## :writing_hand: Autofill
 

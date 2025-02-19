@@ -22,7 +22,7 @@ import { useStepper } from '@/core/composables/useStepper'
 import useLog from '@/core/stores/log'
 
 export default function useAPI() {
-  const { stepNextView, stepPrevView, gotoView } = useTimeline()
+  const { goNextView, goPrevView, gotoView } = useTimeline()
   const route = useRoute()
   const router = useRouter()
   const smilestore = useSmileStore()
@@ -37,8 +37,8 @@ export default function useAPI() {
     dev: smilestore.dev,
     route: route,
     router: router,
-    stepNextView: stepNextView,
-    stepPrevView: stepPrevView,
+    goNextView: goNextView,
+    goPrevView: goPrevView,
     gotoView: gotoView,
     faker: faker_distributions,
     hasNextView: () => route.meta.next && route.meta.sequential,
@@ -152,6 +152,12 @@ export default function useAPI() {
     getPageTracker: (routeName) => {
       return smilestore.getPageTracker(routeName)
     },
+    getPageTrackerData: (routeName) => {
+      return smilestore.getPageTrackerData(routeName)
+    },
+    getPageTrackerIndex: (routeName) => {
+      return smilestore.getPageTrackerIndex(routeName)
+    },
     hasAutofill: () => {
       return smilestore.hasAutofill
     },
@@ -160,9 +166,6 @@ export default function useAPI() {
     },
     currentRouteName: () => {
       return route.name
-    },
-    getCurrentTrial: () => {
-      return smilestore.getPage[route.name]
     },
     getConditionByName: (name) => {
       return smilestore.getConditionByName(name)

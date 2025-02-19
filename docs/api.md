@@ -21,8 +21,8 @@ available methods and their descriptions.
 
 ## Navigation
 
-- `stepNextView()`: Advances to the next view in the experiment.
-- `stepPrevView()`: Returns to the previous view in the experiment.
+- `goNextView()`: Advances to the next view in the experiment.
+- `goPrevView()`: Returns to the previous view in the experiment.
 - `gotoView(view)`: Navigates to a specific view.
 - `goBack()`: Returns to the previous page.
 - `hasNextView()`: Checks if there's a next view available.
@@ -75,7 +75,6 @@ available methods and their descriptions.
 - `hasAutofill()`: Checks if autofill is available.
 - `autofill()`: Performs autofill.
 - `currentRouteName()`: Returns the current route name.
-- `getCurrentTrial()`: Gets the current trial information.
 - `getBrowserFingerprint()`: Retrieves the browser fingerprint.
 - `preloadAllImages()`: Preloads all images for the experiment.
 - `getPublicUrl(path)`: Returns the public URL for a file. See

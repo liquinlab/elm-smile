@@ -31,7 +31,7 @@ api.setPageAutofill(autofill)
 
 function finish() {
   api.saveForm('feedback', forminfo)
-  api.stepNextView()
+  api.goNextView()
 }
 </script>
 

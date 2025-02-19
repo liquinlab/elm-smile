@@ -62,7 +62,7 @@ export default defineConfig({
           { text: '👩‍💻 Developing', link: '/developing' },
           { text: '🧩 Components', link: '/components' },
           { text: '🏗️ Views', link: '/views' },
-          { text: '🔀 Timeline and Design', link: '/timeline' },
+          { text: '🔀 Timeline and Design File', link: '/timeline' },
           { text: '🪜 Stepping Views', link: '/steps' },
           { text: '✍️ Autofill', link: '/autofill' },
           { text: '🎲 Randomization', link: '/randomization' },

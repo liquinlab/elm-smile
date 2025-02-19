@@ -6,14 +6,33 @@ basic structure many times. Smile provides several features for organizing and
 managing trials or other sequenced elements _within_ a View (the
 [Timeline](/timeline) is used to sequence across Views).
 
+<img src="/images/steps.png" width="600" alt="steps example" style="margin: auto;">
+
 Here, we introduce the concept of a "step" and how to programmatically advance
 through a sequence of steps within a particular View. The same concept is also
 used to add sequential build to any type of view (e.g., a sequence of
 instructions, a multi-part form, or an animation).
 
-## Create a trial-based View
+::: tip Steps are like builds in a Keynote/Powerpoint animation
 
-To create a trial-based view, you need to import the SmileAPI, define a list of
+By way of analogy, thing of different [Views](/views) as slides in a
+Keynote/Powerpoint presentation while a step is like a build or animation
+**within** a slide.
+
+:::
+
+A key feature of stepped Views is that they persist their state in the browswer
+using local storage. This means that if the subject reloads the pages, or
+navigates to a different site and then returns, the task will resume from the
+same step. This is nice because it helps ensure that subjects are always
+completing the set of steps/trials assigned to them and are not able to start
+the task over (possibly introducing biased data from practice effects or
+exposure to manipulations). You can learn more about this feature by reading
+about how to [persist stepper state](#persisting-stepper-state)
+
+## Create a stepped View
+
+To create a stepped view, you need to import the SmileAPI, define a list of
 trials and then use the `useTrialStepper` method to advance through the trials.
 Here we walk through the steps.
 
@@ -25,10 +44,8 @@ advance through the trials.
 
 ```vue
 <script setup>
-...
 import useAPI from '@/core/composables/useAPI' // [!code highlight]
 const api = useAPI() // [!code highlight]
-...
 </script>
 ```
 
@@ -41,14 +58,7 @@ trial.
 ```js
 var trials = [
   { word: 'SHIP', color: 'red', condition: 'unrelated' },
-  { word: 'MONKEY', color: 'green', condition: 'unrelated' },
-  { word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
-  { word: 'RED', color: 'red', condition: 'congruent' },
-  { word: 'GREEN', color: 'green', condition: 'congruent' },
-  { word: 'BLUE', color: 'blue', condition: 'congruent' },
-  { word: 'GREEN', color: 'red', condition: 'incongruent' },
-  { word: 'BLUE', color: 'green', condition: 'incongruent' },
-  { word: 'RED', color: 'blue', condition: 'incongruent' },
+  ... // more trials
 ]
 ```
 
@@ -56,133 +66,131 @@ var trials = [
 
 You can then shuffle the trials randomly using
 
-```vue
+```js
 trials = api.shuffle(trials)
 ```
 
 ### Use the `useStepper` method
 
 Next, use the `useStepper` method to advance through the trials. This method
-uses a Vue composable to provide the `nextStep` and `prevStep` methods to
-advance and go back through the trials. It also provides a callback function
-that is called when the last trial is shown. This is where you might do some
-additional data saving or analysis.
+uses a Vue composable to provide methods to advance and go back through the
+trials.
 
 ```js
-const { nextStep, prevStep, step, step_index } = api.useStepper(trials, () => {
-  finalize()
-})
+const step = api.useStepper(trials)
 ```
+
+The returned object provides:
+
+- `step.next()`: Advance to the next step
+- `step.prev()`: Go back to the previous step
+- `step.index()`: Get the current trial index
+- `step.current()`: Get the current trial data
+- `step.reset()`: Reset back to the first step
+
+Each time you want to advance to the next step, you need to call `step.next()`.
+You can also step back through the steps by calling `step.prev()`. If
+`step.next()` is called when the last step is reached, the callback function
+passed to `api.useStepper()` is called.
+
+While you are on a given step you can access the current step number using
+`step.index()` (indexed starting at 0). You can also get the current meta-data
+of the trials passed as input to `api.useStepper()` by calling `step.current()`.
+
+Call `step.reset()` to reset back to the first step.
+
+::: warning You are responsible detecting when the last step is reached!
+
+You are responsible for detecting when the last step is reached and taking
+appropriate action (e.g., saving data, computing a score, etc.). This condition
+is met usually when `step.index()` is equal to the number of trials.
+
+:::
+
+Here is a approximate example of the key features for a simple Stroop task.
 
 ```vue
 <script setup>
 // A Basic Stroop Experiment
 
-// first import from basic functions from Vue
-import { ref, computed } from 'vue'
-
-// do you need keyboard or mouse for your experiment?
-import { onKeyDown } from '@vueuse/core'
-import { useMouse } from '@vueuse/core'
+...
 
 // import and initalize smile API
-import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
-
-// this progress bar is not implemented and a little hard so lets pass for now
-//if (route.meta.progress) smilestore.global.progress = route.meta.progress
+import useAPI from '@/core/composables/useAPI' // [!code highlight]
+const api = useAPI() // [!code highlight]
 
 /*
    Next we need to define the trials for the experiment.  Create
    a list composed of objects where each entry in the list is a trial
    and the keys of the object are the variables that define each trial.
-   For example here we define a stroop experiment and so we mention
-   the word to display, the color of the word, and the condition of the
-   trial for later analysis.
 */
 var trials = [
   { word: 'SHIP', color: 'red', condition: 'unrelated' },
-  { word: 'MONKEY', color: 'green', condition: 'unrelated' },
-  { word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
-  { word: 'RED', color: 'red', condition: 'congruent' },
-  { word: 'GREEN', color: 'green', condition: 'congruent' },
-  { word: 'BLUE', color: 'blue', condition: 'congruent' },
-  { word: 'GREEN', color: 'red', condition: 'incongruent' },
-  { word: 'BLUE', color: 'green', condition: 'incongruent' },
-  { word: 'RED', color: 'blue', condition: 'incongruent' },
+  ... // more trials
 ]
 
 // next we shuffle the trials
 trials = api.shuffle(trials)
 
-//const index = smilestore.getPage[route.name]
-// now we create the trial stepper which will advance through the trials.
-// this method includes a callback function that is called when the
-// last trial is shown.  this might be where you do some additional data saving
-// or analysis (e.g., if you are showing the subject performance feedback about
-// their performance on the task).  it called the finalize() function which is
-// defined below
-const { nextStep, prevStep, step, step_index } = api.useStepper(trials, () => {
-  finalize()
-})
 
-// const trial = computed(() => {
-//   return trials[api.getCurrentTrial()]
-// })
+//  Create the stepper which will advance through the steps.
+const step = api.useStepper(trials) // [!code highlight]
+
+var final_score = ref(0)
 
 // Handle the key presses for the task
 // onKeyDown is a composable from the VueUse package
-// it takes a list of keys to list for each time a key
-// is pressed runs the provided function.
-onKeyDown(
+const stop = onKeyDown(
   ['r', 'R', 'g', 'G', 'b', 'B'],
   (e) => {
-    if (step_index < trials.length) {
+    if (step.index() < trials.length) {
       e.preventDefault()
-      api.debug('pressed ${e}')
       if (['r', 'R'].includes(e.key)) {
-        api.debug('red')
+        // handle red
       } else if (['g', 'G'].includes(e.key)) {
-        api.debug('green')
+        // handle green
       } else if (['b', 'B'].includes(e.key)) {
-        api.debug('blue')
+        // handle blue
       }
-      api.debug(`${step.value}`)
-      api.recordTrialData({
-        trialnum: api.getCurrentTrial(),
-        word: step.value.word,
-        color: step.value.color,
-        condition: step.value.condition,
+      api.recordTrialData({ // record the data
+        trialnum: step.index(),
+        word: step.current().word,
+        color: step.current().color,
+        condition: step.current().condition,
         response: e.key,
       })
-      nextTrial()
+      step.next() // [!code highlight] step to next build/trial
+
+      // if we are at the end of the trials, compute a final score
+      if (step.index() >= trials.length) { // [!code highlight]
+        final_score.value = 100
+        stop() // [!code highlight] This removes the keydown listener
+      }
     }
   },
   { dedupe: true }
 )
 
-// load up the trials including any randomization based on the random see
-// initialize the state of the component
-// set up the call backs that take you through the task
-var final_score = ref(0)
-function finalize() {
-  // sort out what data you are putting in the smile store here?
-  api.debug('finished, so will save data and stuff')
-  final_score.value = 100 // compute a final score here
-}
-
+// what to when all the trials are completed
 function finish() {
-  // do stuff if you want
-  api.stepNextView()
+  api.goNextView()
 }
 </script>
+```
 
+This is the template code for the view. Notice that the `step.index()` method is
+used to get the current step number and the `step.current()` method is used to
+get the current trial data (e.g., `step.current().word`).
+
+```vue
 <template>
   <div class="page prevent-select">
     <!-- Show this for each trial -->
-    <div class="strooptrial" v-if="step_index < trials.length">
-      {{ step_index + 1 }} / {{ trials.length }}
-      <h1 class="title is-1 is-huge" :class="step.color">{{ step.word }}</h1>
+    <div class="strooptrial" v-if="step.index() < trials.length">
+      {{ step.index() + 1 }} / {{ trials.length }}
+      <h1 class="title is-1 is-huge" :class="step.current().color">
+        {{ step.current().word }}
+      </h1>
       <p id="prompt">Type "R" for Red, "B" for blue, "G" for green.</p>
     </div>
 
@@ -201,19 +209,13 @@ function finish() {
     </div>
   </div>
 </template>
-
-<style scoped>
-/*  pick your colors for the stroop design here */
-.red {
-  color: rgb(240, 75, 75);
-}
-
-.blue {
-  color: rgb(118, 193, 237);
-}
-
-.green {
-  color: rgb(123, 199, 123);
-}
-</style>
 ```
+
+## Persisting stepper state
+
+The stepper state is stored in the application state. This means that if the
+subject reloads the pages, or navigates to a different site and then returns,
+the task will resume from the same step. This is nice because it helps ensure
+that subjects are always completing the set of steps/trials assigned to them and
+are not able to start the task over (possibly introducing biased data from
+practice effects or exposure to manipulations).

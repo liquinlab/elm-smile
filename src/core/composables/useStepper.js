@@ -4,31 +4,27 @@ import useSmileStore from '@/core/stores/smilestore'
 import useLog from '@/core/stores/log'
 import { useRoute } from 'vue-router'
 
-export function useStepper(trials, finishedCallback) {
+export function useStepper(trials) {
   const smilestore = useSmileStore()
   const log = useLog()
   const route = useRoute()
   const page = route.name
   smilestore.dev.page_provides_trial_stepper = true
 
-  //const index = ref(0)
   const n_trials = trials.length
 
   function nextStep() {
     log.log('STEPPER: Advancing to next step')
-    if (smilestore.getPageTracker(page) < n_trials - 1) {
-      //index += 1
+    if (smilestore.getPageTrackerIndex(page) < n_trials - 1) {
       smilestore.incrementPageTracker(page)
     } else {
       smilestore.incrementPageTracker(page)
-      finishedCallback()
     }
   }
 
   function prevStep() {
     log.warn('TRIAL STEPPER: Rewinding to prev trial')
-    if (smilestore.getPageTracker(page) > 0) {
-      //index -= 1
+    if (smilestore.getPageTrackerIndex(page) > 0) {
       smilestore.decrementPageTracker(page)
     }
   }
@@ -37,40 +33,22 @@ export function useStepper(trials, finishedCallback) {
     smilestore.resetPageTracker(page)
   }
 
-  const step = computed(() => {
-    return trials[smilestore.getPageTracker(page)]
-  })
-
   const step_index = computed(() => {
-    return smilestore.getPageTracker(page)
+    return smilestore.getPageTrackerIndex(page)
   })
 
-  return { nextStep, prevStep, resetStep, step, step_index }
-}
+  const step = computed(() => {
+    return trials[step_index.value]
+  })
 
-export function useStatelessStepper(trials, index, finishedCallback) {
-  //const index = ref(0)
-  const n_trials = trials.length
-
-  function nextStep() {
-    log.log('STATELESS STEPPER: Advancing to next trial')
-    //log.log("i see index", smilestore.getPageTracker(route.name))
-    if (index.value < n_trials - 1) {
-      index.value += 1
-    } else {
-      finishedCallback()
-      index.value += 1
-    }
+  return {
+    next: nextStep,
+    prev: prevStep,
+    reset: resetStep,
+    // Simple getters for reactive versions
+    index: () => step_index.value,
+    current: () => step.value,
   }
-
-  function prevStep() {
-    log.warn('STATELESSS STEPPER: Rewinding to prev trial')
-    if (index.value > 0) {
-      index.value -= 1
-    }
-  }
-
-  return { nextStep, prevStep }
 }
 
 /*

@@ -29,7 +29,7 @@ onMounted(() => {
 
 function finish() {
   clicked = true
-  api.stepNextView()
+  api.goNextView()
 }
 
 onBeforeUnmount(() => {

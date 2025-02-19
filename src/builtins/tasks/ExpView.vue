@@ -4,7 +4,7 @@ const api = useAPI()
 
 function finish() {
   // smilestore.saveData()
-  api.stepNextView()
+  api.goNextView()
 }
 </script>
 

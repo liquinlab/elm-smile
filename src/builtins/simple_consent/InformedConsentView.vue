@@ -15,7 +15,7 @@ import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
 function finish() {
-  api.stepNextView()
+  api.goNextView()
 }
 
 if (appconfig.anonymous_mode) {

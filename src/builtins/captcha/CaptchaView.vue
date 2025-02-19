@@ -56,11 +56,6 @@ const pages = [
   // { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
 ]
 
-const currentTab = computed(() => {
-  return pages[api.getCurrentTrial()]
-})
-// captcha steps
-
 // a dynamic loader for different trial types which is randomized?
 // each trial type is a simple game that just stores the data from the subject
 // games include tests of 10 possible games
@@ -72,35 +67,33 @@ const currentTab = computed(() => {
 // 5 - human brain should show stroop interference
 // 6 -
 
-const { nextStep } = api.useStepper(pages, () => {
-  finalize()
-})
+const step = api.useStepper(pages)
 
-function finalize() {
-  // sort out what data you are putting in the smile store here?
-  api.log('finished, so will save data and stuff')
-}
+const currentTab = computed(() => {
+  return pages[step.index()]
+})
+// captcha steps
 
 function next_trial() {
-  if (api.getCurrentTrial() >= pages.length - 1) {
+  if (step.index() >= pages.length - 1) {
     //api.resetPageTracker() // you coudl reset when you leavr but why?
     finish()
   } else {
     ///api.incrementTrial()
     api.saveData() // force a save
-    nextStep()
+    step.next()
   }
 }
 
 function finish() {
   // smilestore.saveData()
-  api.stepNextView()
+  api.goNextView()
 }
 </script>
 
 <template>
   <div class="page">
-    <div class="instructions" v-if="api.getCurrentTrial() >= pages.length">
+    <div class="instructions" v-if="step.index() >= pages.length">
       <div class="formstep">
         <article class="message is-danger">
           <div class="message-header">
@@ -121,7 +114,7 @@ function finish() {
       :is="currentTab.component"
       v-bind="currentTab.props"
       @next-page-captcha="next_trial()"
-      :key="api.getCurrentTrial()"
+      :key="step.index()"
       v-else
     >
     </component>

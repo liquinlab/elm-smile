@@ -14,7 +14,7 @@ function finish() {
   // smilestore.setConsented()
   // smilestore.saveData()
   api.verifyVisibility(true)
-  api.stepNextView()
+  api.goNextView()
 }
 </script>
 

@@ -1,4 +1,4 @@
-# :twisted_rightwards_arrows: Timeline and Design
+# :twisted_rightwards_arrows: Timeline and Design File
 
 Web experiments are often composed of several parts presented in sequence. For
 example, we might show a welcome page &rarr; informed consent &rarr;
@@ -633,11 +633,11 @@ The way to import the useTimeline composable into your component is:
 
 ```js
 import useTimeline from '@/composables/useTimeline'
-const { stepNextView, stepPrevView, gotoView } = useTimeline()
+const { goNextView, goPrevView, gotoView } = useTimeline()
 ```
 
-This imports the composable, then import three methods (`stepNextView()`,
-`stepPrevView()`, and `gotoView`) which are functions that when they are called
+This imports the composable, then import three methods (`goNextView()`,
+`goPrevView()`, and `gotoView`) which are functions that when they are called
 provides the `name` of the next route (or `null` if there is no "next" either
 because you are at the end of the sequence or because it is a non-sequential
 route). To navigate to the next route just use the `push()` method of the
@@ -659,7 +659,7 @@ import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
 function finish(goto) {
-  api.stepNextView()
+  api.goNextView()
 }
 </script>
 
@@ -815,12 +815,3 @@ Note that Vue Router provides a variety of lifecycle hooks that you can
 customize for all or individual routes. See the documentation
 [here](https://router.vuejs.org/guide/advanced/navigation-guards.html#the-full-navigation-resolution-flow)
 for a full accounting of the order in which things occur.
-
-## Testing the Timeline
-
-The timeline has a full coverage test in `tests/vitest/timeline.test.js`. You
-can run that test in isolation with
-
-```
-npx vitest timeline
-```

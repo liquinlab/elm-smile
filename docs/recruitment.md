@@ -138,8 +138,6 @@ Next, you have to connect your Mechanical Turk account to Cloud Research,
 effectively granting them access to post and approve HITs on your behalf.
 CloudResearch provides instructions on doing this
 [here](https://cloudresearch-com.s3.amazonaws.com/files/Instructions+for+linking+MTurk+and+CloudResearch+Accounts.pdf).
-If you are in the <GureckisLabText /> you will need to ask Todd to add you to
-our lab MTurk account.
 
 <!-- To create studies you use the intuitive study builder.  There are many custom fields that you can use to configure your study including payment, demographic restrictions, privacy-enhancing features, etc... However, the most important is to post the correct link to the study.  Here is an example.  But basically it is
 
