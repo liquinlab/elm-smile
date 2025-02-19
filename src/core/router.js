@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid'
 import useSmileStore from '@/core/stores/smilestore' // get access to the global store
 import { getQueryParams } from '@/core/utils'
 import timeline from '@/user/design'
-
 import useLog from '@/core/stores/log'
 const log = useLog()
 
