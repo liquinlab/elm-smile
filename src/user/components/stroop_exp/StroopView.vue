@@ -22,8 +22,6 @@ const api = useAPI()
 
 // define the trials for the experiment
 
-const cs = reactive({})
-
 const cs = api.getPageTrackerData(api.currentRouteName())
 defineTrialsPersist(cs)
 
