@@ -4,10 +4,27 @@ import { shallowRef, ref, computed } from 'vue'
 import CaptchaInstructionsText_01 from '@/builtins/captcha/CaptchaInstructionsText_01.vue'
 import CaptchaInstructionsText_02 from '@/builtins/captcha/CaptchaInstructionsText_02.vue'
 import CaptchaTrialImageCategorization from '@/builtins/captcha/CaptchaTrialImageCategorization.vue'
-import CaptchaTrialMotorControl from '@/builtins/captcha/CaptchaTrialMotorControl.vue'
+import CaptchaTrialMaze from '@/builtins/captcha/CaptchaTrialMaze.vue'
 import CaptchaTrialTextComprehension from '@/builtins/captcha/CaptchaTrialTextComprehension.vue'
 import CaptchaTrialStroop from '@/builtins/captcha/CaptchaTrialStroop.vue'
-import CaptchaRotateImage from '@/builtins/captcha/CaptchaRotateImage.vue'
+import CaptchaTrialRotateImage from '@/builtins/captcha/CaptchaTrialRotateImage.vue'
+import CaptchaButtonPress from '@/builtins/captcha/CaptchaButtonPress.vue'
+import CaptchaShyDot from '@/builtins/captcha/CaptchaShyDot.vue'
+
+// give feedback
+
+// rotate image -- good but need to scamble file names
+
+// in progress
+// move slowly towards and object in order to sneak up on it but don't say that in instructions (let them figure it out)
+// maze
+// don't press button
+// text comprehension
+
+// planned
+// listen to the music and tap on the beat
+// intuitive physics - pat which looks like more natural
+// mental rotation - rotate the image to match the other image
 
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
@@ -18,13 +35,25 @@ const api = useAPI()
 // possibly altered so that there is lots of substructure to it
 
 const pages = [
-  { component: CaptchaInstructionsText_01, props: { adjective: 'wonderful' }, data: [] },
-  { component: CaptchaTrialTextComprehension, props: {}, data: [] },
-  { component: CaptchaInstructionsText_02, props: {}, data: [] },
-  { component: CaptchaTrialImageCategorization, props: {}, data: [] },
-  { component: CaptchaTrialMotorControl, props: {}, data: [] },
-  { component: CaptchaRotateImage, props: {}, data: [] },
-  { component: CaptchaTrialMotorControl, props: {}, data: [] },
+  { component: CaptchaInstructionsText_01, props: { adjective: '' }, data: [] },
+  { component: CaptchaTrialRotateImage, props: { timed_task: true, max_time: 50000 }, data: [] },
+  { component: CaptchaTrialMaze, props: { timed_task: false }, data: [] },
+
+  // { component: CaptchaTrialTextComprehension, props: { timed_task: false }, data: [] },
+  // { component: CaptchaShyDot, props: { timed_task: false }, data: [] },
+  // { component: CaptchaInstructionsText_02, props: {}, data: [] },
+  // //{ component: CaptchaTrialImageCategorization, props: {}, data: [] },
+  // { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
+  //
+  // { component: CaptchaButtonPress, props: {}, data: [] },
+  // { component: CaptchaRotateImage, props: {}, data: [] },
+  // { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
+  // { component: CaptchaRotateImage, props: {}, data: [] },
+  // { component: CaptchaButtonPress, props: {}, data: [] },
+  // { component: CaptchaRotateImage, props: {}, data: [] },
+  // { component: CaptchaTrialTextComprehension, props: { timed_task: false }, data: [] },
+  // { component: CaptchaRotateImage, props: {}, data: [] },
+  // { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
 ]
 
 // a dynamic loader for different trial types which is randomized?
@@ -51,6 +80,7 @@ function next_trial() {
     finish()
   } else {
     ///api.incrementTrial()
+    api.saveData() // force a save
     step.next()
   }
 }
@@ -80,7 +110,13 @@ function finish() {
     </div>
 
     <!-- Component changes when currentTab changes -->
-    <component :is="currentTab.component" v-bind="currentTab.props" @next-page-captcha="next_trial()" v-else>
+    <component
+      :is="currentTab.component"
+      v-bind="currentTab.props"
+      @next-page-captcha="next_trial()"
+      :key="step.index()"
+      v-else
+    >
     </component>
   </div>
 </template>

@@ -38,19 +38,18 @@ onMounted(() => {
 
 <template>
   <div class="instructions">
+    <h1 class="title">Choose the <span class="underline">unusual</span> answer.</h1>
     <div class="box">
-      <div class="boxlabel">choose the <span class="underline">unusual</span> answer.</div>
       <p class="is-size-3 has-text-left">The dog ate the _____.</p>
-
       <button class="button is-white mr-4" id="finish" @click="$emit('nextPageCaptcha')">Meal</button>
       <button class="button is-white mr-4" id="finish" @click="$emit('nextPageCaptcha')">Bone</button>
       <button class="button is-white mr-4" id="finish" @click="$emit('nextPageCaptcha')">Food</button>
       <button class="button is-white mr-4" id="finish" @click="$emit('nextPageCaptcha')">Sun</button>
-      <br />
-      <br />
-      <br />
-      Respond quickly: <progress class="progress is-large" :value="timeout" max="100"></progress>
     </div>
+    <br />
+    <br />
+    <br />
+    Respond quickly: <progress class="progress is-large" :value="timeout" max="100"></progress>
   </div>
 </template>
 
