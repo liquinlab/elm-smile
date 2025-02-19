@@ -116,16 +116,13 @@ Here is a approximate example of the key features for a simple Stroop task.
 ...
 
 // import and initalize smile API
-import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
+import useAPI from '@/core/composables/useAPI' // [!code highlight]
+const api = useAPI() // [!code highlight]
 
 /*
    Next we need to define the trials for the experiment.  Create
    a list composed of objects where each entry in the list is a trial
    and the keys of the object are the variables that define each trial.
-   For example here we define a stroop experiment and so we mention
-   the word to display, the color of the word, and the condition of the
-   trial for later analysis.
 */
 var trials = [
   { word: 'SHIP', color: 'red', condition: 'unrelated' },
@@ -135,24 +132,19 @@ var trials = [
 // next we shuffle the trials
 trials = api.shuffle(trials)
 
-// now we create the trial stepper which will advance through the trials.
-// this method includes a callback function that is called when the
-// last trial is shown.
-const step = api.useStepper(trials)
+
+//  Create the stepper which will advance through the steps.
+const step = api.useStepper(trials) // [!code highlight]
 
 var final_score = ref(0)
 
-
 // Handle the key presses for the task
 // onKeyDown is a composable from the VueUse package
-// it takes a list of keys to list for each time a key
-// is pressed runs the provided function.
 const stop = onKeyDown(
   ['r', 'R', 'g', 'G', 'b', 'B'],
   (e) => {
     if (step.index() < trials.length) {
       e.preventDefault()
-      api.debug('pressed ${e}')
       if (['r', 'R'].includes(e.key)) {
         // handle red
       } else if (['g', 'G'].includes(e.key)) {
@@ -160,25 +152,26 @@ const stop = onKeyDown(
       } else if (['b', 'B'].includes(e.key)) {
         // handle blue
       }
-      api.recordTrialData({
+      api.recordTrialData({ // record the data
         trialnum: step.index(),
         word: step.current().word,
         color: step.current().color,
         condition: step.current().condition,
         response: e.key,
       })
-      step.next()
+      step.next() // [!code highlight] step to next build/trial
 
       // if we are at the end of the trials, compute a final score
-      if (step.index() >= trials.length) {
+      if (step.index() >= trials.length) { // [!code highlight]
         final_score.value = 100
-        stop() // This removes the keydown listener
+        stop() // [!code highlight] This removes the keydown listener
       }
     }
   },
   { dedupe: true }
 )
 
+// what to when all the trials are completed
 function finish() {
   api.goNextView()
 }

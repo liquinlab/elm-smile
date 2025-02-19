@@ -23,7 +23,7 @@ const buttonstyle = computed(() => {
         data-tooltip="Current trial counter"
         :disabled="api.dev.page_provides_trial_stepper == false"
       >
-        <span class="counter">{{ api.getPageTracker(api.currentRouteName()) }}</span>
+        <span class="counter">{{ api.getPageTrackerIndex(api.currentRouteName()) }}</span>
       </button>
     </p>
 

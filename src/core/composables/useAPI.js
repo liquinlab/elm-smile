@@ -152,6 +152,12 @@ export default function useAPI() {
     getPageTracker: (routeName) => {
       return smilestore.getPageTracker(routeName)
     },
+    getPageTrackerData: (routeName) => {
+      return smilestore.getPageTrackerData(routeName)
+    },
+    getPageTrackerIndex: (routeName) => {
+      return smilestore.getPageTrackerIndex(routeName)
+    },
     hasAutofill: () => {
       return smilestore.hasAutofill
     },
@@ -160,9 +166,6 @@ export default function useAPI() {
     },
     currentRouteName: () => {
       return route.name
-    },
-    getCurrentTrial: () => {
-      return smilestore.getPage[route.name]
     },
     getConditionByName: (name) => {
       return smilestore.getConditionByName(name)

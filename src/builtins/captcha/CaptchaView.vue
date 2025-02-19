@@ -27,11 +27,6 @@ const pages = [
   { component: CaptchaTrialMotorControl, props: {}, data: [] },
 ]
 
-const currentTab = computed(() => {
-  return pages[api.getCurrentTrial()]
-})
-// captcha steps
-
 // a dynamic loader for different trial types which is randomized?
 // each trial type is a simple game that just stores the data from the subject
 // games include tests of 10 possible games
@@ -45,8 +40,13 @@ const currentTab = computed(() => {
 
 const step = api.useStepper(pages)
 
+const currentTab = computed(() => {
+  return pages[step.index()]
+})
+// captcha steps
+
 function next_trial() {
-  if (api.getCurrentTrial() >= pages.length - 1) {
+  if (step.index() >= pages.length - 1) {
     //api.resetPageTracker() // you coudl reset when you leavr but why?
     finish()
   } else {

@@ -11,24 +11,20 @@ export function useStepper(trials) {
   const page = route.name
   smilestore.dev.page_provides_trial_stepper = true
 
-  //const index = ref(0)
   const n_trials = trials.length
 
   function nextStep() {
     log.log('STEPPER: Advancing to next step')
-    if (smilestore.getPageTracker(page) < n_trials - 1) {
-      //index += 1
+    if (smilestore.getPageTrackerIndex(page) < n_trials - 1) {
       smilestore.incrementPageTracker(page)
     } else {
       smilestore.incrementPageTracker(page)
-      //finishedCallback()
     }
   }
 
   function prevStep() {
     log.warn('TRIAL STEPPER: Rewinding to prev trial')
-    if (smilestore.getPageTracker(page) > 0) {
-      //index -= 1
+    if (smilestore.getPageTrackerIndex(page) > 0) {
       smilestore.decrementPageTracker(page)
     }
   }
@@ -38,7 +34,7 @@ export function useStepper(trials) {
   }
 
   const step_index = computed(() => {
-    return smilestore.getPageTracker(page)
+    return smilestore.getPageTrackerIndex(page)
   })
 
   const step = computed(() => {
