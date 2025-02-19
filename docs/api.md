@@ -75,7 +75,6 @@ available methods and their descriptions.
 - `hasAutofill()`: Checks if autofill is available.
 - `autofill()`: Performs autofill.
 - `currentRouteName()`: Returns the current route name.
-- `getCurrentTrial()`: Gets the current trial information.
 - `getBrowserFingerprint()`: Retrieves the browser fingerprint.
 - `preloadAllImages()`: Preloads all images for the experiment.
 - `getPublicUrl(path)`: Returns the public URL for a file. See
