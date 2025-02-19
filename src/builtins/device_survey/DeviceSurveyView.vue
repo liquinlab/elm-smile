@@ -40,13 +40,11 @@ function autofill() {
 api.setPageAutofill(autofill)
 
 const pages = ['page1', 'page2']
-const { nextStep, prevStep, step_index } = api.useStepper(pages, () => {
-  finish()
-})
+const step = api.useStepper(pages)
 
 function finish() {
   api.saveForm('device', forminfo)
-  api.stepNextView()
+  api.goNextView()
 }
 </script>
 
@@ -59,7 +57,7 @@ function finish() {
         to improve the quality of our experiments in the future.
       </p>
 
-      <div class="formstep" v-if="step_index == 0">
+      <div class="formstep" v-if="step.index() === 0">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -153,7 +151,7 @@ function finish() {
               <div class="columns">
                 <div class="column">
                   <div class="has-text-right">
-                    <button class="button is-warning" id="finish" v-if="page_one_complete" @click="nextStep()">
+                    <button class="button is-warning" id="finish" v-if="page_one_complete" @click="step.next()">
                       Continue &nbsp;
                       <FAIcon icon="fa-solid fa-arrow-right" />
                     </button>
@@ -165,7 +163,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-if="step_index == 1">
+      <div class="formstep" v-else-if="step.index() === 1">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -221,7 +219,7 @@ function finish() {
               <div class="columns">
                 <div class="column">
                   <div class="has-text-left">
-                    <button class="button is-warning" id="finish" @click="prevStep()">
+                    <button class="button is-warning" id="finish" @click="step.prev()">
                       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous
                     </button>
                   </div>
@@ -239,7 +237,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-if="step_index >= 2">
+      <div class="formstep" v-else>
         <article class="message is-danger">
           <div class="message-header">
             <p>Error</p>

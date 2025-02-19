@@ -52,7 +52,7 @@ function submitWithdraw() {
 <template>
   <div class="infobar" role="navigation" aria-label="main navigation">
     <div class="infobar-brand">
-      <a class="infobar-item" :href="appconfig.lab_url" target="_new" v-if="!appconfig.anonymous_mode">
+      <a class="infobar-logo" :href="appconfig.lab_url" target="_new" v-if="!appconfig.anonymous_mode">
         <img :src="api.getStaticUrl(appconfig.brand_logo_fn)" width="90" />
       </a>
       <div class="infobar-item">
@@ -150,9 +150,15 @@ function submitWithdraw() {
   padding-right: 20px;
 }
 
+.infobar-logo {
+  align-items: center;
+  padding-top: 12px;
+}
+
 .infobar-item {
   align-items: center;
   display: flex;
+  padding-top: 3px;
 }
 
 .infobar-end {

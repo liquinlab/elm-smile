@@ -69,7 +69,7 @@ const router = useRouter()
     <p class="control" v-if="api.hasNextView()">
       <button
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
-        v-on:click="api.stepNextView()"
+        v-on:click="api.goNextView()"
         data-tooltip="Step page forward"
       >
         <span>

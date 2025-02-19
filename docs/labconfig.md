@@ -177,6 +177,17 @@ later:
 
 ![Firebase get credentials](/images/labconfig-firebase-credentials-6.png)
 
+### Setup Firebase rules
+
+You need to setup the rules for your Firebase database. These rules are used to
+define the structure of the database and the permissions for accessing it. The
+`firebase.rules` file in the root of your project has an example of the rules
+which work well for most Smile Experiments. These rules allow participants to
+write data to the database and read their own data, but not the data of other
+participants. In addition, private data (personally identifiable information) is
+more heavily protected and is write only. You can upload these rules to your
+Firestore database in the Firebase console.
+
 ## Setup Slack
 
 When your code is updated to the Github it goes through a pre-processing step

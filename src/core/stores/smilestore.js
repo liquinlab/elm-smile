@@ -16,7 +16,6 @@ import {
 import sizeof from 'firestore-size'
 
 import useLog from '@/core/stores/log'
-
 ////////////  SET THE SEED FOR RANDOMIZATION //////////
 
 // note: we only need to run this on page load (not every time smilestore.js is imported in another file)
@@ -25,7 +24,6 @@ import useLog from '@/core/stores/log'
 
 // get local storage
 const existingLocalStorage = JSON.parse(localStorage.getItem(appconfig.local_storage_key))
-console.log(existingLocalStorage)
 
 let seed
 // if there is no local storage, then definitely have to set seed
@@ -53,7 +51,7 @@ if (!existingLocalStorage) {
 if (seed) {
   // set the seed
   seedrandom(seed, { global: true })
-  console.log('Set global seed to ' + seed)
+  //console.log('Set global seed to ' + seed)
 
   // save to local storage
   localStorage.setItem(
@@ -268,17 +266,26 @@ export default defineStore('smilestore', {
     registerPageTracker(page) {
       const log = useLog()
       if (this.local.pageTracker[page] === undefined) {
-        this.local.pageTracker[page] = 0
+        this.local.pageTracker[page] = {
+          index: 0,
+          data: {},
+        }
       }
     },
     getPageTracker(page) {
       return this.local.pageTracker[page]
     },
+    getPageTrackerIndex(page) {
+      return this.local.pageTracker[page]?.index
+    },
+    getPageTrackerData(page) {
+      return this.local.pageTracker[page]?.data
+    },
     incrementPageTracker(page) {
       const log = useLog()
       if (this.local.pageTracker[page] !== undefined) {
-        this.local.pageTracker[page] += 1
-        return this.local.pageTracker[page]
+        this.local.pageTracker[page].index += 1
+        return this.local.pageTracker[page].index
       } else {
         log.error('SMILESTORE: page tracker not initialized for page', page)
       }
@@ -286,18 +293,18 @@ export default defineStore('smilestore', {
     decrementPageTracker(page) {
       const log = useLog()
       if (this.local.pageTracker[page] !== undefined) {
-        this.local.pageTracker[page] -= 1
-        if (this.local.pageTracker[page] < 0) {
-          this.local.pageTracker[page] = 0
+        this.local.pageTracker[page].index -= 1
+        if (this.local.pageTracker[page].index < 0) {
+          this.local.pageTracker[page].index = 0
         }
-        return this.local.pageTracker[page]
+        return this.local.pageTracker[page].index
       } else {
         log.error('SMILESTORE: page tracker not initialized for page', page)
       }
     },
     resetPageTracker(page) {
       if (this.local.pageTracker[page]) {
-        this.local.pageTracker[page] = 0
+        this.local.pageTracker[page].index = 0
       }
     },
     recordWindowEvent(type, event_data = null) {
@@ -390,7 +397,7 @@ export default defineStore('smilestore', {
     },
     async setKnown() {
       const log = useLog()
-      // TODD: this need to have an exception handler wrapping around it
+      // TODO: this need to have an exception handler wrapping around it
       // because things go wrong
       this.local.knownUser = true
       this.data.seedID = this.local.seedID

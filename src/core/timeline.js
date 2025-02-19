@@ -331,8 +331,6 @@ class Timeline {
     }
     // this.buildProgress()
     // save built timeline to local
-    console.log(this.seqtimeline)
-    console.log(this.routes)
 
     smilestore.local.seqtimeline = this.seqtimeline
     smilestore.local.routes = this.routes

@@ -70,14 +70,14 @@ export default function useTimeline() {
     if (goto) router.push(goto)
   }
 
-  const stepNextView = (fn) => {
+  const goNextView = (fn) => {
     if (fn) fn()
     navigateTo(nextView())
   }
-  const stepPrevView = (fn) => {
+  const goPrevView = (fn) => {
     if (fn) fn()
     navigateTo(prevView())
   }
 
-  return { stepNextView, stepPrevView, gotoView, lookupNext }
+  return { goNextView, goPrevView, gotoView, lookupNext }
 }

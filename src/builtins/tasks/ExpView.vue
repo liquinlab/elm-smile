@@ -11,7 +11,7 @@ onMounted(async () => {
 
 function finish() {
   // smilestore.saveData()
-  api.stepNextView()
+  api.goNextView()
 }
 </script>
 
