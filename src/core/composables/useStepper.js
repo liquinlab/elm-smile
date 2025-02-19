@@ -51,31 +51,6 @@ export function useStepper(trials) {
   }
 }
 
-export function useStatelessStepper(trials, index, finishedCallback) {
-  //const index = ref(0)
-  const n_trials = trials.length
-
-  function nextStep() {
-    log.log('STATELESS STEPPER: Advancing to next trial')
-    //log.log("i see index", smilestore.getPageTracker(route.name))
-    if (index.value < n_trials - 1) {
-      index.value += 1
-    } else {
-      finishedCallback()
-      index.value += 1
-    }
-  }
-
-  function prevStep() {
-    log.warn('STATELESSS STEPPER: Rewinding to prev trial')
-    if (index.value > 0) {
-      index.value -= 1
-    }
-  }
-
-  return { nextStep, prevStep }
-}
-
 /*
 export function useTrialStepper(trials, page, finishedCallback) {
   log.log('using trial stepper')
