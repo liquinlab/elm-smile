@@ -1,13 +1,20 @@
-# :test_tube: Setup a base repo
+# :test_tube: Set up for new organization
 
-If you would like to use <SmileText/> in new lab/organization or for yourself
-you need to configure a small set of services (Github, Firebase, Slack, and a
-webserver) to play well together. This document walks you through the steps to
-configure a set up so that multiple users in a lab can share the same resources.
+Labs and organizations which are looking to start using <SmileText/> will have to
+configure a small set of services (Github, Firebase, Slack, and a webserver) to 
+communicate with one another. This configuration only needs to be done one time
+for a new organization, and then multiple users in a group will be able to share these
+resources. If you are using Smile for the first time as a solo user, you will need to 
+configure these services for yourself before you develop your first experiment.
 
-Even if you are using Smile alone you still will need to configure these
-services the first time you develop an experiment. However, afterwards you can
-run multiple experiments using the setup you configured once.
+:::warning First time user of an existing lab?
+
+You're in luck! If your lab already has a base repo in place, please skip this
+guide and jump straight to [adding a new user](/adduser) to be added to your
+organization. If you would like to learn more about how to set up your own 
+configuration for smile, keep reading.
+
+:::
 
 ## Overview
 
@@ -28,12 +35,11 @@ developing and launching experiments relatively painless.
   there are some technical limits, see [here](/datastorage) for more info).
 
 - **Slack** (weakly required).  
-   In order notify you and your other lab members when certain tasks are
+  In order notify you and your other lab members when certain tasks are
   complete or if there are errors, Smile uses a slack bot. You need to have a
   Slack account and get API keys to enable this. If you don't want to use Slack
   it is possible to modify the scripts to provide notifications another way
-  (e.g., email) but currently, that is not implemented and you'd have to
-  research that yourself.
+  (e.g., email) but currently, that is not implemented.
 
   ::: info Slack alternatives
 
@@ -60,20 +66,20 @@ The general overview of how these services interact is shown below:
 
 ![Overview of services](/images/service-overview.png)
 
-Basically, you push code to Github. Each time this happens your code is
+You push code to Github. Each time this happens, your code is
 [deployed](/deploying) to your web (i.e., http) server. In addition, a message
 is posted to slack to let you know if any errors occured while setting things
 up. Participants access your task via their web-browser which is able to write
 to the Google Firebase database.
 
 The following sections walk you through configuring each of these services.
-Remember that although this takes a few steps, it is a one-time set up and
-multiple projects, across multiple members of a lab can use the same
-infrastructure, mostly unaware of the details of this underlying configuration.
+Remember that although this takes a few steps, it is a one-time set up. Afterwards,
+multiple members of a lab can deploy multiple projects with the same infrastructure
+without worrying about the details of this underlying configuration. 
 
 ## Setup Github
 
-The following steps walk you through setting up Github for use with Smile and
+The following steps walk you through setting up Github to use with Smile and
 introduce some basic concepts.
 
 ### Create accounts
@@ -111,8 +117,8 @@ your base repo.
 ![Inheriting between Github repos](/images/labconfig-github-inherit.png)
 
 In the figure above, each node is a Github repository. Each lab (Hartley Lab,
-Lake Lab) forks from the base Smile repo and then student projects for that lab
-fork from the lab's base thus distributing the lab-specific configuration files.
+Lake Lab, Mattar Lab) forks from the base Smile repo. Then, student projects for that lab
+fork from the lab's base and inherit the lab-specific configuration files.
 
 To create this base repo, navigate to the main <SmileText/> repo
 [here](https://github.com/NYUCCL/smile/fork). A screenshot of this page should
@@ -129,20 +135,22 @@ organization was `hartleylabnyu`):
 
 ![Github overview](/images/labconfig-github-overview.png)
 
-Next you should clone a local copy of this repo to your computer:
+Next you should clone a local copy of this repo to your computer with the link
+found under the "Use this template" tab shown below:
 
 ![Cloned repo](/images/labconfig-github-clone.png)
 
 ![Github commandline](/images/labconfig-github-clone-commandline.png)
 
-The results is you will have a fresh copy of the Smile project files in a folder
-on your computer
+After successfully cloning your repository to your local system, you 
+will have a fresh copy of the Smile project files in a folder on your computer. 
+This repository/folder will now serve as a template for each new project/experiment. 
 
 ## Setup Firebase
 
 Data storage and recording is provided using Firebase cloud services
 (specifically Firestore which is a database service provided under the general
-Firebase sytem). You need to create a Firebase account and then create a
+Firebase sytem). You need to create a Firebase account and a
 Firestore project.
 
 First, go to https://console.firebase.google.com and create an account. After
@@ -154,9 +162,8 @@ Click create project and then choose a project name (can by anything, e.g., your
 lab/org name):
 ![Firebase new project](/images/labconfig-firebase-nameproject-2.png)
 
-When you are asked about enabling analytics, it doesn't matter really what you
-decide. Analytics might be able to give you some statistical insight into who is
-using your experiments but again it isn't critical.
+Enabling analytics is optional. While this may give you some statistical insight
+into who is using your experiments, this choice will not affect your experiment.
 
 ![Firebase enable analytics](/images/labconfig-firebase-analytics-3.png)
 
@@ -170,9 +177,9 @@ You do **not** need to also set up Firebase Hosting.
 
 ![Firebase add sdk](/images/labconfig-firebase-addwebapp-5.png)
 
-Next, add the Firebase SDK (select `use npm`) making sure to copy the Firebase
+Next, add the Firebase SDK (select `use npm`), making sure to copy the Firebase
 configuration keys that are shown as a chunk of javascript code lower on the
-page (highlight below) and saving them someplace safe as you will need these
+page (highlight below). Save the keys someplace safe, as you will need these
 later:
 
 ![Firebase get credentials](/images/labconfig-firebase-credentials-6.png)
@@ -376,17 +383,16 @@ git secret init
 
 to reinitialize your gitsecret setup.
 
-Next, create a `gpg` RSA key pair for yourself (e.g., lab manager/pi) see
-[this](https://git-secret.io/#using-gpg) for more info but basically you just
-type:
+Next, create a `gpg` RSA key pair (see [here](https://git-secret.io/#using-gpg)
+for more info) for yourself (e.g., lab manager/pi) using the command:
 
 ```
 gpg --full-generate-key
 ```
 
-In the prompts just choose the default options and make sure to remember the
+In the prompts, just choose the default options and make sure to remember the
 passphrase you use. You also will want to set the expiration of the key to 0
-(never expire).
+(never expire) when prompted. 
 
 Next, add the first user to your repo:
 
@@ -414,58 +420,18 @@ git secret hide
 
 Now commit everything that has changed to your github repo.
 
-## Managing your organization
 
-From this point forward, lab members in your group should just clone from your
-base repo and they will get the correct configuration files. They will have to
-run a set to decrypt those files so you will manually add and remove accounts
-from your base repo.
+## Making changes to the env files for your project
 
-### Adding additional users to your system
-
-First, get the user's GPG key (see above on instructions for that). Ask them to
-type (on mac):
-
-```
-gpg --armor --export their@email.id > pbcopy
-```
-
-and copy the public key to you in a email or slack.
-
-Next, import the key into your keychain by copying it to your keyboard then
-typing
-
-```
-pbpaste | gpg --import
-```
-
-Next this add to your keyring
-
-```
-git secret tell their@email.id
-```
-
-Finally, re-encrypt the files:
-
-```
-git secret reveal; git secret hide
-```
-
-### If you make changes to the env files for your project
-
-- reencrypt the files
-
+You may update the env files for the entire lab at any point. Just make 
+sure to re-encrypt the files and re-upload them to github using the following
+commands. 
 ```
 git secret hide
-```
-
-- upload them to the github repo
-
-```
 npm run upload_config
 ```
 
-### Configure your git secrets on github
+## Configure your git secrets on github
 
 To configure the github repo correct:
 
