@@ -27,9 +27,16 @@ export class StepState {
    * If no value is provided, automatically assigns the next available index as the value.
    * @param {*} value - Optional value for the new state. If null, uses states.length
    * @returns {StepState} The newly created child state
+   * @throws {Error} If a state with the given value already exists
    */
   push(value = null) {
     const autoValue = value === null ? this.states.length : value
+
+    // Check for existing state with same value
+    if (value !== null && this.states.some((state) => state.value === value)) {
+      throw new Error(`State with value "${value}" already exists in this node`)
+    }
+
     const state = new StepState(autoValue, this)
     this.states.push(state)
     return state
@@ -255,6 +262,18 @@ export class StepState {
     return this.states.reduce((leaves, state) => {
       return leaves.concat(state.getLeafNodes())
     }, [])
+  }
+
+  /**
+   * Gets a child node by its index or value.
+   * @param {number|*} identifier - Either the index or value of the child node to find
+   * @returns {StepState|null} The found child node, or null if not found
+   */
+  getNode(identifier) {
+    if (typeof identifier === 'number') {
+      return this.states[identifier] || null
+    }
+    return this.states.find((state) => state.value === identifier) || null
   }
 
   /**

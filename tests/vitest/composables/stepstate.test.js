@@ -79,6 +79,21 @@ describe('StepState', () => {
       expect(stepper.currentIndex).toBe(-1)
       expect(child.currentIndex).toBe(-1)
     })
+
+    it('should not allow pushing duplicate values', () => {
+      const root = new StepState()
+      root.push('A')
+
+      // Attempt to push duplicate value should throw error
+      expect(() => root.push('A')).toThrow('State with value "A" already exists in this node')
+
+      // Verify auto-generated values still work
+      expect(() => root.push()).not.toThrow()
+      expect(() => root.push()).not.toThrow()
+
+      // Verify different values still work
+      expect(() => root.push('B')).not.toThrow()
+    })
   })
 
   describe('path operations', () => {
@@ -259,6 +274,26 @@ describe('StepState', () => {
         ['child4', 'grandchild7', 'greatgrandchild6'],
         ['child4', 'grandchild7', 'greatgrandchild7'],
       ])
+    })
+  })
+
+  describe('node access', () => {
+    it('should get node by index and value correctly', () => {
+      const child1 = stepper.push('child1')
+      const child2 = stepper.push('child2')
+      const child3 = stepper.push('child3')
+
+      // Test getting by index
+      expect(stepper.getNode(0)).toBe(child1)
+      expect(stepper.getNode(1)).toBe(child2)
+      expect(stepper.getNode(2)).toBe(child3)
+      expect(stepper.getNode(3)).toBeNull()
+
+      // Test getting by value
+      expect(stepper.getNode('child1')).toBe(child1)
+      expect(stepper.getNode('child2')).toBe(child2)
+      expect(stepper.getNode('child3')).toBe(child3)
+      expect(stepper.getNode('nonexistent')).toBeNull()
     })
   })
 
