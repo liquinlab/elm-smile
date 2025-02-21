@@ -301,6 +301,30 @@ export class StepState {
       return state
     })
   }
+
+  /**
+   * Gets the current path through the tree based on selected nodes.
+   * Returns an array of values representing each selected node's value,
+   * excluding the root node ('/').
+   * @returns {Array} Array of values representing the current path
+   */
+  getCurrentPath() {
+    const path = []
+    let current = this
+
+    // Add current node's value if it's not the root
+    if (current.value !== '/') {
+      path.push(current.value)
+    }
+
+    // Add values of selected children
+    while (current.currentIndex !== -1 && current.states.length > 0) {
+      current = current.states[current.currentIndex]
+      path.push(current.value)
+    }
+
+    return path
+  }
 }
 
 export default StepState

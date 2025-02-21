@@ -108,6 +108,43 @@ describe('StepState', () => {
       const grandchild = child.push('grandchild')
       expect(grandchild.getNodeDepth()).toBe(2)
     })
+
+    it('should get current path correctly', () => {
+      const child1 = stepper.push('child1')
+      const grandchild1 = child1.push('grandchild1')
+      const child2 = stepper.push('child2')
+
+      // Initially no path is selected
+      expect(stepper.getCurrentPath()).toEqual([])
+
+      // Navigate through the tree
+      stepper.next() // moves to grandchild1
+      expect(stepper.getCurrentPath()).toEqual(['child1', 'grandchild1'])
+
+      stepper.next() // moves to child1
+      expect(stepper.getCurrentPath()).toEqual(['child2'])
+    })
+
+    it('should get current path string correctly with mixed named and indexed nodes', () => {
+      const child1 = stepper.push('child1')
+      const autoChild1 = child1.push() // Will be '0'
+      const autoChild2 = child1.push() // Will be '1'
+      const child2 = stepper.push('child2')
+      const namedChild = child2.push('named')
+
+      // Initially no path is selected
+      expect(stepper.getCurrentPathStr()).toBe('')
+
+      // Navigate through the tree
+      stepper.next() // moves to first auto-indexed child
+      expect(stepper.getCurrentPathStr()).toBe('child1-0')
+
+      stepper.next() // moves to second auto-indexed child
+      expect(stepper.getCurrentPathStr()).toBe('child1-1')
+
+      stepper.next() // moves to named child
+      expect(stepper.getCurrentPathStr()).toBe('child2-named')
+    })
   })
 
   describe('navigation', () => {
