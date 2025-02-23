@@ -34,7 +34,7 @@ const api = useAPI()
 
 // define the trials for the experiment
 
-const cs = api.getPageTrackerData(api.currentRouteName())
+const cs = api.getPageTrackerData()
 defineTrialsPersist(cs)
 
 function defineTrialsPersist(state) {
@@ -153,7 +153,7 @@ function finish() {
 
       <!-- debugging -->
       {{ cs.final_score }}
-      {{ api.getPageTracker(api.currentRouteName()) }}
+      {{ api.getPageTracker() }}
       <hr />
       <div v-for="t in cs.trials">
         <span v-for="tr in t">{{ tr }},</span>

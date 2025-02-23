@@ -149,14 +149,17 @@ export default function useAPI() {
     getRecruitmentService: () => {
       return smilestore.data.recruitment_service
     },
-    getPageTracker: (routeName) => {
-      return smilestore.getPageTracker(routeName)
+    getPageTracker: (routeName = null) => {
+      const lookupname = routeName || route.name
+      return smilestore.getPageTracker(lookupname)
     },
-    getPageTrackerData: (routeName) => {
-      return smilestore.getPageTrackerData(routeName)
+    getPageTrackerData: (routeName = null) => {
+      const lookupname = routeName || route.name
+      return smilestore.getPageTrackerData(lookupname)
     },
-    getPageTrackerIndex: (routeName) => {
-      return smilestore.getPageTrackerIndex(routeName)
+    getPageTrackerIndex: (routeName = null) => {
+      const lookupname = routeName || route.name
+      return smilestore.getPageTrackerIndex(lookupname)
     },
     hasAutofill: () => {
       return smilestore.hasAutofill
