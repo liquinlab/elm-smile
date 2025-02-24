@@ -9,12 +9,13 @@ import useLog from '@/core/stores/log'
 const log = useLog()
 
 import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
+
 // 3. add navigation guards
 //    currently these check if user is known
 //    and if they are, they redirect to last route
 function addGuards(r) {
   r.beforeEach(async (to, from) => {
+    const api = useAPI()
     if (api.isResetApp()) {
       log.warn('ROUTER GUARD: Resetting app')
       api.resetLocalState()
@@ -254,6 +255,7 @@ log.log('Vue Router initialized')
 
 // add additional guard to set global seed before
 router.beforeResolve((to) => {
+  const api = useAPI()
   const smilestore = useSmileStore()
   smilestore.removePageAutofill()
 
@@ -266,7 +268,7 @@ router.beforeResolve((to) => {
   } else {
     // if inactive, just re-seed with a random seed on every route entry
     api.randomSeed()
-    log.log('ROUTER GUARD: Not using participant-specific seed; seed set randomly to ' + newseed)
+    log.log('ROUTER GUARD: Not using participant-specific seed; seed set randomly')
   }
   log.clear_page_history()
   smilestore.dev.page_provides_trial_stepper = false // by default
