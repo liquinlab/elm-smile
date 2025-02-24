@@ -9,7 +9,6 @@ import RecruitmentChooser from '@/dev/developer_mode/RecruitmentChooserView.vue'
 import PresentationMode from '@/dev/presentation_mode/PresentationModeView.vue'
 
 import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
 
 class Timeline {
   constructor() {
@@ -21,7 +20,7 @@ class Timeline {
     this.has_welcome_anonymous = false
     this.g_nonseq = null
     this._IS_ROOT_NODE = '_IS_ROOT_NODE'
-
+    const api = useAPI()
     // add the recruitment chooser if in development mode
     if (api.config.mode === 'development') {
       this.registerView({
@@ -180,6 +179,7 @@ class Timeline {
   }
 
   pushRandomizedNode(routeConfig, push = true) {
+    const api = useAPI()
     const newroute = this.cloneRouteAndFillDefaults(routeConfig)
     // newroute should have name, options, and optional weights
 
@@ -276,6 +276,7 @@ class Timeline {
 
   pushConditionalNode(routeConfig, push = true) {
     // newroute should have name and a condition name (user specified, has to match something in data.conditions)
+    const api = useAPI()
     const newroute = this.cloneRouteAndFillDefaults(routeConfig)
 
     // Check if already registered if not pushing
