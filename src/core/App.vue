@@ -58,6 +58,10 @@ const total_height = computed(() => {
 
 const toosmall = ref(api.isBrowserTooSmall())
 
+const showStatusBar = computed(() => {
+  return api.currentRouteName() !== 'data' && api.currentRouteName() !== 'recruit' && api.config.mode != 'presentation'
+})
+
 onMounted(() => {
   api.log('App.vue initialized')
 
@@ -84,11 +88,7 @@ onMounted(() => {
       <NotificationProgress :item="item" />
     </Notification>
   </Notivue>
-  <StatusBar
-    v-if="
-      api.currentRouteName() !== 'data' && api.currentRouteName() !== 'recruit' && api.config.mode != 'presentation'
-    "
-  ></StatusBar>
+  <StatusBar v-if="showStatusBar"></StatusBar>
   <!-- the router loads here -->
   <div class="router" v-if="toosmall">
     <WindowSizerView triggered="true"></WindowSizerView>
