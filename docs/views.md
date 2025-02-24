@@ -63,6 +63,11 @@ add some other way to set the consent flag.
 
 In the docs for built-in view we will describe the side-effects of each view.
 
+### Metadata options
+
+Each View can also be defined with a set of metadata properties that control page access. These `meta` property will be configured in the `@/user/design.js`. Examples on all of the metadata properties will be shown in the below examples, and more information can be found [here](https://router.vuejs.org/guide/advanced/meta.html#Route-Meta-Fields).
+
+
 ## Overview of Built-in Views
 
 | Name                                                | Side&nbsp;effect? | Description                                                                                                                     |
@@ -241,7 +246,7 @@ timeline.pushSeqView({
 effects**: Yes, saves the data from the tasks.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
-CAPTHCAs (Completely Automated Public Turing test to tell Computers and Humans)
+CAPTCHAS (Completely Automated Public Turing test to tell Computers and Humans)
 are simple tasks used to verify that the user is a human and not a computer. We
 developed a unique CAPTCHA system for <SmileText/> that is fun and engaging for
 participants. The Smile CAPTCHA is a series of tasks that are easy for humans
@@ -308,14 +313,41 @@ timeline.pushSeqView({
 
 ### Simple Instructions
 
-**Component**: `src/components/AdvertisementView.vue`  
-**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
+This page presents the instructions for the experimental task to the participant. If the experiment contains multiple conditions and each requires a unique set of instructions, the participant may be randomly assigned a condition with custom weights so that the Instructions View displays the correct text. This page is also always accessible such that the user is able to return to it if they do not pass the instructions quiz. 
+
+
+**Component**: `@/builtins/instructions/InstructionsView.vue`  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/instructions/InstructionsView.vue)  
+**Side effects**: No  
 **Typical accessibility**: Always
+
+
+```js
+// put this at the top of the file
+import Instructions from '@/builtins/instructions/InstructionsView.vue'
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
+
+// assign instruction condition
+api.randomAssignCondition({
+  instructionsVersion: ['1', '2', '3'],
+  weights: [2, 1, 1], 
+})
+
+// instructions
+timeline.pushSeqView({
+  name: 'instructions',
+  component: Instructions,
+  meta: {
+    allowAlways: true,
+  },
+})
+```
 
 ### Instructions Quiz
 
 **Component**: `@/builtins/instructions_quiz/InstructionsQuiz.vue`  
-**Side effects**: saves the data from the quiz  
+**Side effects**: Saves the data from the quiz  
 **Typical accessibility**: Always
 
 The instructions quiz is a simple quiz that makes sure the participant has read
@@ -466,7 +498,8 @@ timeline.pushSeqView({
 
 ### Withdraw
 
-**Component**: `src/components/AdvertisementView.vue`  
+**Component**: `@/builtins/withdraw/WithdrawView.vue`  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/withdraw/WithdrawView.vue)  
 **Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
 **Typical accessibility**: `{ requiresWithdraw: true }`
 
@@ -486,41 +519,87 @@ taken to a final page asking them to return the task/hit. It is the
 responsibility of the experimenter to monitor withdraws and to try to contact
 the participant.
 
+
+```js
+// put this at the top of the file
+import Withdraw from '@/builtins/withdraw/WithdrawView.vue'
+
+// withdraw
+timeline.registerView({
+  name: 'withdraw',
+  meta: {
+    requiresWithdraw: true,
+    resetApp: api.getConfig('allow_repeats'),
+  },
+  component: Withdraw,
+})
+```
 ### Debrief
 
-**Component**: `src/components/AdvertisementView.vue`  
-**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
-**Typical accessibility**: Always
+**Component**: `@/builtins/debrief/DebriefView.vue`  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/debrief/DebriefView.vue)  
+**Side effects**: No  
+**Typical accessibility**: Always  
+
+The debrief page displays the text that explains the purpose of the experiment and provides the participant with any additional postfacto information about the task they just completed. The text can be customized in `@/user/components/DebriefText.vue`, and this page will transition the user to their post-experiment surveys. 
+
+```js
+// put this at the top of the file
+import Debrief from '@/builtins/debrief/DebriefView.vue'
+
+// debrief
+import DebriefText from '@/user/components/DebriefText.vue' // get access to the global store
+timeline.pushSeqView({
+  name: 'debrief',
+  component: Debrief,
+  props: {
+    debriefText: markRaw(DebriefText),
+  },
+})
+
+```
 
 ### Thanks
 
-**Component**: `src/components/AdvertisementView.vue`  
-**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
-**Typical accessibility**: Always
+**Component**: `@/builtins/thanks/ThanksView.vue`  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/thanks/ThanksView.vue)  
+**Side effects**: Yes, saves the data from the form.  
+**Typical accessibility**: `{requiresDone: true}`
+
+
+```js
+// put this at the top of the file 
+import Thanks from '@/builtins/thanks/ThanksView.vue'
+
+// thanks
+timeline.pushSeqView({
+  name: 'thanks',
+  component: Thanks,
+  meta: {
+    requiresDone: true,
+    resetApp: api.getConfig('allow_repeats'),
+  },
+})
+```
 
 ### Feedback Survey
 
 **Component**: `src/builtins/task_survey/TaskFeedbackSurveyView.vue`  
 **Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/task_survey/TaskFeedbackSurveyView.vue.vue)  
-**Side
-effects**: Yes, saves the data from the form.  
+**Side effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The task survey asks some simple questions about the participant's experience in
-the task includeing
+the task. The questions gauge how enjoyable and challenging the task was and offer a space for the participant to provide general feedback and comments on issues and improvements. 
 
-- How enjoyable was the task?
-- How difficult was the task?
-- General comments
-- Comments about issues or improvements
-
-If you want this to be the last view in the study you can set the `setDone` meta
+If you want this to be the last view in the study, you can set the `setDone` meta
 field.
 
 ```js
 // put this at the top of the file
 import TaskFeedbackSurvey from '@/builtins/device_survey/TaskFeedbackSurveyView.vue'
 
+// feedback
 timeline.pushSeqView({
   name: 'feedback',
   component: TaskFeedbackSurvey,

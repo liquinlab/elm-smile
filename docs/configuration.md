@@ -46,7 +46,7 @@ files provided in the repository.
 
 This will only work if you have signed and encrypted your lab's configurations.
 See instructions
-[here](/requirements#_3-request-access-to-the-shared-database-resources).
+[here](/adduser).
 
 :::
 
@@ -483,9 +483,9 @@ performing your experiment via the source code. So it is useful to keep in mind
 if a configuration option should or shouldn't be shared with your Javascript
 experiment.
 
-## Adding New Configuration Options
+## Adding new configuration options
 
-Adding new configuration options should mostly happen in `.env.local`. You
+Adding new configuration options can also happen in `.env.local`. You
 simply make up a new `VITE_SOMETHING` variable. Then add it to the object in
 `src/core/config.js` to expose it to your web application! The configuration is
 available as `smileconfig` anywhere in your Vue app. It's pretty easy.

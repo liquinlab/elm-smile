@@ -87,7 +87,7 @@ stored.
         </tr>
         <tr>
             <td class="label">
-                <label for="base_git">Base Github repot</label><br>
+                <label for="base_git">Base Github repo</label><br>
                 If in gureckislab then default to `nyuccl/smile` otherwise, it is the base smile repo for your lab (e.g, `hartleylab/smile`).
             </td>
             <td class="data">
@@ -185,7 +185,7 @@ needs to be run once in your project the first time you create it. If you are
 collaborating with someone on an existing project you only need to run
 `git secret reveal`.
 
-::: danger Error
+::: info Error handling
 
 In case of error, retry the process of [adding a new user](/adduser).
 
