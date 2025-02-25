@@ -4,8 +4,7 @@ Most experiments make use of randomization: tasks are presented to participants
 in a random order, stimuli are randomly selected from a large pool of possible
 stimuli, participants are randomly assigned to conditions, etc.
 
-This page shows how to generate random numbers in <SmileText />, and how to use
-random numbers to accomplish each of the above tasks.
+This page shows how to accomplish each of the above tasks.
 
 ## Seeded random number generation
 
@@ -22,12 +21,24 @@ This makes it easier to find bugs, understand each participant's responses, etc.
 Seeding is also useful for testing: we can easily reconstruct the exact same
 trials/stimuli/conditions over and over again.
 
-In <SmileText />, seeding happens automatically upon entry into a **route** (see
-[Timeline](/timeline) for more on routes). Seeds have two components. The first
-component is a random character string we'll call the "seed ID," generated for
-each participant. The second is the name of the route that is currently being
-displayed. Each time a given route is entered (or re-entered), the random number
-generator will be seeded with the route-specific, participant-specific seed.
+Finally, seeding helps prevent randomization errors that can happen when a
+participant accidentally refreshes the page or leaves the page and comes back
+later. **Without** seeded random number generation, a View that randomly
+presents will likely present a different image when the page is refreshed.
+**With** participant-specific seeded random number generation, the View will
+always present the same image when re-visited by the same participant.
+
+In <SmileText />, seeding happens automatically when the website is first
+launched, then again upon entry into each **View** (see [Timeline](/timeline)
+for more on Views and navigation between them). Seeds have two components. The
+first component is a random character string we'll call the "seed ID," generated
+for each participant. The second is the name of the route that is currently
+being displayed. Each time a given route is entered (or re-entered), the random
+number generator will be seeded with the route-specific, participant-specific
+seed. This means that the study will be fully randomized for each participant
+with a new, unique seed. As a result, everything will be fully randomized
+_across_ participants, but completely reproducible _within_ a participant's
+session.
 
 So for example, for a participant with seed ID
 `a5c40328-0625-4353-bab1-05612539dcc3` who enters the route `instructions`, the
@@ -51,57 +62,100 @@ const lodash = _.runInContext()
 lodash.shuffle([1, 2, 3])
 ```
 
-Why is the random number generator re-seeded upon entry to each route? Why can't
-we just seed it once? If the participant accidentally refreshes a page, we want
-the _same_ random number to be generated on each refresh. For example, if a
-random number generator controls which of two images is presented to that
-participant, we don't want the participant to see image 1, accidentally refresh,
-then be re-randomized to see image 2. If the random number generator was seeded
-at the beginning of the study, this is exactly what could happen when the page
-is refreshed (because the code for the beginning of the study won't be re-run).
-However, if the random number generator is seeded within the route where
-randomization occurs, the seed will be reset each time the page reloads. As a
-result, we will always generate the same random numbers for that participant
-within that route.
-
-**Warning:** Be careful with routes that step through multiple trials.
-Generally, if a single route steps through multiple views, each of which require
-a random number (e.g., multiple trials), you should generate all random numbers
-for that route at the beginning of the route (rather than within each specific
+**Warning:** Be careful with Views that step through multiple trials using the
+[stepper](/steps). Generally, if a single View steps through multiple trials,
+each of which require a random number, you should generate all random numbers
+for that route at the beginning of the View (rather than within each specific
 trial). Here's why: If the participant refreshes the page, you want them to go
-back to the trial where they left off (see `pageTracker` in
-`stores/smilestore.js` for more on this). If you set all random numbers at the
+back to the trial where they left off. If you set all random numbers at the
 beginning, the participant can easily pick up from trial 10 with the same
-randomization (all random numbers are regenerated upon refresh, and the
-`pageTracker` will correctly point to the 10th random number for the 10th
-trial). However, if you set random numbers within each trial, the partcipant
-will get a different random number on trial 10 before page refresh (the 10th
-random number after seeding) and after page refresh (the 1st random number after
-seeding).
+randomization (all random numbers are regenerated upon refresh, and the stepper
+will correctly point to the 10th random number for the 10th trial). However, if
+you set random numbers within each trial, the partcipant will get a different
+random number on trial 10 before page refresh (the 10th random number after
+seeding) and after page refresh (the 1st random number after seeding).
+
+## Random condition assignment
+
+Now that you understand seeded random number generation, we'll show you how
+randomization is used in <SmileText />. First, let's look at randomly assigning
+conditions. The [API](/api) provides a function to randomly assign participants
+to between-subjects conditions. This requires a name for the condition (e.g.,
+`taskOrder`) and any number of values that the condition can take (e.g., `AB`
+and `BA`).
+
+```js
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
+
+api.randomAssignCondition({
+  taskOrder: ['AB', 'BA'],
+})
+```
+
+This function can also include weights. Say you want twice as many participants
+in variation condition C compared to variation condition D:
+
+```js
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
+
+api.randomAssignCondition({
+  variation: ['C', 'D'],
+  weights: [2, 1],
+})
+```
+
+Note that the weights are automatically normalized, so [2/3, 1/3] or [4, 2]
+would generate the same distribution.
+
+To access the value of the condition elsewhere (e.g., in the instructions
+component), you can do:
+
+```js
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
+
+api.getConditionByName(taskOrder)
+api.getConditionByName(variation)
+```
+
+As long as the condition has already been set, this will return the value
+assigned to each condition (e.g., `AB` or `BA` for taskOrder). If the condition
+has not already been set, this will return `undefined`. Generally, we recommend
+that you assign all conditions at the beginning of the experiment in
+`design.js`, to avoid cases where you try to access a condition that doesn't
+exist yet.
 
 ## Built-in randomization functions
 
-<SmileText /> includes the following built-in randomization functions:
+You may also want to do your own custom randomization, outside of condition
+assignment. For example, maybe you want to randomize the order of trials that
+you give to the [trial stepper](/steps), or only display a subset of trials.
 
-### `random.randomInt(min, max)`
+<SmileText /> [API](/api) includes the following built-in randomization
+functions for these situations:
 
-Generates a random integer between min and max (both inclusive). For example,
-this can be used to assign a participant to a (numbered) condition.
+### `api.randomInt(min, max)`
+
+Generates a random integer between min and max (both inclusive).
 
 ```js
-import * as random from '@/core/randomization'
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 // generate a random integer: 1, 2, 3, 4, or 5
-const condition = random.randomInt(1, 5)
+const number = api.randomInt(1, 5)
 ```
 
-### `random.shuffle(array)`
+### `api.shuffle(array)`
 
 Randomly shuffles an array. For example, this can be used to present some fixed
 stimuli in a random order.
 
 ```js
-import * as random from '@/core/randomization'
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 const stimuli = [
   'image1.png',
@@ -112,16 +166,17 @@ const stimuli = [
 ]
 
 // shuffle the stimulus array
-const stimuli_shuffled = random.shuffle(stimuli)
+const stimuli_shuffled = api.shuffle(stimuli)
 ```
 
-### `random.sampleWithoutReplacement(array, sampleSize)`
+### `api.sampleWithoutReplacement(array, sampleSize)`
 
 Samples **without** replacement from an array. For example, this can be used to
 randomly present 3 stimuli from a larger set.
 
 ```js
-import * as random from '@/core/randomization'
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 const stimuli = [
   'image1.png',
@@ -132,17 +187,18 @@ const stimuli = [
 ]
 
 // sample (without replacement) from array
-const stimuli_selected = random.sampleWithoutReplacement(stimuli, 3)
+const stimuli_selected = api.sampleWithoutReplacement(stimuli, 3)
 ```
 
-### `random.sampleWithReplacement(array, sampleSize)`
+### `api.sampleWithReplacement(array, sampleSize)`
 
 Samples **with** replacement from an array. For example, this can be used to
 randomly present 3 stimuli from a larger set (with the possibility of presenting
 the same stimulus twice).
 
 ```js
-import * as random from '@/core/randomization'
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 const stimuli = [
   'image1.png',
@@ -153,7 +209,7 @@ const stimuli = [
 ]
 
 // sample (with replacement) from array
-const stimuli_selected = random.sampleWithReplacement(stimuli, 3)
+const stimuli_selected = api.sampleWithReplacement(stimuli, 3)
 ```
 
 ### `random.expandProduct(...arrays)`
@@ -162,7 +218,8 @@ Computes the cartesian product of any number of arrays. For example, this can be
 used to get all permutations of three condition variables.
 
 ```js
-import * as random from '@/core/randomization'
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 
 const stimuli = [
   'image1.png',
@@ -175,7 +232,7 @@ const prompts = ['click the red button', 'click the blue button']
 const backgroundColors = ['purple', 'orange', 'yellow']
 
 // get cartesian product of all arrays -- this will return an array of 5 x 2 x 3 = 30 arrays (each of length 3), each of which contains a stimulus, prompt, and background color
-const all_trial_types = random.expandProduct(stimuli, prompts, backgroundColors)
+const all_trial_types = api.expandProduct(stimuli, prompts, backgroundColors)
 ```
 
 ### Random timeline routes
@@ -186,8 +243,7 @@ It is possible to randomize the order of routes in the timeline. See
 ## "Unseeded" random number generation
 
 In rare cases, it may be desirable to generate "true" or "unseeded" random
-numbers (by default `Math.random()` actually does set a seed, but it's set
-automatically using other random stuff). To do so, you can use the smile API:
+numbers. To do so, you can use the smile API:
 
 ```js
 const api = useAPI()
@@ -196,8 +252,8 @@ const api = useAPI()
 api.randomSeed()
 ```
 
-This will initialize the components with a random seed on each load of the View.
-You can also provide a fixed seed using the same function:
+This will initialize the component with a random seed each time the View is
+loaded. You can also provide a fixed seed using the same function:
 
 ```js
 const api = useAPI()
@@ -212,29 +268,24 @@ As mentioned, <SmileText /> automatically generates a seed ID, which is used to
 set all local seeds throughout the experiment. When in dev mode (see
 [Developing](/developing)), you can also override the seed ID. By doing so, you
 can recreate exactly what a participant saw when they completed the experiment
-(or what you yourself saw in a previous run of the experiment). To do so, on the
-developer mode landing page, replace the contents of the textbox with the seed
-ID you'd like to use. Then click the green refresh button to the right of the
-textbox. Finally, proceed with choosing a platform. The following run of the
-experiment will use random numbers determined by the seed ID you entered.
-
-**Note**: You must choose a platform for the seed to work properly. Make sure
-you choose the same platform when trying to re-run the same seed.
+(or what you yourself saw in a previous run of the experiment). To do so, in the
+dev toolbar randomization dropdown, replace the contents of the textbox with the
+seed ID you'd like to use. Then click the arrow button to the right of the
+textbox. You will now be viewing the experiment using randomization with that
+seed.
 
 ![Seed override](/images/seedoverride.png)
 
-You can also override the seed within a component (e.g., if you'd like to
-re-randomize the condition assignment without starting over the entire
-experiment). To do so, uncheck the box labeled "Seed" in the developer mode
-navigation bar (see below). Now, every time you refresh the page, a new random
-seed will be set (at random---you cannot choose which seed is set). To re-enable
-the initial seed, check the box and refresh the page.
+You can also remove seeded random number generation within a component (e.g., if
+you'd like to re-randomize the condition assignment without starting over the
+entire experiment). To do so, in the same dropdown shown above, switch off
+"Fixed Seed." Now, every time you refresh the page, everything in the View will
+be newly randomized.
 
-![Nav bar randomization override](/images/navbaroverride.png)
+In the same dropdown, you can also override the assigned conditions, by clicking
+on the dropdown for each condition:
 
-As shown in the image above, you can also override the assigned condition using
-the developer mode navigation bar. Hover over the dropdown menu for any named
-condition (pulled from `possibleConditions` in the local store). You can then
-select a condition to override the assigned condition. This could be useful e.g.
-if you want to preview the instructions shown to participants in each condition
-without restarting the entire experiment.
+![Nav bar condition override](/images/conditionoverride.png)
+
+This could be useful e.g. if you want to preview what different in-View
+randomization outputs might look like without re-starting the whole experiment.

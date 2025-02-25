@@ -265,7 +265,7 @@ router.beforeResolve((to) => {
   } else {
     // if inactive, just re-seed with a random seed on every route entry
     api.randomSeed()
-    log.log('ROUTER GUARD: Not using participant-specific seed; seed set randomly to ' + newseed)
+    log.log('ROUTER GUARD: Not using participant-specific seed; seed set randomly')
   }
   log.clear_page_history()
   smilestore.dev.page_provides_trial_stepper = false // by default
