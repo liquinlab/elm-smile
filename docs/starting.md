@@ -130,7 +130,12 @@ cd ~/Desktop
 Following the steps below, copy the Smile GitHub repo into a new project name
 and clone it locally.
 
-In this example command, the new project will be named `{{config.projectname}}`:
+In this example command, the new project will be named `{{config.projectname}}`,
+using the NYU CCL Smile GitHub repo as a template.
+
+**Note:** if your lab has already been [set up](/labconfig), you will likely use
+your lab's copy of the Smile GitHub repo as a template (e.g.,
+`hartleylab/smile`).
 
 <div class="language-js"><pre><code><span class="line">gh repo create {{config.projectname}} --private --template {{config.base_git}}</span></code></pre></div>
 
