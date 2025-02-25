@@ -7,7 +7,7 @@ experiments.
 
 ## :woman_technologist: Developer mode
 
-When learning about <SmileText/> and later developing/debugging your experiment
+When learning about <SmileText/> and later developing/debugging your experiment,
 it is useful to interact with Smile using a web server running on your local
 computer (i.e., your laptop or desktop). <SmileText/> provides a special local
 developer mode that adds some interface elements to the page that help you debug
@@ -55,7 +55,7 @@ views [here](/views).
 
 Smile comes with several [built-in views](/views#built-in-views) for common
 phases of an experiment. This includes things like obtaining informed consent,
-presenting instructions, CAPTCHAs and presenting a thank you page. We describe
+presenting instructions, CAPTCHAs, and presenting a thank you page. We describe
 these default built-in views and provide an overview of how to customize them
 for your own experiment.
 
@@ -82,13 +82,13 @@ Many experiments are organized into a series of repeated events called "trials".
 Trials are different than Views because they often repeat the same basic
 structure many times (analogous to the difference between a 'slide' and a 'build
 step' in a Keynote/Powerpoint presentation). Smile provides several features for
-[stepping views through a series of states](/steps). We introduce the concept of
-a steps and how to programmatically advance through a sequence of steps within a
-particular View. The same concept is also used to add sequential build to any
-type of view (e.g., a sequence of instructions or a multi-part form). Critically
-by using the built-in <SmileText/> stepped Views feature if a participant
-refreshes the page or loses internet connection, they can pick up where they
-left off.
+[stepping views through a series of trials](/steps). We introduce the concept of
+a "step" and how to programmatically advance through a sequence of steps within
+a particular View. The same concept is also used to add sequential steps to any
+type of view (e.g., a sequence of instructions or a multi-part form).
+Critically, by using the built-in <SmileText/> "stepped Views" feature, if a
+participant refreshes the page or loses internet connection, they can pick up
+where they left off.
 
 <img src="/images/steps.png" width="600" alt="steps example" style="margin: auto;">
 
@@ -110,7 +110,7 @@ the flow of experiments.
 
 ## :framed_picture: Image and Videos
 
-Many experiments preset videos or images to participants. We describe how to
+Many experiments present videos or images to participants. We describe how to
 distribute [images and videos](/imagesvideo) with your Smile project, how to
 preload them so that they appear immediately when needed, and how to display
 them in your experiment.
@@ -129,5 +129,5 @@ project.
 
 The most important function of any web experiment platform is securely saving
 data. Smile provides serveral ways to [save and record data](/datastorage). In
-addition the Smile API takes care of manny functions for you so you rarely have
-to think much about data storage and saving.
+addition the Smile API provides convenience functions for data saving, making it
+quick and easy to save and store what you need.
