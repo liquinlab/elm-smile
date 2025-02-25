@@ -2,13 +2,16 @@
 import { createTestingPinia } from '@pinia/testing'
 import useSmileStore from '@/core/stores/smilestore' // get access to the global store
 import { processQuery } from '@/core/utils'
+import { setActivePinia } from 'pinia'
 
 describe('processQuery tests', () => {
   beforeEach(() => {
+    // Create and set the active pinia instance
     const pinia = createTestingPinia({ stubActions: false })
+    setActivePinia(pinia)
   })
 
-  it('is detects when referred from prolific', () => {
+  it('detects when referred from prolific', () => {
     const smilestore = useSmileStore()
     const query = {
       PROLIFIC_PID: '123',
@@ -27,7 +30,7 @@ describe('processQuery tests', () => {
     expect(smilestore.private.recruitment_info).toStrictEqual(finalform) // this is "deep" equality
   })
 
-  it('is detects when referred from cloudresearch', () => {
+  it('detects when referred from cloudresearch', () => {
     const smilestore = useSmileStore()
     const query = {
       assignmentId: '123',
@@ -46,7 +49,7 @@ describe('processQuery tests', () => {
     expect(smilestore.private.recruitment_info).toStrictEqual(finalform)
   })
 
-  it('is detects when referred from mechanical turk', () => {
+  it('detects when referred from mechanical turk', () => {
     const smilestore = useSmileStore()
     const query = {
       assignmentId: '123',
@@ -65,7 +68,7 @@ describe('processQuery tests', () => {
     expect(smilestore.private.recruitment_info).toStrictEqual(finalform)
   })
 
-  it('is detects when referred from citizen science portal', () => {
+  it('detects when referred from citizen science portal', () => {
     const smilestore = useSmileStore()
     const query = {
       CITIZEN_ID: '123',

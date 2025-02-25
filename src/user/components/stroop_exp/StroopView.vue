@@ -73,9 +73,9 @@ function defineTrialsPersist(state) {
 
 // autofill all the trials
 function autofill() {
-  api.debug('running autofill')
+  api.log.debug('running autofill')
   while (step.index() < cs.trials.length) {
-    api.debug('auto stepping')
+    api.log.debug('auto stepping')
 
     // autofill the trial
     // api.faker.render() will autofill the trial with the expected data
@@ -110,17 +110,17 @@ const stop = onKeyDown(
   (e) => {
     if (step.index() < cs.trials.length) {
       e.preventDefault()
-      api.debug('pressed ${e}')
+      api.log.debug('pressed ${e}')
       const reactionTime = performance.now() - trialStartTime.value
       if (['r', 'R'].includes(e.key)) {
         // handle Red
-        api.debug('red')
+        api.log.debug('red')
       } else if (['g', 'G'].includes(e.key)) {
         // handle Green
-        api.debug('green')
+        api.log.debug('green')
       } else if (['b', 'B'].includes(e.key)) {
         // handle Blue
-        api.debug('blue')
+        api.log.debug('blue')
       }
       cs.trials[step.index()].accuracy = step.current().color === e.key ? 1 : 0
       cs.trials[step.index()].response = e.key

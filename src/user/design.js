@@ -37,7 +37,7 @@ import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
 import Timeline from '@/core/timeline'
-const timeline = new Timeline()
+const timeline = new Timeline(api)
 
 import useSmileStore from '@/core/stores/smilestore'
 import { onBeforeRouteLeave } from 'vue-router'

@@ -31,7 +31,7 @@ const rotateImageDelta = (rotationAmount) => {
   //const rotationAmount = direction === 'left' ? -90 : 90
   if (imageRef.value) {
     initRotation += rotationAmount
-    api.log(`${initRotation}`)
+    api.log.log(`${initRotation}`)
     imageRef.value.style.transform = `rotate(${initRotation}deg)`
   }
 }
@@ -40,7 +40,7 @@ onMounted(() => {
   rotateImage(initRotation)
   start_time = Date.now()
   timeout.value = ((MAX_TIME - (Date.now(0) - start_time)) / MAX_TIME) * 100
-  api.log(`${timeout}`)
+  api.log.log(`${timeout}`)
 })
 
 var myInterval = setInterval(() => {

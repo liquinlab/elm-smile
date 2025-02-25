@@ -1,7 +1,11 @@
 /* eslint-disable no-undef */
-
-import axios from 'axios'
-import { createTestingPinia, setActivePinia } from 'pinia'
+//import axios from 'axios'
+import { setActivePinia } from 'pinia'
+import { createTestingPinia } from '@pinia/testing'
+import { createRouter, createWebHashHistory } from 'vue-router'
+import { mount } from '@vue/test-utils'
+import { defineComponent } from 'vue'
+import useAPI from '@/core/composables/useAPI'
 
 import Timeline from '@/core/timeline'
 
@@ -10,95 +14,204 @@ vi.mock('axios', () => ({
 }))
 
 describe('Timeline tests', () => {
+  let router
+  let pinia
+  let api
+  const MockComponent = { template: '<div>Mock Component</div>' }
+
   beforeEach(() => {
-    // Create a new Pinia instance and set it as the active instance before each test
+    // Create a router instance
+    router = createRouter({
+      history: createWebHashHistory(),
+      routes: [{ path: '/', component: { template: '<div>Home</div>' } }],
+    })
+
+    // Create a test component that uses the API
+    const TestComponent = defineComponent({
+      setup() {
+        api = useAPI()
+        // Mock the required API properties
+        api.config = {
+          mode: 'production', // or 'development' or 'presentation' based on your needs
+        }
+        api.log = {
+          debug: vi.fn(),
+          error: vi.fn(),
+          warn: vi.fn(),
+          log: vi.fn(),
+        }
+        api.store = {
+          getRandomizedRouteByName: vi.fn(),
+          setRandomizedRoute: vi.fn(),
+          registerPageTracker: vi.fn(),
+          config: { mode: 'production' },
+          local: {},
+        }
+        return { api }
+      },
+      template: '<div>Test Component</div>',
+    })
+
+    // Create pinia instance and set it as active
     pinia = createTestingPinia({ stubActions: true })
     setActivePinia(pinia)
+
+    // Mount the test component with router
+    mount(TestComponent, {
+      global: {
+        plugins: [[router], [pinia]],
+      },
+    })
   })
 
+  // Helper function to add required welcome route
+  const addWelcomeRoute = (timeline) => {
+    timeline.pushSeqView({
+      path: '/welcome',
+      name: 'welcome_anonymous',
+      component: MockComponent,
+    })
+  }
+
   it('should be able to create a timeline', () => {
-    const timeline = new Timeline()
+    const timeline = new Timeline(api)
+    addWelcomeRoute(timeline)
+    timeline.build()
     expect(timeline).toBeDefined()
   })
 
-  it('should add a sequential route', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-    const timeline = new Timeline()
+  it('should be able to add a route', () => {
+    const timeline = new Timeline(api)
+    addWelcomeRoute(timeline)
+
     timeline.pushSeqView({
-      path: '/',
-      name: 'index',
+      path: '/test-route',
+      name: 'test_route',
       component: MockComponent,
     })
-    expect(timeline.routes.length).toBe(1)
-    expect(timeline.seqtimeline.length).toBe(1)
+
+    timeline.build()
+    expect(timeline.routes.length).toBe(3) // welcome + test route
+  })
+
+  it('should throw error on duplicate path', () => {
+    const timeline = new Timeline(api)
+    addWelcomeRoute(timeline)
+
+    timeline.pushSeqView({
+      path: '/test-route',
+      name: 'test_route1',
+      component: MockComponent,
+    })
+
+    expect(() => {
+      timeline.pushSeqView({
+        path: '/test-route',
+        name: 'test_route2',
+        component: MockComponent,
+      })
+    }).toThrow('DuplicatePathError:/test-route')
+  })
+
+  it('should throw error on duplicate name', () => {
+    const timeline = new Timeline(api)
+    addWelcomeRoute(timeline)
+
+    timeline.pushSeqView({
+      path: '/test-route1',
+      name: 'test_route',
+      component: MockComponent,
+    })
+
+    expect(() => {
+      timeline.pushSeqView({
+        path: '/test-route2',
+        name: 'test_route',
+        component: MockComponent,
+      })
+    }).toThrow('DuplicateNameError:test_route')
+  })
+
+  it('should add a sequential route', () => {
+    const timeline = new Timeline(api)
+    addWelcomeRoute(timeline)
+
+    timeline.pushSeqView({
+      path: '/test-route1',
+      name: 'test_route',
+      component: MockComponent,
+    })
+    expect(timeline.routes.length).toBe(3)
+    expect(timeline.seqtimeline.length).toBe(2)
   })
 
   it('should add a nonsequential route', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-    const timeline = new Timeline()
+    const timeline = new Timeline(api)
+    addWelcomeRoute(timeline)
     timeline.registerView({
-      path: '/',
-      name: 'index',
+      path: '/test-route1',
+      name: 'test_route',
       component: MockComponent,
     })
-    expect(timeline.routes.length).toBe(1)
-    expect(timeline.seqtimeline.length).toBe(0)
+    expect(timeline.routes.length).toBe(3)
+    expect(timeline.seqtimeline.length).toBe(1)
 
     // non sequential routes should be null
-    expect(timeline.routes[0].meta.prev).toBe(null) // should be null
-    expect(timeline.routes[0].meta.next).toBe(null) // should be null
+    expect(timeline.routes[1].meta.prev).toBe(undefined) // should be null
+    expect(timeline.routes[1].meta.next).toBe(undefined) // should be null
   })
 
   it('should leave next and prev undefined but meta defined if a sequential route', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-    const timeline = new Timeline()
+    const timeline = new Timeline(api)
+    addWelcomeRoute(timeline)
     timeline.pushSeqView({
-      path: '/',
-      name: 'index',
+      path: '/test-route1',
+      name: 'test_route',
       component: MockComponent,
       // meta: { prev: 'prev', next: 'next' },
     })
-    expect(timeline.routes[0].meta).toBeDefined()
-    expect(timeline.routes[0].meta.next).toBe(undefined)
-    expect(timeline.routes[0].meta.prev).toBe(undefined)
+    expect(timeline.routes[1].meta).toBeDefined()
+    expect(timeline.routes[1].meta.next).toBe(undefined)
+    expect(timeline.routes[1].meta.prev).toBe(undefined)
   })
 
   it('should leave next or prev undefined if meta is configured for the other', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-    const timeline = new Timeline()
+    const timeline = new Timeline(api)
+    addWelcomeRoute(timeline)
     timeline.pushSeqView({
-      path: '/',
-      name: 'index',
+      path: '/test-route1',
+      name: 'test_route1',
       component: MockComponent,
       meta: { next: 'next' },
     })
-    expect(timeline.routes[0].meta).toBeDefined()
-    expect(timeline.routes[0].meta.next).toBe('next')
-    expect(timeline.routes[0].meta.prev).toBe(undefined)
+    expect(timeline.routes[2].meta).toBeDefined()
+    expect(timeline.routes[2].meta.next).toBe('next')
+    expect(timeline.routes[2].meta.prev).toBe(undefined)
 
-    const timeline2 = new Timeline()
+    const timeline2 = new Timeline(api)
+    addWelcomeRoute(timeline2)
     timeline2.pushSeqView({
-      path: '/',
-      name: 'index',
+      path: '/test-route2',
+      name: 'test_route2',
       component: MockComponent,
       meta: { prev: 'prev' },
     })
-    expect(timeline2.routes[0].meta.next).toBe(undefined)
-    expect(timeline2.routes[0].meta.prev).toBe('prev')
+    expect(timeline2.routes[2].meta.next).toBe(undefined)
+    expect(timeline2.routes[2].meta.prev).toBe('prev')
 
-    const timeline3 = new Timeline()
+    const timeline3 = new Timeline(api)
+    addWelcomeRoute(timeline3)
     timeline3.pushSeqView({
-      path: '/',
-      name: 'index',
+      path: '/test-route3',
+      name: 'test_route3',
       component: MockComponent,
     })
-    expect(timeline3.routes[0].meta.next).toBe(undefined)
-    expect(timeline3.routes[0].meta.prev).toBe(undefined)
+    expect(timeline3.routes[2].meta.next).toBe(undefined)
+    expect(timeline3.routes[2].meta.prev).toBe(undefined)
   })
 
   it('should raise an error if a nonsequential route has prev/next defined', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-    const timeline = new Timeline()
+    const timeline = new Timeline(api)
 
     const errorTrigger = () => {
       timeline.registerView({
@@ -112,26 +225,23 @@ describe('Timeline tests', () => {
   })
 
   it('should add a nonsequential and sequential route', () => {
-    const MockComponentOne = { template: '<div>Mock Component One</div>' }
-    const MockComponentTwo = { template: '<div>Mock Component Two</div>' }
-    const timeline = new Timeline()
+    const timeline = new Timeline(api)
     timeline.pushSeqView({
       path: '/one',
       name: 'one',
-      component: MockComponentOne,
+      component: MockComponent,
     })
     timeline.registerView({
       path: '/two',
       name: 'two',
-      component: MockComponentTwo,
+      component: MockComponent,
     })
-    expect(timeline.routes.length).toBe(2)
+    expect(timeline.routes.length).toBe(2 + 1)
     expect(timeline.seqtimeline.length).toBe(1)
   })
 
   it('should not allow the same sequential route to be registered twice', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-    const timeline = new Timeline()
+    const timeline = new Timeline(api)
     timeline.pushSeqView({
       path: '/thanks',
       name: 'thank',
@@ -146,13 +256,12 @@ describe('Timeline tests', () => {
       })
     }
     expect(errorTrigger).toThrowError()
-    expect(timeline.routes.length).toBe(1)
+    expect(timeline.routes.length).toBe(2)
     expect(timeline.seqtimeline.length).toBe(1) // only first one should work
   })
 
   it('should not allow the same non-sequential route to be registered twice', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-    const timeline = new Timeline()
+    const timeline = new Timeline(api)
     timeline.registerView({
       path: '/thanks',
       name: 'thank',
@@ -166,13 +275,12 @@ describe('Timeline tests', () => {
       })
     }
     expect(errorTrigger).toThrowError()
-    expect(timeline.routes.length).toBe(1)
+    expect(timeline.routes.length).toBe(2)
     expect(timeline.seqtimeline.length).toBe(0)
   })
 
   it('should not allow the same route to be registered twice', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-    const timeline = new Timeline()
+    const timeline = new Timeline(api)
     timeline.pushSeqView({
       path: '/thanks',
       name: 'thank',
@@ -186,15 +294,13 @@ describe('Timeline tests', () => {
       })
     }
     expect(errorTrigger).toThrowError()
-    expect(timeline.routes.length).toBe(1)
+    expect(timeline.routes.length).toBe(2)
     expect(timeline.seqtimeline.length).toBe(1) // only first one should work
   })
 
-
   it('cannot add a timeline to a timeline', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-    const timeline = new Timeline()
-    const timeline2 = new Timeline()
+    const timeline = new Timeline(api)
+    const timeline2 = new Timeline(api)
     timeline.pushSeqView({
       path: '/first',
       name: 'first',
@@ -213,13 +319,11 @@ describe('Timeline tests', () => {
     expect(errorTrigger).toThrowError()
   })
 
-
-
   it('build method should correctly configure a doubly linked list', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-    const timeline = new Timeline()
+    const timeline = new Timeline(api)
+    addWelcomeRoute(timeline)
     timeline.pushSeqView({
-      path: '/',
+      path: '/one',
       name: 'one',
       component: MockComponent,
     })
@@ -240,21 +344,33 @@ describe('Timeline tests', () => {
     })
     timeline.build()
 
-    expect(timeline.seqtimeline[0].meta.next).toBe('two')
-    expect(timeline.seqtimeline[1].meta.next).toBe('three')
-    expect(timeline.seqtimeline[2].meta.next).toBe('four')
+    expect(timeline.seqtimeline[0].meta.next).toBe('one')
+    expect(timeline.seqtimeline[1].meta.next).toBe('two')
+    expect(timeline.seqtimeline[2].meta.next).toBe('three')
+    expect(timeline.seqtimeline[3].meta.next).toBe('four')
+    expect(timeline.seqtimeline[4].meta.next).toBe(null)
 
     expect(timeline.seqtimeline[0].meta.prev).toBe(null)
-    expect(timeline.seqtimeline[1].meta.prev).toBe('one')
-    expect(timeline.seqtimeline[2].meta.prev).toBe('two')
-    expect(timeline.seqtimeline[3].meta.prev).toBe('three')
+    expect(timeline.seqtimeline[1].meta.prev).toBe('welcome_anonymous')
+    expect(timeline.seqtimeline[2].meta.prev).toBe('one')
+    expect(timeline.seqtimeline[3].meta.prev).toBe('two')
+    expect(timeline.seqtimeline[4].meta.prev).toBe('three')
+  })
+
+  it('build method should handle single item timeline correctly', () => {
+    const timeline = new Timeline(api)
+    addWelcomeRoute(timeline)
+    timeline.build()
+
+    expect(timeline.seqtimeline[0].meta.next).toBe(null)
+    expect(timeline.seqtimeline[0].meta.prev).toBe(null)
   })
 
   it('build method should configure a loop', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-    const timeline = new Timeline()
+    const timeline = new Timeline(api)
+    addWelcomeRoute(timeline)
     timeline.pushSeqView({
-      path: '/',
+      path: '/one',
       name: 'one',
       component: MockComponent,
     })
@@ -276,22 +392,22 @@ describe('Timeline tests', () => {
     })
     timeline.build()
 
-    expect(timeline.seqtimeline[0].meta.next).toBe('two')
-    expect(timeline.seqtimeline[1].meta.next).toBe('three')
-    expect(timeline.seqtimeline[2].meta.next).toBe('four')
-    expect(timeline.seqtimeline[3].meta.next).toBe('one')
+    expect(timeline.seqtimeline[0].meta.next).toBe('one')
+    expect(timeline.seqtimeline[1].meta.next).toBe('two')
+    expect(timeline.seqtimeline[2].meta.next).toBe('three')
+    expect(timeline.seqtimeline[3].meta.next).toBe('four')
+    expect(timeline.seqtimeline[4].meta.next).toBe('one')
 
-    // first line here a little unclear... previous is not defined for a loop
-    // implicily.  but it changes if you have gone through the loop
-    expect(timeline.seqtimeline[0].meta.prev).toBe(null) // oh not sure about this
-    expect(timeline.seqtimeline[1].meta.prev).toBe('one')
-    expect(timeline.seqtimeline[2].meta.prev).toBe('two')
-    expect(timeline.seqtimeline[3].meta.prev).toBe('three')
+    expect(timeline.seqtimeline[0].meta.prev).toBe(null)
+    expect(timeline.seqtimeline[1].meta.prev).toBe('welcome_anonymous')
+    expect(timeline.seqtimeline[2].meta.prev).toBe('one')
+    expect(timeline.seqtimeline[3].meta.prev).toBe('two')
+    expect(timeline.seqtimeline[4].meta.prev).toBe('three')
   })
 
   it('build method should allow complex routes, disconnect sequences', () => {
-    const MockComponent = { template: '<div>Mock Component</div>' }
-    const timeline = new Timeline()
+    const timeline = new Timeline(api)
+    addWelcomeRoute(timeline)
     timeline.pushSeqView({
       path: '/one-a',
       name: 'one',
@@ -351,17 +467,18 @@ describe('Timeline tests', () => {
 
     timeline.build()
 
-    expect(timeline.seqtimeline[0].meta.next).toBe('two')
-    expect(timeline.seqtimeline[1].meta.next).toBe('two')
-    expect(timeline.seqtimeline[2].meta.next).toBe('four')
-    expect(timeline.seqtimeline[3].meta.next).toBe('one')
+    // Check the sequence starting from welcome
+    expect(timeline.seqtimeline[0].meta.next).toBe('one') // welcome -> one
+    expect(timeline.seqtimeline[1].meta.next).toBe('two') // one -> two
+    expect(timeline.seqtimeline[2].meta.next).toBe('two') // one-b -> two
+    expect(timeline.seqtimeline[3].meta.next).toBe('four') // three -> four
+    expect(timeline.seqtimeline[4].meta.next).toBe('one') // four -> one (loop)
 
-    // first line here a little unclear... previous is not defined for a loop
-    // implicily.  but it changes if you have gone through the loop
-    expect(timeline.seqtimeline[0].meta.prev).toBe(null) // oh not sure about this
-    expect(timeline.seqtimeline[1].meta.prev).toBe('one')
-    expect(timeline.seqtimeline[2].meta.prev).toBe('one-b')
-    expect(timeline.seqtimeline[3].meta.prev).toBe('three')
+    expect(timeline.seqtimeline[0].meta.prev).toBe(null) // welcome has no prev
+    expect(timeline.seqtimeline[1].meta.prev).toBe('welcome_anonymous') // one prev is welcome
+    expect(timeline.seqtimeline[2].meta.prev).toBe('one') // one-b prev is welcome
+    expect(timeline.seqtimeline[3].meta.prev).toBe('one-b') // three prev is two
+    expect(timeline.seqtimeline[4].meta.prev).toBe('three') // four prev is three
   })
   /*
   it('should compute the progress correctly', () => {

@@ -1,12 +1,7 @@
 import seedrandom from 'seedrandom'
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { v4 as uuidv4 } from 'uuid'
-import useSmileStore from '@/core/stores/smilestore' // get access to the global store
 import { getQueryParams } from '@/core/utils'
 import timeline from '@/user/design'
-
-import useLog from '@/core/stores/log'
-const log = useLog()
 
 import useAPI from '@/core/composables/useAPI'
 
@@ -17,7 +12,7 @@ function addGuards(r) {
   r.beforeEach(async (to, from) => {
     const api = useAPI()
     if (api.isResetApp()) {
-      log.warn('ROUTER GUARD: Resetting app')
+      api.log.warn('ROUTER GUARD: Resetting app')
       api.resetLocalState()
     }
 
@@ -51,17 +46,16 @@ function addGuards(r) {
     // log.debug('from', from.name)
     // log.debug('allowAlways', to.meta.allowAlways)
 
-    const smilestore = useSmileStore()
     // on startup set the page to not autofill by default
 
     // if the database isn't connected and they're a known user, reload their data
-    if (smilestore.isKnownUser && !smilestore.isDBConnected) {
-      const res = await smilestore.loadData()
+    if (api.store.isKnownUser && !api.store.isDBConnected) {
+      const res = await api.store.loadData()
     }
 
     // if withdrew
     // this is leading to infinite redirects.
-    // if (smilestore.isWithdrawn && !smilestore.global.forceNavigate) {
+    // if (api.store.isWithdrawn && !api.store.global.forceNavigate) {
     //   log.debug("withdraw so can't go anywhere")
     //   return {
     //     name: 'withdraw',
@@ -71,24 +65,24 @@ function addGuards(r) {
 
     // if you're going to an always-allowed route, allow it
     if (to.meta.allowAlways) {
-      log.log(`ROUTER GUARD: Requested navigation (${to.name}) is always allowed, so allowing it.`)
-      smilestore.setLastRoute(to.name)
-      smilestore.recordRoute(to.name)
+      api.log.log(`ROUTER GUARD: Requested navigation (${to.name}) is always allowed, so allowing it.`)
+      api.store.setLastRoute(to.name)
+      api.store.recordRoute(to.name)
       return true
     }
 
     // if the route requires withdraw and the user has withdrawn
     // then allow it.
-    if (to.meta.requiresWithdraw && smilestore.isWithdrawn) {
-      log.warn('ROUTER GUARD: Requested withdraw route and is withdrawn so allowing it')
-      smilestore.setLastRoute(to.name)
-      smilestore.recordRoute(to.name)
+    if (to.meta.requiresWithdraw && api.store.isWithdrawn) {
+      api.log.warn('ROUTER GUARD: Requested withdraw route and is withdrawn so allowing it')
+      api.store.setLastRoute(to.name)
+      api.store.recordRoute(to.name)
       return true
     }
 
     // // If user is withdraw
-    if (smilestore.isWithdrawn) {
-      log.warn('ROUTER GUARD: User has withdrawn, redirecting to withdraw page')
+    if (api.store.isWithdrawn) {
+      api.log.warn('ROUTER GUARD: User has withdrawn, redirecting to withdraw page')
       return {
         name: 'withdraw', // this could be lastRoute too
         replace: true,
@@ -98,81 +92,81 @@ function addGuards(r) {
     // if you're in jumping mode
     // or you're in presentation mode allow the new route
     if (
-      (smilestore.config.mode === 'development' && smilestore.global.forceNavigate) ||
-      smilestore.config.mode === 'presentation'
+      (api.store.config.mode === 'development' && api.store.global.forceNavigate) ||
+      api.store.config.mode === 'presentation'
     ) {
-      log.warn(
+      api.log.warn(
         'ROUTER GUARD: Allowing direct, out-of-order navigation to /' +
           to.name +
           //to.meta.allowAlways +,
           '.  This is allowed in development/presentation mode but not in production.'
       )
-      smilestore.setLastRoute(to.name)
-      smilestore.recordRoute(to.name)
+      api.store.setLastRoute(to.name)
+      api.store.recordRoute(to.name)
       return true
     }
 
     // if this is forced
-    if (smilestore.global.forceNavigate) {
-      log.warn(
+    if (api.store.global.forceNavigate) {
+      api.log.warn(
         'ROUTER GUARD: Allowing direct, out-of-order navigation to /' +
           to.name +
           //to.meta.allowAlways +,
           '.  This is being forced by api.gotoView().'
       )
-      smilestore.setLastRoute(to.name)
-      smilestore.recordRoute(to.name)
+      api.store.setLastRoute(to.name)
+      api.store.recordRoute(to.name)
       return true
     }
 
     // if the route requires consent and the user hasn't consented
-    if (to.meta.requiresConsent && !smilestore.isConsented) {
-      log.warn(
-        `ROUTER GUARD: This route (${to.name}) requires consent, but the user has not consented (${smilestore.isConsented}).\
-         Redirecting to the last route visited. (${smilestore.lastRoute})`
+    if (to.meta.requiresConsent && !api.store.isConsented) {
+      api.log.warn(
+        `ROUTER GUARD: This route (${to.name}) requires consent, but the user has not consented (${api.store.isConsented}).\
+         Redirecting to the last route visited. (${api.store.lastRoute})`
       )
       return {
-        name: smilestore.lastRoute, // this could be lastRoute too
+        name: api.store.lastRoute, // this could be lastRoute too
         replace: true,
       }
     }
 
-    if (to.meta.requiresDone && !smilestore.isDone) {
-      log.warn(
+    if (to.meta.requiresDone && !api.store.isDone) {
+      api.log.warn(
         `ROUTER GUARD: This route (${to.name}) requires being marked as done, but the user is not done.\
-        Redirecting to the last route visited. (${smilestore.lastRoute})`
+        Redirecting to the last route visited. (${api.store.lastRoute})`
       )
       return {
-        name: smilestore.lastRoute,
+        name: api.store.lastRoute,
         replace: true,
       }
     }
 
     // if you're trying to go to the welcome screen and you're not a known user, allow it
-    // if (to.name === 'welcome_anonymous' && from.name === undefined && !smilestore.isKnownUser) {
-    //   log.log('ROUTER GUARD: We let anyone see ' + to.name + ' because the users is not known.')
-    //   smilestore.setLastRoute(to.name)
-    //   smilestore.recordRoute(to.name)
+    // if (to.name === 'welcome_anonymous' && from.name === undefined && !api.store.isKnownUser) {
+    //   api.log.log('ROUTER GUARD: We let anyone see ' + to.name + ' because the users is not known.')
+    //   api.store.setLastRoute(to.name)
+    //   api.store.recordRoute(to.name)
     //   return true
     // }
 
     // if you're trying to go to the next route
-    if (from.meta !== undefined && from.meta.next === to.name && smilestore.dev.current_page_done) {
-      log.log(
+    if (from.meta !== undefined && from.meta.next === to.name && api.store.dev.current_page_done) {
+      api.log.log(
         'ROUTER GUARD: You are trying to go to the next route from ' +
           from.name +
           ' to ' +
           to.name +
           ' and the current page is done so allowing it.'
       )
-      smilestore.setLastRoute(to.name)
-      smilestore.recordRoute(to.name)
+      api.store.setLastRoute(to.name)
+      api.store.recordRoute(to.name)
       return true
     }
 
     // if you're trying to go to the next route
-    if (from.meta !== undefined && from.meta.next === to.name && !smilestore.dev.current_page_done) {
-      log.error(
+    if (from.meta !== undefined && from.meta.next === to.name && !api.store.dev.current_page_done) {
+      api.log.error(
         'ROUTER GUARD: You are trying to go to the next route from ' +
           from.name +
           ' to ' +
@@ -180,47 +174,46 @@ function addGuards(r) {
           ' but the current page is not marked as done, so returning you to the current page.'
       )
       return {
-        name: smilestore.lastRoute,
+        name: api.store.lastRoute,
         replace: true,
       }
     }
 
     // if you're trying to go to the same route you're already on, allow it
-    if (smilestore.lastRoute === to.name) {
-      log.log(
+    if (api.store.lastRoute === to.name) {
+      api.log.log(
         "ROUTER GUARD: You're trying to go to the same route as lastRoute (" +
-          smilestore.lastRoute +
+          api.store.lastRoute +
           '), so allowing it.'
       )
       return true
     }
 
     // if you're a known user (and not trying to go to the next or same route), send back to most recent route
-    if (from.meta !== undefined && from.meta.next !== to.name && smilestore.isKnownUser) {
-      log.error(
+    if (from.meta !== undefined && from.meta.next !== to.name && api.store.isKnownUser) {
+      api.log.error(
         `ROUTER GUARD: You are known and trying to access a route (${to.name}) which is not 'next' \
-        on the timeline.  Returning you to the last route you were on (${smilestore.lastRoute}).`
+        on the timeline.  Returning you to the last route you were on (${api.store.lastRoute}).`
       )
       return {
-        name: smilestore.lastRoute,
+        name: api.store.lastRoute,
         replace: true,
       }
     }
 
     // if you're a known user (and not trying to go to the next or same route), send back to most recent route
-    if (smilestore.isKnownUser) {
-      log.error(
-        "ROUTER GUARD: You are known and trying to access a route you can't see yet.  lastRoute: " +
-          smilestore.lastRoute
+    if (api.store.isKnownUser) {
+      api.log.error(
+        "ROUTER GUARD: You are known and trying to access a route you can't see yet.  lastRoute: " + api.store.lastRoute
       )
       return {
-        name: smilestore.lastRoute,
+        name: api.store.lastRoute,
         replace: true,
       }
     }
 
-    if (!smilestore.isKnownUser && to.name === 'landing') {
-      log.error('ROUTER GUARD: Unknown user trying to go to landing page')
+    if (!api.store.isKnownUser && to.name === 'landing') {
+      api.log.error('ROUTER GUARD: Unknown user trying to go to landing page')
       return {
         name: 'welcome_anonymous',
         replace: true,
@@ -228,7 +221,7 @@ function addGuards(r) {
     }
     if (to.name !== 'welcome_anonymous') {
       // otherwise (for an unknown user who's not trying to go to next/same route), just send to welcome anonymous screen
-      log.error('ROUTER GUARD: Unknown user blocked trying to go to ' + to.name)
+      api.log.error('ROUTER GUARD: Unknown user blocked trying to go to ' + to.name)
       return {
         name: 'welcome_anonymous',
         replace: true,
@@ -251,29 +244,27 @@ export const router = createRouter({
   },
 })
 addGuards(router) // add the guards defined above
-log.log('Vue Router initialized')
 
 // add additional guard to set global seed before
 router.beforeResolve((to) => {
   const api = useAPI()
-  const smilestore = useSmileStore()
-  smilestore.removePageAutofill()
+  api.store.removePageAutofill()
 
-  if (smilestore.local.useSeed) {
+  if (api.store.local.useSeed) {
     // if we're using a seed
-    const seedID = smilestore.getSeedID
+    const seedID = api.store.getSeedID
     const seed = `${seedID}-${to.name}`
     seedrandom(seed, { global: true })
-    log.log('ROUTER GUARD: Seed set to ' + seed)
+    api.log.log('ROUTER GUARD: Seed set to ' + seed)
   } else {
     // if inactive, just re-seed with a random seed on every route entry
     api.randomSeed()
-    log.log('ROUTER GUARD: Not using participant-specific seed; seed set randomly')
+    api.log.log('ROUTER GUARD: Not using participant-specific seed; seed set randomly')
   }
-  log.clear_page_history()
-  smilestore.dev.page_provides_trial_stepper = false // by default
-  smilestore.dev.current_page_done = false // set the current page to done
-  log.log('ROUTER GUARD: Router navigated to /' + to.name)
+  api.log.clear_page_history()
+  api.store.dev.page_provides_trial_stepper = false // by default
+  api.store.dev.current_page_done = false // set the current page to done
+  api.log.log('ROUTER GUARD: Router navigated to /' + to.name)
 })
 
 // Check if the next route has a preload function, and if so, run it asynchronously

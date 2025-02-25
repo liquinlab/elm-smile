@@ -1,17 +1,11 @@
 import _ from 'lodash'
 import * as dagre from '@dagrejs/dagre'
-import { pinia } from '@/core/createpinia'
-import useSmileStore from '@/core/stores/smilestore'
-const smilestore = useSmileStore(pinia) //just need to add pinia here, don't need this in any other file
-import useLog from '@/core/stores/log'
-const log = useLog()
 import RecruitmentChooser from '@/dev/developer_mode/RecruitmentChooserView.vue'
 import PresentationMode from '@/dev/presentation_mode/PresentationModeView.vue'
 
-import useAPI from '@/core/composables/useAPI'
-
 class Timeline {
-  constructor() {
+  constructor(api) {
+    this.api = api
     this.routes = [] // the actual routes given to VueRouter
     this.seqtimeline = [] // copies of routes that are sequential
     this.registered = {}
@@ -20,7 +14,6 @@ class Timeline {
     this.has_welcome_anonymous = false
     this.g_nonseq = null
     this._IS_ROOT_NODE = '_IS_ROOT_NODE'
-    const api = useAPI()
     // add the recruitment chooser if in development mode
     if (api.config.mode === 'development') {
       this.registerView({
@@ -54,7 +47,7 @@ class Timeline {
 
     if (newroute.path == null) {
       const nameAsPath = `/${encodeURIComponent(newroute.name.toLowerCase().replace(/\s/g, '_'))}`
-      log.debug(`Assigning path by name for route ${newroute.name}: ${nameAsPath}`)
+      this.api.log.debug(`Assigning path by name for route ${newroute.name}: ${nameAsPath}`)
       newroute.path = nameAsPath
     }
 
@@ -62,15 +55,13 @@ class Timeline {
   }
 
   pushToRoutes(route) {
-    // check that an existing route doesn't exist with same
-    // path and/or name
     for (let i = 0; i < this.routes.length; i += 1) {
       if (this.routes[i].path === route.path) {
-        log.error(`Registering two routes to router with same path.  DuplicatePathError:${route.path}`)
+        this.api.log.error(`Registering two routes to router with same path.  DuplicatePathError:${route.path}`)
         throw new Error(`DuplicatePathError:${route.path}`)
       }
       if (this.routes[i].name === route.name) {
-        log.error(`Registering two routes to router =with same name.  DuplicatePathError:${route.name}`)
+        this.api.log.error(`Registering two routes to router with same name.  DuplicatePathError:${route.name}`)
         throw new Error(`DuplicateNameError:${route.name}`)
       }
     }
@@ -78,15 +69,13 @@ class Timeline {
   }
 
   pushToTimeline(route) {
-    // check that an existing route doesn't exist with same
-    // path and/or name
     for (let i = 0; i < this.seqtimeline.length; i += 1) {
       if (this.seqtimeline[i].name === route.name) {
-        log.error(`Registering two routes to timeline with same name.  DuplicatePathError:${route.name}`)
+        this.api.log.error(`Registering two routes to timeline with same name.  DuplicatePathError:${route.name}`)
         throw new Error(`DuplicateNameError${route.name}`)
       }
       if (this.seqtimeline[i].path === route.path) {
-        log.error(`Registering two routes to timeline with same path.  DuplicatePathError:${route.path}`)
+        this.api.log.error(`Registering two routes to timeline with same path.  DuplicatePathError:${route.path}`)
         throw new Error(`DuplicatePathError${route.path}`)
       }
     }
@@ -127,14 +116,14 @@ class Timeline {
     try {
       this.pushToRoutes(newroute)
     } catch (err) {
-      log.error('Smile FATAL ERROR: ', err)
+      this.api.log.error('Smile FATAL ERROR: ', err)
       throw err
     }
 
     try {
       this.pushToTimeline(newroute) // by reference so should update together
     } catch (err) {
-      log.error('Smile FATAL ERROR: ', err)
+      this.api.log.error('Smile FATAL ERROR: ', err)
       throw err
     }
 
@@ -169,7 +158,7 @@ class Timeline {
     try {
       this.pushToRoutes(newroute)
     } catch (err) {
-      console.error('Smile FATAL ERROR: ', err)
+      this.api.log.error('Smile FATAL ERROR: ', err)
       throw err
     }
 
@@ -179,13 +168,11 @@ class Timeline {
   }
 
   pushRandomizedNode(routeConfig, push = true) {
-    const api = useAPI()
     const newroute = this.cloneRouteAndFillDefaults(routeConfig)
-    // newroute should have name, options, and optional weights
 
     if (!push) {
       if (this.registered[newroute.name]) {
-        log.debug(`Randomized node ${newroute.name} already registered`)
+        this.api.log.debug(`Randomized node ${newroute.name} already registered`)
         return
       } else {
         this.registered[newroute.name] = []
@@ -202,20 +189,19 @@ class Timeline {
 
       // check that options and weights are the same length
       if (options.length !== weights.length) {
-        log.error('Length of options and weights do not match for randomized node')
+        this.api.log.error('Length of options and weights do not match for randomized node')
         throw new Error('OptionsWeightsLengthMismatchError')
       }
     }
 
-    // check if this route has already been assigned
-    let randomOption = smilestore.getRandomizedRouteByName(newroute.name)
+    // Use this.api.store instead of smilestore
+    let randomOption = this.api.store.getRandomizedRouteByName(newroute.name)
     if (randomOption != null) {
-      log.debug(`Randomized node ${newroute.name} already assigned option ${randomOption}`)
+      this.api.log.debug(`Randomized node ${newroute.name} already assigned option ${randomOption}`)
     } else {
-      // randomly choose one of options based on weights
-      randomOption = api.sampleWithReplacement(options, 1, weights)[0]
-      log.debug(`Randomized node ${newroute.name} selected option ${randomOption}`)
-      smilestore.setRandomizedRoute(newroute.name, randomOption)
+      randomOption = this.api.sampleWithReplacement(options, 1, weights)[0]
+      this.api.log.debug(`Randomized node ${newroute.name} selected option ${randomOption}`)
+      this.api.store.setRandomizedRoute(newroute.name, randomOption)
     }
 
     // now, pull entries from routes that match random Option names (for each random option)
@@ -248,7 +234,7 @@ class Timeline {
           }
           continue
         } else {
-          log.error(
+          this.api.log.error(
             `Randomized node option ${option} not found in routes. You must add randomized route options to the timeline using registerView() before adding a randomized node`
           )
           throw new Error('RandomizedNodeOptionNotFoundError')
@@ -276,13 +262,12 @@ class Timeline {
 
   pushConditionalNode(routeConfig, push = true) {
     // newroute should have name and a condition name (user specified, has to match something in data.conditions)
-    const api = useAPI()
     const newroute = this.cloneRouteAndFillDefaults(routeConfig)
 
     // Check if already registered if not pushing
     if (!push) {
       if (this.registered[newroute.name]) {
-        log.debug(`Randomized node ${newroute.name} already registered`)
+        this.api.log.debug(`Randomized node ${newroute.name} already registered`)
         return
       } else {
         this.registered[newroute.name] = []
@@ -292,18 +277,18 @@ class Timeline {
     // get condition name—anything that's not name
     const conditionname = Object.keys(newroute).filter((key) => key !== 'name')
     if (conditionname.length > 1) {
-      log.error('Can only branch routes based on one condition at a time')
+      this.api.log.error('Can only branch routes based on one condition at a time')
       throw new Error('TooManyConditionNamesError')
     }
     const name = conditionname[0]
-    let assignedCondition = api.getConditionByName(name)
+    let assignedCondition = this.api.getConditionByName(name)
     if (!assignedCondition) {
       const possibleConditions = Object.keys(newroute[name])
-      log.warn(
+      this.api.log.warn(
         `Condition ${name} not found in data.conditions -- assigning uniformly from keys of condition object: ${possibleConditions}`
       )
 
-      assignedCondition = api.randomAssignCondition({
+      assignedCondition = this.api.randomAssignCondition({
         conditionname: possibleConditions,
       })
     }
@@ -321,31 +306,31 @@ class Timeline {
 
   build() {
     if (!this.has_welcome_anonymous) {
-      log.error('No welcome_anonymous route defined in src/user/design.js  This is required.')
+      this.api.log.error('No welcome_anonymous route defined in src/user/design.js  This is required.')
       throw new Error('NoWelcomeAnonymousRouteError')
     }
 
     this.buildGraph()
     this.registerCounters()
-    if (smilestore.config.mode === 'development') {
+    if (this.api.store.config.mode === 'development') {
       this.buildDAG()
     }
     // this.buildProgress()
     // save built timeline to local
 
-    smilestore.local.seqtimeline = this.seqtimeline
-    smilestore.local.routes = this.routes
+    this.api.store.local.seqtimeline = this.seqtimeline
+    this.api.store.local.routes = this.routes
   }
 
   registerCounters() {
     // for each route, register a counter based on the name
     for (let i = 0; i < this.routes.length; i += 1) {
-      smilestore.registerPageTracker(this.routes[i].name)
+      this.api.store.registerPageTracker(this.routes[i].name)
     }
   }
 
   buildDAG() {
-    log.log('DEV MODE: building DAG')
+    this.api.log.log('DEV MODE: building DAG')
     this.g = new dagre.graphlib.Graph().setGraph({ nodesep: 80, ranksep: 40 }).setDefaultEdgeLabel(function () {
       return {}
     }) // Default to assigning a new object as a label for each new edge.
@@ -384,12 +369,13 @@ class Timeline {
 
   // buildGraph builds
   buildGraph() {
-    log.debug('DEV MODE: building DAG for timeline')
+    this.api.log.debug('DEV MODE: building DAG for timeline')
 
     for (let i = 0; i < this.seqtimeline.length; i += 1) {
       if (this.seqtimeline[i].meta.next === undefined) {
-        // pass
-        if (i === 0) {
+        if (this.seqtimeline.length === 1) {
+          this.seqtimeline[i].meta.next = null
+        } else if (i === 0) {
           this.seqtimeline[i].meta.next = this.seqtimeline[i + 1].name
         } else if (i === this.seqtimeline.length - 1) {
           this.seqtimeline[i].meta.next = null
@@ -398,8 +384,9 @@ class Timeline {
         }
       }
       if (!this.seqtimeline[i].meta.root && this.seqtimeline[i].meta.prev === undefined) {
-        // pass
-        if (i === 0) {
+        if (this.seqtimeline.length === 1) {
+          this.seqtimeline[i].meta.prev = null
+        } else if (i === 0) {
           this.seqtimeline[i].meta.prev = null
         } else if (i === this.seqtimeline.length - 1) {
           this.seqtimeline[i].meta.prev = this.seqtimeline[i - 1].name

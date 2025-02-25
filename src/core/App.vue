@@ -40,7 +40,7 @@ smilestore.$subscribe((mutation, newstate) => {
         newv = JSON.stringify(newstate.data[key])
       }
 
-      api.log(`SMILESTORE: smilestore.data value changed for ${key}: from ${oldv} to ${newv}`)
+      api.log.log(`SMILESTORE: smilestore.data value changed for ${key}: from ${oldv} to ${newv}`)
       smilestore.global.db_changes = true
     }
   })
@@ -63,7 +63,7 @@ const showStatusBar = computed(() => {
 })
 
 onMounted(() => {
-  api.log('App.vue initialized')
+  api.log.log('App.vue initialized')
 
   window.addEventListener('resize', (event) => {
     api.recordWindowEvent('resize', { width: window.innerWidth, height: window.innerHeight })

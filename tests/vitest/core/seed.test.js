@@ -1,45 +1,63 @@
 /* eslint-disable no-undef */
-import '@/core/seed'
-import Timeline from '@/core/timeline'
+
 import { createTestingPinia } from '@pinia/testing'
-import useSmileStore from '@/core/stores/smilestore'
+import { setActivePinia } from 'pinia'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { mount } from '@vue/test-utils'
 import seedrandom from 'seedrandom'
-
-let router
-let pinia
+import Timeline from '@/core/timeline'
+import useAPI from '@/core/composables/useAPI'
+import { defineComponent } from 'vue'
+import useSmileStore from '@/core/stores/smilestore'
 
 describe('Seed tests', () => {
-  // set up the app
-  function setupapp(routes) {
-    const TestAppRouter = {
-      template: `<h1>hi</h1><router-view></router-view>`,
-    }
-    pinia = createTestingPinia({ stubActions: true })
+  let router
+  let pinia
+  let api
 
+  beforeEach(() => {
+    // Create a router instance
     router = createRouter({
       history: createWebHashHistory(),
-      routes,
+      routes: [{ path: '/', component: { template: '<div>Home</div>' } }],
     })
 
-    const wrapper = mount(TestAppRouter, {
+    // Create a test component that uses the API
+    const TestComponent = defineComponent({
+      setup() {
+        api = useAPI()
+        return { api }
+      },
+      template: '<div>Test Component</div>',
+    })
+
+    // Create pinia instance
+    pinia = createTestingPinia({ stubActions: true })
+    setActivePinia(pinia)
+
+    // Mount the test component with router
+    const wrapper = mount(TestComponent, {
       global: {
-        plugins: [router, pinia],
+        plugins: [[router], [pinia]], // Provide as arrays of plugins
       },
     })
-    return wrapper
-  }
+  })
+
+  it('should return true', () => {
+    expect(true).toBe(true)
+  })
 
   it('should save automatic seed to smilestore.local.seedID', async () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
 
-    const timeline = new Timeline()
+    const timeline = new Timeline(api)
+
     timeline.pushSeqView({
-      path: '/',
-      name: 'first',
+      path: '/welcome',
+      name: 'welcome_anonymous',
       component: MockComponent,
     })
+
     timeline.pushSeqView({
       path: '/second',
       name: 'second',
@@ -49,12 +67,10 @@ describe('Seed tests', () => {
     timeline.build()
     const { routes } = timeline
 
-    const wrapper = setupapp(routes)
     await router.isReady()
 
-    const smilestore = useSmileStore() // uses the testing pinia!
-
     // expect seed to not be an empty string
+    const smilestore = useSmileStore() // uses the testing pinia!
     expect(smilestore.local.seedID).not.toEqual('')
   })
 

@@ -25,252 +25,196 @@ export default function useAPI() {
   const { goNextView, goPrevView, gotoView } = useTimeline()
   const route = useRoute()
   const router = useRouter()
-  const smilestore = useSmileStore()
-  const log = useLog()
+  const store = useSmileStore()
+  const logStore = useLog()
+
   const api = reactive({
-    config: smilestore.config,
-    data: smilestore.data,
-    private: smilestore.private,
-    all_data: { private: smilestore.private, data: smilestore.data },
-    local: smilestore.local,
-    global: smilestore.global,
-    dev: smilestore.dev,
-    route: route,
-    router: router,
-    goNextView: goNextView,
-    goPrevView: goPrevView,
-    gotoView: gotoView,
-    faker: faker_distributions,
+    // Store and logging
+    store,
+    log: {
+      debug: (...args) => logStore.debug(...args),
+      log: (...args) => logStore.log(...args),
+      warn: (...args) => logStore.warn(...args),
+      error: (...args) => logStore.error(...args),
+      success: (...args) => logStore.success(...args),
+    },
+
+    // Store data access
+    config: store.config,
+    data: store.data,
+    private: store.private,
+    all_data: { private: store.private, data: store.data },
+    local: store.local,
+    global: store.global,
+    dev: store.dev,
+
+    // Router related
+    route,
+    router,
+    goNextView,
+    goPrevView,
+    gotoView,
     hasNextView: () => route.meta.next && route.meta.sequential,
     hasPrevView: () => route.meta.prev && route.meta.sequential,
-    randomInt: randomInt,
-    shuffle: shuffle,
-    sampleWithReplacement: sampleWithReplacement,
-    sampleWithoutReplacement: sampleWithoutReplacement,
-    useStepper: useStepper,
-    // isKnownUser: smilestore.local.knownUser,
-    // isDone: smilestore.local.done,
-    // isConsented: smilestore.local.consented,
-    // isWithdrawn: smilestore.local.withdrawn,
-    urls: smilestore.global.urls,
-    resetApp: () => {
-      smilestore.resetApp()
-    },
-    isResetApp: () => {
-      return smilestore.local.reset
-    },
-    resetStore: () => {
-      smilestore.resetLocal()
-    },
-    resetLocalState() {
-      localStorage.removeItem(api.config.local_storage_key) // delete the local store
-      // localStorage.removeItem(`${appconfig.local_storage_key}-seed_id`)
-      // localStorage.removeItem(`${appconfig.local_storage_key}-seed_set`)
-      smilestore.resetLocal() // reset all the data even
 
-      // go back to the landing page (don't use router because it won't refresh the page and thus won't reset the app)
+    // Randomization utilities
+    faker: faker_distributions,
+    randomInt,
+    shuffle,
+    sampleWithReplacement,
+    sampleWithoutReplacement,
+    useStepper,
+
+    // URL helpers
+    urls: store.global.urls,
+    getPublicUrl: (name) => import.meta.env.VITE_DEPLOY_BASE_PATH + name,
+    getCoreStaticUrl: (name) => new URL(`../../assets/${name}`, import.meta.url).href,
+    getStaticUrl: (name) => new URL(`../../user/assets/${name}`, import.meta.url).href,
+
+    // App state management
+    resetApp: () => store.resetApp(),
+    isResetApp: () => store.local.reset,
+    resetStore: () => store.resetLocal(),
+    resetLocalState() {
+      localStorage.removeItem(api.config.local_storage_key)
+      store.resetLocal()
       const url = window.location.href
       window.location.href = url.substring(0, url.lastIndexOf('#/'))
     },
-    setAppComponent: (key, value) => {
-      if (!smilestore.config.global_app_components) {
-        smilestore.config.global_app_components = {}
-      }
-      smilestore.config.global_app_components[key] = value
-    },
-    getAppComponent: (key) => {
-      return smilestore.config.global_app_components[key]
-    },
-    setRuntimeConfig: (key, value) => {
-      if (key in smilestore.config) {
-        smilestore.config[key] = value
-      } else {
-        if (!smilestore.config.runtime) {
-          smilestore.config.runtime = {}
-        }
-        smilestore.config.runtime[key] = value
-      }
 
-      // remove global_components from the config
-      const { global_app_components, ...configWithoutComponents } = smilestore.config
-      smilestore.data.smile_config = configWithoutComponents
+    // App component management
+    setAppComponent: (key, value) => {
+      if (!store.config.global_app_components) {
+        store.config.global_app_components = {}
+      }
+      store.config.global_app_components[key] = value
+    },
+    getAppComponent: (key) => store.config.global_app_components[key],
+
+    // Config management
+    setRuntimeConfig: (key, value) => {
+      if (key in store.config) {
+        store.config[key] = value
+      } else {
+        if (!store.config.runtime) {
+          store.config.runtime = {}
+        }
+        store.config.runtime[key] = value
+      }
+      const { global_app_components, ...configWithoutComponents } = store.config
+      store.data.smile_config = configWithoutComponents
     },
     getConfig: (key) => {
-      if (key in smilestore.config) {
-        return smilestore.config[key]
-      } else if (key in smilestore.config.runtime) {
-        return smilestore.config.runtime[key]
+      if (key in store.config) {
+        return store.config[key]
+      } else if (key in store.config.runtime) {
+        return store.config.runtime[key]
       } else {
-        log.error('SMILE API: getConfig() key not found', key)
+        logStore.error('SMILE API: getConfig() key not found', key)
         return null
       }
     },
-    setKnown: async () => {
-      await smilestore.setKnown()
-    },
-    setDone: () => {
-      smilestore.setDone()
-    },
-    setConsented: () => {
-      smilestore.setConsented()
-    },
-    setWithdrawn: (forminfo) => {
-      smilestore.setWithdrawn(forminfo)
-    },
+
+    // User state management
+    setKnown: async () => await store.setKnown(),
+    setDone: () => store.setDone(),
+    setConsented: () => store.setConsented(),
+    setWithdrawn: (forminfo) => store.setWithdrawn(forminfo),
     verifyVisibility: (value) => {
-      smilestore.data.verified_visibility = value
+      store.data.verified_visibility = value
     },
-    saveForm: (name, data) => {
-      smilestore.saveForm(name, data)
-    },
-    getVerifiedVisibility: () => {
-      return smilestore.verifiedVisibility
-    },
+    saveForm: (name, data) => store.saveForm(name, data),
+    getVerifiedVisibility: () => store.verifiedVisibility,
+
+    // Browser checks
     isBrowserTooSmall: () => {
       let val = false
-      if (smilestore.config.windowsizer_aggressive === true && smilestore.data.verified_visibility === true) {
+      if (store.config.windowsizer_aggressive === true && store.data.verified_visibility === true) {
         val =
-          window.innerWidth < smilestore.config.windowsizer_request.width + 40 ||
-          window.innerHeight < smilestore.config.windowsizer_request.height + 40
+          window.innerWidth < store.config.windowsizer_request.width + 40 ||
+          window.innerHeight < store.config.windowsizer_request.height + 40
       }
       return val
     },
+
+    // Development tools
     setPageAutofill: (autofill) => {
-      log.debug('SMILEAPI: registering autofill function')
-      if (smilestore.config.mode === 'development') smilestore.setPageAutofill(autofill)
+      logStore.debug('SMILEAPI: registering autofill function')
+      if (store.config.mode === 'development') store.setPageAutofill(autofill)
     },
     removePageAutofill: () => {
-      log.debug('SMILEAPI: resetting autofill')
-      if (smilestore.config.mode === 'development') smilestore.removePageAutofill()
+      logStore.debug('SMILEAPI: resetting autofill')
+      if (store.config.mode === 'development') store.removePageAutofill()
     },
-    setCompletionCode: (code) => {
-      smilestore.setCompletionCode(code)
-    },
-    getRecruitmentService: () => {
-      return smilestore.data.recruitment_service
-    },
-    getPageTracker: (routeName = null) => {
-      const lookupname = routeName || route.name
-      return smilestore.getPageTracker(lookupname)
-    },
-    getPageTrackerData: (routeName = null) => {
-      const lookupname = routeName || route.name
-      return smilestore.getPageTrackerData(lookupname)
-    },
-    getPageTrackerIndex: (routeName = null) => {
-      const lookupname = routeName || route.name
-      return smilestore.getPageTrackerIndex(lookupname)
-    },
-    hasAutofill: () => {
-      return smilestore.hasAutofill
-    },
-    autofill: () => {
-      return smilestore.autofill()
-    },
-    currentRouteName: () => {
-      return route.name
-    },
-    getConditionByName: (name) => {
-      return smilestore.getConditionByName(name)
-    },
-    getBrowserFingerprint: () => {
-      return smilestore.getBrowserFingerprint()
-    },
-    recordWindowEvent: (type, event_data = null) => {
-      smilestore.recordWindowEvent(type, event_data)
-    },
-    incrementTrial: () => {
-      smilestore.incrementPageTracker(route.name)
-    },
-    decrementTrial: () => {
-      smilestore.decrementPageTracker(route.name)
-    },
-    resetTrial: () => {
-      smilestore.resetPageTracker(route.name)
-    },
-    saveData: (force) => {
-      smilestore.saveData(force)
-    },
-    log: (...message) => {
-      log.log(message)
-    },
-    debug: (...message) => {
-      log.debug(message)
-    },
-    warn: (...message) => {
-      log.warn(message)
-    },
-    error: (...message) => {
-      log.error(message)
-    },
-    getPublicUrl: (name) => {
-      return import.meta.env.VITE_DEPLOY_BASE_PATH + name
-    },
-    getCoreStaticUrl: (name) => {
-      return new URL(`../../assets/${name}`, import.meta.url).href
-    },
-    getStaticUrl: (name) => {
-      return new URL(`../../user/assets/${name}`, import.meta.url).href
-    },
+
+    // Completion and recruitment
+    setCompletionCode: (code) => store.setCompletionCode(code),
+    getRecruitmentService: () => store.data.recruitment_service,
+
+    // Page tracking
+    getPageTracker: (routeName = null) => store.getPageTracker(routeName || route.name),
+    getPageTrackerData: (routeName = null) => store.getPageTrackerData(routeName || route.name),
+    getPageTrackerIndex: (routeName = null) => store.getPageTrackerIndex(routeName || route.name),
+    hasAutofill: () => store.hasAutofill,
+    autofill: () => store.autofill(),
+    currentRouteName: () => route.name,
+    getConditionByName: (name) => store.getConditionByName(name),
+    getBrowserFingerprint: () => store.getBrowserFingerprint(),
+
+    // Event and trial management
+    recordWindowEvent: (type, event_data = null) => store.recordWindowEvent(type, event_data),
+    incrementTrial: () => store.incrementPageTracker(route.name),
+    decrementTrial: () => store.decrementPageTracker(route.name),
+    resetTrial: () => store.resetPageTracker(route.name),
+    saveData: (force) => store.saveData(force),
     recordTrialData: (data) => {
-      smilestore.data.trial_num += 1
-      smilestore.recordTrialData(data)
-      log.debug('SMILE API: data ', smilestore.data.study_data)
+      store.data.trial_num += 1
+      store.recordTrialData(data)
+      logStore.debug('SMILE API: data ', store.data.study_data)
     },
+
+    // Randomization and conditions
     randomSeed(seed = uuidv4()) {
-      // sets new global seed(will remain in use until next route)
       seedrandom(seed, { global: true })
     },
     randomAssignCondition(conditionObject) {
-      // get conditionobject keys
       const keys = Object.keys(conditionObject)
-
-      // Try to find the condition name
       const conditionNames = keys.filter((key) => key !== 'weights')
-      let randomCondition
 
-      // if condition name is longer than one element, error
       if (conditionNames.length > 1) {
-        log.error('SMILE API: randomAssignCondition() only accepts one condition name at a time')
+        logStore.error('SMILE API: randomAssignCondition() only accepts one condition name at a time')
         return null
       }
 
       const [name] = conditionNames
-      const currentCondition = smilestore.getConditionByName(name)
+      const currentCondition = store.getConditionByName(name)
       if (currentCondition) {
-        log.debug('SMILE API: condition already assigned', name, currentCondition)
+        logStore.debug('SMILE API: condition already assigned', name, currentCondition)
         return currentCondition
       }
 
-      // if we haven't assigned the condition name, set the possible condition values
       const possibleConditions = conditionObject[name]
-      smilestore.local.possibleConditions[name] = possibleConditions
+      store.local.possibleConditions[name] = possibleConditions
 
-      // Check if we're doing weighted or unweighted randomization
       const hasWeights = keys.includes('weights')
-      let weights
+      const weights = hasWeights ? conditionObject.weights : undefined
 
-      if (hasWeights) {
-        // if weights are provided
-        weights = conditionObject.weights
-        // make sure weights is the same length as the condition possibilities
-        if (weights.length !== possibleConditions.length) {
-          log.error('SMILE API: randomAssignCondition() weights must be the same length as the condition possibilities')
-          return null
-        }
+      if (hasWeights && weights.length !== possibleConditions.length) {
+        logStore.error(
+          'SMILE API: randomAssignCondition() weights must be the same length as the condition possibilities'
+        )
+        return null
       }
-      // get random condition from conditionobject[name]
-      randomCondition = sampleWithReplacement(possibleConditions, 1, weights)[0]
 
-      // set the condition in the store
-      smilestore.setCondition(name, randomCondition)
-      log.debug('SMILE API: assigned condition', name, randomCondition)
-
-      // Returning to allow immediate use if assigned
+      const randomCondition = sampleWithReplacement(possibleConditions, 1, weights)[0]
+      store.setCondition(name, randomCondition)
+      logStore.debug('SMILE API: assigned condition', name, randomCondition)
       return randomCondition
     },
+
+    // Image preloading
     preloadAllImages: () => {
-      log.debug('Preloading images')
+      logStore.debug('Preloading images')
       setTimeout(() => {
         Object.values(
           import.meta.glob('@/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', {
@@ -284,10 +228,12 @@ export default function useAPI() {
         })
       }, 1)
     },
+
+    // Consent management
     completeConsent: async () => {
       api.setConsented()
       if (!api.local.knownUser) {
-        await api.setKnown() // set new user and add document, then assign conditions
+        await api.setKnown()
       }
     },
   })

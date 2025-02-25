@@ -9,7 +9,7 @@ import { Timeline, processQuery } from '@/core/timeline'
 let router
 let pinia
 
-describe.skip('Stepper tests', () => {
+describe('Stepper tests', () => {
   // set up the app
   function setupapp(routes) {
     const TestAppRouter = {
