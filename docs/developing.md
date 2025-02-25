@@ -25,10 +25,10 @@ in the project folder. You should see something like this:
   ready in 283ms.
 ```
 
-If you open `http://localhost:3000/` in your browser[^mac] it will show you a
-live demo of your web experiment. This website will automatically refresh and
-change as you make modifications to your code. That's all you need to get
-started.
+If you open the link shown after `Local:` (in this case,
+`http://localhost:3000/`) in your browser[^mac] it will show you a live demo of
+your web experiment. This website will automatically refresh and change as you
+make modifications to your code. That's all you need to get started.
 
 [^mac]:
     On Mac if you press the Command (⌘) key while clicking the link it will open
@@ -47,12 +47,15 @@ testing. `npm run dev` provides the same basic purpose with additional features.
 When you are viewing your website on the development server there is a special
 bar visible along the top of the page. This provides some useful links as well
 as the ability to jump between different stages/routes of your experiment. This
-bar will not be rendered when the website is deployed.
+bar will not be rendered when the website is deployed (so participants won't be
+able to see it!).
 
 On pages that have forms that have to be filled out you as the developer can
 make a new button appear in the developer bar called "Autofill Form" which will
 automatically fill in the form with some preset values making it easier to
 advance to the next stage of debugging.
+
+[TO DO: WALK THROUGH DEV BAR HERE]
 
 ## Testing the build process
 
@@ -75,9 +78,9 @@ npm run preview
 ## Hot Module Replacement
 
 One of the most useful features of Vite in development mode is that it
-automatically reloads the webpage anytime changes are made to any project files.
-This prevents you from having to go back and forth between your editor and the
-browser and pressing shift-reload.
+automatically reloads the webpage any time changes are made to any project
+files. This prevents you from having to go back and forth between your editor
+and the browser and manually refreshing the browser window.
 
 [Some tools](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)
 provide this automatic updating by forcing the entire browser webpage to reload
@@ -93,7 +96,7 @@ Instead, Vite can reload modules for parts of a page without reloading the
 _entire_ page. This can be **very powerful** for developing experiments because
 it can prevent a lot of mindless clicking just to get back to a particular state
 and trigger an error, etc... Once you understand this difference you'll wonder
-how you every programmed for the web without it. This feature is known as
+how you ever programmed for the web without it. This feature is known as
 [Hot Module Replacement](https://vitejs.dev/guide/features.html#hot-module-replacement).
 
 ## Bundling, Tree-Shaking, and Code-spliting
@@ -104,19 +107,21 @@ between packages. As one example, the popular [lodash](https://lodash.com)
 library organizes all the functions into individual modules so importing the
 lodash library in Node.js technically may load as many as 600 other files at
 once. If this was running on a real webserver the number of separate requests
-might overload the server. As a result modern website "bundle" the required code
-into a single, optimized file so that only one file is imported. Vite does this
-behind the scenes for you both in development and building mode.
+might overload the server. As a result, modern websites "bundle" the required
+code into a single, optimized file so that only one file is imported. Vite does
+this behind the scenes for you both in development and building mode.
 
 There are several other features of Vite including a process called
-[Tree-Shaking](https://developer.mozilla.org/en-US/docs/Glossary/Tree_shaking)
+[Tree-Shaking](https://developer.mozilla.org/en-US/docs/Glossary/Tree_shaking),
 which removes functions from the bundle which are not used in the current app to
-reduce the file size and
-[Code Splitting](https://developer.mozilla.org/en-US/docs/Glossary/Code_splitting)
-which organizes files into "chunks" the reflect common dependencies across
+reduce the file size, and
+[Code Splitting](https://developer.mozilla.org/en-US/docs/Glossary/Code_splitting),
+which organizes files into "chunks" that reflect common dependencies across
 different pages of a site.
 
 ## Merging changes to the template into your existing project
+
+[TO DO: INSTRUCTIONS FOR HOW TO DO THIS FOR A LAB]
 
 Because Smile is still being developed, there may be changes to the Smile
 template after you begin setting up your own project. If you want to merge those
