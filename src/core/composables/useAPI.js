@@ -37,6 +37,8 @@ export default function useAPI() {
       warn: (...args) => logStore.warn(...args),
       error: (...args) => logStore.error(...args),
       success: (...args) => logStore.success(...args),
+      clear_page_history: () => logStore.clear_page_history(),
+      add_to_history: (...args) => logStore.add_to_history(...args),
     },
 
     // Store data access
