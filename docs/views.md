@@ -53,15 +53,15 @@ Views sometimes have "side-effects" which are changes to the state of the
 overall application as a result of the operation of the view. For example, the
 Informed Consent View might present the text of the consent form and ask the
 participant if they agree to participate. If they do, then a flag is set by the
-API to indicate that the participant has consented. Subsequent Views might check
-this flag to verify that the subject has consented.
+[API](/api) to indicate that the participant has consented. Subsequent Views
+might check this flag to verify that the subject has consented.
 
-Programmers call these "side-effects" because the break the apparent modularity
+Programmers call these "side-effects" because they break the apparent modularity
 of the View. For example, if your experiment needs to know if the participant
 has consented, and you remove the Informed Consent View, then you will need to
 add some other way to set the consent flag.
 
-In the docs for built-in view we will describe the side-effects of each view.
+Below, we describe each built-in View, including the side-effects of each View.
 
 ### Metadata options
 
@@ -70,22 +70,22 @@ Each View can also be defined with a set of metadata properties that control pag
 
 ## Overview of Built-in Views
 
-| Name                                                | Side&nbsp;effect? | Description                                                                                                                     |
-| --------------------------------------------------- | :---------------- | :------------------------------------------------------------------------------------------------------------------------------ |
-| [Recruitment Ad](#recruitment-advertisement)        | No                | Landing page for participants                                                                                                   |
-| [MTurk Ad](#mturk-recruitment)                      | No                | Interacts with the MTurk system                                                                                                 |
-| [Simple Informed Consent](#simple-informed-consent) | Yes               | Collects informed consent using a simple checkbox                                                                               |
-| [CAPTCHA](#the-smile-captcha)                       | No                | Fun tasks to verify human-ness and attention                                                                                    |
-| [Window Sizer](#window-sizer)                       | Yes               | Verifies a given area of the screen is visible (with a more that agressively hides page content if window is resized too small) |
-| [Simple Instructions](#simple-instructions)         | No                | A simple sequence of pages for instructions                                                                                     |
-| [Instructions Quiz](#instructions-quiz)             | No                | A simple sequence of pages for instructions                                                                                     |
-| [Demographic Survey](#demographic-survey)           | No                | A survey which collects somedemographic info                                                                                    |
-| [Device Survey](#device-survey)                     | No                | A survey which collects some self-report about computer/device                                                                  |
-| [Withdraw](#withdraw)                               | Yes               | A survey which processes a subject request to withdraw from study                                                               |
-| [Debrief](#debrief)                                 | No                | A simple text View which describes the purpose of study                                                                         |
-| [Feedback](#feedback)                               | No                | A survey for soliciting structured and unstructured feedback on the study                                                       |
-| [Thanks Page](#thanks)                              | Yes               | A thank you page                                                                                                                |
-| [Report Issue](#report-issue)                       | Yes               | A form to report a bug/issue with the experiment                                                                                |
+| Name                                                | Side&nbsp;effect? | Description                                                                                                                               |
+| --------------------------------------------------- | :---------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
+| [Recruitment Ad](#recruitment-advertisement)        | No                | Landing page for participants                                                                                                             |
+| [MTurk Ad](#mturk-recruitment)                      | No                | Interacts with the MTurk system                                                                                                           |
+| [Simple Informed Consent](#simple-informed-consent) | Yes               | Collects informed consent using a simple checkbox                                                                                         |
+| [CAPTCHA](#the-smile-captcha)                       | No                | Fun tasks to verify human-ness and attention                                                                                              |
+| [Window Sizer](#window-sizer)                       | Yes               | Verifies a given area of the screen is visible (with a more aggressive option that hides page content if the window is resized too small) |
+| [Simple Instructions](#simple-instructions)         | No                | A simple sequence of pages for instructions                                                                                               |
+| [Instructions Quiz](#instructions-quiz)             | No                | A basic instructions quiz                                                                                                                 |
+| [Demographic Survey](#demographic-survey)           | No                | A survey which collects some demographic info                                                                                             |
+| [Device Survey](#device-survey)                     | No                | A survey which collects some self-report about computer/device                                                                            |
+| [Withdraw](#withdraw)                               | Yes               | A survey which processes a participant's request to withdraw from study                                                                   |
+| [Debrief](#debrief)                                 | No                | A simple text View which describes the purpose of study                                                                                   |
+| [Feedback](#feedback)                               | No                | A survey for soliciting structured and unstructured feedback on the study                                                                 |
+| [Thanks Page](#thanks)                              | Yes               | A thank you page                                                                                                                          |
+| [Report Issue](#report-issue)                       | Yes               | A form to report a bug/issue with the experiment                                                                                          |
 
 These components are located in the `src/builtins` directory. In <SmileText/> a
 short-hand for the src folder is '@' so for instance '@/builtins' refers to the
@@ -96,17 +96,17 @@ short-hand for the src folder is '@' so for instance '@/builtins' refers to the
 ### Recruitment Advertisement
 
 **Base Component**: `@/builtins/recruitment/AdvertisementView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/recruitment/AdvertisementView.vue)  
-**Side
-effects**: None  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/recruitment/AdvertisementView.vue)  
+**Side effects**: None  
 **Typical accessibility**: `{allowAlways: true}`
 
-Before a participant can begin a study they must first be recruited. The landing
-page for your experiment is the Advertisement View. This is the first thing that
-participants will see when they visit your experiment. The Advertisement View is
-a simple page that contains a title and an invitation to participate. There is a
-animated button which will take the participant to the next view in the
-timeline.
+Before a participant can begin a study, they must first be recruited. The
+landing page for your experiment is the Advertisement View. This is the first
+thing that participants will see when they visit your experiment. The
+Advertisement View is a simple page that contains a title and an invitation to
+participate. There is a animated button which will take the participant to the
+next View in the timeline.
 
 - There are no side effects, and nothing is recorded.
 - The template can be edited to change the text.
@@ -133,7 +133,8 @@ timeline.pushSeqView({
 })
 ```
 
-Another `design.js` alternative for coming from services like Prolific:
+Another `design.js` alternative for studies that use external services like
+Prolific:
 
 ```js
 // put this at the top of the file
@@ -157,15 +158,19 @@ timeline.pushSeqView({
 })
 ```
 
+This will automatically save service-specific participant info to your data
+(e.g., Prolific ID), with current built-in support for Prolific, Amazon MTurk,
+and CloudResearch.
+
 ### MTurk Recruitment
 
 **Base Component**: `@/builtins/mturk/MTurkRecruitView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/mturk/MTurkRecruitView.vue)  
-**Side
-effects**: None  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/mturk/MTurkRecruitView.vue)  
+**Side effects**: None  
 **Typical accessibility**: `{allowAlways: true}`
 
-On the Mechanical Turk, the platform list possible HITs (Human Intelligence
+On the Mechanical Turk, the platform lists possible HITs (Human Intelligence
 Tasks) and workers can choose to complete them. When browsing the listing
 participants see one "advertisement" view of the task in an `iframe`. When
 browsing in this listing the assignmentId is set to
@@ -175,8 +180,8 @@ be provided.
 
 This View provides the logic to handle these two versions of the recruitment
 text. When the assignmentId is not available the participant sees the
-"recruitment" text with some information about the study. When the accept the
-hit, then see a new page with a button which will launch the <SmileText/>
+"recruitment" text with some information about the study. When they accept the
+HIT, they then see a new page with a button which will launch the <SmileText/>
 experiment in a new browser window.
 
 - There are no side effects, and nothing is recorded.
@@ -201,9 +206,9 @@ this.registerView({
 ### Simple Informed Consent
 
 **Base Component**: `@/builtins/simple_consent/InformedConsentView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/simple_consent/InformedConsentView.vue)  
-**Side
-effects**: No  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/simple_consent/InformedConsentView.vue)  
+**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
 **Typical accessibility**: `{requiresConsent: false, requiresDone: false}`
 
 Most studies require some type of informed consent from participants. This is
@@ -220,7 +225,7 @@ The text of the informed consent should be updated for each study and placed in
 After a participant accepts the informed consent (usually the first few steps of
 study) they will see a button in the [status bar](#status-bar) that will always
 be available allowing them to review the consent form in case they have
-questions. Click this button pops up a modal with the text of the informed
+questions. Clicking this button pops up a modal with the text of the informed
 consent (also `@/builtins/simple_consent/InformedConsentText.vue`).
 
 ```js
@@ -241,21 +246,21 @@ timeline.pushSeqView({
 ### The Smile CAPTCHA
 
 **Base Component**: `@/builtins/captcha/CaptchaView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/captcha/CaptchaView.vue)  
-**Side
-effects**: Yes, saves the data from the tasks.  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/captcha/CaptchaView.vue)  
+**Side effects**: Yes, saves the data from the tasks.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
-CAPTCHAS (Completely Automated Public Turing test to tell Computers and Humans)
-are simple tasks used to verify that the user is a human and not a computer. We
-developed a unique CAPTCHA system for <SmileText/> that is fun and engaging for
-participants. The Smile CAPTCHA is a series of tasks that are easy for humans
-but difficult for computers. The tasks happen quickly in sequence with a timer
-requiring fast responses (limiting the ability to send the questions to and AI).
-In addition, the set of tasks is diverse and requires language understanding,
-intuitive physical reasoning, fine motor control and perception, and object
-recognition. In addition, a few of the tasks measures known cognitive phenomena
-that people are known to show such as patterns in reaction time.
+CAPTHCAs (Completely Automated Public Turing test to tell Computers and Humans
+Apart) are simple tasks used to verify that the user is a human and not a
+computer. We developed a unique CAPTCHA system for <SmileText/> that is fun and
+engaging for participants. The Smile CAPTCHA is a series of tasks that are easy
+for humans but difficult for computers. The tasks happen quickly in sequence
+with a timer requiring fast responses (limiting the ability to send the
+questions to an AI). In addition, the set of tasks is diverse and requires
+language understanding, intuitive physical reasoning, fine motor control and
+perception, and object recognition. A few of the tasks measure known cognitive
+phenomena specific to humans, such as patterns in reaction time.
 
 <SmileText/> we use a simple CAPTCHA that asks the participant to click on a
 specific location on the screen. This is a simple task that is easy for humans
@@ -275,21 +280,24 @@ timeline.pushSeqView({
 ### Window Sizer
 
 **Base Component**: `@/builtins/window_sizer/WindowSizerView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/window_sizer/WindowSizerView.vue)  
-**Side
-effects**: Yes, sets the is verifiedVisibility key in the [API](/api) to true.  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/window_sizer/WindowSizerView.vue)  
+**Side effects**: Yes, sets the is verifiedVisibility key in the [API](/api) to
+true.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The window sizer is a small component `src/components/pages/WindowSizerView.vue`
-that will display a box with a configured size on the screen and asked the
+that will display a box with a configured size on the screen and ask the
 participant to adjust their browser window to that size so everything is
 visible. It looks like this:
+
+![Window sizer](/images/windowsizer.png)
 
 The size of the box is configured in `env/.env` file using the
 `VITE_WINDOWSIZER_REQUEST` configuration option. The default value is `800x600`
 which means 800 pixel wide and 600 pixels tall. You can change these values as
-needed. In development mode you will need to restart the development server
-since environment files are only read once on the loading of the application.
+needed. In development mode, you will need to restart the development server
+since environment files are only read once when the application first loads.
 
 In addition to a View appearing on the Timeline in a particular place, it is
 possible to re-trigger this View when the browser detects the user has adjusted
@@ -316,10 +324,12 @@ timeline.pushSeqView({
 This page presents the instructions for the experimental task to the participant. If the experiment contains multiple conditions and each requires a unique set of instructions, the participant may be randomly assigned a condition with custom weights so that the Instructions View displays the correct text. This page is also always accessible such that the user is able to return to it if they do not pass the instructions quiz. 
 
 
-**Component**: `@/builtins/instructions/InstructionsView.vue`  
+**Base Component**: `@/builtins/instructions/InstructionsView.vue`  
 **Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/instructions/InstructionsView.vue)  
 **Side effects**: No  
-**Typical accessibility**: Always
+**Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
+
+[TO DO: Add info about instructions]
 
 
 ```js
@@ -351,15 +361,17 @@ timeline.pushSeqView({
 **Typical accessibility**: Always
 
 The instructions quiz is a simple quiz that makes sure the participant has read
-and understood the experiment instructions. The user has to answer all the questions
-correctly before they can continue. If they get a question wrong, they are redirected 
-to the timeline at the location specified in the `returnTo` prop, which is by default
-the instructions page, and will be asked to try the quiz again.
+and understood the experiment instructions. The user has to answer all the
+questions correctly before they can continue. If they get a question wrong, they
+are redirected to the timeline at the location specified in the `returnTo` prop,
+which is by default the instructions page, and will be asked to try the quiz
+again.
 
-The quiz questions are configured in `@/user/components/quizQuestions.js` as an array 
-of dictionary objects, where each dictionary represents a page of multiple questions. 
-Each question has an id, a question text, a list of answers, and the correct answer(s). 
-The field `multiSelect` can be set to true if a question has multiple correct answers. 
+The quiz questions are configured in `@/user/components/quizQuestions.js` as an
+array of dictionary objects, where each dictionary represents a page of multiple
+questions. Each question has an id, a question text, a list of answers, and the
+correct answer(s). The field `multiSelect` can be set to true if a question has
+multiple correct answers.
 
 ```js
 export const QUIZ_QUESTIONS = [
@@ -404,13 +416,13 @@ export const QUIZ_QUESTIONS = [
 ]
 ```
 
-The questions from `@/user/components/quizQuestions.js` are then imported and 
-passed to `InstructionsQuiz` component as a prop (`quizQuestions`).
-The `randomizeQuestionsAndAnswers` prop is optional and defaults to `true`. 
-This will randomize the order of the questions and answers on each page at
-loading time (meaning if the subject repeats the quiz multiple times, the order
-of the questions and answers will be different each time). If set to `false`, 
-the questions will be randomized in the same way each time the quiz is taken.
+The questions from `@/user/components/quizQuestions.js` are then imported and
+passed to `InstructionsQuiz` component as a prop (`quizQuestions`). The
+`randomizeQuestionsAndAnswers` prop is optional and defaults to `true`. This
+will randomize the order of the questions and answers on each page at loading
+time (meaning if the subject repeats the quiz multiple times, the order of the
+questions and answers will be different each time). If set to `false`, the
+questions will be randomized in the same way each time the quiz is taken.
 
 ```js
 // import the quiz questions
@@ -430,9 +442,9 @@ timeline.pushSeqView({
 ### Demographic Survey
 
 **Base Component**: `@/builtins/demographic_survey/DemographicSurveyView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/demographic_survey/DemographicSurveyView.vue)  
-**Side
-effects**: Yes, saves the data from the form.  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/demographic_survey/DemographicSurveyView.vue)  
+**Side effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The demographic survey is a simple survey that asks participants to provide some
@@ -456,9 +468,9 @@ timeline.pushSeqView({
 ### Device Survey
 
 **Base Component**: `@/builtins/device_survey/DeviceSurveyView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/device_survey/DeviceSurveyView.vue)  
-**Side
-effects**: Yes, saves the data from the form.  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/device_survey/DeviceSurveyView.vue)  
+**Side effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The device survey askes participants to provide some information about their
@@ -481,7 +493,7 @@ default survey asks for the following information:
 - Did you use any tools to help you complete the task? (e.g., calculator, notes,
   browser extensions, AI tools, other)
 
-If you want this to be the last view in the study you can set the `setDone` meta
+If you want this to be the last View in the study you can set the `setDone` meta
 field.
 
 ```js
@@ -503,21 +515,23 @@ timeline.pushSeqView({
 **Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
 **Typical accessibility**: `{ requiresWithdraw: true }`
 
-As part of most IRB approved protocols participants should be eligible to
-withdraw from a study at any time for any reason. Online this is as simple as
-closing the browser windows and moving onto something else. However,
-<SmileText/> provides a simple way to withdraw at any time from a study.
+As part of most IRB protocols, participants should be able to withdraw from a
+study at any time for any reason. Online, this is as simple as closing the
+browser window and moving onto something else. However, <SmileText/> provides a
+simple and clear way for a participant withdraw at any time from a study, while
+also providing feedback about why they are withdrawing.
 
 ![Withdraw button](/images/withdraw.png)
 
 When participants click this button (only appears after accepting the informed
-consent), then they are presented with a form with several optional questions
-about why they are withdrawing and also providing information about partial
-compensation. If a participant is eligible for partial compensation depends on
-several things specific to each study. When they submit this form they will be
-taken to a final page asking them to return the task/hit. It is the
-responsibility of the experimenter to monitor withdraws and to try to contact
-the participant.
+consent), then they are presented with a form, including several optional
+questions about why they are withdrawing and their contact information (e.g.,
+for receiving partial compensation). As a side effect of
+
+When they submit this form, they will be taken to a final page asking them to
+return the task/HIT. It is the responsibility of the experimenter to monitor
+withdraws and to try to contact the participant if needed for partial
+compensation.
 
 
 ```js
@@ -585,7 +599,7 @@ timeline.pushSeqView({
 ### Feedback Survey
 
 **Component**: `src/builtins/task_survey/TaskFeedbackSurveyView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/task_survey/TaskFeedbackSurveyView.vue.vue)  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/task_survey/TaskFeedbackSurveyView.vue)  
 **Side effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
@@ -630,18 +644,20 @@ them as needed for your study.
 ### Status Bar
 
 **Base Component**: `@/builtins/navbars/StatusBar.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/navbars/StatusBar.vue)
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/navbars/StatusBar.vue)
 
 ### Progress Bar
 
 **Base Component**: `@/builtins/navbars/ProgressBar.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/navbars/ProgressBar.vue)
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/navbars/ProgressBar.vue)
 
 Not implemented fully.
 
 ### Withdraw Modal
 
 **Base Component**: `@/builtins/withdraw/WithdrawFormModal.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/withdraw/WithdrawFormModal)  
-**Side
-effects**: Yes
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/withdraw/WithdrawFormModal)  
+**Side effects**: Yes

@@ -29,10 +29,11 @@ browsers to try out your code in each of them. However, for
 developing/testing your code, ARC/Chrome is particularly recommended because of
 the wide range of available extensions.
 
-## 4. Install VSCode, Volar, and Prettier
+
+## 4. Install VSCode, Vue Extension for VSCode, and Prettier
 
 It is highly recommended that you use [VS Code](https://code.visualstudio.com/),
-the [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+the [Vue](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
 extension, and the
 [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 extension. These tools will help you write and debug your code more easily.

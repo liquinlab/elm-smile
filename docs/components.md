@@ -35,25 +35,24 @@ leveraging modularity and code reuse.
 
 Components are somewhat similar to the role that
 ["plugins"](https://www.jspsych.org/7.2/overview/plugins/) play in a library
-like [JSPsych](https://www.jspsych.org/7.2/) but JSPsych plugins often handle
-single trials of an experiment whereas a Vue.js component might be as small as a
-button or as big as an entire webpage or even application. In addition,
-components leverage some other concepts in modern web design such as
+like [JSPsych](https://www.jspsych.org/7.2/). However, JSPsych plugins often
+handle single trials of an experiment, whereas a Vue.js component might be as
+small as a button or as big as an entire webpage or even application. In
+addition, components leverage some other concepts in modern web design such as
 [reactivity and declarative rendering](/reactive) that make your development and
 debugging much easier.
 
 ### How are components used in <SmileText/>?
 
 Typically in <SmileText/>, components are used to define
-[phases of an experiment](/views) (e.g., consent, instructions, etc...), Smile
+[phases of an experiment](/views) (e.g., consent, instructions, etc.), Smile
 provides several [built-in components](/views#built-in-views) (which we refer to
-as "Views") that implement nicely designs components that collect informed
+as "Views") that implement nicely designed components that collect informed
 consent or show instructions. Components are also used to define the individual
 trials of an experiment (i.e., the logic and flow of what is shown in a given
 trial). Some trials might be complex and composed of other components that
-define the look and layout of stimuli, buttons, etc...In addition, Smile
-provides a simple component API which makes it easy to
-[step through sequences of trials](/steps).
+define the look and layout of stimuli, buttons, etc. In addition, Smile provides
+a simple API which makes it easy to [step through sequences of trials](/steps).
 
 ## Vue.js components
 
@@ -81,11 +80,11 @@ The preferred way to develop Vue components is using a special file format known
 as SFC (Single File Component). These files end with an extension `.vue`. The
 SFC files combine elements of Javascript, HTML, and CSS/SCSS into a single
 modular element that defines your component. These files can be edited best
-using the [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+using the [Vue](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
 extension for [VSCode](https://code.visualstudio.com) (i.e., it provides syntax
 highlighting and other code formatting hints).
 
-Here is an example Vue 3 SFC file called `SimpleButton.vue` which is using the
+Here is an example Vue 3 SFC file called `SimpleButton.vue`, which is using the
 Vue 3.0 composition API:
 
 ```vue
@@ -112,7 +111,7 @@ the javascript behavior (script), the HTML rendering (template), and the
 look/feel of the component (style). These three factors are typical for
 interactive websites (e.g., you typically import your javascript code (.js), and
 style sheet (.css) code into your basic HTML document (.html)). However,
-normally you define these for the entire page not separately for individual
+normally you define these for the entire page—not separately for individual
 pieces of a larger page. The SFC file format highlights the value of modularity
 since it helps you group the code for a particular part of the page together
 with its HTML and CSS styling.
@@ -130,7 +129,7 @@ If we look more closely, the template for this component looks like basic HTML:
 It has a simple `<button>` element that when clicked (`@click`) increments a
 variable called `count`. The current value of `count` is rendered into the
 template using the <span v-pre>`{{ count }}`</span> syntax. The `@click` event
-handlers is not normal HTML but is a Vue directive/shorthand for adding the
+handler is not normal HTML, but is a Vue directive/shorthand for adding the
 `onclick()` event listener. Similarly, the <span v-pre>`{{ count }}`</span> is
 template syntax for text interpolation which essentially converts the value of
 `count` to a string and inserts it into the HTML template. You can read more
@@ -168,9 +167,9 @@ button {
 Here we are specifying that the text in the button for this component should be
 bold and the button light blue. Since the style section has the word `scoped` in
 it, the styles will only apply to this component and not to other components on
-the page (i.e., only this button will be bolded). In other words even if
-elsewhere on the page, in a different component there is a `<button>` tag this
-style will not apply to it.
+the page (i.e., only this button will be bolded). In other words, even if
+elsewhere on the page, if a different component has a `<button>` tag, this style
+will not apply to it.
 
 #### Using a component
 
@@ -198,10 +197,10 @@ template and the logic for the button.
 Try clicking the button and see how the counter is incremented! All the logic
 for this was self-contained in the small SFC file above and could be easily
 moved into another project just by copying the SFC file and importing it where
-needed. In addition, it can be applied multiple times on the same page each
+needed. In addition, it can be applied multiple times on the same page. Each
 instance of the component will have its own state and behavior.
 
-For example writing
+For example, writing
 
 ```
 <SimpleButton/>
@@ -237,7 +236,7 @@ This way more complex elements can be composed out of simpler elements.
 ## Declarative Rendering and Reactivity
 
 A core concept in Vue.js is the idea of **reactivity** and **declarative
-rendering**. There are many useful guides to this include the excellent
+rendering**. There are many useful guides to this, including the excellent
 [Vue tutorial](https://vuejs.org/tutorial/#step-1) and the
 [Vue documentation](https://vuejs.org/guide/introduction.html). However, here is
 a quick summary.
@@ -293,10 +292,10 @@ template when the underlying state changes.**
 #### Two-way binding
 
 An even more interesting version of this can create two-way binding between
-elements in a form. For example this component defines a reactive value called
-`text`. In the template is defines a text input element `input` which is "bound"
-to the value of `text` using the `v-model` directive. This means that when the
-the value of the input changes, it automatically updates the value of `text` and
+elements in a form. For example, this component defines a reactive value called
+`text`. The template defines a text input element `input` which is "bound" to
+the value of `text` using the `v-model` directive. This means that when the the
+value of the input changes, it automatically updates the value of `text` and
 vice versa. This is a powerful feature of Vue.js that can save a lot of time and
 code.
 
@@ -367,7 +366,7 @@ input:
 }
 ```
 
-unpacking this code, first we add the input and text to the page using the
+Unpacking this code, first we add the input and text to the page:
 
 ```js
 var html = `<input class="input" name="text" id="myinput" placeholder="Type here" />`
@@ -376,7 +375,7 @@ display_element.innerHTML = html
 ```
 
 This looks similar to the `<template>` section of the Vue component. However, we
-still need to add the event handler to the jsPsych plugin example. We do this by
+still need to add the event handler to the JSPsych plugin example. We do this by
 selecting the `#myinput` element and adding an event listener to to the click
 for `onchange` events.
 
@@ -390,7 +389,7 @@ display_element
 
 In the Vue component, the event handler which listens to changes was implicitly
 registered using the `v-model="text"` directive. Finally in the JSPsych example
-we have to handle the change by running a function the reads the current value
+we have to handle the change by running a function that reads the current value
 of the input field and sets the HTML of the message to the new value.
 
 ```js
@@ -404,22 +403,23 @@ function handle_change() {
 This is also implicitly accomplished using the declarative rendering in the Vue
 template.
 
-Conceptually these are not radically different -- in both cases we have to think
+Conceptually, these are not radically different—in both cases we have to think
 about how our program reacts to inputs from the user. However, the JSPsych
 version, besides being more verbose, requires the programmer to manually
 coordinate more of the updating process (retrieving values and setting them in
 the display). This can be error-prone. As the complexity of a plugin/component
-grows the savings from declarative rendering and reactivity become more and more
-apparent. For example, if the same components was extended to include multiple
-form elements, each of a highly specialized type (e.g., date pickers, etc...)
-then the JSPsych version would require a lot of manual code to handle the
+grows, the savings from declarative rendering and reactivity become more and
+more apparent. For example, if the same component was extended to include
+multiple form elements, each of a highly specialized type (e.g., date pickers,
+etc.) then the JSPsych version would require a lot of manual code to handle the
 updating of the display.
 
-In addition, this example didn't use it but the CSS styling for a JSPsych plugin
-is defined in a different file from the plugin itself which can make it harder
-to update (e.g., you have to be careful to not call any other element `#myinput`
-if you applied a style to it because CSS classes apply globally, where as in Vue
-they can be, optinally, scoped to apply to the current component only).
+In addition, this example didn't use it, but the CSS styling for a JSPsych
+plugin is defined in a different file from the plugin itself which can make it
+harder to update (e.g., you have to be careful to not call any other element
+`#myinput` if you applied a style to it because CSS classes apply globally,
+where as in Vue they can be, optionally, scoped to apply to the current
+component only).
 
 ## Building Vue components
 
@@ -444,16 +444,16 @@ advantages.
 
 - First, the build process can optimize the code for quick loading (e.g., when
   Vite processes the SFC files it can remove comments and whitespace, a process
-  call "minifying", making the imported code smaller and faster to load over the
-  web).
+  called "minifying", making the imported code smaller and faster to load over
+  the web).
 - Second, the build process can strip out unused functions from the libraries
-  you use. So for example, the
+  you use. In the
   [simplest method](https://www.jspsych.org/7.3/tutorials/hello-world/#step-3-create-a-script-element-and-initialize-jspsych)
-  of using JSPsych you import the current version of the library which includes
-  all the functions of JSPsych even if you never use them. In contrast, Vite,
-  through it's build function can analyze your code and only include the parts
-  of the library that you actually use. This is called **tree-shaking** and is a
-  powerful way to reduce the size of your website.
+  of using JSPsych, you import entire JSPsych library, which includes all the
+  functions of JSPsych even if you never use them. In contrast, Vite's build
+  function can analyze your code and only include the parts of the library that
+  you actually use. This is called **tree-shaking** and is a powerful way to
+  reduce the size of your website.
 - Third, the build process can **code-split** your website. This means that the
   build process can break your website into smaller pieces that can be loaded on
   demand or in parallel (breaking the code into multiple .js file "chunks").
@@ -495,10 +495,10 @@ Here are some additional resources:
 
 Finally, one very useful tool for learning about components is the
 [Vue Single File Component Playground](https://sfc.vuejs.org/). On this page,
-you can write simple components see how they will render in real-time, and even
+you can write simple components, see how they will render in real-time, and even
 build slightly larger components that include sub-components. It can be useful
-for learning setting up <SmileText/> on your computer and even can help engage
-students in the research process.
+for learning without setting up <SmileText/> on your computer, and it even can
+help engage students in the research process.
 
 ## Component organization
 
@@ -568,3 +568,6 @@ Based on what type of component you are developing, place the corresponding
 component file in the correct folder. This will help you stay organized and help
 other users of your code know where to look to find an element they might like
 to reuse in their projects.
+
+[TO DO: Describe each folder? But also we actually want people to use User
+folder, right?]
