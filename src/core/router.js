@@ -2,9 +2,7 @@ import seedrandom from 'seedrandom'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { getQueryParams } from '@/core/utils'
 import timeline from '@/user/design'
-
 import useAPI from '@/core/composables/useAPI'
-
 // 3. add navigation guards
 //    currently these check if user is known
 //    and if they are, they redirect to last route
@@ -231,54 +229,57 @@ function addGuards(r) {
   })
 }
 
-const { routes } = timeline
+export function useRouter() {
+  const { routes } = timeline
 
-// 4. Create the router instance and pass the `routes` option
-// You can pass in additional options here, but let's
-// keep it simple for now.
-export const router = createRouter({
-  history: createWebHashHistory(), // We are using the hash history for now/simplicity
-  routes,
-  scrollBehavior(to, from, savedPosition) {
-    return { top: 0 }
-  },
-})
-addGuards(router) // add the guards defined above
+  // 4. Create the router instance and pass the `routes` option
+  // You can pass in additional options here, but let's
+  // keep it simple for now.
+  const router = createRouter({
+    history: createWebHashHistory(), // We are using the hash history for now/simplicity
+    routes,
+    scrollBehavior(to, from, savedPosition) {
+      return { top: 0 }
+    },
+  })
+  addGuards(router) // add the guards defined above
 
-// add additional guard to set global seed before
-router.beforeResolve((to) => {
-  const api = useAPI()
-  api.store.removePageAutofill()
+  // add additional guard to set global seed before
+  router.beforeResolve((to) => {
+    const api = useAPI()
+    api.store.removePageAutofill()
 
-  if (api.store.local.useSeed) {
-    // if we're using a seed
-    const seedID = api.store.getSeedID
-    const seed = `${seedID}-${to.name}`
-    seedrandom(seed, { global: true })
-    api.log.log('ROUTER GUARD: Seed set to ' + seed)
-  } else {
-    // if inactive, just re-seed with a random seed on every route entry
-    api.randomSeed()
-    api.log.log('ROUTER GUARD: Not using participant-specific seed; seed set randomly')
-  }
-  api.log.clear_page_history()
-  api.store.dev.page_provides_trial_stepper = false // by default
-  api.store.dev.current_page_done = false // set the current page to done
-  api.log.log('ROUTER GUARD: Router navigated to /' + to.name)
-})
-
-// Check if the next route has a preload function, and if so, run it asynchronously
-router.afterEach(async (to, from) => {
-  if (to.meta !== undefined && to.meta.next !== undefined) {
-    const fullTo = router.resolve({ name: to.meta.next })
-
-    if (fullTo.meta !== undefined && fullTo.meta.preload !== undefined) {
-      await fullTo.meta.preload()
+    if (api.store.local.useSeed) {
+      // if we're using a seed
+      const seedID = api.store.getSeedID
+      const seed = `${seedID}-${to.name}`
+      seedrandom(seed, { global: true })
+      api.log.log('ROUTER GUARD: Seed set to ' + seed)
+    } else {
+      // if inactive, just re-seed with a random seed on every route entry
+      api.randomSeed()
+      api.log.log('ROUTER GUARD: Not using participant-specific seed; seed set randomly')
     }
-  }
-})
+    api.log.clear_page_history()
+    api.store.dev.page_provides_trial_stepper = false // by default
+    api.store.dev.current_page_done = false // set the current page to done
+    api.log.log('ROUTER GUARD: Router navigated to /' + to.name)
+  })
 
+  // Check if the next route has a preload function, and if so, run it asynchronously
+  router.afterEach(async (to, from) => {
+    if (to.meta !== undefined && to.meta.next !== undefined) {
+      const fullTo = router.resolve({ name: to.meta.next })
+
+      if (fullTo.meta !== undefined && fullTo.meta.preload !== undefined) {
+        await fullTo.meta.preload()
+      }
+    }
+  })
+
+  return router
+}
 // they are defined in a function like this for the testing harness
-export { routes, addGuards }
+//export { routes, addGuards }
 
-export default router
+export default useRouter
