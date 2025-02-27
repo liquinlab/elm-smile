@@ -62,3 +62,17 @@ DATA_PATH = '...'
 with open(DATA_PATH, 'r') as f:
   data = json.load(f, object_hook=lambda d: ExtendedSimpleNamespace(**d))
 ```
+
+## Data provenance
+
+Smile tracks the provenance of each data file, including the version of the code
+that was used to generate it and the git commit hash of the code at the time it
+was run. This allows you to know exactly which version of the code was used to
+generate any given data file.
+
+In the Firestore document, this information is stored in `smile_config.github`
+field and includes the repo name, owner, branch, last commit message, last
+commit hash, and the URL of the commmit.
+
+By keeping this information stored with the data, you can also link directly to
+the code used to generate the data even as it evolves during development.

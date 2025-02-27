@@ -202,7 +202,7 @@ Firebase/Firestore or the LocalStorage in the browser.
 
 ## Writing Data to the Global Store
 
-The preferred way write write data to the store is to use the [Smile API](/api):
+The preferred way to write data to the store is to use the [Smile API](/api):
 
 ```vue
 <script setup>
