@@ -1,6 +1,5 @@
 /* eslint-disable no-undef */
 import { defineComponent, h } from 'vue'
-import { createTestingPinia } from '@pinia/testing'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { mount, flushPromises } from '@vue/test-utils'
 import { vi, describe, beforeEach, afterEach, it, expect } from 'vitest'
@@ -10,7 +9,6 @@ import useAPI from '@/core/composables/useAPI'
 
 let router
 let wrapper
-let pinia
 
 // Create a test component that uses the composable
 const TestComponent = defineComponent({
@@ -83,55 +81,11 @@ describe('useAPI composable', () => {
     })
 
     // Create a fresh pinia for each test with initial state
-    pinia = createTestingPinia({
-      createSpy: vi.fn,
-      initialState: {
-        smilestore: {
-          local: {
-            reset: false,
-            knownUser: false,
-            possibleConditions: {},
-            useSeed: false,
-            seedID: 'test-seed',
-            seedSet: true,
-            pageTracker: {
-              test: { index: 0, data: [] },
-            },
-            lastRoute: 'welcome_anonymous',
-          },
-          global: {
-            forceNavigate: false,
-            db_connected: false,
-            urls: {
-              base: 'http://localhost:3000',
-            },
-          },
-          data: {
-            study_data: [],
-            trial_num: 0,
-            verified_visibility: false,
-            recruitment_service: 'test',
-            smile_config: {},
-          },
-          private: {},
-          dev: {
-            current_page_done: false,
-            page_provides_trial_stepper: false,
-            notification_filter: 'None',
-            page_provides_autofill: null,
-          },
-        },
-        log: {
-          history: [],
-          page_history: [],
-        },
-      },
-    })
 
     // Mount the test component
     wrapper = mount(TestComponent, {
       global: {
-        plugins: [router, pinia],
+        plugins: [router],
         stubs: {
           RouterLink: true,
         },
@@ -264,7 +218,7 @@ describe('useAPI composable', () => {
     const gotoViewSpy = vi.spyOn(api, 'gotoView')
 
     // Navigate to the landing page
-    await router.push({ name: 'landing' })
+    api.gotoView('landing')
     await flushPromises()
 
     // Check if the route meta is correctly set
@@ -286,7 +240,7 @@ describe('useAPI composable', () => {
 
   it('should check if next and previous views are available', async () => {
     // Navigate to the landing page
-    await router.push({ name: 'landing' })
+    api.gotoView('landing')
     await flushPromises()
 
     // Check if the route meta is correctly set
@@ -300,7 +254,8 @@ describe('useAPI composable', () => {
     expect(api.hasPrevView()).toBe(true)
 
     // Navigate to the test page
-    await router.push({ name: 'test' })
+
+    api.gotoView('test')
     await flushPromises()
 
     // Check if only previous view is available
