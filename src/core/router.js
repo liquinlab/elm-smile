@@ -6,9 +6,10 @@ import useAPI from '@/core/composables/useAPI'
 // 3. add navigation guards
 //    currently these check if user is known
 //    and if they are, they redirect to last route
-function addGuards(r) {
+export function addGuards(r, providedApi = null) {
+  const api = providedApi || useAPI()
+  api.store.inGuards = true
   r.beforeEach(async (to, from) => {
-    const api = useAPI()
     if (api.isResetApp()) {
       api.log.warn('ROUTER GUARD: Resetting app')
       api.resetLocalState()
@@ -227,25 +228,9 @@ function addGuards(r) {
     }
     return true // is this right? why is the default to allow the navigation?
   })
-}
-
-export function useRouter(timeline) {
-  const { routes } = timeline
-
-  // 4. Create the router instance and pass the `routes` option
-  // You can pass in additional options here, but let's
-  // keep it simple for now.
-  const router = createRouter({
-    history: createWebHashHistory(), // We are using the hash history for now/simplicity
-    routes,
-    scrollBehavior(to, from, savedPosition) {
-      return { top: 0 }
-    },
-  })
-  addGuards(router) // add the guards defined above
 
   // add additional guard to set global seed before
-  router.beforeResolve((to) => {
+  r.beforeResolve((to) => {
     const api = useAPI()
     api.store.removePageAutofill()
 
@@ -267,14 +252,29 @@ export function useRouter(timeline) {
   })
 
   // Check if the next route has a preload function, and if so, run it asynchronously
-  router.afterEach(async (to, from) => {
+  r.afterEach(async (to, from) => {
     if (to.meta !== undefined && to.meta.next !== undefined) {
-      const fullTo = router.resolve({ name: to.meta.next })
+      const fullTo = r.resolve({ name: to.meta.next })
 
       if (fullTo.meta !== undefined && fullTo.meta.preload !== undefined) {
         await fullTo.meta.preload()
       }
     }
+  })
+}
+
+export function useRouter(timeline) {
+  const { routes } = timeline
+
+  // 4. Create the router instance and pass the `routes` option
+  // You can pass in additional options here, but let's
+  // keep it simple for now.
+  const router = createRouter({
+    history: createWebHashHistory(), // We are using the hash history for now/simplicity
+    routes,
+    scrollBehavior(to, from, savedPosition) {
+      return { top: 0 }
+    },
   })
 
   return router

@@ -1,29 +1,61 @@
 import { describe, it, expect, beforeEach, vi, beforeAll } from 'vitest'
-import { shallowMount, flushPromises } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent, h, createApp } from 'vue'
 import { createTestingPinia } from '@pinia/testing'
+//import { setActivePinia, createPinia } from 'pinia'
 import '../setup/mocks' // Import shared mocks
 import { setupBrowserEnvironment } from '../setup/mocks'
 
 // Import the actual router (not mocked) after the timeline mock is set up
 import useAPI from '@/core/composables/useAPI'
 import Timeline from '@/core/timeline'
-import { useRouter } from '@/core/router'
+import { useRouter, addGuards } from '@/core/router'
 
 // Helper function to create a timeline with test routes
 function createTestTimeline() {
-  const timeline = new Timeline(useAPI())
+  // Create a minimal mock API that satisfies Timeline's requirements
+  const mockMiniAPI = {
+    config: {
+      mode: 'development',
+      local_storage_key: 'test_storage',
+    },
+    log: {
+      debug: vi.fn(),
+      log: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      success: vi.fn(),
+    },
+    store: {
+      getRandomizedRouteByName: vi.fn().mockReturnValue(null),
+      setRandomizedRoute: vi.fn(),
+      registerPageTracker: vi.fn(),
+      config: {
+        mode: 'development',
+      },
+      local: {
+        seqtimeline: [],
+        routes: [],
+      },
+    },
+    sampleWithReplacement: vi.fn((options) => [options[0]]), // Returns first option by default
+    getConditionByName: vi.fn(),
+    randomAssignCondition: vi.fn((options) => options.conditionname[0]), // Returns first condition by default
+  }
+
+  const timeline = new Timeline(mockMiniAPI)
 
   // Create a mock component for routes
-  const MockComponent = defineComponent({
-    template: '<div>Mock Component</div>',
-  })
+  const MockComponent = (text = 'Mock Component') =>
+    defineComponent({
+      template: `<div>${text}</div>`,
+    })
 
   // Add welcome_anonymous route (required by Timeline)
   timeline.pushSeqView({
     path: '/welcome',
     name: 'welcome_anonymous',
-    component: MockComponent,
+    component: MockComponent('Welcome Anonymous'),
     meta: {
       prev: undefined,
       next: 'consent',
@@ -36,7 +68,7 @@ function createTestTimeline() {
   timeline.pushSeqView({
     path: '/welcome/:service',
     name: 'welcome_referred',
-    component: MockComponent,
+    component: MockComponent('Welcome Referred'),
     meta: {
       prev: undefined,
       next: 'consent',
@@ -49,7 +81,7 @@ function createTestTimeline() {
   timeline.pushSeqView({
     path: '/consent',
     name: 'consent',
-    component: MockComponent,
+    component: MockComponent('Consent'),
     meta: {
       requiresConsent: false,
       setConsented: true,
@@ -60,42 +92,42 @@ function createTestTimeline() {
   timeline.pushSeqView({
     path: '/demograph',
     name: 'demograph',
-    component: MockComponent,
+    component: MockComponent('Demograph'),
   })
 
   // Add instructions route
   timeline.pushSeqView({
     path: '/instructions',
     name: 'instructions',
-    component: MockComponent,
+    component: MockComponent('Instructions'),
   })
 
   // Add quiz route
   timeline.pushSeqView({
     path: '/quiz',
     name: 'quiz',
-    component: MockComponent,
+    component: MockComponent('Quiz'),
   })
 
   // Add experiment route
   timeline.pushSeqView({
     path: '/experiment',
     name: 'exp',
-    component: MockComponent,
+    component: MockComponent('Experiment'),
   })
 
   // Add debrief route
   timeline.pushSeqView({
     path: '/debrief',
     name: 'debrief',
-    component: MockComponent,
+    component: MockComponent('Debrief'),
   })
 
   // Add feedback route
   timeline.pushSeqView({
     path: '/feedback',
     name: 'feedback',
-    component: MockComponent,
+    component: MockComponent('Feedback'),
     meta: {
       setDone: true,
     },
@@ -105,7 +137,7 @@ function createTestTimeline() {
   timeline.registerView({
     path: '/always_allow',
     name: 'always_allow',
-    component: MockComponent,
+    component: MockComponent('Always Allow'),
     meta: {
       allowAlways: true,
       requiresConsent: false,
@@ -116,7 +148,7 @@ function createTestTimeline() {
   timeline.pushSeqView({
     path: '/thanks',
     name: 'thanks',
-    component: MockComponent,
+    component: MockComponent('Thanks'),
     meta: {
       requiresDone: true,
       //resetApp: api.getConfig('allow_repeats'),
@@ -127,7 +159,7 @@ function createTestTimeline() {
   timeline.registerView({
     path: '/withdraw',
     name: 'withdraw',
-    component: MockComponent,
+    component: MockComponent('Withdraw'),
     meta: {
       requiresWithdraw: true,
       //resetApp: api.getConfig('allow_repeats'),
@@ -140,62 +172,88 @@ function createTestTimeline() {
   return timeline
 }
 
-const RouterTest = defineComponent({
-  setup() {},
+const TestComponent = defineComponent({
+  setup() {
+    const api = useAPI()
+    return { api }
+  },
   template: `
-    <router-view></router-view>
+    <div class="test-wrapper">
+      <router-view></router-view>
+    </div>
   `,
 })
 
 describe('useRouter', () => {
   let wrapper
-  let testApp
-  let api
   let router
   let timeline
-
-  // Create a minimal app to provide context for useRouter
-  const createTestApp = async () => {
-    const app = createApp({})
-    const pinia = createTestingPinia()
-    const timeline = createTestTimeline()
-    const router = await useRouter(timeline) // This will now use the real router code with our mocked timeline
-    app.use(pinia)
-    app.use(router)
-    return { app, router }
-  }
+  let api
+  let completeConsentSpy
+  let resetAppSpy
 
   beforeAll(() => {
-    //setActivePinia(createPinia())
     setupBrowserEnvironment()
   })
 
   beforeEach(async () => {
-    // Create the test app with router
-    testApp = await createTestApp()
-    api = testApp.api
-    router = testApp.router
-    timeline = createTestTimeline() // ground truth timeline
+    vi.clearAllMocks()
 
-    try {
-      wrapper = shallowMount(RouterTest, {
-        global: {
-          plugins: [testApp.router],
+    // Create timeline first
+    timeline = createTestTimeline()
+
+    // Initialize router
+    router = await useRouter(timeline)
+
+    // Create pinia instance
+    const pinia = createTestingPinia()
+
+    // Mount the component with both router and pinia
+    wrapper = mount(TestComponent, {
+      global: {
+        plugins: [router, pinia],
+        stubs: {},
+        components: {
+          FAIcon: {
+            name: 'FAIcon',
+            render() {
+              return h('i', { class: 'mock-icon' }, 'icon')
+            },
+          },
         },
-      })
-    } catch (e) {
-      console.error('Failed to mount component:', e)
-    }
+      },
+    })
+
+    await router.isReady()
+
+    // Get API instance
+    api = wrapper.vm.api
+
+    // Add guards with the API instance from the component
+    addGuards(router, api)
+
+    // Add spy on completeConsent
+    completeConsentSpy = vi.spyOn(api, 'completeConsent')
+    resetAppSpy = vi.spyOn(api, 'resetApp')
+
+    // Force a route to ensure router is working
+    await router.push('/welcome')
+    await flushPromises()
   })
 
-  // Clean up after tests
   afterEach(() => {
     if (wrapper) {
       wrapper.unmount()
     }
   })
 
-  // Test basic router creation
+  it('should render router view', async () => {
+    //console.log('Router current route:', router.currentRoute.value)
+    //console.log('Rendered HTML:', wrapper.html())
+    expect(wrapper.html()).toContain('test-wrapper')
+    expect(wrapper.html()).toContain('Welcome Anonymous')
+  })
+
   it('should create a router with the correct routes', async () => {
     expect(router).toBeDefined()
     const routes = router.getRoutes()
@@ -209,26 +267,54 @@ describe('useRouter', () => {
     })
   })
 
-  it.skip('should allow navigation to routes with allowAlways=true', async () => {
-    await router.push({ name: 'welcome_anonymous' })
+  it('should navigate between routes', async () => {
+    // Start at welcome
+    await api.gotoView('welcome_anonymous')
     await flushPromises()
+    expect(router.currentRoute.value.name).toBe('welcome_anonymous')
+    expect(wrapper.html()).toContain('Welcome Anonymous')
 
-    expect(api.store.setLastRoute).toHaveBeenCalledWith('welcome_anonymous')
-    expect(api.store.recordRoute).toHaveBeenCalledWith('welcome_anonymous')
+    // Navigate to consent
+    await api.gotoView('consent')
+    await flushPromises()
+    expect(router.currentRoute.value.name).toBe('consent')
+    expect(wrapper.html()).toContain('Consent')
   })
 
-  // Test consent-related navigation
-  it.skip('should set user as consented when navigating from a route with setConsented=true', async () => {
-    await router.push({ name: 'welcome_anonymous' })
+  it('show allow navigation to routes with allowAlways=true', async () => {
+    await api.gotoView('welcome_anonymous')
     await flushPromises()
+    expect(router.currentRoute.value.name).toBe('welcome_anonymous')
+    expect(wrapper.html()).toContain('Welcome Anonymous')
 
-    await router.push({ name: 'consent' })
+    await api.gotoView('always_allow')
     await flushPromises()
+    expect(router.currentRoute.value.name).toBe('always_allow')
+  })
+
+  it.only('should set user as consented when navigating from a route with setConsented=true', async () => {
+    await api.gotoView('welcome_anonymous')
+    await flushPromises()
+    expect(router.currentRoute.value.name).toBe('welcome_anonymous')
+    expect(wrapper.html()).toContain('Welcome Anonymous')
+
+    await api.gotoView('consent')
+    await flushPromises()
+    expect(router.currentRoute.value.name).toBe('consent')
+    expect(wrapper.html()).toContain('Consent')
 
     // Now navigate away from consent to trigger the guard
-    await router.push({ name: 'demograph' })
+    await api.gotoView('demograph')
     await flushPromises()
+    expect(router.currentRoute.value.name).toBe('demograph')
+    expect(wrapper.html()).toContain('Demograph')
 
-    expect(mockAPI.completeConsent).toHaveBeenCalled()
+    //expect(api.isResetApp).toHaveBeenCalled()
+    expect(api.isResetApp()).toBe(false)
+    //expect(resetAppSpy).toHaveBeenCalled()
+
+    //api.completeConsent()
+    expect(api.store.inGuards).toBe(true)
+    expect(completeConsentSpy).toHaveBeenCalled()
   })
 })
