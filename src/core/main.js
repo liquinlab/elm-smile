@@ -6,6 +6,7 @@ import VueGtag from 'vue-gtag' // google analytics
 // import with an @ symbol are resolved by vite to ./src directory
 
 import App from '@/core/App.vue' // import the main app component
+import timeline from '@/user/design'
 import { useRouter } from '@/core/router' // import the router
 import { pinia } from '@/core/createpinia'
 import '@/core/icons' // configure fontawesome
@@ -17,7 +18,7 @@ import { createNotivue } from 'notivue'
 // Create the app and the data store
 // const pinia = createPinia() // create the data store
 const app = createApp(App) // create the app
-const router = useRouter()
+const router = useRouter(timeline)
 const notivue = createNotivue({
   position: 'top-left',
   limit: 4,

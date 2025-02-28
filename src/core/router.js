@@ -1,7 +1,7 @@
 import seedrandom from 'seedrandom'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { getQueryParams } from '@/core/utils'
-import timeline from '@/user/design'
+//import timeline from '@/user/design'
 import useAPI from '@/core/composables/useAPI'
 // 3. add navigation guards
 //    currently these check if user is known
@@ -229,7 +229,7 @@ function addGuards(r) {
   })
 }
 
-export function useRouter() {
+export function useRouter(timeline) {
   const { routes } = timeline
 
   // 4. Create the router instance and pass the `routes` option

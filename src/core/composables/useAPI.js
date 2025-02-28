@@ -56,8 +56,8 @@ export default function useAPI() {
     goNextView,
     goPrevView,
     gotoView,
-    hasNextView: () => route.meta.next && route.meta.sequential,
-    hasPrevView: () => route.meta.prev && route.meta.sequential,
+    hasNextView: () => !!route.meta.next && route.meta.sequential,
+    hasPrevView: () => !!route.meta.prev && route.meta.sequential,
 
     // Randomization utilities
     faker: faker_distributions,
