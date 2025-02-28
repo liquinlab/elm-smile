@@ -6,7 +6,6 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import useAPI from '@/core/composables/useAPI'
-
 import Timeline from '@/core/timeline'
 
 vi.mock('axios', () => ({

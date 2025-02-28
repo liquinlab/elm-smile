@@ -14,6 +14,30 @@ vi.mock('@/core/stores/firestore-db', () => {
   }
 })
 
+// Mock log store
+vi.mock('@/core/stores/log', () => {
+  console.log('Mocking log store...')
+  const mockLogFn =
+    (type) =>
+    (...args) => {
+      console.log(`[${type}]`, ...args)
+    }
+
+  return {
+    default: vi.fn().mockReturnValue({
+      history: [],
+      page_history: [],
+      add_to_history: vi.fn(),
+      clear_page_history: vi.fn(),
+      log: vi.fn(mockLogFn('log')),
+      debug: vi.fn(mockLogFn('debug')),
+      warn: vi.fn(mockLogFn('warn')),
+      error: vi.fn(mockLogFn('error')),
+      success: vi.fn(mockLogFn('success')),
+    }),
+  }
+})
+
 // Mock axios for getBrowserFingerprint
 vi.mock('axios', () => {
   console.log('Mocking axios...')
