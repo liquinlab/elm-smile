@@ -1,17 +1,18 @@
 # :test_tube: Set up for new organization
 
-Labs and organizations which are looking to start using <SmileText/> will have to
-configure a small set of services (Github, Firebase, Slack, and a webserver) to 
-communicate with one another. This configuration only needs to be done one time
-for a new organization, and then multiple users in a group will be able to share these
-resources. If you are using Smile for the first time as a solo user, you will need to 
-configure these services for yourself before you develop your first experiment.
+Labs and organizations which are looking to start using <SmileText/> will have
+to configure a small set of services (Github, Firebase, Slack, and a web server)
+to communicate with one another. This configuration only needs to be done one
+time for a new organization, and then multiple users in a group will be able to
+share these resources. If you are using Smile for the first time as a solo user,
+you will need to configure these services for yourself before you develop your
+first experiment.
 
 :::warning First time user of an existing lab?
 
 You're in luck! If your lab already has a base repo in place, please skip this
 guide and jump straight to [adding a new user](/adduser) to be added to your
-organization. If you would like to learn more about how to set up your own 
+organization. If you would like to learn more about how to set up your own
 configuration for smile, keep reading.
 
 :::
@@ -35,7 +36,7 @@ developing and launching experiments relatively painless.
   there are some technical limits, see [here](/datastorage) for more info).
 
 - **Slack** (weakly required).  
-  In order notify you and your other lab members when certain tasks are
+  In order to notify you and your other lab members when certain tasks are
   complete or if there are errors, Smile uses a slack bot. You need to have a
   Slack account and get API keys to enable this. If you don't want to use Slack
   it is possible to modify the scripts to provide notifications another way
@@ -68,14 +69,15 @@ The general overview of how these services interact is shown below:
 
 You push code to Github. Each time this happens, your code is
 [deployed](/deploying) to your web (i.e., http) server. In addition, a message
-is posted to slack to let you know if any errors occured while setting things
-up. Participants access your task via their web-browser which is able to write
-to the Google Firebase database.
+is posted to Slack to let you know that deployment was successful (or to let you
+know that there were errors preventing deployment). Participants access your
+task via their web browser, which is able to write to the Google Firebase
+database.
 
-The following sections walk you through configuring each of these services.
-Remember that although this takes a few steps, it is a one-time set up. Afterwards,
-multiple members of a lab can deploy multiple projects with the same infrastructure
-without worrying about the details of this underlying configuration. 
+The following sections walk you through configuring each of these services. This
+takes a few steps, but it is a one-time set up. Afterwards, multiple members of
+a lab can deploy multiple projects using the same infrastructure, without
+worrying about the details of this underlying configuration.
 
 ## Setup Github
 
@@ -87,7 +89,7 @@ introduce some basic concepts.
 Github acts as a hub for most things in Smile. Each person in your lab needs to
 have a Github account (these are free). In addition, it makes sense for your lab
 to create a Github organization (also known as [team](https://github.com/team)).
-Github organizations are meta-accounts that multiple individuals can belong to
+Github organizations are meta-accounts that multiple individuals can belong to,
 granting them access to multiple private and public repositories.
 
 - First create a new organization, using the docs provided by Github
@@ -104,7 +106,7 @@ granting them access to multiple private and public repositories.
 
 ### Set up a "base" Smile repo for your organization/lab
 
-Next you want to create a fork of the main smile Github repo for use in your
+Next you want to create a fork of the main Smile Github repo for use in your
 organization. A fork is a copy of all the code in a repository that can be then
 developed and changed independently of the parent. However, you maintain a
 connection to the original repository so you can pull down and synchronize
@@ -117,8 +119,9 @@ your base repo.
 ![Inheriting between Github repos](/images/labconfig-github-inherit.png)
 
 In the figure above, each node is a Github repository. Each lab (Hartley Lab,
-Lake Lab, Mattar Lab) forks from the base Smile repo. Then, student projects for that lab
-fork from the lab's base and inherit the lab-specific configuration files.
+Lake Lab, Mattar Lab) forks from the base Smile repo. Then, student projects for
+that lab fork from the lab's base and inherit the lab-specific configuration
+files.
 
 To create this base repo, navigate to the main <SmileText/> repo
 [here](https://github.com/NYUCCL/smile/fork). A screenshot of this page should
@@ -127,31 +130,30 @@ look like this:
 ![Forking the base repo](/images/labconfig-github-fork.png)
 
 Be sure to make the owner of the account your **organization** rather than your
-personal Github account. The name can be anything but `smile` works and the
-description is up to you. Copy the main branch only is fine.
+personal Github account. The name can be anything, but `smile` works. The
+description is up to you. It's fine to copy only the main branch.
 
 This will create a new repository that will look like this (assuming your
 organization was `hartleylabnyu`):
 
 ![Github overview](/images/labconfig-github-overview.png)
 
-Next you should clone a local copy of this repo to your computer with the link
+Next, you should clone a local copy of this repo to your computer with the link
 found under the "Use this template" tab shown below:
 
 ![Cloned repo](/images/labconfig-github-clone.png)
 
 ![Github commandline](/images/labconfig-github-clone-commandline.png)
 
-After successfully cloning your repository to your local system, you 
-will have a fresh copy of the Smile project files in a folder on your computer. 
-This repository/folder will now serve as a template for each new project/experiment. 
+After successfully cloning your repository to your local system, you will have a
+fresh copy of the Smile project files in a folder on your computer. This
+repository/folder will now serve as a template for each new project/experiment.
 
 ## Setup Firebase
 
 Data storage and recording is provided using Firebase cloud services
-(specifically Firestore which is a database service provided under the general
-Firebase sytem). You need to create a Firebase account and a
-Firestore project.
+(specifically Firestore, which is a database service provided under the general
+Firebase sytem). You need to create a Firebase account and a Firestore project.
 
 First, go to https://console.firebase.google.com and create an account. After
 your account is created, you are presented with a page that looks like this:
@@ -172,13 +174,13 @@ icon that looks like `<\>`):
 ![Firebase project overview](/images/labconfig-firebase-console-4.png)
 
 Register the new web app giving it a nickname (something like `smile-db` might
-make sense but up to you).  
+make sense, but up to you).  
 You do **not** need to also set up Firebase Hosting.
 
 ![Firebase add sdk](/images/labconfig-firebase-addwebapp-5.png)
 
-Next, add the Firebase SDK (select `use npm`), making sure to copy the Firebase
-configuration keys that are shown as a chunk of javascript code lower on the
+Next, add the Firebase SDK (select `use npm`). Make sure to copy the Firebase
+configuration keys, which are shown as a chunk of javascript code lower on the
 page (highlight below). Save the keys someplace safe, as you will need these
 later:
 
@@ -193,21 +195,21 @@ which work well for most Smile Experiments. These rules allow participants to
 write data to the database and read their own data, but not the data of other
 participants. In addition, private data (personally identifiable information) is
 more heavily protected and is write only. You can upload these rules to your
-Firestore database in the Firebase console.
+Firestore database in the Firebase console. Read more about Firebase rules in
+the [Firebase rules documentation](https://firebase.google.com/docs/rules).
 
 ## Setup Slack
 
-When your code is updated to the Github it goes through a pre-processing step
-which optimizes the speed at which the code is delievered to participants. If
-this process fails it is helpful to get a notification. Also when you code
-builds successfully it is deployed to a unique URL (see [deploy](/deploying)
-docs for full details). It is also helpful to receive error messages when things
-go wrong.
+When you're developing an experiment and push changed to Github, your experiment
+code goes through a pre-processing step, which optimizes the speed at which the
+code is delievered to participants. Also, when your code builds successfully it
+is deployed to a unique URL (see [deploy](/deploying) docs for full details). If
+things go wrong in this process, it is helpful to get a notification.
 
 **If you don't want to use Slack, skip these instructions and go to the next
 section.**
 
-First from the side bar in Slack choose your organization name and select
+First, from the side bar in Slack choose your organization name and select
 "Tools" from the dropdown menu, when "Workflow Builder". You'll get a screen
 that looks like this:
 
@@ -260,8 +262,8 @@ Smile requires you to host your HTML files on a webserver with a SSL signed
 certificate (so that it loads using the `https://` prefix in a browser). Many
 universities provide these (sometimes called web hosting accounts), and they are
 available cheaply from many internet service providers. We use
-[Dreamhost](https://www.dreamhost.com) which is a very long standing internet
-hosting provided. Their basic shared hosting plan can host all of a lab's
+[Dreamhost](https://www.dreamhost.com) which is a very long-standing internet
+hosting provider. Their basic shared hosting plan can host all of a lab's
 experiments for about $2/month:
 [Dreamhost shared hosting plans](https://www.dreamhost.com/hosting/shared/).
 
@@ -285,7 +287,7 @@ version (see above) your listing in that folder will look like this:
 You are going to first delete the files ending in `.secret`. You will regenerate
 those secret files in a later step.
 
-Next you need to create a file called `.env.local` in the `env/` folder. The
+Next, you need to create a file called `.env.local` in the `env/` folder. The
 content of that file should look like this:
 
 ```
@@ -310,7 +312,7 @@ VITE_GOOGLE_ANALYTICS            = xxxx
 
 You will want to replace the values for the entires that contain the word
 `FIREBASE` with the corresponding values you obtained above when setting up your
-Firebase (you should have copied them down but it is possible to look them up
+Firebase (you should have copied them down, but it is possible to look them up
 again on your Firebase project page). The `VITE_GOOGLE_ANALYTICS` field can be
 empty or you can add a Google analytics ID. The `VITE_BUG_REPORTS` is an
 unimplemented feature currently and can be ignored.
@@ -335,30 +337,30 @@ EXP_DEPLOY_KEY         = "-----BEGIN RSA PRIVATE KEY-----\nxxx\n-----END RSA PRI
 
 The `EXP_DEPLOY_HOST` is the domain name of the http hosting service you set up
 above. For example `www.psych.nyu.edu`. The `EXP_DEPLOY_PATH` is the path to the
-folder on that server where you will upload you web files. The `EXP_DEPLOY_PORT`
-should be 22 for ssh access unless something very special is configured on your
-hosting service. The `EXP_DEPLOY_USER` should be the username of the account you
-use to access your http hosting service The `SLACK_WEBHOOK_URL` is the URL you
-should have written code when setting up your slack workflows above. The
-`SLACK_WEBHOOK_ERROR_URL` is the URL you should have written code when setting
-up your slack workflows above this time for the error handling workflow.
-Finally, `EXP_DEPLOY_KEY` should be the private SSH key you use to access your
-HTTP server using passwordless ssh. Instructions on creating that key are
-provided
+folder on that server where you will upload your web files. The
+`EXP_DEPLOY_PORT` should be 22 for ssh access unless something very special is
+configured on your hosting service. The `EXP_DEPLOY_USER` should be the username
+of the account you use to access your http hosting service. The
+`SLACK_WEBHOOK_URL` is the URL you received when setting up your first slack
+workflow above (for successful deployments). The `SLACK_WEBHOOK_ERROR_URL` is
+the URL you received when setting up your second Slack workflow above (for
+errors). Finally, `EXP_DEPLOY_KEY` should be the private SSH key you use to
+access your HTTP server using passwordless ssh. Instructions on creating that
+key are provided
 [here for dreamhost](https://help.dreamhost.com/hc/en-us/articles/216499537-How-to-configure-passwordless-login-in-Mac-OS-X-and-Linux).
 The key needs to be all on one line with `\n` characters when there are new
 lines and should include the part that says `BEGIN RSA PRIVATE KEY` as is
-visible above. It should be very long though.
+visible above. It will be very long.
 
 You can safely ignore the `.env.docs.local` file since the main docs are hosted
 by the main NYUCCL repo.
 
 By default all of the `env/.env.*.local` files are ignored by github (using the
 `.gitignore` file). This is because they have sensitive information. However you
-need to distribute those files out to people working in your lab. To do that we
-instead will encrypt the files and store the encrypted files in your github
-account. This works even for public github repositories ensuring that your
-content is not visible to others.
+need to distribute those files out to people working in your lab. To do that, we
+will encrypt the files and store the encrypted files in your github account.
+This works even for public github repositories ensuring that your content is not
+visible to others.
 
 ## Encrypt your configuration files
 
@@ -392,7 +394,7 @@ gpg --full-generate-key
 
 In the prompts, just choose the default options and make sure to remember the
 passphrase you use. You also will want to set the expiration of the key to 0
-(never expire) when prompted. 
+(never expire) when prompted.
 
 Next, add the first user to your repo:
 
@@ -407,10 +409,7 @@ Next, add the files:
 ```
 git secret add env/.env.deploy.local
 git secret add env/.env.local
-git secret add env/.env.docs.local
 ```
-
-(TRhe last command about `.env.docs.local` is optional)
 
 Finally, encrypt the files
 
@@ -420,20 +419,19 @@ git secret hide
 
 Now commit everything that has changed to your github repo.
 
-
 ## Making changes to the env files for your project
 
-You may update the env files for the entire lab at any point. Just make 
-sure to re-encrypt the files and re-upload them to github using the following
-commands. 
+You may update the env files for the entire lab at any point. Just make sure to
+re-encrypt the files and re-upload them to github using the following commands.
+
 ```
 git secret hide
 npm run upload_config
 ```
 
-## Configure your git secrets on github
+## Configure your git secrets on Github
 
-To configure the github repo correct:
+To configure the Github repo correctly:
 
 ```
 gh auth login
@@ -446,3 +444,10 @@ Then, upload the configuration settings
 ```
 npm run upload_config
 ```
+
+## All done!
+
+Now, your organization-specific base <SmileText /> template is all set! You can
+go ahead with [Adding a new user](/adduser) if you have other lab members, or
+skip to [Starting a new project](/starting) if you're ready to get started on a
+Smile experiment!
