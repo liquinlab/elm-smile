@@ -3,10 +3,10 @@ import { defineComponent, h } from 'vue'
 import { createTestingPinia } from '@pinia/testing'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { mount, flushPromises } from '@vue/test-utils'
-import useAPI from '@/core/composables/useAPI'
 import { vi, describe, beforeEach, afterEach, it, expect } from 'vitest'
 import '../../setup/mocks' // Import shared mocks
 import { setupBrowserEnvironment } from '../../setup/mocks'
+import useAPI from '@/core/composables/useAPI'
 
 let router
 let wrapper
