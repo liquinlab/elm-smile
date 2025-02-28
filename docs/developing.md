@@ -121,20 +121,27 @@ different pages of a site.
 
 ## Merging changes to the template into your existing project
 
-[TO DO: INSTRUCTIONS FOR HOW TO DO THIS FOR A LAB]
-
 Because Smile is still being developed, there may be changes to the Smile
 template after you begin setting up your own project. If you want to merge those
 changes into your own project, follow these steps:
 
+First, you need to make sure that your organization's fork of the Smile template
+(the base Smile repo for your organization) has the latest version of Smile.
+
+Once the Smile admin for your lab has merged any changes with your own lab's
+base repo, you can follow these steps to merge the changes into your own
+project.
+
 The first time you want to get changes from the Smile template, you need to add
-the smile repo as a new remote:
+the base Smile repo for your lab as a new remote. For example, if your lab
+organization is called `NYUCCL` on Github and the template repo is called
+`smile`, you'd type the following command:
 
 ```
 git remote add smile https://github.com/NYUCCL/smile.git
 ```
 
-You only need to do this once -- next time, the Smile template will already be
+You only need to do this once. Next time, the Smile template will already be
 added as a remote.
 
 Next, fetch the current template from the Smile repo:
@@ -185,12 +192,12 @@ git checkout main
 git merge update
 ```
 
-Voila your smile has been updated to be even bigger! The extra step (creating
+Voila, your smile has been updated to be even bigger! The extra step (creating
 another additional update branch) prevented the entire commit history of the
 NYUCCL/smile repository from being added to your project, which helps keeps
 things nice and clean.
 
-Finally, you should rerun node's package installer incase any of the required
+Finally, you should re-run node's package installer incase any of the required
 packages changed:
 
 ```
