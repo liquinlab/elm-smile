@@ -18,7 +18,7 @@ import { createNotivue } from 'notivue'
 // Create the app and the data store
 // const pinia = createPinia() // create the data store
 const app = createApp(App) // create the app
-const router = await useRouter(timeline)
+const router = useRouter(timeline)
 addGuards(router)
 const notivue = createNotivue({
   position: 'top-left',
