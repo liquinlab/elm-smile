@@ -11,7 +11,7 @@ const mousedown = ref(false)
 
 const { x, y } = useMouse()
 
-const height_pct = computed(() => `${api.dev.data_bar_height}px`)
+const height_pct = computed(() => `${api.store.dev.data_bar_height}px`)
 
 function down() {
   mousedown.value = true
@@ -23,7 +23,7 @@ function up() {
 }
 function move() {
   if (mousedown.value == true) {
-    api.dev.data_bar_height = Math.min(window.innerHeight - y.value + 20, window.innerHeight) // small adjustment to where you probably click
+    api.store.dev.data_bar_height = Math.min(window.innerHeight - y.value + 20, window.innerHeight) // small adjustment to where you probably click
   }
 }
 </script>
@@ -32,26 +32,26 @@ function move() {
   <nav class="databar devdatabar is-fixed-bottom">
     <aside class="menu datamenu">
       <ul class="menu-list">
-        <li :class="{ active: api.dev.data_bar_tab == 'database' }">
+        <li :class="{ active: api.store.dev.data_bar_tab == 'database' }">
           <a
-            @click="api.dev.data_bar_tab = 'database'"
+            @click="api.store.dev.data_bar_tab = 'database'"
             class="has-tooltip-arrow has-tooltip-right"
             data-tooltip="Database Info"
             ><FAIcon icon="fa-solid fa-database icon" />
           </a>
         </li>
-        <li :class="{ active: api.dev.data_bar_tab == 'browse' }">
+        <li :class="{ active: api.store.dev.data_bar_tab == 'browse' }">
           <a
-            @click="api.dev.data_bar_tab = 'browse'"
+            @click="api.store.dev.data_bar_tab = 'browse'"
             class="has-tooltip-arrow has-tooltip-right"
             data-tooltip="Data Explorer"
           >
             <FAIcon icon="fa-solid fa-magnifying-glass icon" />
           </a>
         </li>
-        <li :class="{ active: api.dev.data_bar_tab == 'log' }">
+        <li :class="{ active: api.store.dev.data_bar_tab == 'log' }">
           <a
-            @click="api.dev.data_bar_tab = 'log'"
+            @click="api.store.dev.data_bar_tab = 'log'"
             class="has-tooltip-arrow has-tooltip-right"
             data-tooltip="Narrative Log"
           >
@@ -65,21 +65,21 @@ function move() {
       <nav class="databar-panel-header logpanel" role="navigation" aria-label="data navigation">
         <div id="navbardatabase" class="databar-panel-header-menu" @mousedown="down()">
           <div class="databar-panel-header-start">
-            <div class="databar-panel-header-item info" v-if="api.dev.data_bar_tab == 'database'">
+            <div class="databar-panel-header-item info" v-if="api.store.dev.data_bar_tab == 'database'">
               <FAIcon icon="fa-solid fa-database icon" />&nbsp;&nbsp;<b>Database Info</b>
             </div>
 
-            <div class="databar-panel-header-item info" v-if="api.dev.data_bar_tab == 'browse'">
+            <div class="databar-panel-header-item info" v-if="api.store.dev.data_bar_tab == 'browse'">
               <FAIcon icon="fa-solid fa-magnifying-glass icon" />&nbsp;&nbsp;<b>Data Explorer</b>
             </div>
-            <div class="databar-panel-header-item info" v-if="api.dev.data_bar_tab == 'log'">
+            <div class="databar-panel-header-item info" v-if="api.store.dev.data_bar_tab == 'log'">
               <FAIcon icon="fa-solid fa-book icon" />&nbsp;&nbsp;<b>Narrative Log</b>
             </div>
           </div>
 
           <div class="databar-panel-header-end">
             <div class="databar-panel-header-item closebutton">
-              <a class="databar-panel-header-item" @click="api.dev.show_data_bar = !api.dev.show_data_bar">
+              <a class="databar-panel-header-item" @click="api.store.dev.show_data_bar = !api.store.dev.show_data_bar">
                 <FAIcon icon="fa-solid fa-circle-xmark icon" />
               </a>
             </div>
@@ -88,9 +88,9 @@ function move() {
       </nav>
 
       <!-- content of panel here -->
-      <DatabaseInfoPanel v-if="api.dev.data_bar_tab == 'database'"></DatabaseInfoPanel>
-      <DatabaseBrowsePanel v-if="api.dev.data_bar_tab == 'browse'"></DatabaseBrowsePanel>
-      <DatabaseLogPanel v-if="api.dev.data_bar_tab == 'log'"></DatabaseLogPanel>
+      <DatabaseInfoPanel v-if="api.store.dev.data_bar_tab == 'database'"></DatabaseInfoPanel>
+      <DatabaseBrowsePanel v-if="api.store.dev.data_bar_tab == 'browse'"></DatabaseBrowsePanel>
+      <DatabaseLogPanel v-if="api.store.dev.data_bar_tab == 'log'"></DatabaseLogPanel>
     </section>
   </nav>
 </template>

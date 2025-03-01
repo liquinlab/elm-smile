@@ -12,24 +12,24 @@ const altKeyState = useKeyModifier('Alt')
 // if not a known user
 
 function connectDB() {
-  if (!api.local.knownUser) api.setKnown()
+  if (!api.store.local.knownUser) api.setKnown()
 }
 
 const database_tooltip = computed(() => {
   var msg = 'Toggle data panel | '
-  if (api.global.db_connected == true) {
+  if (api.store.global.db_connected == true) {
     msg += 'Database connected | '
   } else {
     msg += 'Database not connected | '
   }
-  if (api.global.db_changes == true) {
+  if (api.store.global.db_changes == true) {
     msg += 'Unsynced data '
   } else {
     msg += 'Data in sync '
   }
-  if (api.global.db_connected == true) {
+  if (api.store.global.db_connected == true) {
     msg += '| '
-    msg += Math.round((api.local.approx_data_size / 1048576) * 1000) / 1000 + '% data used'
+    msg += Math.round((api.store.local.approx_data_size / 1048576) * 1000) / 1000 + '% data used'
   }
   return msg
 })
@@ -40,7 +40,7 @@ const alt_tooltip = computed(() => {
 </script>
 
 <template>
-  <div v-if="altKeyState && api.global.db_connected == false">
+  <div v-if="altKeyState && api.store.global.db_connected == false">
     <button
       class="button devbar-button has-tooltip-arrow has-tooltip-bottom"
       :data-tooltip="alt_tooltip"
@@ -49,7 +49,7 @@ const alt_tooltip = computed(() => {
       <FAIcon
         icon="fa-solid fa-cloud-arrow-up"
         class="notconnected"
-        :class="{ connected: api.global.db_connected == true }"
+        :class="{ connected: api.store.global.db_connected == true }"
       />
     </button>
   </div>
@@ -57,27 +57,27 @@ const alt_tooltip = computed(() => {
     <button
       class="button devbar-button has-tooltip-arrow has-tooltip-bottom"
       :data-tooltip="database_tooltip"
-      @click="api.dev.show_data_bar = !api.dev.show_data_bar"
+      @click="api.store.dev.show_data_bar = !api.store.dev.show_data_bar"
     >
       <FAIcon
         icon="fa-solid fa-database"
         class="disconnected"
-        :class="{ connected: api.global.db_connected == true }"
+        :class="{ connected: api.store.global.db_connected == true }"
       />
       &nbsp;&nbsp;|&nbsp;&nbsp;
-      <template v-if="!api.global.db_connected">
+      <template v-if="!api.store.global.db_connected">
         <FAIcon icon="fa-solid fa-rotate" class="has-text-grey" />
       </template>
-      <template v-else-if="api.global.db_changes && api.global.db_connected">
+      <template v-else-if="api.store.global.db_changes && api.store.global.db_connected">
         <FAIcon icon="fa-solid fa-rotate" class="outofsync" />
       </template>
       <template v-else>
         <FAIcon icon="fa-solid fa-rotate" class="insync" />
       </template>
-      <template v-if="!api.global.db_connected">
+      <template v-if="!api.store.global.db_connected">
         &nbsp;&nbsp;|&nbsp;&nbsp;
         <CircleProgress
-          :percentage="Math.round(api.local.approx_data_size / 1048576) * 100"
+          :percentage="Math.round(api.store.local.approx_data_size / 1048576) * 100"
           :size="12"
           :strokeWidth="40"
           slicecolor="#aaa"
@@ -88,7 +88,7 @@ const alt_tooltip = computed(() => {
         &nbsp;&nbsp;|&nbsp;&nbsp;
 
         <CircleProgress
-          :percentage="Math.round(api.local.approx_data_size / 1048576) * 100"
+          :percentage="Math.round(api.store.local.approx_data_size / 1048576) * 100"
           :size="12"
           :strokeWidth="40"
           slicecolor="hsl(var(--bulma-button-h), var(--bulma-button-s), calc(var(--bulma-button-background-l) + var(--bulma-button-background-l-delta)))"

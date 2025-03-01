@@ -46,9 +46,9 @@ export default function useAPI() {
     data: store.data,
     private: store.private,
     all_data: { private: store.private, data: store.data },
-    local: store.local,
-    global: store.global,
-    dev: store.dev,
+    // local: store.local,
+    // global: store.global,
+    // dev: store.dev,
 
     // Router related
     route,
@@ -234,7 +234,7 @@ export default function useAPI() {
     // Consent management
     completeConsent: async () => {
       api.setConsented()
-      if (!api.local.knownUser) {
+      if (!api.store.local.knownUser) {
         await api.setKnown()
       }
     },

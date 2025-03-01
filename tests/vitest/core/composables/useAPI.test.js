@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 import { defineComponent, h } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { createTestingPinia } from '@pinia/testing'
 import { mount, flushPromises } from '@vue/test-utils'
 import { vi, describe, beforeEach, afterEach, it, expect } from 'vitest'
 import '../../setup/mocks' // Import shared mocks
@@ -82,10 +83,16 @@ describe('useAPI composable', () => {
 
     // Create a fresh pinia for each test with initial state
 
+    // Create pinia instance
+    const pinia = createTestingPinia({
+      stubActions: false,
+      createSpy: vi.fn,
+    })
+
     // Mount the test component
     wrapper = mount(TestComponent, {
       global: {
-        plugins: [router],
+        plugins: [router, pinia],
         stubs: {
           RouterLink: true,
         },
@@ -121,9 +128,9 @@ describe('useAPI composable', () => {
     expect(api.config).toBeDefined()
     expect(api.data).toBeDefined()
     expect(api.private).toBeDefined()
-    expect(api.local).toBeDefined()
-    expect(api.global).toBeDefined()
-    expect(api.dev).toBeDefined()
+    // expect(api.store.local).toBeDefined()
+    // expect(api.store.global).toBeDefined()
+    // expect(api.store.dev).toBeDefined()
 
     // Check router related methods
     expect(api.route).toBeDefined()

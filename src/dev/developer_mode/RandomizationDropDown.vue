@@ -11,16 +11,16 @@ import { v4 as uuidv4 } from 'uuid'
 import TextInputWithButton from '@/dev/developer_mode/TextInputWithButton.vue'
 
 function toggle_and_reset() {
-  api.dev.randomization_panel.visible = !api.dev.randomization_panel.visible
-  if (api.dev.randomization_panel.visible == false) {
-    api.dev.randomization_panel.x = -130
-    api.dev.randomization_panel.y = 0
+  api.store.dev.randomization_panel.visible = !api.store.dev.randomization_panel.visible
+  if (api.store.dev.randomization_panel.visible == false) {
+    api.store.dev.randomization_panel.x = -130
+    api.store.dev.randomization_panel.y = 0
   }
 }
 
 function onDragCallback(x, y) {
-  api.dev.randomization_panel.x = x
-  api.dev.randomization_panel.y = y
+  api.store.dev.randomization_panel.x = x
+  api.store.dev.randomization_panel.y = y
 }
 
 function randomize_seed() {
@@ -55,7 +55,7 @@ watch(
 )
 </script>
 <template>
-  <div class="dropdown is-hoverable is-right" :class="{ 'is-active': api.dev.randomization_panel.visible }">
+  <div class="dropdown is-hoverable is-right" :class="{ 'is-active': api.store.dev.randomization_panel.visible }">
     <div class="dropdown-trigger">
       <button class="button devbar-button">
         <FAIcon icon=" fa-solid fa-dice" />
@@ -64,14 +64,14 @@ watch(
 
     <div class="dropdown-menu pt-0 mt-0" id="dropdown-menu" role="menu">
       <vue-draggable-resizable
-        :x="api.dev.randomization_panel.x"
-        :y="api.dev.randomization_panel.y"
-        :draggable="api.dev.randomization_panel.visible"
+        :x="api.store.dev.randomization_panel.x"
+        :y="api.store.dev.randomization_panel.y"
+        :draggable="api.store.dev.randomization_panel.visible"
         :resizable="false"
         :onDrag="onDragCallback"
       >
         <div class="dropdown-content">
-          <div class="pin" :class="{ 'pin-selected': api.dev.randomization_panel.visible }">
+          <div class="pin" :class="{ 'pin-selected': api.store.dev.randomization_panel.visible }">
             <a @click="toggle_and_reset()">
               <FAIcon icon=" fa-solid fa-thumbtack" />
             </a>

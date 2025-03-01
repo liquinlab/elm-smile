@@ -20,8 +20,8 @@ const route = useRoute()
 // construct routes in order we want to display them
 const routerRoutes = router.getRoutes()
 // get seqtimeline and routes from local storage
-const seqtimeline = api.local.seqtimeline
-const routes = api.local.routes
+const seqtimeline = api.store.local.seqtimeline
+const routes = api.store.local.routes
 
 // filter routes - only those that aren't in seqtimeline
 const filteredRoutes = routes.filter((r) => {
@@ -56,7 +56,7 @@ function navigate(route) {
     api.gotoView(route, false)
   }
   // dismiss hover if open but not if panel is set to remain visible.
-  //api.dev.route_panel.visible = false
+  //api.store.dev.route_panel.visible = false
 }
 </script>
 <template>

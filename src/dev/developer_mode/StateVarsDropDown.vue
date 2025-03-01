@@ -5,19 +5,19 @@ import useSmileStore from '@/core/stores/smilestore'
 const smilestore = useSmileStore() // load the global store
 
 function toggle_and_reset() {
-  api.dev.state_var_panel.visible = !api.dev.state_var_panel.visible
-  if (api.dev.state_var_panel.visible == false) {
-    api.dev.state_var_panel.x = -150
-    api.dev.state_var_panel.y = 0
+  api.store.dev.state_var_panel.visible = !api.store.dev.state_var_panel.visible
+  if (api.store.dev.state_var_panel.visible == false) {
+    api.store.dev.state_var_panel.x = -150
+    api.store.dev.state_var_panel.y = 0
   }
 }
 function onDragCallback(x, y) {
-  api.dev.state_var_panel.x = x
-  api.dev.state_var_panel.y = y
+  api.store.dev.state_var_panel.x = x
+  api.store.dev.state_var_panel.y = y
 }
 </script>
 <template>
-  <div class="dropdown is-hoverable is-right" :class="{ 'is-active': api.dev.state_var_panel.visible }">
+  <div class="dropdown is-hoverable is-right" :class="{ 'is-active': api.store.dev.state_var_panel.visible }">
     <div class="dropdown-trigger">
       <button class="button devbar-button">
         <FAIcon icon=" fa-solid fa-hand" />
@@ -25,14 +25,14 @@ function onDragCallback(x, y) {
     </div>
     <div class="dropdown-menu pt-0 mt-0" id="dropdown-menu" role="menu">
       <vue-draggable-resizable
-        :x="api.dev.state_var_panel.x"
-        :y="api.dev.state_var_panel.y"
-        :draggable="api.dev.state_var_panel.visible"
+        :x="api.store.dev.state_var_panel.x"
+        :y="api.store.dev.state_var_panel.y"
+        :draggable="api.store.dev.state_var_panel.visible"
         :resizable="false"
         :onDrag="onDragCallback"
       >
         <div class="dropdown-content">
-          <div class="pin" :class="{ 'pin-selected': api.dev.state_var_panel.visible }">
+          <div class="pin" :class="{ 'pin-selected': api.store.dev.state_var_panel.visible }">
             <a @click="toggle_and_reset()">
               <FAIcon icon=" fa-solid fa-thumbtack" />
             </a>

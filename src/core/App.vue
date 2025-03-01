@@ -48,10 +48,10 @@ smilestore.$subscribe((mutation, newstate) => {
 })
 
 const total_height = computed(() => {
-  if (api.config.mode == 'development' && !api.dev.show_data_bar) {
+  if (api.config.mode == 'development' && !api.store.dev.show_data_bar) {
     return '100vh'
   } else {
-    var pct = ((window.innerHeight + api.dev.data_bar_height) / window.innerHeight) * 100
+    var pct = ((window.innerHeight + api.store.dev.data_bar_height) / window.innerHeight) * 100
     return `${pct}vh`
   }
 })
@@ -98,7 +98,7 @@ onMounted(() => {
   </div>
 
   <Transition name="v-slide">
-    <DevDataBar v-if="api.config.mode == 'development' && api.dev.show_data_bar"></DevDataBar>
+    <DevDataBar v-if="api.config.mode == 'development' && api.store.dev.show_data_bar"></DevDataBar>
   </Transition>
 </template>
 

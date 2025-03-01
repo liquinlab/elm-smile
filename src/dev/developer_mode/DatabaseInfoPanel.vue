@@ -13,7 +13,7 @@ var timer = ref(null)
 const firebase_url = computed(() => {
   const mode = api.config.mode == 'development' ? 'testing' : 'real'
 
-  return `https://console.firebase.google.com/u/0/project/${api.config.firebaseConfig.projectId}/firestore/data/~2F${mode}~2F${api.config.project_ref}~2Fdata~2F${api.local.docRef}`
+  return `https://console.firebase.google.com/u/0/project/${api.config.firebaseConfig.projectId}/firestore/data/~2F${mode}~2F${api.config.project_ref}~2Fdata~2F${api.store.local.docRef}`
 })
 
 function open_firebase_console(url) {
@@ -21,9 +21,9 @@ function open_firebase_console(url) {
 }
 
 const sync_state = computed(() => {
-  if (api.global.db_changes && api.global.db_connected) {
+  if (api.store.global.db_changes && api.store.global.db_connected) {
     return 'is-warning is-completed'
-  } else if (!api.global.db_changes && api.global.db_connected) {
+  } else if (!api.store.global.db_changes && api.store.global.db_connected) {
     return 'is-success is-completed'
   } else {
     return ''
@@ -37,11 +37,11 @@ const stopTimer = () => {
 
 const startTimer = () => {
   timer.value = setInterval(() => {
-    //api.debug("updating timer", api.dev.show_data_bar)
-    if (!api.global.db_connected) {
+    //api.debug("updating timer", api.store.dev.show_data_bar)
+    if (!api.store.global.db_connected) {
       last_write_time_string.value = `Never happened`
     } else {
-      var time = ((Date.now() - api.local.lastWrite) / 1000).toFixed(1)
+      var time = ((Date.now() - api.store.local.lastWrite) / 1000).toFixed(1)
       if (time < 60) {
         last_write_time_string.value = `${time} secs ago`
       } else if (time < 180) {
@@ -70,16 +70,16 @@ onBeforeUnmount(() => {
   <!-- content of panel here -->
   <div class="contentpanel info">
     <div class="steps">
-      <div class="step-item" :class="{ 'is-success is-completed': api.local.knownUser }">
-        <div class="step-marker" v-if="!api.local.knownUser">1</div>
+      <div class="step-item" :class="{ 'is-success is-completed': api.store.local.knownUser }">
+        <div class="step-marker" v-if="!api.store.local.knownUser">1</div>
         <div class="step-marker" v-else><FAIcon icon="fa-solid fa-check" /></div>
-        <div class="step-details" :class="{ 'is-success is-completed': api.local.knownUser }">
+        <div class="step-details" :class="{ 'is-success is-completed': api.store.local.knownUser }">
           <p class="step-title is-size-6">
-            <FAIcon icon="fa-solid fa-user-plus" v-if="api.local.knownUser" />
+            <FAIcon icon="fa-solid fa-user-plus" v-if="api.store.local.knownUser" />
             <FAIcon icon="fa-solid fa-user-minus" v-else />
             &nbsp;&nbsp;User status
           </p>
-          <p v-if="!api.local.knownUser">User has <b>not been seen before</b>.</p>
+          <p v-if="!api.store.local.knownUser">User has <b>not been seen before</b>.</p>
           <p v-else>User <b>has</b> been seen before.</p>
           <br />
           <table class="table is-hoverable is-striped is-fullwidth">
@@ -90,11 +90,11 @@ onBeforeUnmount(() => {
               </tr>
               <tr>
                 <td class="has-text-left"><b>Last route:</b></td>
-                <td class="has-text-left is-family-code is-size-7">{{ '/' + api.local.lastRoute }}</td>
+                <td class="has-text-left is-family-code is-size-7">{{ '/' + api.store.local.lastRoute }}</td>
               </tr>
               <tr>
                 <td class="has-text-left"><b>Is done:</b></td>
-                <td class="has-text-left is-family-code is-size-7">{{ api.local.done }}</td>
+                <td class="has-text-left is-family-code is-size-7">{{ api.store.local.done }}</td>
               </tr>
               <tr>
                 <td class="has-text-left"><b>Allow repeat:</b></td>
@@ -114,15 +114,15 @@ onBeforeUnmount(() => {
         </div>
       </div>
 
-      <div class="step-item" :class="{ 'is-success is-completed': api.global.db_connected }">
-        <div class="step-marker" v-if="!api.global.db_connected">2</div>
+      <div class="step-item" :class="{ 'is-success is-completed': api.store.global.db_connected }">
+        <div class="step-marker" v-if="!api.store.global.db_connected">2</div>
         <div class="step-marker" v-else><FAIcon icon="fa-solid fa-check" /></div>
 
-        <div class="step-details" :class="{ 'is-success is-completed': api.global.db_connected }">
+        <div class="step-details" :class="{ 'is-success is-completed': api.store.global.db_connected }">
           <p class="step-title is-size-6">
             <img src="/src/assets/dev/logo_lockup_firebase_vertical.svg" width="15" />&nbsp;&nbsp;Firestore
           </p>
-          <p v-if="!api.global.db_connected">Database is <b>not</b> connected.</p>
+          <p v-if="!api.store.global.db_connected">Database is <b>not</b> connected.</p>
           <p v-else>Database is connected.</p>
           <br />
           <table class="table is-hoverable is-striped is-fullwidth">
@@ -144,8 +144,8 @@ onBeforeUnmount(() => {
               <tr>
                 <td class="has-text-left"><b>DocRef:</b></td>
                 <td class="has-text-left is-family-code is-size-7">
-                  {{ api.local.docRef }}&nbsp;&nbsp;<a
-                    v-if="api.local.docRef"
+                  {{ api.store.local.docRef }}&nbsp;&nbsp;<a
+                    v-if="api.store.local.docRef"
                     @click.prevent="open_firebase_console(firebase_url)"
                     ><FAIcon icon="fa-solid fa-square-up-right"
                   /></a>
@@ -156,15 +156,15 @@ onBeforeUnmount(() => {
         </div>
       </div>
       <div class="step-item" :class="sync_state">
-        <div class="step-marker" v-if="!api.global.db_connected">3</div>
-        <div class="step-marker" v-if="api.global.db_connected && api.global.db_changes">
+        <div class="step-marker" v-if="!api.store.global.db_connected">3</div>
+        <div class="step-marker" v-if="api.store.global.db_connected && api.store.global.db_changes">
           <FAIcon icon="fa-solid fa-xmark" />
         </div>
         <div class="step-marker" v-else><FAIcon icon="fa-solid fa-check" /></div>
         <div class="step-details">
           <p class="step-title is-size-6" :class="sync_state"><FAIcon icon="fa-solid fa-rotate" />&nbsp;&nbsp;Sync</p>
-          <p v-if="!api.global.db_connected">Data never synced.</p>
-          <p v-else-if="api.global.db_changes">Data out of sync.</p>
+          <p v-if="!api.store.global.db_connected">Data never synced.</p>
+          <p v-else-if="api.store.global.db_changes">Data out of sync.</p>
           <p v-else>Database is synced.</p>
 
           <br />
@@ -177,7 +177,7 @@ onBeforeUnmount(() => {
               <tr>
                 <td class="has-text-left"><b>Writes:</b></td>
                 <td class="has-text-left is-family-code is-size-7">
-                  {{ api.local.totalWrites }} out of {{ api.config.max_writes }} max
+                  {{ api.store.local.totalWrites }} out of {{ api.config.max_writes }} max
                 </td>
               </tr>
               <tr>
@@ -193,8 +193,8 @@ onBeforeUnmount(() => {
               <tr>
                 <td class="has-text-left"><b>Approx size:</b></td>
                 <td class="has-text-left is-family-code is-size-7">
-                  {{ api.local.approx_data_size }} / 1,048,576 max<br />
-                  ({{ Math.round((api.local.approx_data_size / 1048576) * 1000) / 1000 }}%)
+                  {{ api.store.local.approx_data_size }} / 1,048,576 max<br />
+                  ({{ Math.round((api.store.local.approx_data_size / 1048576) * 1000) / 1000 }}%)
                 </td>
               </tr>
             </tbody>
