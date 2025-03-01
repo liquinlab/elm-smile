@@ -220,7 +220,7 @@ export function addGuards(r, providedApi = null) {
       // otherwise (for an unknown user who's not trying to go to next/same route), just send to welcome anonymous screen
       api.log.error('ROUTER GUARD: Unknown user blocked trying to go to ' + to.name)
       return {
-        name: 'welcome_anonymous',
+        name: api.store.lastRoute,
         replace: true,
       }
     }
