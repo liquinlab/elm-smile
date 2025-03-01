@@ -1,6 +1,9 @@
 import { computed, ref } from 'vue'
 import { vi } from 'vitest'
 
+// Debug flag for controlling console output in tests
+export const DEBUG = false
+
 // Mock Firebase-related methods
 vi.mock('@/core/stores/firestore-db', () => {
   console.log('Mocking firestore-db...')
@@ -20,7 +23,10 @@ vi.mock('@/core/stores/log', () => {
   const mockLogFn =
     (type) =>
     (...args) => {
-      console.log(`[${type}]`, ...args)
+      // Only log if DEBUG is true
+      if (DEBUG) {
+        console.log(`[${type}]`, ...args)
+      }
     }
 
   return {
@@ -77,35 +83,36 @@ vi.mock('@/core/composables/useStepper', () => {
 })
 
 // Mock meta.env
-vi.mock('@/core/config', () => {
-  console.log('Mocking config...')
-  return {
-    default: {
-      mode: 'development',
-      local_storage_key: 'smile_test',
-      windowsizer_aggressive: false,
-      windowsizer_request: { width: 800, height: 600 },
-      max_writes: 100,
-      min_write_interval: 1000,
-      dev_local_storage_key: 'smile_dev_test',
-    },
-  }
-})
+// vi.mock('@/core/config', () => {
+//   console.log('Mocking config...')
+//   return {
+//     default: {
+//       mode: 'development',
+//       local_storage_key: 'smile_test',
+//       windowsizer_aggressive: false,
+//       windowsizer_request: { width: 800, height: 600 },
+//       max_writes: 100,
+//       min_write_interval: 1000,
+//       dev_local_storage_key: 'smile_dev_test',
+//     },
+//   }
+// })
 
 // Setup global browser APIs
 export function setupBrowserEnvironment() {
   // Mock localStorage
-  Object.defineProperty(window, 'localStorage', {
-    value: {
-      getItem: vi.fn((key) => {
-        if (key === 'smile_seed') return 'test-seed'
-        return null
-      }),
-      setItem: vi.fn(),
-      removeItem: vi.fn(),
-    },
-    writable: true,
-  })
+  // Object.defineProperty(window, 'localStorage', {
+  //   value: {
+  //     getItem: vi.fn((key) => {
+  //       if (key === 'smile_seed') return 'test-seed'
+  //       return null
+  //     }),
+  //     setItem: vi.fn(),
+  //     removeItem: vi.fn(),
+  //     clear: vi.fn(),
+  //   },
+  //   writable: true,
+  // })
 
   // Mock window.location
   Object.defineProperty(window, 'location', {

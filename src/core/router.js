@@ -8,7 +8,6 @@ import useAPI from '@/core/composables/useAPI'
 //    and if they are, they redirect to last route
 export function addGuards(r, providedApi = null) {
   const api = providedApi || useAPI()
-  api.store.inGuards = true
   r.beforeEach(async (to, from) => {
     if (api.isResetApp()) {
       api.log.warn('ROUTER GUARD: Resetting app')
@@ -19,7 +18,6 @@ export function addGuards(r, providedApi = null) {
     if (from.meta !== undefined && from.meta.setConsented !== undefined && from.meta.setConsented) {
       api.completeConsent()
     }
-
     if (from.meta !== undefined && from.meta.setDone !== undefined && from.meta.setDone) {
       api.setDone()
     }
