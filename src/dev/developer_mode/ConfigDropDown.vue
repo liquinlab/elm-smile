@@ -8,15 +8,15 @@ const smilestore = useSmileStore() // load the global store
 //const panel = reactive({ type: 'local', visible: false, x: -280, y: 0 })
 
 function toggle_and_reset() {
-  api.dev.config_panel.visible = !api.dev.config_panel.visible
-  if (api.dev.config_panel.visible == false) {
-    api.dev.config_panel.x = -280
-    api.dev.config_panel.y = 0
+  api.store.dev.config_panel.visible = !api.store.dev.config_panel.visible
+  if (api.store.dev.config_panel.visible == false) {
+    api.store.dev.config_panel.x = -280
+    api.store.dev.config_panel.y = 0
   }
 }
 function onDragCallback(x, y) {
-  api.dev.config_panel.x = x
-  api.dev.config_panel.y = y
+  api.store.dev.config_panel.x = x
+  api.store.dev.config_panel.y = y
 }
 
 function createLink(option) {
@@ -34,12 +34,12 @@ function createLink(option) {
 
 function resetDevState() {
   localStorage.removeItem(api.config.dev_local_storage_key) // delete the local store
-  api.dev.config_panel.visible = false
+  api.store.dev.config_panel.visible = false
   location.reload()
 }
 </script>
 <template>
-  <div class="dropdown is-hoverable is-right" :class="{ 'is-active': api.dev.config_panel.visible }">
+  <div class="dropdown is-hoverable is-right" :class="{ 'is-active': api.store.dev.config_panel.visible }">
     <div class="dropdown-trigger">
       <button class="button devbar-button">
         <FAIcon icon="fa-solid fa-gear" />
@@ -47,14 +47,14 @@ function resetDevState() {
     </div>
     <div class="dropdown-menu pt-0 mt-0" id="dropdown-menu" role="menu">
       <vue-draggable-resizable
-        :x="api.dev.config_panel.x"
-        :y="api.dev.config_panel.y"
-        :draggable="api.dev.config_panel.visible"
+        :x="api.store.dev.config_panel.x"
+        :y="api.store.dev.config_panel.y"
+        :draggable="api.store.dev.config_panel.visible"
         :resizable="false"
         :onDrag="onDragCallback"
       >
         <div class="dropdown-content">
-          <div class="pin" :class="{ 'pin-selected': api.dev.config_panel.visible }">
+          <div class="pin" :class="{ 'pin-selected': api.store.dev.config_panel.visible }">
             <a @click="toggle_and_reset()">
               <FAIcon icon=" fa-solid fa-thumbtack" />
             </a>
@@ -69,21 +69,21 @@ function resetDevState() {
             <br />
             <div class="tabs is-small is-centered">
               <ul>
-                <li :class="{ 'is-active': api.dev.config_panel.type == 'local' }">
-                  <a @click="api.dev.config_panel.type = 'local'"><b> Local State </b></a>
+                <li :class="{ 'is-active': api.store.dev.config_panel.type == 'local' }">
+                  <a @click="api.store.dev.config_panel.type = 'local'"><b> Local State </b></a>
                 </li>
-                <li :class="{ 'is-active': api.dev.config_panel.type == 'dev' }">
-                  <a @click="api.dev.config_panel.type = 'dev'"><b>Dev Mode State</b></a>
+                <li :class="{ 'is-active': api.store.dev.config_panel.type == 'dev' }">
+                  <a @click="api.store.dev.config_panel.type = 'dev'"><b>Dev Mode State</b></a>
                 </li>
-                <li :class="{ 'is-active': api.dev.config_panel.type == 'code' }">
-                  <a @click="api.dev.config_panel.type = 'code'"><b> Code Version </b></a>
+                <li :class="{ 'is-active': api.store.dev.config_panel.type == 'code' }">
+                  <a @click="api.store.dev.config_panel.type = 'code'"><b> Code Version </b></a>
                 </li>
-                <li :class="{ 'is-active': api.dev.config_panel.type == 'full' }">
-                  <a @click="api.dev.config_panel.type = 'full'"><b>Full Config</b></a>
+                <li :class="{ 'is-active': api.store.dev.config_panel.type == 'full' }">
+                  <a @click="api.store.dev.config_panel.type = 'full'"><b>Full Config</b></a>
                 </li>
               </ul>
             </div>
-            <div class="datapanel" v-if="api.dev.config_panel.type == 'local'">
+            <div class="datapanel" v-if="api.store.dev.config_panel.type == 'local'">
               <div class="code">
                 <div class="resetbutton has-tooltip-arrow has-tooltip-bottom" data-tooltip="Reset local state">
                   <a class="button is-small" @click="api.resetLocalState()">
@@ -110,7 +110,7 @@ function resetDevState() {
                 </ul>
               </div>
             </div>
-            <div class="configinfo" v-if="api.dev.config_panel.type == 'code'">
+            <div class="configinfo" v-if="api.store.dev.config_panel.type == 'code'">
               <div class="datapanel">
                 <div class="code">
                   <ul>
@@ -123,7 +123,7 @@ function resetDevState() {
               </div>
             </div>
 
-            <div class="configinfo" v-if="api.dev.config_panel.type == 'full'">
+            <div class="configinfo" v-if="api.store.dev.config_panel.type == 'full'">
               <div class="datapanel">
                 <div class="code">
                   <ul>
@@ -148,7 +148,7 @@ function resetDevState() {
               </div>
             </div>
 
-            <div class="configinfo" v-if="api.dev.config_panel.type == 'dev'">
+            <div class="configinfo" v-if="api.store.dev.config_panel.type == 'dev'">
               <div class="datapanel">
                 <div class="code">
                   <div
