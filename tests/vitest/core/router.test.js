@@ -12,6 +12,9 @@ import Timeline from '@/core/timeline'
 import { useRouter, addGuards } from '@/core/router'
 import appconfig from '@/core/config'
 
+//
+import StatusBar from '@/builtins/navbars/StatusBar.vue'
+
 // Helper function to create a timeline with test routes
 function createTestTimeline() {
   // Create a minimal mock API that satisfies Timeline's requirements
@@ -152,7 +155,18 @@ function createTestTimeline() {
     component: MockComponent('Thanks'),
     meta: {
       requiresDone: true,
-      //resetApp: api.getConfig('allow_repeats'),
+      resetApp: true,
+    },
+  })
+
+  // Add thanks route
+  timeline.pushSeqView({
+    path: '/thanks2',
+    name: 'thanks2',
+    component: MockComponent('Thanks 2'),
+    meta: {
+      requiresDone: true,
+      resetApp: false,
     },
   })
 
@@ -185,20 +199,30 @@ async function setupApp(mode = 'production') {
   const pinia = createPinia()
   setActivePinia(pinia)
 
+  const InformedConsentText = defineComponent({
+    template: `
+      <div>Informed Consent Text</div>
+    `,
+  })
+
   const TestComponent = defineComponent({
+    components: {
+      StatusBar,
+      InformedConsentText,
+    },
     setup() {
       const api = useAPI()
+      //api.setAppComponent('informed_consent_text', InformedConsentText)
+
       return { api }
     },
     template: `
       <div class="test-wrapper">
+        <StatusBar></StatusBar>
         <router-view></router-view>
       </div>
     `,
   })
-
-  console.log('appconfig.local_storage_key', appconfig.local_storage_key)
-  console.log('Initial localStorage:', localStorage.getItem(appconfig.local_storage_key))
 
   // Mount the component with both router and pinia
   const wrapper = mount(TestComponent, {
@@ -208,6 +232,12 @@ async function setupApp(mode = 'production') {
       components: {
         FAIcon: {
           name: 'FAIcon',
+          render() {
+            return h('i', { class: 'mock-icon' }, 'icon')
+          },
+        },
+        FormKit: {
+          name: 'FormKit',
           render() {
             return h('i', { class: 'mock-icon' }, 'icon')
           },
@@ -224,13 +254,10 @@ async function setupApp(mode = 'production') {
 
   api.resetStore()
 
-  console.log('appconfig.local_storage_key', appconfig.local_storage_key)
-  console.log('Initial localStorage:', localStorage.getItem(appconfig.local_storage_key))
-
   // Add spy on completeConsent
-  const setDoneSpy = vi.spyOn(api, 'setDone')
-  const completeConsentSpy = vi.spyOn(api, 'completeConsent')
-  const resetAppSpy = vi.spyOn(api, 'resetApp')
+  vi.spyOn(api, 'setDone')
+  vi.spyOn(api, 'completeConsent')
+  vi.spyOn(api, 'resetApp')
 
   // Add guards with the API instance from the component
   addGuards(router, api)
@@ -238,7 +265,7 @@ async function setupApp(mode = 'production') {
   await router.push('/welcome')
   await flushPromises()
 
-  return { wrapper, router, timeline, api, completeConsentSpy, resetAppSpy, setDoneSpy }
+  return { wrapper, router, timeline, api } //, completeConsentSpy, resetAppSpy, setDoneSpy }
 }
 
 // resets the local storage.  simulates deleting it in the browser
@@ -492,6 +519,10 @@ describe('useRouter methods', () => {
       await api.goNextView()
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('thanks')
+
+      await api.goNextView()
+      await flushPromises()
+      expect(router.currentRoute.value.name).toBe('thanks2')
     })
   })
 
@@ -535,6 +566,8 @@ describe('useRouter methods', () => {
       await flushPromises()
       expect(api.store.local.lastRoute).toBe('demograph')
 
+      expect(api.completeConsent).toHaveBeenCalled()
+
       expect(api.store.isConsented).toBe(true)
       expect(api.store.isKnownUser).toBe(true)
     })
@@ -557,16 +590,58 @@ describe('useRouter methods', () => {
       await flushPromises()
       expect(api.store.local.lastRoute).toBe('thanks')
 
+      expect(api.setDone).toHaveBeenCalled()
       expect(api.store.isConsented).toBe(true)
       expect(api.store.isKnownUser).toBe(true)
       expect(api.store.isDone).toBe(true)
     })
 
-    // test withdraw
-    it('should set withdraw when leaving /feedback', async () => {})
-
     // test reset app and starting over
-    it('should reset app when leaving ? with reset app', async () => {})
+    it('should reset app when navigating to thanks', async () => {
+      const { router, api } = await setupApp()
+      await api.gotoView('welcome_anonymous')
+      await flushPromises()
+      expect(api.store.local.lastRoute).toBe('welcome_anonymous')
+
+      await api.goNextView()
+      await flushPromises()
+      expect(api.store.local.lastRoute).toBe('consent')
+
+      await api.gotoView('feedback')
+      await flushPromises()
+      expect(api.store.local.lastRoute).toBe('feedback')
+
+      await api.goNextView()
+      await flushPromises()
+      expect(api.store.local.lastRoute).toBe('thanks')
+      expect(api.resetApp).toHaveBeenCalled()
+    })
+
+    it('should not reset app when navigating to thanks 2', async () => {
+      const { router, api } = await setupApp()
+      await api.gotoView('welcome_anonymous')
+      await flushPromises()
+      expect(api.store.local.lastRoute).toBe('welcome_anonymous')
+
+      await api.goNextView()
+      await flushPromises()
+      expect(api.store.local.lastRoute).toBe('consent')
+
+      await api.gotoView('feedback')
+      await flushPromises()
+      expect(api.store.local.lastRoute).toBe('feedback')
+
+      await api.gotoView('thanks2')
+      await flushPromises()
+      expect(api.store.local.lastRoute).toBe('thanks2')
+      expect(api.resetApp).not.toHaveBeenCalled()
+    })
+
+    it('should set withdraw when the user has withdrawn', async () => {})
+
+    it('should allow repeats if app has been reset', async () => {})
+
+    it('should not allow repeats if app has not been reset', async () => {})
   })
 
   describe('Advanced routerguard logic', () => {
