@@ -91,7 +91,13 @@ export default function useAPI() {
       }
       store.config.global_app_components[key] = value
     },
-    getAppComponent: (key) => store.config.global_app_components[key],
+    getAppComponent: (key) => {
+      if (!store.config.global_app_components || !(key in store.config.global_app_components)) {
+        logStore.error('SMILE API: getAppComponent() key not found:', key)
+        return undefined
+      }
+      return store.config.global_app_components[key]
+    },
 
     // Config management
     setRuntimeConfig: (key, value) => {
