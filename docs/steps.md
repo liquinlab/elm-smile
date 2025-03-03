@@ -38,66 +38,182 @@ Here we walk through the steps.
 
 ### Import the SmileAPI
 
-In your `<script setup>` section, import the SmileAPI and initialize it. This
-will give you access to the `useTrialStepper` method which will allow you to
-advance through the trials.
+In your `<script setup>` section, import the SmileAPI and initialize it. Next,
+construct a trial stepper using the `useTrialStepper` method and save it into
+a variable (`step`). This trial stepper will allow you to advance through the
+trials. 
 
 ```vue
 <script setup>
-import useAPI from '@/core/composables/useAPI' // [!code highlight]
-const api = useAPI() // [!code highlight]
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
+
+var step = api.useTrialStepper()
+
 </script>
 ```
 
-### Define the trials
+### Define the trials: simple
 
-Next, still in `<script setup>`, define a list of trials. Each trial is an
-object with keys that define aspects of what you wish to display on a given
-trial.
+Next, still in `<script setup>`, you can define your trials. Each trial 
+is an object with keys which defines the information displayed for that
+trial. Below is a simple example of two trials with the same keys. 
 
 ```js
 var trials = [
-  { word: 'SHIP', color: 'red', condition: 'unrelated' },
+  { shape: ['circle'], color: ['red'] },
+  { shape: ['square'], color: ['green'] },
   ... // more trials
 ]
 ```
-
-### Randomize the trials
-
-You can then shuffle the trials randomly using
+Next, to add your trials to the trial stepper, simply push the list of
+trial conditions to `step` as follows:
 
 ```js
-trials = api.shuffle(trials)
+step.push(trials)
 ```
 
-### Use the `useStepper` method
+### Define the trials: advanced
 
-Next, use the `useStepper` method to advance through the trials. This method
-uses a Vue composable to provide methods to advance and go back through the
-trials.
+
+
+You can also define your trials by providing the all of the different
+values for a given key, and then using list comprehesion to generate 
+the unique trial conditions. An example is shown below.
 
 ```js
-const step = api.useStepper(trials)
+var trials = {
+  shape: ['circle', 'square', 'triangle'],
+  color:['red', 'green', 'blue']
+  }
 ```
 
-The returned object provides:
+When pushing your trials to the trial stepper, there are a number of
+additional fields you can configure to make sure the total structure
+of trials is fit to your experiment. 
 
-- `step.next()`: Advance to the next step
-- `step.prev()`: Go back to the previous step
-- `step.index()`: Get the current trial index
-- `step.current()`: Get the current trial data
-- `step.reset()`: Reset back to the first step
+#### Zip or Outer 
 
-Each time you want to advance to the next step, you need to call `step.next()`.
-You can also step back through the steps by calling `step.prev()`. If
-`step.next()` is called when the last step is reached, the callback function
-passed to `api.useStepper()` is called.
+The `method` metafield will determine how the values in each list of
+keys will be combined. in the `zip` option, the values will be paired
+based on their list positions. If `zip` is chosen, the lists of keys
+being zipped must be the same length. 
 
-While you are on a given step you can access the current step number using
-`step.index()` (indexed starting at 0). You can also get the current meta-data
-of the trials passed as input to `api.useStepper()` by calling `step.current()`.
+```js
+var step = api.useTrialStepper()
 
-Call `step.reset()` to reset back to the first step.
+var trials = {
+  shape: ['circle', 'square', 'triangle'],
+  color:['red', 'green', 'blue']
+  }
+
+step.push(trials, {method: 'zip'})
+
+// trials = [{shape: 'circle', color: 'red'},
+//           {shape: 'square', color: 'green'},
+//           {shape: 'triangle', color: 'blue'}]
+```
+
+The `outer` option is best for defining nested trials. In this case, the 
+trials will include all combinations of the key values. In other words, 
+the first key can be thought of the top level condition, and each 
+subsequent key is a subcondition of it. Using the same trials variable,
+`outer` will result in the following trials. 
+
+```js
+var step = api.useTrialStepper()
+
+var trials = {
+  shape: ['circle', 'square', 'triangle'],
+  color:['red', 'green', 'blue']
+  }
+
+step.push(trials, {method: 'outer'})
+
+// trials = [{shape: 'circle', color: 'red'},
+//           {shape: 'circle', color: 'green'},
+//           {shape: 'circle', color: 'blue'},
+
+//           {shape: 'square', color: 'red'},
+//           {shape: 'square', color: 'green'},
+//           {shape: 'square', color: 'blue'},
+
+//           {shape: 'triangle', color: 'red'},
+//           {shape: 'triangle', color: 'green'},
+//           {shape: 'triangle', color: 'blue'}]
+```
+
+#### Shuffle
+
+The `shuffle` metafield will determine whether the trials are added to the 
+stepper in their default order or in a randomized order. By default, `shuffle`
+will be set to false, which means the trials will keep their defined order. 
+If `shuffle` is set to true, the trials will be loaded in a random order. 
+
+```js
+var step = api.useTrialStepper()
+
+var trials = {
+  shape: ['circle', 'square', 'triangle'],
+  color:['red', 'green', 'blue']
+  }
+step.push(trials, {method: 'zip', shuffle: true})
+
+// trials = [{shape: 'square', color: 'green'},
+//           {shape: 'circle', color: 'red'},
+//           {shape: 'triangle', color: 'blue'}]
+```
+
+#### Repeat
+
+Finally, the `repeat` metafield allows you to repeat the same trial multiple
+times without changing any of the key values. `repeat` takes on integer values, 
+and will result in the following trials. An `index` field will be automatically
+generated. 
+
+```js
+var step = api.useTrialStepper()
+
+var trials = {
+  shape: ['circle', 'square', 'triangle'],
+  color:['red', 'green', 'blue']
+  }
+step.push(trials, {method: 'zip', shuffle: true, repeat: 5})
+
+// trials = [{shape: 'square', color: 'green', index: 0},
+//           {shape: 'square', color: 'green', index: 1},
+//           {shape: 'square', color: 'green', index: 2},
+//           {shape: 'square', color: 'green', index: 3},
+//           {shape: 'square', color: 'green', index: 4},
+//           {shape: 'circle', color: 'red', index: 0},
+//           {shape: 'circle', color: 'red', index: 1},
+//           {shape: 'circle', color: 'red', index: 2},
+//           {shape: 'circle', color: 'red', index: 3},
+//           {shape: 'circle', color: 'red', index: 4},
+//           {shape: 'triangle', color: 'blue', index: 0},
+//           {shape: 'triangle', color: 'blue', index: 1},
+//           {shape: 'triangle', color: 'blue', index: 2},
+//           {shape: 'triangle', color: 'blue', index: 3},
+//           {shape: 'triangle', color: 'blue', index: 4}]
+```
+
+### Stepping through the trials
+The trial stepper will allow you to iterate over the trials and populate
+your View with the unique values given in each trial. The structure of the 
+trial stepper should make it easy and flexible for you to set up multiple
+nested conditions with different degrees of randomization and reptition for 
+each experiment page!
+
+The methods for each stepper object include: 
+
+- `step.next()`: Advance to the next trial
+- `step.prev()`: Go back to the previous trial
+- `step.index()`: Get the global index of the current trial
+- `step.current()`: Get the data of the curret trial 
+- `step.reset()`: Reset stepper back to the first trial
+
+When the last step is reached, `step.next()` will call the callback function 
+passed to `api.useStepper()`. 
 
 ::: warning You are responsible detecting when the last step is reached!
 
@@ -111,23 +227,23 @@ Here is a approximate example of the key features for a simple Stroop task.
 
 ```vue
 <script setup>
-// A Basic Stroop Experiment
+// A Basic Multi-armed Bandit Experiment 
+// to implement
 
 ...
 
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI' // [!code highlight]
 const api = useAPI() // [!code highlight]
+var step = api.useTrialStepper() 
 
 /*
-   Next we need to define the trials for the experiment.  Create
-   a list composed of objects where each entry in the list is a trial
-   and the keys of the object are the variables that define each trial.
+   Next we need to define the trials for the experiment.
 */
-var trials = [
-  { word: 'SHIP', color: 'red', condition: 'unrelated' },
-  ... // more trials
-]
+var trials = {
+
+  
+}
 
 // next we shuffle the trials
 trials = api.shuffle(trials)
