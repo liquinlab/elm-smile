@@ -325,6 +325,16 @@ export class StepState {
 
     return path
   }
+
+  /**
+   * Gets the current path through the tree as a hyphen-separated string.
+   * Returns a string of values representing each selected node's value,
+   * excluding the root node ('/'), joined with hyphens.
+   * @returns {string} Hyphen-separated string representing the current path
+   */
+  getCurrentPathStr() {
+    return this.getCurrentPath().join('-')
+  }
 }
 
 export default StepState
