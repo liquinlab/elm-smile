@@ -16,11 +16,11 @@ import appconfig from '@/core/config'
 import StatusBar from '@/builtins/navbars/StatusBar.vue'
 
 // Helper function to create a timeline with test routes
-function createTestTimeline() {
+function createTestTimeline(mode) {
   // Create a minimal mock API that satisfies Timeline's requirements
   const mockMiniAPI = {
     config: {
-      mode: 'development',
+      mode: mode,
       local_storage_key: 'test_storage',
     },
     log: {
@@ -190,7 +190,7 @@ function createTestTimeline() {
 // Helper function to setup the app for testing
 async function setupApp(mode = 'production') {
   // Create timeline first
-  const timeline = createTestTimeline()
+  const timeline = createTestTimeline(mode)
 
   // Initialize router
   const router = await useRouter(timeline)
@@ -376,7 +376,6 @@ describe('useRouter methods', () => {
       const { wrapper } = await setupApp()
       expect(wrapper.html()).toContain('test-wrapper')
       expect(wrapper.html()).toContain('Welcome Anonymous')
-      console.log(wrapper.html())
     })
 
     it('should create a router with the correct routes', async () => {
@@ -437,11 +436,10 @@ describe('useRouter methods', () => {
     // test prolific
     it('should render welcome_referred when accessing a prolific route', async () => {
       const { wrapper, router, api } = await setupApp()
-      console.log('api.store.local.lastRoute', api.store.local.lastRoute)
+
       router.push('/welcome/prolific?test=test')
       await router.isReady()
       await flushPromises() // Add extra wait for redirect
-      console.log('api.store.local.lastRoute', api.store.local.lastRoute)
       expect(api.store.local.lastRoute).toBe('welcome_referred')
       expect(router.currentRoute.value.name).toBe('welcome_referred') // have to use .value.name here to unpack reactivity mechanism
     })
@@ -449,11 +447,9 @@ describe('useRouter methods', () => {
     // test cloudresearch
     it('should render welcome_referred when accessing a cloudresearch route', async () => {
       const { wrapper, router, api } = await setupApp()
-      console.log('api.store.local.lastRoute', api.store.local.lastRoute)
       router.push('/welcome/cloudresearch?test=test')
       await router.isReady()
       await flushPromises() // Add extra wait for redirect
-      console.log('api.store.local.lastRoute', api.store.local.lastRoute)
       expect(api.store.local.lastRoute).toBe('welcome_referred')
       expect(router.currentRoute.value.name).toBe('welcome_referred') // have to use .value.name here to unpack reactivity mechanism
     })
@@ -461,11 +457,9 @@ describe('useRouter methods', () => {
     // test mturk
     it('should render welcome_referred when accessing a mturk route', async () => {
       const { wrapper, router, api } = await setupApp()
-      console.log('api.store.local.lastRoute', api.store.local.lastRoute)
       router.push('/welcome/mturk?test=test')
       await router.isReady()
       await flushPromises() // Add extra wait for redirect
-      console.log('api.store.local.lastRoute', api.store.local.lastRoute)
       expect(api.store.local.lastRoute).toBe('welcome_referred')
       expect(router.currentRoute.value.name).toBe('welcome_referred') // have to use .value.name here to unpack reactivity mechanism
     })
@@ -473,11 +467,9 @@ describe('useRouter methods', () => {
     // test citizen science site
     it('should render welcome_referred when accessing a citizen science route', async () => {
       const { wrapper, router, api } = await setupApp()
-      console.log('api.store.local.lastRoute', api.store.local.lastRoute)
       router.push('/welcome/citizen?test=test')
       await router.isReady()
       await flushPromises() // Add extra wait for redirect
-      console.log('api.store.local.lastRoute', api.store.local.lastRoute)
       expect(api.store.local.lastRoute).toBe('welcome_referred')
       expect(router.currentRoute.value.name).toBe('welcome_referred') // have to use .value.name here to unpack reactivity mechanism
     })
@@ -518,15 +510,63 @@ describe('useRouter methods', () => {
 
       await api.goNextView()
       await flushPromises()
-      expect(router.currentRoute.value.name).toBe('thanks')
+      expect(router.currentRoute.value.name).toBe('thanks') // resets
 
       await api.goNextView()
       await flushPromises()
-      expect(router.currentRoute.value.name).toBe('thanks2')
+      expect(router.currentRoute.value.name).toBe('welcome_anonymous')
     })
   })
 
-  describe.only('Side effects of navigation', () => {
+  describe('Behavior with different modes', () => {
+    beforeAll(() => {
+      setupBrowserEnvironment()
+    })
+
+    beforeEach(() => {
+      vi.clearAllMocks()
+
+      // this nuckes the local storage and pinia making
+      // it like a new user
+      // Reset the store state by clearing localStorage and recreating pinia
+      window.localStorage.clear()
+      // Create a fresh pinia instance for each test
+      const pinia = createPinia()
+      setActivePinia(pinia)
+    })
+
+    afterEach(() => {
+      const { wrapper } = this
+      if (wrapper) {
+        wrapper.unmount()
+      }
+    })
+
+    it('should have landing route in production mode', async () => {
+      const { router, api } = await setupApp('production')
+      await router.push('/')
+      await flushPromises()
+      // check mode is production
+      expect(api.config.mode).toBe('production')
+      expect(router.currentRoute.value.name).toBe('welcome_anonymous')
+    })
+
+    it('should have recruit route in development mode', async () => {
+      const { router } = await setupApp('development')
+      await router.push('/')
+      await flushPromises()
+      expect(router.currentRoute.value.name).toBe('recruit')
+    })
+
+    it('should have presentation_home route in presentation mode', async () => {
+      const { router } = await setupApp('presentation')
+      await router.push('/')
+      await flushPromises()
+      expect(router.currentRoute.value.name).toBe('presentation_home')
+    })
+  })
+
+  describe('Side effects of navigation', () => {
     beforeAll(() => {
       setupBrowserEnvironment()
     })
@@ -682,7 +722,7 @@ describe('useRouter methods', () => {
     })
 
     it('should set user as consented when navigating from a route with setConsented=true', async () => {
-      const { router, api, wrapper, completeConsentSpy } = await setupApp()
+      const { router, api, wrapper } = await setupApp()
 
       await api.gotoView('welcome_anonymous')
       await flushPromises()
@@ -701,11 +741,11 @@ describe('useRouter methods', () => {
       expect(wrapper.html()).toContain('Demograph')
 
       expect(api.isResetApp()).toBe(false)
-      expect(completeConsentSpy).toHaveBeenCalled()
+      expect(api.completeConsent).toHaveBeenCalled()
     })
 
     it('should mark user as done when navigating from a route with setDone=true', async () => {
-      const { router, api, wrapper, setDoneSpy } = await setupApp()
+      const { router, api, wrapper } = await setupApp()
 
       await api.gotoView('feedback')
       await flushPromises()
@@ -716,7 +756,7 @@ describe('useRouter methods', () => {
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('thanks')
       expect(wrapper.html()).toContain('Thanks')
-      expect(setDoneSpy).toHaveBeenCalled()
+      expect(api.setDone).toHaveBeenCalled()
       expect(api.store.isDone).toBe(true)
     })
 
@@ -816,24 +856,6 @@ describe('useRouter methods', () => {
       expect(router.currentRoute.value.name).toBe('instructions')
     })
 
-    it('should allow known users trying to access any route in dev mode', async () => {
-      const { router, api } = await setupApp()
-
-      // Set user as known and set last route
-      api.config.mode = 'development'
-      api.setKnown()
-      api.store.setLastRoute('demograph')
-
-      await api.gotoView('demograph') // this mimics a click rather than a API execution
-      await flushPromises()
-
-      // Try to navigate to a different route
-      await api.gotoView('instructions') // this mimics a click rather than a API execution
-      await flushPromises()
-
-      expect(router.currentRoute.value.name).toBe('instructions')
-    })
-
     it('should redirect to withdraw page if user has withdrawn', async () => {
       const { router, api } = await setupApp()
 
@@ -854,9 +876,48 @@ describe('useRouter methods', () => {
       await api.gotoView('withdraw', false)
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('withdraw')
-      console.log('lastroute', api.store.lastRoute)
     })
   })
 
-  //describe('Dev mode logic', () => {})
+  describe('Dev mode logic', () => {
+    beforeAll(() => {
+      setupBrowserEnvironment()
+    })
+
+    beforeEach(() => {
+      vi.clearAllMocks()
+
+      // this nuckes the local storage and pinia making
+      // it like a new user
+      // Reset the store state by clearing localStorage and recreating pinia
+      window.localStorage.clear()
+      // Create a fresh pinia instance for each test
+      const pinia = createPinia()
+      setActivePinia(pinia)
+    })
+
+    afterEach(() => {
+      const { wrapper } = this
+      if (wrapper) {
+        wrapper.unmount()
+      }
+    })
+
+    it('should allow known users trying to access any route in dev mode', async () => {
+      const { router, api } = await setupApp('development')
+
+      // Set user as known and set last route
+      api.setKnown()
+      api.store.setLastRoute('demograph')
+
+      await api.gotoView('demograph') // this mimics a click rather than a API execution
+      await flushPromises()
+
+      // Try to navigate to a different route
+      await api.gotoView('instructions') // this mimics a click rather than a API execution
+      await flushPromises()
+
+      expect(router.currentRoute.value.name).toBe('instructions')
+    })
+  })
 })
