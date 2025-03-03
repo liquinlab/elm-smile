@@ -1,10 +1,8 @@
-# :ladder: Stepping Views
-
-Many experiments are organized into a series of repeated events called "trials".
-Trials are different than [Views](/views) because they often repeat the same
-basic structure many times. Smile provides several features for organizing and
-managing trials or other sequenced elements _within_ a View (the
-[Timeline](/timeline) is used to sequence across Views).
+# :ladder: Stepping Through Trials
+For some conditions in your experiment, you may want to repeat several trials
+of the same event. Smile provides a trial stepper for organizing and managing
+sequenced events _within_ a View. This way, you can avoid repeating a 
+[View](/views) multiple times in your [timeline](/timeline). 
 
 <img src="/images/steps.png" width="600" alt="steps example" style="margin: auto;">
 
