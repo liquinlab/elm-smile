@@ -6,7 +6,7 @@ export const DEBUG = false
 
 // Mock Firebase-related methods
 vi.mock('@/core/stores/firestore-db', () => {
-  console.log('Mocking firestore-db...')
+  if (DEBUG) console.log('Mocking firestore-db...')
   return {
     createDoc: vi.fn().mockResolvedValue({ id: 'test-doc-id' }),
     createPrivateDoc: vi.fn().mockResolvedValue({ id: 'test-private-doc-id' }),
@@ -19,7 +19,7 @@ vi.mock('@/core/stores/firestore-db', () => {
 
 // Mock log store
 vi.mock('@/core/stores/log', () => {
-  console.log('Mocking log store...')
+  if (DEBUG) console.log('Mocking log store...')
   const mockLogFn =
     (type) =>
     (...args) => {
@@ -46,7 +46,7 @@ vi.mock('@/core/stores/log', () => {
 
 // Mock axios for getBrowserFingerprint
 vi.mock('axios', () => {
-  console.log('Mocking axios...')
+  if (DEBUG) console.log('Mocking axios...')
   return {
     default: {
       get: vi.fn().mockResolvedValue({ data: { ip: '127.0.0.1' } }),
@@ -56,7 +56,7 @@ vi.mock('axios', () => {
 
 // Mock randomization functions
 vi.mock('@/core/randomization', () => {
-  console.log('Mocking randomization...')
+  if (DEBUG) console.log('Mocking randomization...')
   return {
     randomInt: vi.fn(),
     shuffle: vi.fn(),
@@ -68,7 +68,7 @@ vi.mock('@/core/randomization', () => {
 
 // Mock useStepper
 vi.mock('@/core/composables/useStepper', () => {
-  console.log('Mocking useStepper...')
+  if (DEBUG) console.log('Mocking useStepper...')
   return {
     useStepper: vi.fn().mockReturnValue({
       currentStep: ref(1),
@@ -84,7 +84,7 @@ vi.mock('@/core/composables/useStepper', () => {
 
 // Mock meta.env
 // vi.mock('@/core/config', () => {
-//   console.log('Mocking config...')
+//   if (DEBUG) console.log('Mocking config...')
 //   return {
 //     default: {
 //       mode: 'development',
