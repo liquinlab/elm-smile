@@ -74,15 +74,15 @@ step.push(trials)
 ### Define the trials: advanced
 
 
-
 You can also define your trials by providing the all of the different
-values for a given key, and then using list comprehesion to generate 
-the unique trial conditions. An example is shown below.
+values for a given key. The trial stepper will then use list 
+comprehension to generate the unique trial conditions in a customizable
+way. An example is shown below.
 
 ```js
 var trials = {
   shape: ['circle', 'square', 'triangle'],
-  color:['red', 'green', 'blue']
+  color:['red', 'green', 'blue'],
   }
 ```
 
@@ -96,7 +96,6 @@ The `method` metafield will determine how the values in each list of
 keys will be combined. in the `zip` option, the values will be paired
 based on their list positions. If `zip` is chosen, the lists of keys
 being zipped must be the same length. 
-
 ```js
 var step = api.useTrialStepper()
 
@@ -140,6 +139,32 @@ step.push(trials, {method: 'outer'})
 //           {shape: 'triangle', color: 'green'},
 //           {shape: 'triangle', color: 'blue'}]
 ```
+#### Defining data columns
+You can indicate any expected data fields associated with 
+each of the trials and specify if you want to autofill them with mock
+data from a certain distribution. When pushing your data to the 
+trial stepper, `autofill` will be true by 
+default if you specify the data distributions, but can be set to 
+false if you would like to populate all datacolumns with null values. 
+For both the `zip` and `outer` methods, the data columns will be
+appended to every unique trial. 
+
+```js
+var step = api.useTrialStepper()
+
+var trials = {
+  shape: ['circle', 'square', 'triangle'],
+  color:['red', 'green', 'blue'],
+  reactionTime: api.faker.rnorm(3, 5), 
+  accuracy: null,
+  }
+
+step.push(trials, {method: 'zip', autofill: true})
+
+// trials = [{shape: 'circle', color: 'red', reactionTime: [5.12, 4.87, 5.66], accuracy: null},
+//           {shape: 'square', color: 'green', reactionTime: [4.77, 4.56, 5.71], accuracy: null},
+//           {shape: 'triangle', color: 'blue', reactionTime: [5.09, 4.50, 5.02], accuracy: null}]
+```
 
 #### Shuffle
 
@@ -155,6 +180,7 @@ var trials = {
   shape: ['circle', 'square', 'triangle'],
   color:['red', 'green', 'blue']
   }
+  
 step.push(trials, {method: 'zip', shuffle: true})
 
 // trials = [{shape: 'square', color: 'green'},
@@ -176,6 +202,7 @@ var trials = {
   shape: ['circle', 'square', 'triangle'],
   color:['red', 'green', 'blue']
   }
+
 step.push(trials, {method: 'zip', shuffle: true, repeat: 5})
 
 // trials = [{shape: 'square', color: 'green', index: 0},
