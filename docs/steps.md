@@ -7,25 +7,24 @@ sequenced events _within_ a View. This way, you can avoid repeating a
 <img src="/images/steps.png" width="600" alt="steps example" style="margin: auto;">
 
 Here, we introduce the concept of a "step" and how to programmatically advance
-through a sequence of steps within a particular View. The same concept is also
-used to add sequential build to any type of view (e.g., a sequence of
+through a sequence of steps within a particular View. The canonical use is for trials within an experiment, but the same concept applies for any sequential presentation (e.g., a sequence of
 instructions, a multi-part form, or an animation).
 
 ::: tip Steps are like builds in a Keynote/Powerpoint animation
 
-By way of analogy, thing of different [Views](/views) as slides in a
+By way of analogy, think of different [Views](/views) as slides in a
 Keynote/Powerpoint presentation while a step is like a build or animation
 **within** a slide.
 
 :::
 
-A key feature of stepped Views is that they persist their state in the browswer
-using local storage. This means that if the subject reloads the pages, or
+A key feature of stepped Views is that their state persists in the browswer
+through the use of local storage. This means that if the subject reloads the page, or
 navigates to a different site and then returns, the task will resume from the
 same step. This is nice because it helps ensure that subjects are always
 completing the set of steps/trials assigned to them and are not able to start
 the task over (possibly introducing biased data from practice effects or
-exposure to manipulations). You can learn more about this feature by reading
+exposure to different manipulations). You can learn more about this feature by reading
 about how to [persist stepper state](#persisting-stepper-state)
 
 ## Create a stepped View
@@ -54,7 +53,7 @@ const step = api.useTrialStepper()
 ### Define the trials: simple
 
 Next, still in `<script setup>`, you can define your trials. Each trial 
-is an object with keys which defines the information displayed for that
+is an object with keys which define the information displayed for that
 trial. Below is a simple example of two trials with the same keys. 
 
 ```js
@@ -65,7 +64,7 @@ var trials = [
 ]
 ```
 Next, to add your trials to the trial stepper, simply push the list of
-trial conditions to `step` as follows:
+trials to `step` as follows:
 
 ```js
 step.push(trials)
@@ -74,9 +73,8 @@ step.push(trials)
 ### Define the trials: advanced
 
 
-You can also define your trials by providing the all of the different
-values for a given key. The trial stepper will then use list 
-comprehension to generate the unique trial conditions in a customizable
+You can also define your trials by providing all of the different
+values for a given key. The trial stepper will then generate the unique trial conditions in a customizable
 way. An example is shown below.
 
 ```js
@@ -111,9 +109,8 @@ step.push(trials, {method: 'zip'})
 //           {shape: 'triangle', color: 'blue'}]
 ```
 
-The `outer` option is best for defining nested trials. In this case, the 
-trials will include all combinations of the key values. In other words, 
-the first key can be thought of the top level condition, and each 
+The `outer` option is best for defining nested trials, or where all combinations of trial parameters should be shown. With this option, the 
+trials will include the outer product of the key values. The first key can be thought of as the top level condition, and each 
 subsequent key is a subcondition of it. Using the same trials variable,
 `outer` will result in the following trials. 
 
@@ -341,12 +338,3 @@ the current trial data (e.g. `step.value.arms`).
 }
 </style>
 ```
-
-## Persisting stepper state
-
-The stepper state is stored in the application state. This means that if the
-subject reloads the pages, or navigates to a different site and then returns,
-the task will resume from the same step. This is nice because it helps ensure
-that subjects are always completing the set of steps/trials assigned to them and
-are not able to start the task over (possibly introducing biased data from
-practice effects or exposure to manipulations).
