@@ -262,7 +262,8 @@ const api = useAPI()
 const step = api.useTrialStepper()
 
 // Either import or manually define the trial data
-var armValues = [(10, 24, 8, 11, 9), (44, 19, 6, 13, 12), (30, 21, 7, 2, 14)]
+var armValues = [[10, 24, 8, 11, 9], [44, 19, 6, 13, 12], [30, 21, 7, 2, 14]]
+
 
 // Convert the dataset into an array of trial objects
 const trials = armValues.map(values => ({ arms: values }))
@@ -282,7 +283,6 @@ const keys = ['a', 's', 'd', 'f', 'g']
 function chooseBandit(idx) {
   // Use the current trial's arms array and select the value based on the index
   reward.value = step.value.arms[idx]
-  step.next()
 }
 
 // Listen for key presses corresponding to the bandits
