@@ -46,7 +46,7 @@ trials.
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
-var step = api.useTrialStepper()
+const step = api.useTrialStepper()
 
 </script>
 ```
@@ -97,7 +97,7 @@ keys will be combined. in the `zip` option, the values will be paired
 based on their list positions. If `zip` is chosen, the lists of keys
 being zipped must be the same length. 
 ```js
-var step = api.useTrialStepper()
+const step = api.useTrialStepper()
 
 var trials = {
   shape: ['circle', 'square', 'triangle'],
@@ -118,7 +118,7 @@ subsequent key is a subcondition of it. Using the same trials variable,
 `outer` will result in the following trials. 
 
 ```js
-var step = api.useTrialStepper()
+const step = api.useTrialStepper()
 
 var trials = {
   shape: ['circle', 'square', 'triangle'],
@@ -150,7 +150,7 @@ For both the `zip` and `outer` methods, the data columns will be
 appended to every unique trial. 
 
 ```js
-var step = api.useTrialStepper()
+const step = api.useTrialStepper()
 
 var trials = {
   shape: ['circle', 'square', 'triangle'],
@@ -174,13 +174,13 @@ will be set to false, which means the trials will keep their defined order.
 If `shuffle` is set to true, the trials will be loaded in a random order. 
 
 ```js
-var step = api.useTrialStepper()
+const step = api.useTrialStepper()
 
 var trials = {
   shape: ['circle', 'square', 'triangle'],
   color:['red', 'green', 'blue']
   }
-  
+
 step.push(trials, {method: 'zip', shuffle: true})
 
 // trials = [{shape: 'square', color: 'green'},
@@ -196,7 +196,7 @@ and will result in the following trials. An `index` field will be automatically
 generated. 
 
 ```js
-var step = api.useTrialStepper()
+const step = api.useTrialStepper()
 
 var trials = {
   shape: ['circle', 'square', 'triangle'],
@@ -234,7 +234,6 @@ The methods for each stepper object include:
 - `step.next()`: Advance to the next trial
 - `step.prev()`: Go back to the previous trial
 - `step.index()`: Get the global index of the current trial
-- `step.current()`: Get the data of the curret trial 
 - `step.reset()`: Reset stepper back to the first trial
 
 When the last step is reached, `step.next()` will call the callback function 
@@ -248,108 +247,99 @@ is met usually when `step.index()` is equal to the number of trials.
 
 :::
 
-Here is a approximate example of the key features for a simple Stroop task.
+Here is a approximate example of the key features for a simple multi-armed bandit 
+task. In this case, we use the trials to determine the unique arm values in each
+game and the repetitions to give the partipant multiple samples 
 
 ```vue
 <script setup>
-// A Basic Multi-armed Bandit Experiment 
-// to implement
+import { ref } from 'vue'
+import useAPI from '@/core/composables/useAPI'
+import { onKeyDown } from '@vueuse/core'
 
-...
+// Instantiate your trialStepper 
+const api = useAPI()
+const step = api.useTrialStepper()
 
-// import and initalize smile API
-import useAPI from '@/core/composables/useAPI' // [!code highlight]
-const api = useAPI() // [!code highlight]
-var step = api.useTrialStepper() 
+// Either import or manually define the trial data
+var armValues = [(10, 24, 8, 11, 9), (44, 19, 6, 13, 12), (30, 21, 7, 2, 14)]
 
-/*
-   Next we need to define the trials for the experiment.
-*/
-var trials = {
+// Convert the dataset into an array of trial objects
+const trials = armValues.map(values => ({ arms: values }))
 
-  
+// Push the trials to the stepper with shuffling
+// Repeate every trial condition for 20 iterations
+const num_iters = 20
+step.push(trials, { shuffle: true, repeat: num_iters })
+
+// A reactive value to display the reward
+const reward = ref(null)
+
+// Define key mapping for bandit arm indices to keys
+// (0: A, 1: S, 2: D, 3: F, 4: G)
+const keys = ['a', 's', 'd', 'f', 'g']
+
+function chooseBandit(idx) {
+  // Use the current trial's arms array and select the value based on the index
+  reward.value = step.value.arms[idx]
+  step.next()
 }
 
-// next we shuffle the trials
-trials = api.shuffle(trials)
+// Listen for key presses corresponding to the bandits
+const stop = onKeyDown(keys, (e) => {
+    const key = e.key.toLowerCase()
+    const idx = keys.indexOf(key)
 
+    if (idx !== -1) chooseBandit(idx)
 
-//  Create the stepper which will advance through the steps.
-const step = api.useStepper(trials) // [!code highlight]
-
-var final_score = ref(0)
-
-// Handle the key presses for the task
-// onKeyDown is a composable from the VueUse package
-const stop = onKeyDown(
-  ['r', 'R', 'g', 'G', 'b', 'B'],
-  (e) => {
-    if (step.index() < trials.length) {
-      e.preventDefault()
-      if (['r', 'R'].includes(e.key)) {
-        // handle red
-      } else if (['g', 'G'].includes(e.key)) {
-        // handle green
-      } else if (['b', 'B'].includes(e.key)) {
-        // handle blue
-      }
-      api.recordTrialData({ // record the data
+    // Record data after every 20 iterations
+    if (step.value.index == num_iters - 1) {
+      api.recordTrialData({
         trialnum: step.index(),
-        word: step.current().word,
-        color: step.current().color,
-        condition: step.current().condition,
-        response: e.key,
-      })
-      step.next() // [!code highlight] step to next build/trial
-
-      // if we are at the end of the trials, compute a final score
-      if (step.index() >= trials.length) { // [!code highlight]
-        final_score.value = 100
-        stop() // [!code highlight] This removes the keydown listener
-      }
+        arms: step.value.arms,
+        choicenum: step.value.index,
+    })
     }
+    // Advance to the next trial
+    step.next()
+    
   },
   { dedupe: true }
 )
-
-// what to when all the trials are completed
-function finish() {
-  api.goNextView()
-}
 </script>
+
 ```
 
-This is the template code for the view. Notice that the `step.index()` method is
-used to get the current step number and the `step.current()` method is used to
-get the current trial data (e.g., `step.current().word`).
+This is the template code for the view. The `step.index()` method is
+used to get the current step number, and `step.value` is used to access
+the current trial data (e.g. `step.value.arms`).
 
 ```vue
 <template>
-  <div class="page prevent-select">
-    <!-- Show this for each trial -->
-    <div class="strooptrial" v-if="step.index() < trials.length">
-      {{ step.index() + 1 }} / {{ trials.length }}
-      <h1 class="title is-1 is-huge" :class="step.current().color">
-        {{ step.current().word }}
-      </h1>
-      <p id="prompt">Type "R" for Red, "B" for blue, "G" for green.</p>
+  <div class="experiment">
+    <!-- If there's an active trial, display its arms and instructions -->
+    <div v-if="step.value">
+      <h2>Trial {{ step.index() + 1 }} / {{ step.trials.length }}</h2>
+      <p><strong>Arms:</strong> {{ step.value.arms.join(', ') }}</p>
+      <p>Press A, S, D, F, or G to choose a bandit.</p>
+      <p v-if="reward !== null"><strong>Reward:</strong> {{ reward }}</p>
     </div>
-
-    <!-- Show this when you are done with the trials and offer a button
-         which will advance to the next route -->
-    <div class="endoftask" v-else>
-      <p id="prompt">
-        Thanks! You are finished with this task and can move on.
-      </p>
-      <!-- display the final score -->
-      <p>Your score was {{ final_score }}</p>
-      <button class="button is-success is-light" id="finish" @click="finish()">
-        Continue &nbsp;
-        <FAIcon icon="fa-solid fa-arrow-right" />
-      </button>
+    <!-- When all trials are done, display a completion message -->
+    <div v-else>
+      <h2>Experiment Completed!</h2>
+      <p>Thank you for participating.</p>
     </div>
   </div>
 </template>
+
+<style scoped>
+.experiment {
+  max-width: 600px;
+  margin: 2rem auto;
+  text-align: center;
+  font-family: sans-serif;
+}
+</style>
 ```
 
 ## Persisting stepper state
