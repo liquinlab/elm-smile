@@ -282,10 +282,30 @@ export class StepState {
    * @returns {string} A JSON representation of the StepState object
    */
   toJSON() {
+    // Helper function to clean non-serializable data
+    const cleanData = (data) => {
+      if (!data) return data
+      const cleaned = {}
+      for (const [key, value] of Object.entries(data)) {
+        // Handle different non-serializable types differently
+        if (typeof value === 'function' || typeof value === 'undefined') {
+          // Skip functions and undefined values entirely
+          continue
+        } else if (value instanceof RegExp || (value instanceof Object && 'nodeType' in value)) {
+          // Convert DOM elements and RegExp to empty objects
+          cleaned[key] = {}
+        } else {
+          cleaned[key] = value
+        }
+      }
+      return cleaned
+    }
+
     return {
       value: this.value,
       currentIndex: this.currentIndex,
       states: this.states.map((state) => state.toJSON()),
+      data: cleanData(this.data),
     }
   }
 
@@ -296,6 +316,7 @@ export class StepState {
   loadFromJSON(data) {
     this.value = data.value
     this.currentIndex = data.currentIndex
+    this.data = data.data
     this.states = data.states.map((stateData) => {
       const state = new StepState(stateData.value, this)
       state.loadFromJSON(stateData)

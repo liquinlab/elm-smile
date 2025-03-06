@@ -393,6 +393,69 @@ describe('StepState', () => {
       expect(stepper.getData()).toBeNull()
     })
   })
+
+  describe('data serialization', () => {
+    let stepper
+
+    beforeEach(() => {
+      stepper = new StepState('/')
+    })
+
+    it('should serialize and deserialize simple data types', () => {
+      const testData = {
+        string: 'test',
+        number: 42,
+        boolean: true,
+        null: null,
+        array: [1, 2, 3],
+        nestedObject: { a: 1, b: 2 },
+      }
+
+      stepper.setData(testData)
+      const serialized = stepper.toJSON()
+      const newState = new StepState('/')
+      newState.loadFromJSON(serialized)
+
+      expect(newState.getData()).toEqual(testData)
+    })
+
+    it('should handle data serialization in nested nodes', () => {
+      const child = stepper.push('child')
+      child.setData({ childData: 'test' })
+      const grandchild = child.push('grandchild')
+      grandchild.setData({ grandchildData: 123 })
+
+      const serialized = stepper.toJSON()
+      const newState = new StepState('/')
+      newState.loadFromJSON(serialized)
+
+      expect(newState.getNode('child').getData()).toEqual({ childData: 'test' })
+      expect(newState.getNode('child').getNode('grandchild').getData()).toEqual({ grandchildData: 123 })
+    })
+
+    it('should handle non-serializable data types', () => {
+      const nonSerializableData = {
+        function: () => console.log('hello'),
+        vueComponent: { template: '<div></div>', setup: () => ({}) },
+        domElement: typeof window !== 'undefined' ? document.createElement('div') : {},
+        regexp: /test/,
+        undefined: undefined,
+      }
+
+      stepper.setData(nonSerializableData)
+      const serialized = stepper.toJSON()
+      const newState = new StepState('/')
+      newState.loadFromJSON(serialized)
+
+      const deserializedData = newState.getData()
+      expect(deserializedData.function).toBeUndefined()
+      expect(deserializedData.undefined).toBeUndefined()
+      // DOM elements become empty objects
+      expect(deserializedData.domElement).toEqual({})
+      // RegExp becomes an empty object
+      expect(deserializedData.regexp).toEqual({})
+    })
+  })
 })
 
 // flatten this string

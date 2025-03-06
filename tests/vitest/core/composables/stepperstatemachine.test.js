@@ -156,4 +156,92 @@ describe('StepperStateMachine', () => {
       expect(stepper['first'].getData()).toBeNull()
     })
   })
+
+  describe('serialization', () => {
+    it('should serialize and deserialize a simple state machine', () => {
+      stepper.push('first')
+      stepper.push('second')
+      stepper['second'].push('child')
+      stepper['second']['child'].setData({ test: 'value' })
+
+      const serialized = stepper.toJSON()
+      const newStepper = new StepperStateMachine()
+      newStepper.loadFromJSON(serialized)
+
+      // Verify structure
+      expect(newStepper['first']).toBeTruthy()
+      expect(newStepper['second']).toBeTruthy()
+      expect(newStepper['second']['child']).toBeTruthy()
+
+      // Verify data
+      expect(newStepper['second']['child'].getData()).toEqual({ test: 'value' })
+    })
+
+    it('should preserve navigation state after serialization', () => {
+      // Create a complex tree and navigate through it
+      stepper.push('A')
+      stepper['A'].push('B')
+      stepper['A']['B'].push('C')
+      stepper.push('D')
+      stepper['D'].push('E')
+
+      // Navigate through the tree
+      stepper.next() // to A
+      stepper['A'].next() // to B
+      stepper['A']['B'].next() // to C
+
+      const serialized = stepper.toJSON()
+      const newStepper = new StepperStateMachine()
+      newStepper.loadFromJSON(serialized)
+
+      // Verify navigation state is preserved
+      expect(newStepper.getCurrentPath()).toEqual(['A', 'B', 'C'])
+    })
+
+    it('should handle non-serializable data in nested nodes', () => {
+      const nonSerializableData = {
+        function: () => console.log('hello'),
+        vueComponent: { template: '<div></div>', setup: () => ({}) },
+        domElement: typeof window !== 'undefined' ? document.createElement('div') : {},
+        regexp: /test/,
+        undefined: undefined,
+      }
+
+      stepper.push('test')
+      stepper['test'].setData(nonSerializableData)
+
+      const serialized = stepper.toJSON()
+      const newStepper = new StepperStateMachine()
+      newStepper.loadFromJSON(serialized)
+
+      const deserializedData = newStepper['test'].getData()
+      expect(deserializedData.function).toBeUndefined()
+      expect(deserializedData.undefined).toBeUndefined()
+      expect(deserializedData.domElement).toEqual({})
+      expect(deserializedData.regexp).toEqual({})
+    })
+
+    it('should preserve tree structure and data after serialization', () => {
+      // Create a complex tree with data at various levels
+      stepper.push('root1', { rootData: 1 })
+      stepper['root1'].push('child1', { childData: 1 })
+      stepper['root1'].push('child2', { childData: 2 })
+      stepper.push('root2', { rootData: 2 })
+      stepper['root2'].push('child3', { childData: 3 })
+
+      const serialized = stepper.toJSON()
+      const newStepper = new StepperStateMachine()
+      newStepper.loadFromJSON(serialized)
+
+      // Verify tree structure
+      expect(newStepper.getTreeDiagram()).toBe(stepper.getTreeDiagram())
+
+      // Verify data at all levels
+      expect(newStepper['root1'].getData()).toEqual({ rootData: 1 })
+      expect(newStepper['root1']['child1'].getData()).toEqual({ childData: 1 })
+      expect(newStepper['root1']['child2'].getData()).toEqual({ childData: 2 })
+      expect(newStepper['root2'].getData()).toEqual({ rootData: 2 })
+      expect(newStepper['root2']['child3'].getData()).toEqual({ childData: 3 })
+    })
+  })
 })

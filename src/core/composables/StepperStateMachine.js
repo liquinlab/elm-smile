@@ -138,4 +138,20 @@ export class StepperStateMachine {
   getTreeDiagram() {
     return this.stepState.getTreeDiagram()
   }
+
+  /**
+   * Serializes the StepperStateMachine to a JSON string.
+   * @returns {string} A JSON representation of the StepperStateMachine
+   */
+  toJSON() {
+    return this.stepState.toJSON()
+  }
+
+  /**
+   * Deserializes a JSON string to a StepperStateMachine object.
+   * @param {string} data - The JSON string to deserialize
+   */
+  loadFromJSON(data) {
+    this.stepState.loadFromJSON(data)
+  }
 }
