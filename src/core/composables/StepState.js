@@ -20,6 +20,7 @@ export class StepState {
       this.depth = parent.depth + 1
     }
     this.parent = parent
+    this.data = null // Add this line to store node data
   }
 
   /**
@@ -334,6 +335,14 @@ export class StepState {
    */
   getCurrentPathStr() {
     return this.getCurrentPath().join('-')
+  }
+
+  setData(data) {
+    this.data = data
+  }
+
+  getData() {
+    return this.data
   }
 }
 

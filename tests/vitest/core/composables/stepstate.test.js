@@ -368,6 +368,31 @@ describe('StepState', () => {
       expect(newState.next()).toBe('child4') // Preserves end of sequence
     })
   })
+
+  describe('data management', () => {
+    it('should initialize with null data', () => {
+      expect(stepper.getData()).toBeNull()
+    })
+
+    it('should store and retrieve data', () => {
+      const data = { test: 'value' }
+      stepper.setData(data)
+      expect(stepper.getData()).toEqual(data)
+    })
+
+    it('should update existing data', () => {
+      stepper.setData({ initial: 'data' })
+      const newData = { updated: 'value' }
+      stepper.setData(newData)
+      expect(stepper.getData()).toEqual(newData)
+    })
+
+    it('should allow null data', () => {
+      stepper.setData({ test: 'value' })
+      stepper.setData(null)
+      expect(stepper.getData()).toBeNull()
+    })
+  })
 })
 
 // flatten this string
