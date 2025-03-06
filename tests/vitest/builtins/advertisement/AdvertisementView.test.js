@@ -7,11 +7,16 @@ import Advertisement from '@/builtins/advertisement/AdvertisementView.vue'
 
 // Mock API with goNextView method
 const mockGoNextView = vi.fn()
+const mockPreloadAllImages = vi.fn()
+const mockPreloadAllVideos = vi.fn()
+
 vi.mock('@/core/composables/useAPI', () => ({
   default: () => ({
     get: vi.fn().mockResolvedValue({ data: {} }),
     post: vi.fn().mockResolvedValue({ data: {} }),
     goNextView: mockGoNextView,
+    preloadAllImages: mockPreloadAllImages,
+    preloadAllVideos: mockPreloadAllVideos,
   }),
 }))
 
@@ -23,6 +28,8 @@ describe('Advertisement tests', () => {
     setActivePinia(pinia)
     // Clear mock calls between tests
     mockGoNextView.mockClear()
+    mockPreloadAllImages.mockClear()
+    mockPreloadAllVideos.mockClear()
   })
 
   it('should render', async () => {

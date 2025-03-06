@@ -219,10 +219,9 @@ export default function useAPI() {
       logStore.debug('SMILE API: assigned condition', name, randomCondition)
       return randomCondition
     },
-
     // Image preloading
     preloadAllImages: () => {
-      logStore.debug('Preloading images')
+      log.debug('Preloading images')
       setTimeout(() => {
         Object.values(
           import.meta.glob('@/user/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', {
@@ -236,10 +235,6 @@ export default function useAPI() {
         })
       }, 1)
     },
-<<<<<<< HEAD
-
-    // Consent management
-=======
     preloadAllVideos: () => {
       log.debug('Preloading videos')
       setTimeout(() => {
@@ -255,7 +250,6 @@ export default function useAPI() {
         })
       }, 1)
     },
->>>>>>> main
     completeConsent: async () => {
       api.setConsented()
       if (!api.store.local.knownUser) {
