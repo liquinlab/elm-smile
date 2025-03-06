@@ -115,23 +115,13 @@ const table = stepper.new().zip({
 // ]
 ```
 
-You can also specify how to handle arrays of different lengths:
+By default, `zip()` requires all arrays to have the same length. If the arrays
+have different lengths, you must specify how to handle this using the `method`
+option:
 
 ```js
-// Pad with last value (default)
-const table1 = stepper.new().zip({
-  shape: ['circle', 'square'],
-  color: ['red', 'green', 'blue'],
-})
-// Results in:
-// [
-//   { shape: 'circle', color: 'red' },
-//   { shape: 'square', color: 'green' },
-//   { shape: 'square', color: 'blue' }
-// ]
-
 // Loop shorter arrays
-const table2 = stepper.new().zip(
+const table1 = stepper.new().zip(
   {
     shape: ['circle', 'square'],
     color: ['red', 'green', 'blue'],
@@ -145,16 +135,72 @@ const table2 = stepper.new().zip(
 //   { shape: 'circle', color: 'blue' }
 // ]
 
-// Throw error for different lengths
+// Pad with a specific value
+const table2 = stepper.new().zip(
+  {
+    shape: ['circle', 'square'],
+    color: ['red', 'green', 'blue'],
+  },
+  { method: 'pad', padValue: 'unknown' }
+)
+// Results in:
+// [
+//   { shape: 'circle', color: 'red' },
+//   { shape: 'square', color: 'green' },
+//   { shape: 'unknown', color: 'blue' }
+// ]
+
+// Repeat the last value
 const table3 = stepper.new().zip(
   {
     shape: ['circle', 'square'],
     color: ['red', 'green', 'blue'],
   },
-  { method: 'error' }
+  { method: 'last' }
 )
-// Throws: "All columns must have the same length when using zip()"
+// Results in:
+// [
+//   { shape: 'circle', color: 'red' },
+//   { shape: 'square', color: 'green' },
+//   { shape: 'square', color: 'blue' }
+// ]
 ```
+
+::: warning Different Lengths
+
+When using `zip()`, if the arrays have different lengths:
+
+- By default, it will throw an error
+- You must specify a `method` to handle the difference:
+  - `'loop'`: Repeats the shorter array values
+  - `'pad'`: Fills with a specified `padValue` (required)
+  - `'last'`: Repeats the last value of each shorter array
+
+:::
+
+::: tip Non-Array Values
+
+The `zip()` method can handle non-array values by treating them as
+single-element arrays:
+
+```js
+const table = stepper.new().zip(
+  {
+    shape: 'circle', // Treated as ['circle']
+    color: ['red', 'green', 'blue'],
+  },
+  { method: 'loop' }
+)
+
+// Results in:
+// [
+//   { shape: 'circle', color: 'red' },
+//   { shape: 'circle', color: 'green' },
+//   { shape: 'circle', color: 'blue' }
+// ]
+```
+
+:::
 
 #### Creating All Combinations with outer()
 
@@ -183,10 +229,30 @@ an error.
 
 :::
 
-#### Repeating Trials
+::: tip Non-Array Values
+
+Like `zip()`, the `outer()` method can handle non-array values by treating them
+as single-element arrays:
+
+```js
+const table = stepper.new().outer({
+  shape: 'circle', // Treated as ['circle']
+  color: ['red', 'green'],
+})
+
+// Results in:
+// [
+//   { shape: 'circle', color: 'red' },
+//   { shape: 'circle', color: 'green' }
+// ]
+```
+
+:::
+
+#### Repeating Blocks of Trials
 
 The `repeat()` method allows you to repeat all trials a specified number of
-times:
+times, in order:
 
 ```js
 const table = stepper

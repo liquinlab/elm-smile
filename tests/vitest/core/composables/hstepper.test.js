@@ -151,7 +151,7 @@ describe('useHStepper composable', () => {
       expect(stepper).toBeDefined()
     })
 
-    it('should include the key functions in the stepper', async () => {
+    it('should include the key top-level functions in the stepper', async () => {
       const stepper = getCurrentRouteStepper()
       expect(stepper).toBeDefined()
       expect(stepper.next).toBeInstanceOf(Function)
@@ -159,6 +159,8 @@ describe('useHStepper composable', () => {
       expect(stepper.reset).toBeInstanceOf(Function)
       expect(stepper.index).toBeInstanceOf(Function)
       expect(stepper.current).toBeInstanceOf(Function)
+      expect(stepper.new).toBeInstanceOf(Function)
+      expect(stepper.sm).toBeInstanceOf(StepperStateMachine)
     })
 
     it('should create a StepperStateMachine instance', async () => {
@@ -182,9 +184,31 @@ describe('useHStepper composable', () => {
       expect(Array.isArray(table.rows)).toBe(true)
       expect(table.append).toBeInstanceOf(Function)
       expect(table.shuffle).toBeInstanceOf(Function)
+      expect(table.sample).toBeInstanceOf(Function)
       expect(table.repeat).toBeInstanceOf(Function)
       expect(table.push).toBeInstanceOf(Function)
+      expect(table.forEach).toBeInstanceOf(Function)
       expect(table.zip).toBeInstanceOf(Function)
+      expect(table.outer).toBeInstanceOf(Function)
+      expect(table.delete).toBeInstanceOf(Function)
+      expect(table.length).toBeDefined()
+      expect(table.indexOf).toBeInstanceOf(Function)
+      expect(table.slice).toBeInstanceOf(Function)
+      expect(table[Symbol.iterator]).toBeInstanceOf(Function)
+      expect(table[Symbol.isConcatSpreadable]).toBeDefined()
+    })
+
+    it('should throw errors if chain methods are called before new()', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Test all chainable methods
+      const methods = ['append', 'shuffle', 'sample', 'repeat', 'push', 'forEach', 'zip', 'outer', 'delete']
+
+      methods.forEach((method) => {
+        expect(() => {
+          stepper[method]()
+        }).toThrow(`${method}() must be called after new()`)
+      })
     })
 
     it('should provide array-like access to rows', async () => {
@@ -216,6 +240,23 @@ describe('useHStepper composable', () => {
       expect(spreadArray).toEqual(trials)
     })
 
+    it('should create an empty table when new() is called without data operations', async () => {
+      const stepper = getCurrentRouteStepper()
+      const table = stepper.new()
+
+      // Test empty state
+      expect(table.length).toBe(0)
+      expect(table.rows).toHaveLength(0)
+      expect([...table]).toHaveLength(0)
+      expect(table.slice()).toHaveLength(0)
+      expect(table.indexOf({})).toBe(-1)
+
+      // Test array-like properties still work
+      expect(table[0]).toBeUndefined()
+      expect(table[1]).toBeUndefined()
+      expect(table[-1]).toBeUndefined()
+    })
+
     it('should allow appending trials to a table', async () => {
       const stepper = getCurrentRouteStepper()
       const trials = [
@@ -228,6 +269,37 @@ describe('useHStepper composable', () => {
       expect(table.rows).toHaveLength(2)
       expect(table.rows[0]).toEqual(trials[0])
       expect(table.rows[1]).toEqual(trials[1])
+    })
+
+    it('should allow building complex tables through multiple append operations', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create a table with multiple append operations
+      const table = stepper
+        .new()
+        .append([{ color: 'red', shape: 'triangle' }])
+        .append([{ color: 'blue', shape: 'square' }])
+        .append([{ color: 'green', shape: 'circle' }])
+        .append([{ color: 'yellow', shape: 'star' }])
+
+      // Test the final state
+      expect(table.rows).toHaveLength(4)
+      expect(table.rows).toEqual([
+        { color: 'red', shape: 'triangle' },
+        { color: 'blue', shape: 'square' },
+        { color: 'green', shape: 'circle' },
+        { color: 'yellow', shape: 'star' },
+      ])
+
+      // Test array-like access still works
+      expect(table.length).toBe(4)
+      expect(table[0]).toEqual({ color: 'red', shape: 'triangle' })
+      expect(table[3]).toEqual({ color: 'yellow', shape: 'star' })
+      expect([...table]).toHaveLength(4)
+      expect(table.slice(1, 3)).toEqual([
+        { color: 'blue', shape: 'square' },
+        { color: 'green', shape: 'circle' },
+      ])
     })
 
     it('should allow modifying rows with forEach', async () => {
@@ -329,20 +401,14 @@ describe('useHStepper composable', () => {
       }).toThrow(/append\(\) would generate \d+ rows, which exceeds the safety limit of \d+/)
     })
 
-    it('should be chainable', async () => {
-      const stepper = getCurrentRouteStepper()
-
-      const table = stepper
-        .new()
-        .append([{ color: 'red', shape: 'triangle' }])
-        .append([{ color: 'blue', shape: 'square' }])
-
-      expect(table.rows).toHaveLength(2)
-      expect(table.rows[0]).toEqual({ color: 'red', shape: 'triangle' })
-      expect(table.rows[1]).toEqual({ color: 'blue', shape: 'square' })
-    })
-
     describe('zip functionality', () => {
+      it('should throw error if zip is called before new', async () => {
+        const stepper = getCurrentRouteStepper()
+        expect(() => {
+          stepper.zip()
+        }).toThrow('zip() must be called after new()')
+      })
+
       it('should zip columns with equal lengths', async () => {
         const stepper = getCurrentRouteStepper()
         const trials = {
@@ -358,22 +424,21 @@ describe('useHStepper composable', () => {
         expect(table.rows[2]).toEqual({ shape: 'triangle', color: 'blue' })
       })
 
-      it('should pad shorter columns by default', async () => {
+      it('should throw error by default when columns have different lengths', async () => {
         const stepper = getCurrentRouteStepper()
         const trials = {
           shape: ['circle', 'square'],
           color: ['red', 'green', 'blue'],
         }
 
-        const table = stepper.new().zip(trials)
-
-        expect(table.rows).toHaveLength(3)
-        expect(table.rows[0]).toEqual({ shape: 'circle', color: 'red' })
-        expect(table.rows[1]).toEqual({ shape: 'square', color: 'green' })
-        expect(table.rows[2]).toEqual({ shape: 'square', color: 'blue' })
+        expect(() => {
+          stepper.new().zip(trials)
+        }).toThrow(
+          'All columns must have the same length when using zip(). Specify a method (loop, pad, last) to handle different lengths.'
+        )
       })
 
-      it('should pad with specified value', async () => {
+      it('should pad with specified value when using pad method', async () => {
         const stepper = getCurrentRouteStepper()
         const trials = {
           shape: ['circle', 'square'],
@@ -386,6 +451,33 @@ describe('useHStepper composable', () => {
         expect(table.rows[0]).toEqual({ shape: 'circle', color: 'red' })
         expect(table.rows[1]).toEqual({ shape: 'square', color: 'green' })
         expect(table.rows[2]).toEqual({ shape: 'unknown', color: 'blue' })
+      })
+
+      it('should handle null padValue', async () => {
+        const stepper = getCurrentRouteStepper()
+        const trials = {
+          shape: ['circle', 'square'],
+          color: ['red', 'green', 'blue'],
+        }
+
+        // Test with null padValue
+        const tableNull = stepper.new().zip(trials, { method: 'pad', padValue: null })
+        expect(tableNull.rows).toHaveLength(3)
+        expect(tableNull.rows[0]).toEqual({ shape: 'circle', color: 'red' })
+        expect(tableNull.rows[1]).toEqual({ shape: 'square', color: 'green' })
+        expect(tableNull.rows[2]).toEqual({ shape: null, color: 'blue' })
+      })
+
+      it('should throw error when padValue is undefined', async () => {
+        const stepper = getCurrentRouteStepper()
+        const trials = {
+          shape: ['circle', 'square'],
+          color: ['red', 'green', 'blue'],
+        }
+
+        expect(() => {
+          stepper.new().zip(trials, { method: 'pad' })
+        }).toThrow('padValue is required when using the pad method')
       })
 
       it('should loop shorter columns', async () => {
@@ -401,9 +493,53 @@ describe('useHStepper composable', () => {
         expect(table.rows[0]).toEqual({ shape: 'circle', color: 'red' })
         expect(table.rows[1]).toEqual({ shape: 'square', color: 'green' })
         expect(table.rows[2]).toEqual({ shape: 'circle', color: 'blue' })
+
+        // Test with more loops
+        const trials2 = {
+          shape: ['circle', 'square'],
+          color: ['red', 'green', 'blue', 'yellow', 'purple'],
+        }
+
+        const table2 = stepper.new().zip(trials2, { method: 'loop' })
+
+        expect(table2.rows).toHaveLength(5)
+        expect(table2.rows[0]).toEqual({ shape: 'circle', color: 'red' })
+        expect(table2.rows[1]).toEqual({ shape: 'square', color: 'green' })
+        expect(table2.rows[2]).toEqual({ shape: 'circle', color: 'blue' })
+        expect(table2.rows[3]).toEqual({ shape: 'square', color: 'yellow' })
+        expect(table2.rows[4]).toEqual({ shape: 'circle', color: 'purple' })
+
+        // Test with multiple columns of different lengths
+        const trials3 = {
+          shape: ['circle'],
+          color: ['red', 'green', 'blue'],
+          size: ['small', 'medium'],
+        }
+
+        const table3 = stepper.new().zip(trials3, { method: 'loop' })
+
+        expect(table3.rows).toHaveLength(3)
+        expect(table3.rows[0]).toEqual({ shape: 'circle', color: 'red', size: 'small' })
+        expect(table3.rows[1]).toEqual({ shape: 'circle', color: 'green', size: 'medium' })
+        expect(table3.rows[2]).toEqual({ shape: 'circle', color: 'blue', size: 'small' })
       })
 
-      it('should throw error for different lengths when method is error', async () => {
+      it('should repeat last value when using last method', async () => {
+        const stepper = getCurrentRouteStepper()
+        const trials = {
+          shape: ['circle', 'square'],
+          color: ['red', 'green', 'blue'],
+        }
+
+        const table = stepper.new().zip(trials, { method: 'last' })
+
+        expect(table.rows).toHaveLength(3)
+        expect(table.rows[0]).toEqual({ shape: 'circle', color: 'red' })
+        expect(table.rows[1]).toEqual({ shape: 'square', color: 'green' })
+        expect(table.rows[2]).toEqual({ shape: 'square', color: 'blue' })
+      })
+
+      it('should throw error for invalid method', async () => {
         const stepper = getCurrentRouteStepper()
         const trials = {
           shape: ['circle', 'square'],
@@ -411,24 +547,8 @@ describe('useHStepper composable', () => {
         }
 
         expect(() => {
-          stepper.new().zip(trials, { method: 'error' })
-        }).toThrow('All columns must have the same length when using zip()')
-      })
-
-      it('should throw error for invalid input', async () => {
-        const stepper = getCurrentRouteStepper()
-
-        expect(() => {
-          stepper.new().zip(null)
-        }).toThrow('zip() requires an object with arrays as values')
-
-        expect(() => {
-          stepper.new().zip({})
-        }).toThrow('zip() requires at least one column')
-
-        expect(() => {
-          stepper.new().zip({ shape: 'not an array' })
-        }).toThrow('zip() requires an object with arrays as values')
+          stepper.new().zip(trials, { method: 'invalid' })
+        }).toThrow('Invalid method: invalid. Must be one of: loop, pad, last')
       })
 
       it('should throw error when zip would exceed safety limit', async () => {
@@ -462,9 +582,58 @@ describe('useHStepper composable', () => {
         expect(table.rows[1]).toEqual({ shape: 'square', color: 'green' })
         expect(table.rows[2]).toEqual({ shape: 'triangle', color: 'blue' })
       })
+
+      it('should handle non-array values as single-element arrays', async () => {
+        const stepper = getCurrentRouteStepper()
+        const trials = {
+          shape: 'circle',
+          color: ['red', 'green', 'blue'],
+        }
+
+        const table = stepper.new().zip(trials, { method: 'loop' })
+
+        expect(table.rows).toHaveLength(3)
+        expect(table.rows[0]).toEqual({ shape: 'circle', color: 'red' })
+        expect(table.rows[1]).toEqual({ shape: 'circle', color: 'green' })
+        expect(table.rows[2]).toEqual({ shape: 'circle', color: 'blue' })
+      })
+
+      it('should handle multiple non-array values', async () => {
+        const stepper = getCurrentRouteStepper()
+        const trials = {
+          shape: 'circle',
+          color: 'red',
+          size: ['small', 'medium'],
+        }
+
+        const table = stepper.new().zip(trials, { method: 'loop' })
+
+        expect(table.rows).toHaveLength(2)
+        expect(table.rows[0]).toEqual({ shape: 'circle', color: 'red', size: 'small' })
+        expect(table.rows[1]).toEqual({ shape: 'circle', color: 'red', size: 'medium' })
+      })
+
+      it('should throw error for invalid input', async () => {
+        const stepper = getCurrentRouteStepper()
+
+        expect(() => {
+          stepper.new().zip(null)
+        }).toThrow('zip() requires an object with arrays as values')
+
+        expect(() => {
+          stepper.new().zip({})
+        }).toThrow('zip() requires at least one column')
+      })
     })
 
     describe('outer functionality', () => {
+      it('should throw error if repeat is called before new', async () => {
+        const stepper = getCurrentRouteStepper()
+        expect(() => {
+          stepper.outer()
+        }).toThrow('outer() must be called after new()')
+      })
+
       it('should create factorial combinations of columns', async () => {
         const stepper = getCurrentRouteStepper()
         const trials = {
@@ -506,6 +675,39 @@ describe('useHStepper composable', () => {
         ])
       })
 
+      it('should handle non-array values as single-element arrays', async () => {
+        const stepper = getCurrentRouteStepper()
+        const trials = {
+          shape: 'circle',
+          color: ['red', 'green'],
+        }
+
+        const table = stepper.new().outer(trials)
+
+        expect(table.rows).toHaveLength(2)
+        expect(table.rows).toEqual([
+          { shape: 'circle', color: 'red' },
+          { shape: 'circle', color: 'green' },
+        ])
+      })
+
+      it('should handle multiple non-array values', async () => {
+        const stepper = getCurrentRouteStepper()
+        const trials = {
+          shape: 'circle',
+          color: 'red',
+          size: ['small', 'medium'],
+        }
+
+        const table = stepper.new().outer(trials)
+
+        expect(table.rows).toHaveLength(2)
+        expect(table.rows).toEqual([
+          { shape: 'circle', color: 'red', size: 'small' },
+          { shape: 'circle', color: 'red', size: 'medium' },
+        ])
+      })
+
       it('should throw error for invalid input', async () => {
         const stepper = getCurrentRouteStepper()
 
@@ -516,10 +718,6 @@ describe('useHStepper composable', () => {
         expect(() => {
           stepper.new().outer({})
         }).toThrow('outer() requires at least one column')
-
-        expect(() => {
-          stepper.new().outer({ shape: 'not an array' })
-        }).toThrow('outer() requires an object with arrays as values')
       })
 
       it('should throw error when combinations would exceed safety limit', async () => {
@@ -571,6 +769,13 @@ describe('useHStepper composable', () => {
     })
 
     describe('repeat functionality', () => {
+      it('should throw error if repeat is called before new', async () => {
+        const stepper = getCurrentRouteStepper()
+        expect(() => {
+          stepper.repeat(3)
+        }).toThrow('repeat() must be called after new()')
+      })
+
       it('should repeat trials n times', async () => {
         const stepper = getCurrentRouteStepper()
         const trials = [
@@ -634,6 +839,65 @@ describe('useHStepper composable', () => {
           { color: 'blue', shape: 'square' },
           { color: 'green', shape: 'circle' },
         ])
+      })
+    })
+
+    describe('delete functionality', () => {
+      it('should throw error if delete() is called before new()', async () => {
+        const stepper = getCurrentRouteStepper()
+        expect(() => {
+          stepper.delete()
+        }).toThrow('delete() must be called after new()')
+      })
+
+      it('should delete the table and end the chain', async () => {
+        const stepper = getCurrentRouteStepper()
+        const table = stepper.new()
+
+        // Add some data to the table
+        table.append([
+          { color: 'red', shape: 'triangle' },
+          { color: 'blue', shape: 'square' },
+        ])
+
+        // Delete should not return this for chaining
+        const result = table.delete()
+        expect(result).toBeUndefined()
+      })
+
+      it('should prevent using table methods after deletion', async () => {
+        const stepper = getCurrentRouteStepper()
+        const table = stepper.new()
+
+        // Add some data and delete
+        table.append([{ color: 'red', shape: 'triangle' }]).delete()
+
+        // Test all chainable methods throw after deletion
+        const methods = ['append', 'shuffle', 'sample', 'repeat', 'push', 'forEach', 'zip', 'outer']
+
+        methods.forEach((method) => {
+          expect(() => {
+            table[method]()
+          }).toThrow('Table has been deleted')
+        })
+
+        // Test array-like access throws after deletion
+        expect(() => table.length).toThrow('Table has been deleted')
+        expect(() => table.rows).toThrow('Table has been deleted')
+        expect(() => table[0]).toThrow('Table has been deleted')
+        expect(() => [...table]).toThrow('Table has been deleted')
+        expect(() => table.slice()).toThrow('Table has been deleted')
+        expect(() => table.indexOf({})).toThrow('Table has been deleted')
+      })
+
+      it('should throw error when trying to delete an already deleted table', async () => {
+        const stepper = getCurrentRouteStepper()
+        const table = stepper.new()
+
+        table.delete()
+        expect(() => {
+          table.delete()
+        }).toThrow('Table has been deleted')
       })
     })
   })
