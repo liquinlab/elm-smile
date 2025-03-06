@@ -1,6 +1,13 @@
 <script setup>
+import { onMounted } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
+
+onMounted(async () => {
+  let catURL = await api.getStaticUrl('cat.mp4')
+  let catVid = document.getElementById('cat')
+  catVid.src = catURL
+});
 
 function finish() {
   // smilestore.saveData()

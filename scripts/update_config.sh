@@ -1,14 +1,19 @@
 #!/bin/bash
 
+
+url=$(git config --get remote.origin.url)
+
+repo_path=$(echo "$url" | sed -E 's|.*/([^/]+)/([^/.]+)(\.git)?|\1/\2|')
+
+
 # update the app configs using a base64 encoding of 
 # all the variables
 ENC=$(cat env/.env.local | base64)
-gh secret set SECRET_APP_CONFIG --body "$ENC"
+gh secret set SECRET_APP_CONFIG --body "$ENC" --repo $repo_path
+
 
 # update doc secrets (these go one variable at a time)
 # only do this if repo name is nyuccl/docs
-url=$(git config --get remote.origin.url)
-
 re="^(https|git)(:\/\/|@)([^\/:]+)[\/:]([^\/:]+)\/(.+)(.git)*$"
 
 if [[ $url =~ $re ]]; then    
@@ -25,4 +30,4 @@ then
 fi
 
 # update deploy secrets (these go one variable at a time)
-gh secret set -f env/.env.deploy.local
+gh secret set -f env/.env.deploy.local --repo $repo_path

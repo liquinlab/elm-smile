@@ -225,7 +225,7 @@ export default function useAPI() {
       logStore.debug('Preloading images')
       setTimeout(() => {
         Object.values(
-          import.meta.glob('@/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', {
+          import.meta.glob('@/user/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', {
             eager: true,
             query: '?url',
             import: 'default',
@@ -236,8 +236,26 @@ export default function useAPI() {
         })
       }, 1)
     },
+<<<<<<< HEAD
 
     // Consent management
+=======
+    preloadAllVideos: () => {
+      log.debug('Preloading videos')
+      setTimeout(() => {
+        Object.values(
+          import.meta.glob('@/user/assets/**/*.{mp4,mov,avi,m4v}', {
+            eager: true,
+            query: '?url',
+            import: 'default',
+          })
+        ).forEach((url) => {
+          const video = document.createElement('video')
+          video.src = url
+        })
+      }, 1)
+    },
+>>>>>>> main
     completeConsent: async () => {
       api.setConsented()
       if (!api.store.local.knownUser) {

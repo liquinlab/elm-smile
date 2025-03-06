@@ -87,7 +87,7 @@ stored.
         </tr>
         <tr>
             <td class="label">
-                <label for="base_git">Base Github repot</label><br>
+                <label for="base_git">Base Github repo</label><br>
                 If in gureckislab then default to `nyuccl/smile` otherwise, it is the base smile repo for your lab (e.g, `hartleylab/smile`).
             </td>
             <td class="data">
@@ -130,7 +130,12 @@ cd ~/Desktop
 Following the steps below, copy the Smile GitHub repo into a new project name
 and clone it locally.
 
-In this example command, the new project will be named `{{config.projectname}}`:
+In this example command, the new project will be named `{{config.projectname}}`,
+using the NYU CCL Smile GitHub repo as a template.
+
+**Note:** if your lab has already been [set up](/labconfig), you will likely use
+your lab's copy of the Smile GitHub repo as a template (e.g.,
+`hartleylab/smile`).
 
 <div class="language-js"><pre><code><span class="line">gh repo create {{config.projectname}} --private --template {{config.base_git}}</span></code></pre></div>
 
@@ -153,25 +158,24 @@ your project `{{config.projectname}}`):
 
 ## 2. Configure your project
 
-Information about the configuration setting is [here](/configuration) but if
-your lab has already been [set up](/labconfig) you will want to simply decrypt
-the files provided in the repository.
+If your lab has already been [set up](/labconfig), then you simply need to decrypt 
+the files provided in the repository. You can find more information on the 
+configuration settings and options [here](/configuration), but this is optional.
 
 ::: danger Warning!
 
 This will only work if you have first sent your lab coordinator your gpg key and
 waited for them to push a change to the <SmileText/> repo. See instructions
-[here](/requirements#_3-request-access-to-the-shared-database-resources).
+[here](/adduser).
 
 :::
 
-To do this simply type:
-
+To decrypt the organization files, simply type:
 ```
 git secret reveal
 ```
 
-this should create several `.env.*.local` files in your `env/` directory.
+This should create several `.env.*.local` files in your `env/` directory.
 
 **Only on first setup:** After all the necessary files are in the `env` folder
 run:
@@ -185,6 +189,12 @@ create an initial deployment/commit. The `npm run upload_config` command only
 needs to be run once in your project the first time you create it. If you are
 collaborating with someone on an existing project you only need to run
 `git secret reveal`.
+
+::: info Error handling
+
+In case of error, retry the process of [adding a new user](/adduser).
+
+:::
 
 ## 3. Setup the project
 

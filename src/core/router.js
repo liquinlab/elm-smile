@@ -1,7 +1,14 @@
 import seedrandom from 'seedrandom'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { getQueryParams } from '@/core/utils'
+<<<<<<< HEAD
 //import timeline from '@/user/design'
+=======
+import timeline from '@/user/design'
+import useLog from '@/core/stores/log'
+const log = useLog()
+
+>>>>>>> main
 import useAPI from '@/core/composables/useAPI'
 // 3. add navigation guards
 //    currently these check if user is known
@@ -264,6 +271,7 @@ export function addGuards(r, providedApi = null) {
 export function useRouter(timeline) {
   const { routes } = timeline
 
+<<<<<<< HEAD
   // 4. Create the router instance and pass the `routes` option
   // You can pass in additional options here, but let's
   // keep it simple for now.
@@ -274,6 +282,53 @@ export function useRouter(timeline) {
       return { top: 0 }
     },
   })
+=======
+// 4. Create the router instance and pass the `routes` option
+// You can pass in additional options here, but let's
+// keep it simple for now.
+export const router = createRouter({
+  history: createWebHashHistory(), // We are using the hash history for now/simplicity
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    return { top: 0 }
+  },
+})
+addGuards(router) // add the guards defined above
+log.log('Vue Router initialized')
+
+// add additional guard to set global seed before
+router.beforeResolve((to) => {
+  const smilestore = useSmileStore()
+  smilestore.removePageAutofill()
+
+  if (smilestore.local.useSeed) {
+    // if we're using a seed
+    const seedID = smilestore.getSeedID
+    const seed = `${seedID}-${to.name}`
+    seedrandom(seed, { global: true })
+    log.log('ROUTER GUARD: Seed set to ' + seed)
+  } else {
+    // if inactive, just re-seed with a random seed on every route entry
+    api.randomSeed()
+    log.log('ROUTER GUARD: Not using participant-specific seed; seed set randomly')
+  }
+  log.clear_page_history()
+  smilestore.dev.page_provides_trial_stepper = false // by default
+  smilestore.dev.current_page_done = false // set the current page to done
+  log.log('ROUTER GUARD: Router navigated to /' + to.name)
+})
+
+// Check if the next route has a preload function, and if so, run it asynchronously
+router.afterEach(async (to, from) => {
+  if (to.meta !== undefined && to.meta.next !== undefined) {
+    const fullTo = router.resolve({ name: to.meta.next })
+
+    if (fullTo.meta !== undefined && fullTo.meta.preload !== undefined) {
+      await fullTo.meta.preload()
+    }
+  }
+})
+>>>>>>> main
 
   return router
 }

@@ -29,6 +29,8 @@ onMounted(() => {
 
 function finish() {
   clicked = true
+  api.preloadAllImages()
+  api.preloadAllVideos()
   api.goNextView()
 }
 
