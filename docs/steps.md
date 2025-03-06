@@ -71,6 +71,53 @@ const table = stepper.new().append([
 ])
 ```
 
+#### Nested Tables
+
+You can create nested tables within individual rows. This is useful when you
+want to create hierarchical trial structures or when each trial needs its own
+sequence of sub-trials:
+
+```js
+const stepper = api.useHStepper()
+
+// Create a parent table with 3 trials
+const trials = stepper.new().range(3)
+
+// Create nested tables for specific trials
+trials[0].new().range(3) // First trial gets 3 sub-trials
+trials[1].new().range(5) // Second trial gets 5 sub-trials
+trials[1].new().append({ color: 'red', shape: 'triangle' }) // Add another sub-trial
+
+// You can chain operations on nested tables
+const nestedTable = trials[0]
+  .new()
+  .range(3)
+  .forEach((row) => ({ ...row, type: 'test' }))
+  .append([{ index: 3, type: 'extra' }])
+```
+
+Each row in a table can have its own nested table, and you can perform all the
+same operations on nested tables that you can on parent tables (append, range,
+forEach, etc.).
+
+::: tip Multiple Nested Tables You can create multiple nested tables for the
+same row. Only the most recently created table will be stored in the row:
+
+```js
+// Create two nested tables for the first trial
+const nestedTable1 = trials[0].new().range(2)
+const nestedTable2 = trials[0].new().range(3)
+
+// trials[0] will now reference nestedTable2
+```
+
+:::
+
+::: warning Data Serialization Nested tables follow the same serialization rules
+as regular tables. When storing nested tables, make sure all data is
+serializable according to the guidelines in the
+[Data Serialization Limitations](#data-serialization-limitations) section. :::
+
 #### Array-like Access
 
 Tables provide array-like access to their rows:
@@ -284,9 +331,9 @@ const table = stepper.new().range(3)
 
 // Results in:
 // [
-//   { index: 0 },
-//   { index: 1 },
-//   { index: 2 }
+//   { range: 0 },
+//   { range: 1 },
+//   { range: 2 }
 // ]
 ```
 
@@ -299,13 +346,13 @@ const table = stepper
   .range(2)
   .forEach((row) => ({
     ...row,
-    condition: row.index % 2 === 0 ? 'A' : 'B',
+    condition: row.range % 2 === 0 ? 'A' : 'B',
   }))
 
 // Results in:
 // [
-//   { index: 0, condition: 'A' },
-//   { index: 1, condition: 'B' }
+//   { range: 0, condition: 'A' },
+//   { range: 1, condition: 'B' }
 // ]
 ```
 

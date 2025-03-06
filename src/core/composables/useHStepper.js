@@ -141,6 +141,15 @@ export function useHStepper() {
               )
             }
             this.rows = [...this.rows, ...input.rows]
+          } else if (input && typeof input === 'object') {
+            // Handle single object case
+            const newLength = this.rows.length + 1
+            if (newLength > config.max_stepper_rows) {
+              throw new Error(
+                `append() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to append.`
+              )
+            }
+            this.rows = [...this.rows, input]
           }
           return this
         },
@@ -339,7 +348,7 @@ export function useHStepper() {
           }
           const rows = Array(n)
             .fill(null)
-            .map((_, i) => ({ index: i }))
+            .map((_, i) => ({ range: i }))
           this.rows = [...this.rows, ...rows]
           return this
         },
@@ -481,7 +490,81 @@ export function useHStepper() {
         get(target, prop) {
           // Handle numeric indexing
           if (typeof prop === 'string' && !isNaN(prop)) {
-            return target.rows[parseInt(prop)]
+            const row = target.rows[parseInt(prop)]
+            if (row) {
+              // Return a proxy for the row that adds the chainable API
+              return new Proxy(row, {
+                get(rowTarget, rowProp) {
+                  // If the property is new(), return a function that creates a new table
+                  if (rowProp === 'new') {
+                    return () => {
+                      const newTable = api.new()
+                      // Make the new table's rows recursive by wrapping them in the same proxy
+                      const originalRows = newTable.rows
+                      let currentRows = originalRows
+                      Object.defineProperty(newTable, 'rows', {
+                        get() {
+                          return currentRows.map(
+                            (row) =>
+                              new Proxy(row, {
+                                get(nestedRowTarget, nestedRowProp) {
+                                  if (nestedRowProp === 'new') {
+                                    return () => {
+                                      const nestedTable = api.new()
+                                      nestedRowTarget[Symbol.for('table')] = nestedTable
+                                      return nestedTable
+                                    }
+                                  }
+                                  if (nestedRowProp === Symbol.for('table')) {
+                                    return nestedRowTarget[Symbol.for('table')]
+                                  }
+                                  if (nestedRowProp === 'table') {
+                                    return undefined
+                                  }
+                                  return nestedRowTarget[nestedRowProp]
+                                },
+                                ownKeys(nestedRowTarget) {
+                                  return Object.keys(nestedRowTarget).filter((key) => key !== 'table')
+                                },
+                                getOwnPropertyDescriptor(nestedRowTarget, prop) {
+                                  if (prop === 'table') return undefined
+                                  return Object.getOwnPropertyDescriptor(nestedRowTarget, prop)
+                                },
+                              })
+                          )
+                        },
+                        set(value) {
+                          currentRows = value
+                          return true
+                        },
+                      })
+                      // Store the new table in a Symbol to hide it from enumeration
+                      const tableSymbol = Symbol.for('table')
+                      rowTarget[tableSymbol] = newTable
+                      return newTable
+                    }
+                  }
+                  // Return the table if explicitly requested via Symbol
+                  if (rowProp === Symbol.for('table')) {
+                    return rowTarget[Symbol.for('table')]
+                  }
+                  // Hide the table property during normal property access
+                  if (rowProp === 'table') {
+                    return undefined
+                  }
+                  return rowTarget[rowProp]
+                },
+                // Hide the table property from enumeration and JSON stringification
+                ownKeys(rowTarget) {
+                  return Object.keys(rowTarget).filter((key) => key !== 'table')
+                },
+                getOwnPropertyDescriptor(rowTarget, prop) {
+                  if (prop === 'table') return undefined
+                  return Object.getOwnPropertyDescriptor(rowTarget, prop)
+                },
+              })
+            }
+            return row
           }
           // Handle all other properties normally
           return target[prop]
