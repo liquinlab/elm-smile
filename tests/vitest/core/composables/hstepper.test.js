@@ -1,148 +1,160 @@
+/* eslint-disable no-undef */
+// general testing functions
+import { defineComponent, h } from 'vue'
+//import { createPinia, setActivePinia } from 'pinia'
+import { createTestingPinia } from '@pinia/testing'
+import { mount, flushPromises } from '@vue/test-utils'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { useHStepper } from '@/core/composables/useHStepper'
-import { createPinia, setActivePinia } from 'pinia'
-import { createApp } from 'vue'
-import useSmilestore from '@/core/stores/smilestore'
 
-// Add this mock
-vi.mock('vue-router', async () => {
-  const actual = await vi.importActual('vue-router')
-  return {
-    ...actual,
-    useRoute: () => ({
-      name: 'test-route',
-    }),
-  }
+// import shared mocks
+import '../../setup/mocks' // Import shared mocks
+import { setupBrowserEnvironment } from '../../setup/mocks'
+
+// import the API composable (h stepper is a method of the API)
+import useAPI from '@/core/composables/useAPI'
+import { StepperStateMachine } from '@/core/composables/StepperStateMachine'
+
+// Create a test component that uses the composable
+const TestComponent = defineComponent({
+  template: `
+    <div>
+      <router-view></router-view>
+    </div>
+  `,
 })
 
-describe.skip('useHStepper', () => {
+// Create a mock component for routes
+const MockComponent = (text = 'Mock Component') =>
+  defineComponent({
+    name: 'MockComponent',
+    setup() {
+      const api = useAPI()
+      const stepper = api.useHStepper()
+      return { api, stepper }
+    },
+    template: `<div>${text}</div>`,
+  })
+
+// Define test routes
+const routes = [
+  {
+    path: '/',
+    name: 'welcome_anonymous',
+    component: MockComponent('Welcome Anonymous'),
+    meta: { next: 'landing', allowAlways: true },
+  },
+  {
+    path: '/landing',
+    name: 'landing',
+    component: MockComponent('Landing'),
+    meta: { prev: 'welcome_anonymous', next: 'test', sequential: true },
+  },
+  {
+    path: '/test',
+    name: 'test',
+    component: MockComponent('Test'),
+    meta: { prev: 'landing', sequential: true },
+  },
+]
+
+describe('useHStepper composable', () => {
+  let api
   let router
-  let app
+  let wrapper
+
+  // Helper function to get the API instance for the current route
+  const getCurrentRouteAPI = () => {
+    const currentRoute = router.currentRoute.value
+    const mockComponent = wrapper.findComponent(currentRoute.matched[0].components.default)
+    expect(mockComponent.exists()).toBe(true)
+    return mockComponent.vm.api
+  }
+
+  // Helper function to get the stepper instance for the current route
+  const getCurrentRouteStepper = () => {
+    const currentRoute = router.currentRoute.value
+    const mockComponent = wrapper.findComponent(currentRoute.matched[0].components.default)
+    expect(mockComponent.exists()).toBe(true)
+    return mockComponent.vm.stepper
+  }
+
+  beforeAll(() => {
+    setupBrowserEnvironment()
+  })
 
   beforeEach(async () => {
-    // Create Vue app
-    app = createApp({})
+    // Reset mock state
+    vi.clearAllMocks()
 
-    // Setup Pinia
-    const pinia = createPinia()
-    setActivePinia(pinia)
-    app.use(pinia)
+    // Create a fresh router for each test
+    router = createRouter({
+      history: createWebHashHistory(),
+      routes,
+    })
 
-    // Register page tracker in smilestore
-    const smilestore = useSmilestore()
-    smilestore.registerPageTracker('test-route')
+    // Create pinia instance
+    const pinia = createTestingPinia({
+      stubActions: false,
+      createSpy: vi.fn,
+    })
+
+    // Mount the test component
+    wrapper = mount(TestComponent, {
+      global: {
+        plugins: [pinia, router],
+        stubs: {
+          RouterLink: true,
+        },
+      },
+    })
+
+    // Navigate to the first route and wait for it to be ready
+    await router.push('/')
+    await router.isReady()
+    await flushPromises()
+
+    api = getCurrentRouteAPI()
   })
 
-  it('initializes with an empty root state', async () => {
-    const step = useHStepper([])
-    //console.log('step', step)
-    expect(step.index()).toBe(0)
-    expect(step.current()).toBeUndefined()
+  afterEach(() => {
+    wrapper.unmount()
   })
 
-  // it('can push top-level states', () => {
-  //   const timeline = new TimelineStateMachine()
-  //   timeline.push('1')
-  //   timeline.push('2')
-  //   timeline.push('3')
-  //   expect(timeline.length).toBe(3)
+  it('should provide the useStepper method', async () => {
+    expect(api).toBeDefined()
+    expect(api.useHStepper).toBeDefined()
+    expect(api.useHStepper).toBeInstanceOf(Function)
+  })
+
+  it('should create the stepper', async () => {
+    const stepper = getCurrentRouteStepper()
+    expect(stepper).toBeDefined()
+  })
+
+  it('should include the key functions in the stepper', async () => {
+    const stepper = getCurrentRouteStepper()
+    expect(stepper).toBeDefined()
+    expect(stepper.next).toBeInstanceOf(Function)
+    expect(stepper.prev).toBeInstanceOf(Function)
+    expect(stepper.reset).toBeInstanceOf(Function)
+    expect(stepper.index).toBeInstanceOf(Function)
+    expect(stepper.current).toBeInstanceOf(Function)
+  })
+
+  it('should create a StepperStateMachine instance', async () => {
+    const stepper = getCurrentRouteStepper()
+    expect(stepper.sm).toBeInstanceOf(StepperStateMachine)
+  })
+
+  // it('should create a trial in the statemachine using push', async () => {
+  //   const stepper = getCurrentRouteStepper()
+  //   stepper.push({ name: 'test', value: 'test' })
+  //   expect(stepper.sm.states).toEqual(['test'])
   // })
 
-  // it('can create nested states', () => {
-  //   const timeline = new TimelineStateMachine()
-  //   timeline.push('1')
-  //   timeline[0].push('a')
-  //   timeline[0].push('b')
-
-  //   expect(timeline.length).toBe(1)
-  //   expect(timeline[0].states.length).toBe(2)
-  // })
-
-  // it('navigates through states correctly', () => {
-  //   const timeline = new TimelineStateMachine()
-  //   timeline.push('1')
-  //   timeline[0].push('a')
-  //   timeline[0].push('b')
-
-  //   expect(timeline.next()).toBe('a') // First child of '1'
-  //   expect(timeline.next()).toBe('b') // Second child of '1'
-  //   expect(timeline.prev()).toBe('a') // Back to first child
-  // })
-
-  // it('returns null when no more next states', () => {
-  //   const timeline = new TimelineStateMachine()
-  //   timeline.push('1')
-  //   timeline[0].push('a')
-
-  //   timeline.next() // Move to 'a'
-  //   expect(timeline.next()).toBe(null)
-  // })
-
-  // it('can peek at next and previous states without moving', () => {
-  //   const timeline = new TimelineStateMachine()
-  //   timeline.push('1')
-  //   timeline[0].push('a')
-  //   timeline[0].push('b')
-
-  //   timeline.next() // Move to 'a'
-  //   expect(timeline.peekNext()).toBe('b')
-  //   expect(timeline.getCurrentPath()).toEqual(['1', 'a']) // Position unchanged
-  // })
-
-  // it('can get current path', () => {
-  //   const timeline = new TimelineStateMachine()
-  //   timeline.push('1')
-  //   timeline[0].push('a')
-  //   timeline[0].states[0].push('x')
-
-  //   timeline.next() // Move to 'a'
-  //   timeline.next() // Move to 'x'
-  //   expect(timeline.getCurrentPath()).toEqual(['1', 'a', 'x'])
-  // })
-
-  // it('can set position by path', () => {
-  //   const timeline = new TimelineStateMachine()
-  //   timeline.push('1')
-  //   timeline[0].push('a')
-  //   timeline[0].states[0].push('x')
-  //   timeline[0].states[0].push('y')
-
-  //   timeline.setPosition('1-a-y')
-  //   expect(timeline.getCurrentPath().join('-')).toBe('1-a-y')
-  // })
-
-  // it('can be serialized and deserialized', () => {
-  //   const timeline = new TimelineStateMachine()
-  //   timeline.push('1')
-  //   timeline[0].push('a')
-  //   timeline[0].states[0].push('x')
-
-  //   const serialized = timeline.toString()
-  //   const newTimeline = TimelineStateMachine.fromString(serialized)
-
-  //   expect(newTimeline.length).toBe(timeline.length)
-  //   expect(newTimeline[0].states[0].states[0].value).toBe('x')
-  // })
-
-  // it('can get leaf nodes', () => {
-  //   const timeline = new TimelineStateMachine()
-  //   timeline.push('1')
-  //   timeline[0].push('a')
-  //   timeline[0].push('b')
-  //   timeline[0].states[0].push('x')
-  //   timeline[0].states[0].push('y')
-
-  //   const leafNodes = timeline.getLeafNodes()
-  //   expect(leafNodes).toContainEqual(['1', 'a', 'x'])
-  //   expect(leafNodes).toContainEqual(['1', 'a', 'y'])
-  //   expect(leafNodes).toContainEqual(['1', 'b'])
-  // })
-
-  // it('throws error when setting invalid position', () => {
-  //   const timeline = new TimelineStateMachine()
-  //   timeline.push('1')
-  //   timeline[0].push('a')
-
-  //   expect(() => timeline.setPosition('1-b-x')).toThrow('Invalid position')
+  // it('should provide the useStepper method', async () => {
+  //   const stepper = api.useHStepper()
+  //   expect(stepper).toBeInstanceOf(StepperStateMachine)
   // })
 })
