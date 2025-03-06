@@ -39,16 +39,57 @@ export class StepperStateMachine {
 
   /**
    * Pushes a new state to the current node
-   * @param {*} value - Optional value for the new state
+   * @param {*} value - Value for the new state
+   * @param {Object} [data=null] - Optional data to associate with the node
    * @returns {StepState} The newly created state
    * @throws {Error} If a state with the given value already exists
    */
-  push(value = null) {
+  push(value = null, data = null) {
     try {
-      return this.stepState.push(value)
+      const state = this.stepState.push(value)
+      if (data !== null) {
+        state.setData(data)
+      }
+      return state
     } catch (error) {
       throw new Error(`Push failed: ${error.message}`)
     }
+  }
+
+  /**
+   * Sets or updates data for the current node
+   * @param {Object} data - Data to associate with the node
+   */
+  setData(data) {
+    this.stepState.setData(data)
+  }
+
+  /**
+   * Gets data associated with the current node
+   * @returns {Object|null} The node's data or null if none exists
+   */
+  getData() {
+    return this.stepState.getData()
+  }
+
+  /**
+   * Sets data for a node at the specified path
+   * @param {Array|string} path - Path to the node (array of values or hyphen-separated string)
+   * @param {Object} data - Data to associate with the node
+   * @throws {Error} If the path doesn't exist
+   */
+  setDataAtPath(path, data) {
+    const pathArray = typeof path === 'string' ? path.split('-') : path
+    let current = this
+
+    for (const value of pathArray) {
+      current = current[value]
+      if (!current) {
+        throw new Error(`Invalid path: ${path}`)
+      }
+    }
+
+    current.setData(data)
   }
 
   /**

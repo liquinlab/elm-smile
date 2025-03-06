@@ -106,4 +106,54 @@ describe('StepperStateMachine', () => {
       expect(diagram).toContain('C')
     })
   })
+
+  describe('data management', () => {
+    it('should store data during push', () => {
+      const data = { test: 'value' }
+      stepper.push('first', data)
+      expect(stepper['first'].getData()).toEqual(data)
+    })
+
+    it('should allow setting data after creation', () => {
+      stepper.push('first')
+      const data = { test: 'value' }
+      stepper['first'].setData(data)
+      expect(stepper['first'].getData()).toEqual(data)
+    })
+
+    it('should update existing data', () => {
+      stepper.push('first', { initial: 'data' })
+      const newData = { updated: 'value' }
+      stepper['first'].setData(newData)
+      expect(stepper['first'].getData()).toEqual(newData)
+    })
+
+    it('should set data at specified path', () => {
+      stepper.push('first')
+      stepper['first'].push('second')
+      stepper['first']['second'].push('third')
+
+      const data = { test: 'value' }
+      stepper.setDataAtPath(['first', 'second'], data)
+      expect(stepper['first']['second'].getData()).toEqual(data)
+    })
+
+    it('should set data using string path', () => {
+      stepper.push('first')
+      stepper['first'].push('second')
+
+      const data = { test: 'value' }
+      stepper.setDataAtPath('first-second', data)
+      expect(stepper['first']['second'].getData()).toEqual(data)
+    })
+
+    it('should throw error for invalid path in setDataAtPath', () => {
+      expect(() => stepper.setDataAtPath('nonexistent', {})).toThrow('Invalid path')
+    })
+
+    it('should return null for nodes without data', () => {
+      stepper.push('first')
+      expect(stepper['first'].getData()).toBeNull()
+    })
+  })
 })
