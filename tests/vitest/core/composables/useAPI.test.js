@@ -1,15 +1,17 @@
 /* eslint-disable no-undef */
+// general testing functions
 import { defineComponent, h } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { createTestingPinia } from '@pinia/testing'
 import { mount, flushPromises } from '@vue/test-utils'
 import { vi, describe, beforeEach, afterEach, it, expect } from 'vitest'
+
+// import shared mocks
 import '../../setup/mocks' // Import shared mocks
 import { setupBrowserEnvironment } from '../../setup/mocks'
-import useAPI from '@/core/composables/useAPI'
 
-let router
-let wrapper
+// import the composable
+import useAPI from '@/core/composables/useAPI'
 
 // Create a test component that uses the composable
 const TestComponent = defineComponent({
@@ -52,22 +54,11 @@ const routes = [
 ]
 
 describe('useAPI composable', () => {
-  // Add variables to hold spies
+  let router
+  let wrapper
   let api
-  let logStore
-  let debugSpy
-  let logSpy
-  let warnSpy
-  let errorSpy
-  let successSpy
-  let clearPageHistorySpy
-  let addToHistorySpy
-  let resetAppSpy
-  let resetLocalSpy
-  let localStorageRemoveSpy
 
   beforeAll(() => {
-    //setActivePinia(createPinia())
     setupBrowserEnvironment()
   })
 
@@ -101,21 +92,18 @@ describe('useAPI composable', () => {
 
     // Get API and create spies
     api = wrapper.vm.api
-    logStore = api.log
 
-    // Create spies for the log methods
-    debugSpy = vi.spyOn(logStore, 'debug')
-    logSpy = vi.spyOn(logStore, 'log')
-    warnSpy = vi.spyOn(logStore, 'warn')
-    errorSpy = vi.spyOn(logStore, 'error')
-    successSpy = vi.spyOn(logStore, 'success')
-    clearPageHistorySpy = vi.spyOn(logStore, 'clear_page_history')
-    addToHistorySpy = vi.spyOn(logStore, 'add_to_history')
-
-    // Create spies for the store methods
-    resetAppSpy = vi.spyOn(api.store, 'resetApp')
-    resetLocalSpy = vi.spyOn(api.store, 'resetLocal')
-    localStorageRemoveSpy = vi.spyOn(window.localStorage, 'removeItem')
+    // Create spies for all methods
+    vi.spyOn(api.log, 'debug')
+    vi.spyOn(api.log, 'log')
+    vi.spyOn(api.log, 'warn')
+    vi.spyOn(api.log, 'error')
+    vi.spyOn(api.log, 'success')
+    vi.spyOn(api.log, 'clear_page_history')
+    vi.spyOn(api.log, 'add_to_history')
+    vi.spyOn(api.store, 'resetApp')
+    vi.spyOn(api.store, 'resetLocal')
+    vi.spyOn(window.localStorage, 'removeItem')
   })
 
   afterEach(() => {
@@ -147,7 +135,7 @@ describe('useAPI composable', () => {
     expect(api.shuffle).toBeInstanceOf(Function)
     expect(api.sampleWithReplacement).toBeInstanceOf(Function)
     expect(api.sampleWithoutReplacement).toBeInstanceOf(Function)
-    expect(api.useStepper).toBeInstanceOf(Function)
+    expect(api.useHStepper).toBeInstanceOf(Function)
 
     // Check URL helpers
     expect(api.urls).toBeDefined()
@@ -279,16 +267,16 @@ describe('useAPI composable', () => {
   it('should reset app state correctly', () => {
     // Test resetApp
     api.resetApp()
-    expect(resetAppSpy).toHaveBeenCalled()
+    expect(api.store.resetApp).toHaveBeenCalled()
 
     // Test resetStore
     api.resetStore()
-    expect(resetLocalSpy).toHaveBeenCalled()
+    expect(api.store.resetLocal).toHaveBeenCalled()
 
     // Test resetLocalState
     api.resetLocalState()
-    expect(localStorageRemoveSpy).toHaveBeenCalledWith(api.config.local_storage_key)
-    expect(resetLocalSpy).toHaveBeenCalled()
+    expect(window.localStorage.removeItem).toHaveBeenCalledWith(api.config.local_storage_key)
+    expect(api.store.resetLocal).toHaveBeenCalled()
   })
 
   it('should manage app components correctly', () => {
@@ -321,24 +309,24 @@ describe('useAPI composable', () => {
   it('should handle logging correctly', () => {
     // Test log methods
     api.log.debug('test debug')
-    expect(debugSpy).toHaveBeenCalledWith('test debug')
+    expect(api.log.debug).toHaveBeenCalledWith('test debug')
 
     api.log.log('test log')
-    expect(logSpy).toHaveBeenCalledWith('test log')
+    expect(api.log.log).toHaveBeenCalledWith('test log')
 
     api.log.warn('test warn')
-    expect(warnSpy).toHaveBeenCalledWith('test warn')
+    expect(api.log.warn).toHaveBeenCalledWith('test warn')
 
     api.log.error('test error')
-    expect(errorSpy).toHaveBeenCalledWith('test error')
+    expect(api.log.error).toHaveBeenCalledWith('test error')
 
     api.log.success('test success')
-    expect(successSpy).toHaveBeenCalledWith('test success')
+    expect(api.log.success).toHaveBeenCalledWith('test success')
 
     api.log.clear_page_history()
-    expect(clearPageHistorySpy).toHaveBeenCalled()
+    expect(api.log.clear_page_history).toHaveBeenCalled()
 
     api.log.add_to_history('test history')
-    expect(addToHistorySpy).toHaveBeenCalledWith('test history')
+    expect(api.log.add_to_history).toHaveBeenCalledWith('test history')
   })
 })
