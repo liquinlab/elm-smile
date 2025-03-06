@@ -51,40 +51,4 @@ export function useStepper(trials) {
   }
 }
 
-/*
-export function useTrialStepper(trials, page, finishedCallback) {
-  log.log('using trial stepper')
-  const smilestore = useSmileStore()
-  log.log(smilestore.local)
-  const index = smilestore.getPage[page]
-  log.log(index)
-  log.log(smilestore.getLocal)
-  log.log(smilestore.getLocal.pageTracker)
-  const n_trials = trials.length
-  const trial = ref(trials[index])
-  log.log(trial)
-
-  function nextTrial() {
-    log.log('next trial please')
-    if (index < n_trials - 1) {
-      //smilestore.incrementPageTracker(page)
-      index += 1
-      log.log(trial)
-      trial.value = trials[index]
-      log.log(trial)
-    } else {
-      finishedCallback()
-    }
-  }
-
-  function prevTrial() {
-    if (index > 0) {
-      //index.value = smilestore.decrementPageTracker(page)
-      trial.value = trials[index]
-    }
-  }
-  return { index, trial, nextTrial, prevTrial }
-}
-*/
-//export { useTrialStepper, useStatelessTrialStepper }
 export default useStepper
