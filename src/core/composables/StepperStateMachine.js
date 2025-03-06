@@ -2,7 +2,9 @@ import { StepState } from './StepState'
 
 // todo items
 // -- get position by giving a path and then testing you can step foward correctly
-// -- instead of initalizing off of push give an array or nested array and build the timeline that way
+// -- instead of initalizing off of push give an array or nested array and
+// build the timeline that way
+// -- jspsych compatibility mode?
 // -- should have option to append
 // -- delete tree and start over
 // -- check serializing

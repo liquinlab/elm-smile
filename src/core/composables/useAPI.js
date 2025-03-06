@@ -17,7 +17,7 @@ import {
 
 // import the trial stepper functionality which advances linearly through
 // a set of trials
-import { useStepper } from '@/core/composables/useStepper'
+import { useHStepper } from '@/core/composables/useHStepper'
 
 import useLog from '@/core/stores/log'
 
@@ -65,7 +65,7 @@ export default function useAPI() {
     shuffle,
     sampleWithReplacement,
     sampleWithoutReplacement,
-    useStepper,
+    useHStepper,
 
     // URL helpers
     urls: store.global.urls,
