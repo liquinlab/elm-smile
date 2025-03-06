@@ -94,8 +94,8 @@ export function useHStepper() {
     outer() {
       throw new Error('outer() must be called after new()')
     },
-    delete() {
-      throw new Error('delete() must be called after new()')
+    range() {
+      throw new Error('range() must be called after new()')
     },
 
     // Chainable methods for trial building
@@ -103,35 +103,28 @@ export function useHStepper() {
       const tableId = uuidv4()
       const table = {
         rows: [],
-        deleted: false,
 
         get length() {
-          this.checkDeleted()
           return this.rows.length
         },
 
         [Symbol.iterator]() {
-          this.checkDeleted()
           return this.rows[Symbol.iterator]()
         },
 
         get [Symbol.isConcatSpreadable]() {
-          this.checkDeleted()
           return true
         },
 
         indexOf(...args) {
-          this.checkDeleted()
           return this.rows.indexOf(...args)
         },
 
         slice(...args) {
-          this.checkDeleted()
           return this.rows.slice(...args)
         },
 
         append(input) {
-          this.checkDeleted()
           if (Array.isArray(input)) {
             const newLength = this.rows.length + input.length
             if (newLength > config.max_stepper_rows) {
@@ -153,7 +146,6 @@ export function useHStepper() {
         },
 
         shuffle(seed) {
-          this.checkDeleted()
           // Only create a new RNG if a seed is provided
           // Otherwise use the global seeded RNG that was set by the router
           const rng = seed ? seedrandom(seed) : Math.random
@@ -167,7 +159,6 @@ export function useHStepper() {
         },
 
         sample(options = {}) {
-          this.checkDeleted()
           if (this.rows.length === 0) return this
 
           const type = options.type || 'without-replacement'
@@ -328,7 +319,6 @@ export function useHStepper() {
         },
 
         repeat(n) {
-          this.checkDeleted()
           if (n <= 0 || this.rows.length === 0) return this
           const totalRows = this.rows.length * n
           if (totalRows > config.max_stepper_rows) {
@@ -343,14 +333,23 @@ export function useHStepper() {
           return this
         },
 
+        range(n) {
+          if (n <= 0) {
+            throw new Error('range() must be called with a positive integer')
+          }
+          const rows = Array(n)
+            .fill(null)
+            .map((_, i) => ({ index: i }))
+          this.rows = [...this.rows, ...rows]
+          return this
+        },
+
         push() {
-          this.checkDeleted()
           // To be implemented
           return this
         },
 
         forEach(callback) {
-          this.checkDeleted()
           this.rows = this.rows.map((row, index) => {
             const modifiedRow = callback(row, index)
             return modifiedRow || row
@@ -359,7 +358,6 @@ export function useHStepper() {
         },
 
         zip(trials, options = {}) {
-          this.checkDeleted()
           if (typeof trials !== 'object' || trials === null) {
             throw new Error('zip() requires an object with arrays as values')
           }
@@ -433,7 +431,6 @@ export function useHStepper() {
         },
 
         outer(trials, options = {}) {
-          this.checkDeleted()
           if (typeof trials !== 'object' || trials === null) {
             throw new Error('outer() requires an object with arrays as values')
           }
@@ -477,27 +474,11 @@ export function useHStepper() {
           this.rows = [...this.rows, ...outerRows]
           return this
         },
-
-        checkDeleted() {
-          if (this.deleted) throw new Error('Table has been deleted')
-        },
-
-        delete() {
-          this.checkDeleted()
-          this.deleted = true
-          trialTables.delete(tableId)
-          // Don't return this to end the chain
-        },
       }
 
       // Create a proxy to handle array indexing
       const proxiedTable = new Proxy(table, {
         get(target, prop) {
-          // Check deleted state before any property access
-          if (prop !== 'deleted' && prop !== 'checkDeleted') {
-            target.checkDeleted()
-          }
-
           // Handle numeric indexing
           if (typeof prop === 'string' && !isNaN(prop)) {
             return target.rows[parseInt(prop)]

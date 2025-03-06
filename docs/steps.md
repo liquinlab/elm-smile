@@ -273,6 +273,49 @@ const table = stepper
 // ]
 ```
 
+#### Creating Sequences with range()
+
+The `range()` method allows you to create a sequence of trials with incrementing
+index values. This is particularly useful when you need to create a series of
+numbered trials or when you want to build a sequence that you'll modify later:
+
+```js
+const table = stepper.new().range(3)
+
+// Results in:
+// [
+//   { index: 0 },
+//   { index: 1 },
+//   { index: 2 }
+// ]
+```
+
+You can combine `range()` with other methods like `forEach()` to create more
+complex sequences:
+
+```js
+const table = stepper
+  .new()
+  .range(2)
+  .forEach((row) => ({
+    ...row,
+    condition: row.index % 2 === 0 ? 'A' : 'B',
+  }))
+
+// Results in:
+// [
+//   { index: 0, condition: 'A' },
+//   { index: 1, condition: 'B' }
+// ]
+```
+
+::: warning Positive Numbers Only
+
+The `range()` method requires a positive integer as its argument. It will throw
+an error if called with zero or a negative number.
+
+:::
+
 #### Modifying Trials with forEach()
 
 The `forEach()` method allows you to modify each trial:

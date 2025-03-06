@@ -190,8 +190,8 @@ describe('useHStepper composable', () => {
       expect(table.push).toBeInstanceOf(Function)
       expect(table.forEach).toBeInstanceOf(Function)
       expect(table.zip).toBeInstanceOf(Function)
+      expect(table.range).toBeInstanceOf(Function)
       expect(table.outer).toBeInstanceOf(Function)
-      expect(table.delete).toBeInstanceOf(Function)
       expect(table.length).toBeDefined()
       expect(table.indexOf).toBeInstanceOf(Function)
       expect(table.slice).toBeInstanceOf(Function)
@@ -203,7 +203,7 @@ describe('useHStepper composable', () => {
       const stepper = getCurrentRouteStepper()
 
       // Test all chainable methods
-      const methods = ['append', 'shuffle', 'sample', 'repeat', 'push', 'forEach', 'zip', 'outer', 'delete']
+      const methods = ['append', 'shuffle', 'sample', 'repeat', 'push', 'forEach', 'zip', 'outer', 'range']
 
       methods.forEach((method) => {
         expect(() => {
@@ -379,17 +379,6 @@ describe('useHStepper composable', () => {
       expect(table1.rows[1]).toEqual({ color: 'blue', shape: 'square' })
     })
 
-    it('should throw error when append would exceed safety limit', async () => {
-      const stepper = getCurrentRouteStepper()
-
-      // Create an array that would exceed the limit when appended
-      const largeArray = Array(config.max_stepper_rows + 1).fill({ color: 'red', shape: 'circle' })
-
-      expect(() => {
-        stepper.new().append(largeArray)
-      }).toThrow(/append\(\) would generate \d+ rows, which exceeds the safety limit of \d+/)
-    })
-
     it('should throw error when appending table would exceed safety limit', async () => {
       const stepper = getCurrentRouteStepper()
       const smallTable = stepper.new().append([{ color: 'blue', shape: 'square' }])
@@ -400,6 +389,36 @@ describe('useHStepper composable', () => {
           .append(Array(config.max_stepper_rows + 1).fill({ color: 'red', shape: 'circle' }))
         smallTable.append(largeTable)
       }).toThrow(/append\(\) would generate \d+ rows, which exceeds the safety limit of \d+/)
+    })
+
+    describe('range functionality', () => {
+      it('should throw error if range is called before new', async () => {
+        const stepper = getCurrentRouteStepper()
+        expect(() => {
+          stepper.range(10)
+        }).toThrow('range() must be called after new()')
+      })
+
+      it('should create a range of rows', async () => {
+        const stepper = getCurrentRouteStepper()
+        const table = stepper.new().range(10)
+        expect(table.rows).toHaveLength(10)
+
+        for (let i = 0; i < 10; i++) {
+          expect(table.rows[i]).toEqual({ index: i })
+        }
+      })
+
+      it('should throw error if range is called with non-positive number', async () => {
+        const stepper = getCurrentRouteStepper()
+        expect(() => {
+          stepper.new().range(0)
+        }).toThrow('range() must be called with a positive integer')
+
+        expect(() => {
+          stepper.new().range(-1)
+        }).toThrow('range() must be called with a positive integer')
+      })
     })
 
     describe('zip functionality', () => {
@@ -840,65 +859,6 @@ describe('useHStepper composable', () => {
           { color: 'blue', shape: 'square' },
           { color: 'green', shape: 'circle' },
         ])
-      })
-    })
-
-    describe('delete functionality', () => {
-      it('should throw error if delete() is called before new()', async () => {
-        const stepper = getCurrentRouteStepper()
-        expect(() => {
-          stepper.delete()
-        }).toThrow('delete() must be called after new()')
-      })
-
-      it('should delete the table and end the chain', async () => {
-        const stepper = getCurrentRouteStepper()
-        const table = stepper.new()
-
-        // Add some data to the table
-        table.append([
-          { color: 'red', shape: 'triangle' },
-          { color: 'blue', shape: 'square' },
-        ])
-
-        // Delete should not return this for chaining
-        const result = table.delete()
-        expect(result).toBeUndefined()
-      })
-
-      it('should prevent using table methods after deletion', async () => {
-        const stepper = getCurrentRouteStepper()
-        const table = stepper.new()
-
-        // Add some data and delete
-        table.append([{ color: 'red', shape: 'triangle' }]).delete()
-
-        // Test all chainable methods throw after deletion
-        const methods = ['append', 'shuffle', 'sample', 'repeat', 'push', 'forEach', 'zip', 'outer']
-
-        methods.forEach((method) => {
-          expect(() => {
-            table[method]()
-          }).toThrow('Table has been deleted')
-        })
-
-        // Test array-like access throws after deletion
-        expect(() => table.length).toThrow('Table has been deleted')
-        expect(() => table.rows).toThrow('Table has been deleted')
-        expect(() => table[0]).toThrow('Table has been deleted')
-        expect(() => [...table]).toThrow('Table has been deleted')
-        expect(() => table.slice()).toThrow('Table has been deleted')
-        expect(() => table.indexOf({})).toThrow('Table has been deleted')
-      })
-
-      it('should throw error when trying to delete an already deleted table', async () => {
-        const stepper = getCurrentRouteStepper()
-        const table = stepper.new()
-
-        table.delete()
-        expect(() => {
-          table.delete()
-        }).toThrow('Table has been deleted')
       })
     })
 
