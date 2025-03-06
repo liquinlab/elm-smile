@@ -32,7 +32,7 @@ vi.mock('firebase/firestore', () => ({
 
 vi.mock('@/core/config', () => ({
   default: {
-    mode: 'testing',
+    mode: 'production',
     project_ref: 'test-project',
     project_name: 'Test Project',
     code_name: 'test-code',
