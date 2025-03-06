@@ -5,6 +5,7 @@ import useLog from '@/core/stores/log'
 import { useRoute } from 'vue-router'
 import { StepperStateMachine } from '@/core/composables/StepperStateMachine'
 import config from '@/core/config'
+import { v4 as uuidv4 } from 'uuid'
 
 export function useHStepper() {
   const smilestore = useSmileStore()
@@ -69,7 +70,7 @@ export function useHStepper() {
 
     // Chainable methods for trial building
     new() {
-      const tableId = Date.now().toString()
+      const tableId = uuidv4()
       const table = {
         rows: [],
         get length() {
