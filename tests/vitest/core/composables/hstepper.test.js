@@ -1022,5 +1022,523 @@ describe('useHStepper composable', () => {
         expect(table.rows[3]).toEqual({ id: 4, value: 'd' })
       })
     })
+
+    describe('sample functionality', () => {
+      it('should throw error if sample is called before new', async () => {
+        const stepper = getCurrentRouteStepper()
+        expect(() => {
+          stepper.sample()
+        }).toThrow('sample() must be called after new()')
+      })
+
+      it('should handle empty table', async () => {
+        const stepper = getCurrentRouteStepper()
+        const table = stepper.new()
+        table.sample({ type: 'without-replacement', size: 5 })
+        expect(table.rows).toEqual([])
+      })
+
+      describe('with-replacement sampling', () => {
+        it('should require size parameter', async () => {
+          const stepper = getCurrentRouteStepper()
+          const table = stepper.new().append([
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+          ])
+
+          expect(() => {
+            table.sample({ type: 'with-replacement' })
+          }).toThrow('size parameter is required for with-replacement sampling')
+        })
+
+        it('should sample with replacement', async () => {
+          const stepper = getCurrentRouteStepper()
+          const data = [
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+            { id: 3, value: 'c' },
+          ]
+
+          const table = stepper.new().append(data)
+          table.sample({ type: 'with-replacement', size: 5 })
+
+          expect(table.rows).toHaveLength(5)
+          // Check that all sampled items are from the original data
+          table.rows.forEach((row) => {
+            expect(data).toContainEqual(row)
+          })
+        })
+
+        it('should produce consistent results with same seed', async () => {
+          const stepper = getCurrentRouteStepper()
+          const data = [
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+            { id: 3, value: 'c' },
+          ]
+
+          // Create two tables with same data
+          const table1 = stepper.new().append(data)
+          const table2 = stepper.new().append(data)
+
+          // Sample both with same seed
+          table1.sample({ type: 'with-replacement', size: 5, seed: 'test-seed-123' })
+          table2.sample({ type: 'with-replacement', size: 5, seed: 'test-seed-123' })
+
+          // They should have the same order
+          expect(table1.rows.map((r) => r.id)).toEqual(table2.rows.map((r) => r.id))
+        })
+
+        it('should handle weighted sampling', async () => {
+          const stepper = getCurrentRouteStepper()
+          const data = [
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+            { id: 3, value: 'c' },
+          ]
+
+          const table = stepper.new().append(data)
+          table.sample({
+            type: 'with-replacement',
+            size: 1000,
+            weights: [0.5, 0.3, 0.2],
+            seed: 'test-seed-123',
+          })
+
+          // Count occurrences
+          const counts = table.rows.reduce((acc, row) => {
+            acc[row.id] = (acc[row.id] || 0) + 1
+            return acc
+          }, {})
+
+          // With these weights, we expect roughly:
+          // id 1: ~500 occurrences
+          // id 2: ~300 occurrences
+          // id 3: ~200 occurrences
+          expect(counts[1]).toBeGreaterThan(450)
+          expect(counts[1]).toBeLessThan(550)
+          expect(counts[2]).toBeGreaterThan(250)
+          expect(counts[2]).toBeLessThan(350)
+          expect(counts[3]).toBeGreaterThan(150)
+          expect(counts[3]).toBeLessThan(250)
+        })
+
+        it('should throw error when weights length does not match table length', async () => {
+          const stepper = getCurrentRouteStepper()
+          const data = [
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+            { id: 3, value: 'c' },
+          ]
+
+          const table = stepper.new().append(data)
+
+          // Test with too few weights
+          expect(() => {
+            table.sample({
+              type: 'with-replacement',
+              size: 5,
+              weights: [0.5, 0.3], // Only 2 weights for 3 items
+              seed: 'test-seed-123',
+            })
+          }).toThrow('Weights array length must match the number of trials')
+
+          // Test with too many weights
+          expect(() => {
+            table.sample({
+              type: 'with-replacement',
+              size: 5,
+              weights: [0.5, 0.3, 0.2, 0.1], // 4 weights for 3 items
+              seed: 'test-seed-123',
+            })
+          }).toThrow('Weights array length must match the number of trials')
+        })
+      })
+
+      describe('without-replacement sampling', () => {
+        it('should require size parameter', async () => {
+          const stepper = getCurrentRouteStepper()
+          const table = stepper.new().append([
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+          ])
+
+          expect(() => {
+            table.sample({ type: 'without-replacement' })
+          }).toThrow('size parameter is required for without-replacement sampling')
+        })
+
+        it('should not allow size larger than available trials', async () => {
+          const stepper = getCurrentRouteStepper()
+          const table = stepper.new().append([
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+          ])
+
+          expect(() => {
+            table.sample({ type: 'without-replacement', size: 3 })
+          }).toThrow('Sample size cannot be larger than the number of available trials')
+        })
+
+        it('should sample without replacement', async () => {
+          const stepper = getCurrentRouteStepper()
+          const data = [
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+            { id: 3, value: 'c' },
+            { id: 4, value: 'd' },
+          ]
+
+          const table = stepper.new().append(data)
+          table.sample({ type: 'without-replacement', size: 2 })
+
+          expect(table.rows).toHaveLength(2)
+          // Check that no item appears twice
+          const ids = table.rows.map((r) => r.id)
+          expect(new Set(ids).size).toBe(2)
+          // Check that all sampled items are from the original data
+          table.rows.forEach((row) => {
+            expect(data).toContainEqual(row)
+          })
+        })
+
+        it('should produce consistent results with same seed', async () => {
+          const stepper = getCurrentRouteStepper()
+          const data = [
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+            { id: 3, value: 'c' },
+            { id: 4, value: 'd' },
+          ]
+
+          // Create two tables with same data
+          const table1 = stepper.new().append(data)
+          const table2 = stepper.new().append(data)
+
+          // Sample both with same seed
+          table1.sample({ type: 'without-replacement', size: 2, seed: 'test-seed-123' })
+          table2.sample({ type: 'without-replacement', size: 2, seed: 'test-seed-123' })
+
+          // They should have the same order
+          expect(table1.rows.map((r) => r.id)).toEqual(table2.rows.map((r) => r.id))
+        })
+      })
+
+      describe('fixed-repetitions sampling', () => {
+        it('should require size parameter', async () => {
+          const stepper = getCurrentRouteStepper()
+          const table = stepper.new().append([
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+          ])
+
+          expect(() => {
+            table.sample({ type: 'fixed-repetitions' })
+          }).toThrow('size parameter is required for fixed-repetitions sampling')
+        })
+
+        it('should repeat each trial size times', async () => {
+          const stepper = getCurrentRouteStepper()
+          const data = [
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+          ]
+
+          const table = stepper.new().append(data)
+          table.sample({ type: 'fixed-repetitions', size: 3 })
+
+          expect(table.rows).toHaveLength(6) // 2 trials * 3 repetitions
+          // Count occurrences of each trial
+          const counts = table.rows.reduce((acc, row) => {
+            acc[row.id] = (acc[row.id] || 0) + 1
+            return acc
+          }, {})
+          expect(counts[1]).toBe(3)
+          expect(counts[2]).toBe(3)
+        })
+
+        it('should shuffle the result', async () => {
+          const stepper = getCurrentRouteStepper()
+          const data = [
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+          ]
+
+          const table = stepper.new().append(data)
+          table.sample({ type: 'fixed-repetitions', size: 3, seed: 'test-seed-123' })
+
+          // The order should be different from the original
+          expect(table.rows.map((r) => r.id)).not.toEqual([1, 1, 1, 2, 2, 2])
+        })
+
+        it('should produce consistent results with same seed', async () => {
+          const stepper = getCurrentRouteStepper()
+          const data = [
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+          ]
+
+          // Create two tables with same data
+          const table1 = stepper.new().append(data)
+          const table2 = stepper.new().append(data)
+
+          // Sample both with same seed
+          table1.sample({ type: 'fixed-repetitions', size: 3, seed: 'test-seed-123' })
+          table2.sample({ type: 'fixed-repetitions', size: 3, seed: 'test-seed-123' })
+
+          // They should have the same order
+          expect(table1.rows.map((r) => r.id)).toEqual(table2.rows.map((r) => r.id))
+        })
+      })
+
+      describe('alternate-groups sampling', () => {
+        it('should require groups parameter', async () => {
+          const stepper = getCurrentRouteStepper()
+          const table = stepper.new().append([
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+          ])
+
+          expect(() => {
+            table.sample({ type: 'alternate-groups' })
+          }).toThrow('groups parameter is required for alternate-groups sampling')
+        })
+
+        it('should require at least two groups', async () => {
+          const stepper = getCurrentRouteStepper()
+          const table = stepper.new().append([
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+          ])
+
+          expect(() => {
+            table.sample({ type: 'alternate-groups', groups: [[0]] })
+          }).toThrow('groups must be an array with at least two groups')
+        })
+
+        it('should alternate between groups', async () => {
+          const stepper = getCurrentRouteStepper()
+          const data = [
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+            { id: 3, value: 'c' },
+            { id: 4, value: 'd' },
+          ]
+
+          const table = stepper.new().append(data)
+          table.sample({
+            type: 'alternate-groups',
+            groups: [
+              [0, 2],
+              [1, 3],
+            ], // Group 1: [a, c], Group 2: [b, d]
+          })
+
+          // Should alternate between groups: [a, b, c, d]
+          expect(table.rows.map((r) => r.id)).toEqual([1, 2, 3, 4])
+        })
+
+        it('should handle groups of different sizes', async () => {
+          const stepper = getCurrentRouteStepper()
+          const data = [
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+            { id: 3, value: 'c' },
+            { id: 4, value: 'd' },
+            { id: 5, value: 'e' },
+          ]
+
+          const table = stepper.new().append(data)
+          table.sample({
+            type: 'alternate-groups',
+            groups: [
+              [0, 1],
+              [2, 3, 4],
+            ], // Group 1: [a, b], Group 2: [c, d, e]
+          })
+
+          // Should alternate between groups until shortest group is exhausted
+          // and then continue with remaining elements from longer group
+          expect(table.rows.map((r) => r.id)).toEqual([1, 3, 2, 4, 5])
+        })
+
+        it('should randomize group order when requested', async () => {
+          const stepper = getCurrentRouteStepper()
+          const data = [
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+            { id: 3, value: 'c' },
+            { id: 4, value: 'd' },
+          ]
+
+          const table = stepper.new().append(data)
+          table.sample({
+            type: 'alternate-groups',
+            groups: [
+              [0, 2],
+              [1, 3],
+            ],
+            randomize_group_order: true,
+            seed: 'test-seed-123',
+          })
+
+          // The order should be different from the default
+          // With this seed, the groups should be in reverse order
+          expect(table.rows.map((r) => r.id)).toEqual([2, 4, 1, 3])
+        })
+
+        it('should produce consistent results with same seed', async () => {
+          const stepper = getCurrentRouteStepper()
+          const data = [
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+            { id: 3, value: 'c' },
+            { id: 4, value: 'd' },
+          ]
+
+          // Create two tables with same data
+          const table1 = stepper.new().append(data)
+          const table2 = stepper.new().append(data)
+
+          // Sample both with same seed
+          table1.sample({
+            type: 'alternate-groups',
+            groups: [
+              [0, 2],
+              [1, 3],
+            ],
+            randomize_group_order: true,
+            seed: 'test-seed-123',
+          })
+          table2.sample({
+            type: 'alternate-groups',
+            groups: [
+              [0, 2],
+              [1, 3],
+            ],
+            randomize_group_order: true,
+            seed: 'test-seed-123',
+          })
+
+          // They should have the same order
+          expect(table1.rows.map((r) => r.id)).toEqual(table2.rows.map((r) => r.id))
+        })
+
+        it('should validate group indices', async () => {
+          const stepper = getCurrentRouteStepper()
+          const table = stepper.new().append([
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+          ])
+
+          expect(() => {
+            table.sample({
+              type: 'alternate-groups',
+              groups: [[0, 2], [1]], // Invalid index 2
+            })
+          }).toThrow('Invalid index 2 in group 0')
+        })
+      })
+
+      describe('custom sampling', () => {
+        it('should require fn parameter', async () => {
+          const stepper = getCurrentRouteStepper()
+          const table = stepper.new().append([
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+          ])
+
+          expect(() => {
+            table.sample({ type: 'custom' })
+          }).toThrow('fn parameter is required for custom sampling')
+        })
+
+        it('should require fn to be a function', async () => {
+          const stepper = getCurrentRouteStepper()
+          const table = stepper.new().append([
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+          ])
+
+          expect(() => {
+            table.sample({ type: 'custom', fn: 'not a function' })
+          }).toThrow('fn must be a function')
+        })
+
+        it('should use custom sampling function', async () => {
+          const stepper = getCurrentRouteStepper()
+          const data = [
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+            { id: 3, value: 'c' },
+          ]
+
+          const table = stepper.new().append(data)
+          table.sample({
+            type: 'custom',
+            fn: (indices) => indices.reverse(), // Reverse the order
+          })
+
+          expect(table.rows.map((r) => r.id)).toEqual([3, 2, 1])
+        })
+
+        it('should validate custom function output', async () => {
+          const stepper = getCurrentRouteStepper()
+          const table = stepper.new().append([
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+          ])
+
+          expect(() => {
+            table.sample({
+              type: 'custom',
+              fn: () => 'not an array',
+            })
+          }).toThrow('Custom sampling function must return an array')
+        })
+
+        it('should validate custom function indices', async () => {
+          const stepper = getCurrentRouteStepper()
+          const table = stepper.new().append([
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+          ])
+
+          expect(() => {
+            table.sample({
+              type: 'custom',
+              fn: () => [2], // Invalid index
+            })
+          }).toThrow('Invalid index 2 returned by custom sampling function')
+        })
+      })
+
+      it('should throw error for invalid sampling type', async () => {
+        const stepper = getCurrentRouteStepper()
+        const table = stepper.new().append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ])
+
+        expect(() => {
+          table.sample({ type: 'invalid-type' })
+        }).toThrow('Invalid sampling type: invalid-type')
+      })
+
+      it('should throw error when exceeding safety limit', async () => {
+        const stepper = getCurrentRouteStepper()
+        const table = stepper.new().append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ])
+
+        expect(() => {
+          table.sample({
+            type: 'with-replacement',
+            size: config.max_stepper_rows + 1,
+          })
+        }).toThrow(/sample\(\) would generate \d+ rows, which exceeds the safety limit/)
+      })
+    })
   })
 })

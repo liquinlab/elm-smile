@@ -55,8 +55,9 @@ const stepper = api.useHStepper()
 ### Building Trial Tables
 
 The `useHStepper` provides a powerful API for building and manipulating trial
-tables. The main method for creating a new table is `new()`, which returns a
-table object with various chainable methods for building your trials.
+tables, inspired by jsPsych's timeline system. The main method for creating a
+new table is `new()`, which returns a table object with various chainable
+methods for building your trials.
 
 #### Basic Table Creation and Appending
 
@@ -343,6 +344,106 @@ seed (see [Randomization](/randomization) for details). This ensures that:
 1. Each participant gets a unique but reproducible order
 2. The order remains consistent if the page is refreshed
 3. You can recreate any participant's exact trial order using their seed ID
+
+:::
+
+#### Sampling Trials
+
+The `sample()` method provides various ways to sample from your trials, all of
+which respect Smile's seeded randomization system (see
+[Randomization](/randomization) for details). The method supports several
+sampling types:
+
+```js
+const table = stepper.new().append([
+  { id: 1, shape: 'circle', color: 'red' },
+  { id: 2, shape: 'square', color: 'green' },
+  { id: 3, shape: 'triangle', color: 'blue' },
+  { id: 4, shape: 'star', color: 'yellow' },
+])
+```
+
+##### With Replacement Sampling
+
+Sample trials with replacement, allowing each trial to be selected multiple
+times:
+
+```js
+// Sample 5 trials with replacement
+table.sample({ type: 'with-replacement', size: 5, seed: 'test-seed-123' })
+
+// Weighted sampling
+table.sample({
+  type: 'with-replacement',
+  size: 5,
+  weights: [0.5, 0.3, 0.2], // Higher weights = more likely to be selected
+  seed: 'test-seed-123',
+})
+```
+
+##### Without Replacement Sampling
+
+Sample trials without replacement, ensuring each trial appears at most once:
+
+```js
+// Sample 2 trials without replacement
+table.sample({ type: 'without-replacement', size: 2, seed: 'test-seed-123' })
+```
+
+##### Fixed Repetitions Sampling
+
+Repeat each trial a fixed number of times and shuffle the result:
+
+```js
+// Repeat each trial 3 times and shuffle
+table.sample({ type: 'fixed-repetitions', size: 3, seed: 'test-seed-123' })
+```
+
+##### Alternate Groups Sampling
+
+Sample trials by alternating between predefined groups:
+
+```js
+// Define groups and alternate between them
+table.sample({
+  type: 'alternate-groups',
+  groups: [
+    [0, 2], // First group: trials 1 and 3
+    [1, 3], // Second group: trials 2 and 4
+  ],
+  randomize_group_order: true, // Optional: randomize the order of groups
+  seed: 'test-seed-123',
+})
+```
+
+##### Custom Sampling
+
+Define your own sampling function:
+
+```js
+// Use a custom function to determine the order
+table.sample({
+  type: 'custom',
+  fn: (indices) => indices.reverse(), // Example: reverse the order
+})
+```
+
+::: tip Seeded Randomization
+
+All sampling operations use Smile's seeded randomization system (see
+[Randomization](/randomization) for details). When no seed is provided, it uses
+the current route-specific seed. This ensures that:
+
+1. Each participant gets a unique but reproducible sampling
+2. The sampling remains consistent if the page is refreshed
+3. You can recreate any participant's exact sampling using their seed ID
+
+:::
+
+::: warning Safety Limits
+
+The sampling operations have a safety limit of 5000 rows to prevent accidentally
+creating too many trials. If you exceed this limit, it will throw an error.
 
 :::
 
