@@ -18,6 +18,7 @@ import {
 // import the trial stepper functionality which advances linearly through
 // a set of trials
 import { useHStepper } from '@/core/composables/useHStepper'
+import { useStepper } from '@/core/composables/useStepper'
 
 import useLog from '@/core/stores/log'
 
@@ -66,6 +67,7 @@ export default function useAPI() {
     sampleWithReplacement,
     sampleWithoutReplacement,
     useHStepper,
+    useStepper,
 
     // URL helpers
     urls: store.global.urls,
@@ -221,7 +223,7 @@ export default function useAPI() {
     },
     // Image preloading
     preloadAllImages: () => {
-      log.debug('Preloading images')
+      logStore.debug('Preloading images')
       setTimeout(() => {
         Object.values(
           import.meta.glob('@/user/assets/**/*.{png,jpg,jpeg,svg,SVG,JPG,PNG,JPEG}', {
@@ -236,7 +238,7 @@ export default function useAPI() {
       }, 1)
     },
     preloadAllVideos: () => {
-      log.debug('Preloading videos')
+      logStore.debug('Preloading videos')
       setTimeout(() => {
         Object.values(
           import.meta.glob('@/user/assets/**/*.{mp4,mov,avi,m4v}', {
