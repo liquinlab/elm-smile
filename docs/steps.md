@@ -297,6 +297,55 @@ const table = stepper
 // ]
 ```
 
+#### Shuffling Trials
+
+The `shuffle()` method allows you to randomize the order of trials. This is
+particularly useful for counterbalancing trial order across participants. The
+shuffle operation respects the seeded random number generation system (see
+[Randomization](/randomization) for more details).
+
+```js
+const table = stepper
+  .new()
+  .append([
+    { shape: 'circle', color: 'red' },
+    { shape: 'square', color: 'green' },
+    { shape: 'triangle', color: 'blue' },
+  ])
+  .shuffle()
+
+// Results in a randomly ordered array of the same trials
+// The order will be deterministic based on the current seed
+```
+
+You can also provide a specific seed to the shuffle operation for custom
+randomization:
+
+```js
+const table = stepper
+  .new()
+  .append([
+    { shape: 'circle', color: 'red' },
+    { shape: 'square', color: 'green' },
+    { shape: 'triangle', color: 'blue' },
+  ])
+  .shuffle('custom-seed-123')
+
+// Results in a deterministically ordered array based on the provided seed
+```
+
+::: tip Seeded Randomization
+
+The shuffle operation uses the same seeded random number generation system as
+the rest of Smile. When no seed is provided, it uses the current route-specific
+seed (see [Randomization](/randomization) for details). This ensures that:
+
+1. Each participant gets a unique but reproducible order
+2. The order remains consistent if the page is refreshed
+3. You can recreate any participant's exact trial order using their seed ID
+
+:::
+
 ### Stepping through the trials
 
 The trial stepper provides methods to navigate through your trials:

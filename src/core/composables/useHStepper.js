@@ -6,6 +6,7 @@ import { useRoute } from 'vue-router'
 import { StepperStateMachine } from '@/core/composables/StepperStateMachine'
 import config from '@/core/config'
 import { v4 as uuidv4 } from 'uuid'
+import seedrandom from 'seedrandom'
 
 export function useHStepper() {
   const smilestore = useSmileStore()
@@ -151,9 +152,17 @@ export function useHStepper() {
           return this
         },
 
-        shuffle() {
+        shuffle(seed) {
           this.checkDeleted()
-          // To be implemented
+          // Only create a new RNG if a seed is provided
+          // Otherwise use the global seeded RNG that was set by the router
+          const rng = seed ? seedrandom(seed) : Math.random
+
+          // Fisher-Yates shuffle algorithm
+          for (let i = this.rows.length - 1; i > 0; i--) {
+            const j = Math.floor(rng() * (i + 1))
+            ;[this.rows[i], this.rows[j]] = [this.rows[j], this.rows[i]]
+          }
           return this
         },
 

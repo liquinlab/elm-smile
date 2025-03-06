@@ -6,6 +6,7 @@ import { createTestingPinia } from '@pinia/testing'
 import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+import seedrandom from 'seedrandom'
 
 // import shared mocks
 import '../../setup/mocks' // Import shared mocks
@@ -898,6 +899,127 @@ describe('useHStepper composable', () => {
         expect(() => {
           table.delete()
         }).toThrow('Table has been deleted')
+      })
+    })
+
+    describe('shuffle functionality', () => {
+      it('should throw error if shuffle is called before new', async () => {
+        const stepper = getCurrentRouteStepper()
+        expect(() => {
+          stepper.shuffle()
+        }).toThrow('shuffle() must be called after new()')
+      })
+
+      it('should shuffle rows with a specific seed', async () => {
+        const stepper = getCurrentRouteStepper()
+        const table = stepper.new().append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+          { id: 4, value: 'd' },
+          { id: 5, value: 'e' },
+        ])
+
+        // Shuffle with a specific seed
+        table.shuffle('test-seed-123')
+
+        // The order should be deterministic with this seed
+        // This order was determined by running the test with this seed
+        expect(table.rows.map((r) => r.id)).toEqual([3, 1, 5, 2, 4])
+      })
+
+      it('should produce consistent order with same seed', async () => {
+        const stepper = getCurrentRouteStepper()
+        const data = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+          { id: 4, value: 'd' },
+          { id: 5, value: 'e' },
+        ]
+
+        // Create two tables with same data
+        const table1 = stepper.new().append(data)
+        const table2 = stepper.new().append(data)
+
+        // Shuffle both with same seed
+        table1.shuffle('test-seed-123')
+        table2.shuffle('test-seed-123')
+
+        // They should have the same order
+        expect(table1.rows.map((r) => r.id)).toEqual(table2.rows.map((r) => r.id))
+      })
+
+      it('should use global seeded RNG when no seed is provided', async () => {
+        const stepper = getCurrentRouteStepper()
+        const table = stepper.new().append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+          { id: 4, value: 'd' },
+          { id: 5, value: 'e' },
+        ])
+
+        // Set up global seed
+        seedrandom('global-test-seed', { global: true })
+
+        // Shuffle without a seed
+        table.shuffle()
+
+        // The order should be deterministic with the global seed
+        // This order was determined by running the test with this global seed
+        expect(table.rows.map((r) => r.id)).toEqual([5, 2, 4, 1, 3])
+      })
+
+      it('should preserve all elements after shuffling', async () => {
+        const stepper = getCurrentRouteStepper()
+        const originalData = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+          { id: 4, value: 'd' },
+          { id: 5, value: 'e' },
+        ]
+
+        const table = stepper.new().append(originalData)
+        const originalIds = [...table.rows.map((r) => r.id)].sort()
+
+        // Shuffle with a specific seed
+        table.shuffle('test-seed-123')
+        const shuffledIds = [...table.rows.map((r) => r.id)].sort()
+
+        // All elements should still be present, just in different order
+        expect(shuffledIds).toEqual(originalIds)
+      })
+
+      it('should handle empty table', async () => {
+        const stepper = getCurrentRouteStepper()
+        const table = stepper.new()
+        table.shuffle('test-seed-123')
+        expect(table.rows).toEqual([])
+      })
+
+      it('should handle single element table', async () => {
+        const stepper = getCurrentRouteStepper()
+        const table = stepper.new().append([{ id: 1, value: 'a' }])
+        table.shuffle('test-seed-123')
+        expect(table.rows).toEqual([{ id: 1, value: 'a' }])
+      })
+
+      it('should be chainable with other methods', async () => {
+        const stepper = getCurrentRouteStepper()
+        const table = stepper
+          .new()
+          .append([
+            { id: 1, value: 'a' },
+            { id: 2, value: 'b' },
+            { id: 3, value: 'c' },
+          ])
+          .shuffle('test-seed-123')
+          .append([{ id: 4, value: 'd' }])
+
+        expect(table.rows).toHaveLength(4)
+        expect(table.rows[3]).toEqual({ id: 4, value: 'd' })
       })
     })
   })
