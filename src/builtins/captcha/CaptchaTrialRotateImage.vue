@@ -86,7 +86,7 @@ const handleClick = (e) => {
   // Record final values when user clicks
   data.response_time = Date.now() - start_time.value
   data.final_rotation = currentRotation.value
-  api.log(`Final rotation: ${currentRotation.value}`)
+  api.log.log(`Final rotation: ${currentRotation.value}`)
   // Save trial data before emitting
   api.recordTrialData(data)
   emit('nextPageCaptcha')
