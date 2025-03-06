@@ -4,6 +4,7 @@ import useSmileStore from '@/core/stores/smilestore'
 import useLog from '@/core/stores/log'
 import { useRoute } from 'vue-router'
 import { StepperStateMachine } from '@/core/composables/StepperStateMachine'
+import config from '@/core/config'
 
 export function useHStepper() {
   const smilestore = useSmileStore()
@@ -88,8 +89,20 @@ export function useHStepper() {
         },
         append(input) {
           if (Array.isArray(input)) {
+            const newLength = this.rows.length + input.length
+            if (newLength > config.max_stepper_rows) {
+              throw new Error(
+                `append() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to append.`
+              )
+            }
             this.rows = [...this.rows, ...input]
           } else if (input && input.rows) {
+            const newLength = this.rows.length + input.rows.length
+            if (newLength > config.max_stepper_rows) {
+              throw new Error(
+                `append() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to append.`
+              )
+            }
             this.rows = [...this.rows, ...input.rows]
           }
           return this
@@ -100,6 +113,12 @@ export function useHStepper() {
         },
         repeat(n) {
           if (n <= 0 || this.rows.length === 0) return this
+          const totalRows = this.rows.length * n
+          if (totalRows > config.max_stepper_rows) {
+            throw new Error(
+              `repeat() would generate ${totalRows} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the repeat count.`
+            )
+          }
           const originalRows = [...this.rows]
           for (let i = 1; i < n; i++) {
             this.rows = [...this.rows, ...originalRows]
@@ -163,6 +182,13 @@ export function useHStepper() {
               return row
             })
 
+          const newLength = this.rows.length + zippedRows.length
+          if (newLength > config.max_stepper_rows) {
+            throw new Error(
+              `zip() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of values in your arrays.`
+            )
+          }
+
           this.rows = [...this.rows, ...zippedRows]
           return this
         },
@@ -183,9 +209,9 @@ export function useHStepper() {
 
           // Calculate total number of combinations
           const totalCombinations = columns.reduce((total, [_, arr]) => total * arr.length, 1)
-          if (totalCombinations > 5000) {
+          if (totalCombinations > config.max_stepper_rows) {
             throw new Error(
-              `outer() would generate ${totalCombinations} combinations, which exceeds the safety limit of 5000. Consider using zip() or reducing the number of values in your arrays.`
+              `outer() would generate ${totalCombinations} combinations, which exceeds the safety limit of ${config.max_stepper_rows}. Consider using zip() or reducing the number of values in your arrays.`
             )
           }
 

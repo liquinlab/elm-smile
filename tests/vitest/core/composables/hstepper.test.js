@@ -11,9 +11,17 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import '../../setup/mocks' // Import shared mocks
 import { setupBrowserEnvironment } from '../../setup/mocks'
 
+// Mock the config import
+vi.mock('@/core/config', () => ({
+  default: {
+    max_stepper_rows: 5000,
+  },
+}))
+
 // import the API composable (h stepper is a method of the API)
 import useAPI from '@/core/composables/useAPI'
 import { StepperStateMachine } from '@/core/composables/StepperStateMachine'
+import config from '@/core/config' // Add this import after the mock
 
 // Create a test component that uses the composable
 const TestComponent = defineComponent({
@@ -298,6 +306,29 @@ describe('useHStepper composable', () => {
       expect(table1.rows[1]).toEqual({ color: 'blue', shape: 'square' })
     })
 
+    it('should throw error when append would exceed safety limit', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create an array that would exceed the limit when appended
+      const largeArray = Array(config.max_stepper_rows + 1).fill({ color: 'red', shape: 'circle' })
+
+      expect(() => {
+        stepper.new().append(largeArray)
+      }).toThrow(/append\(\) would generate \d+ rows, which exceeds the safety limit of \d+/)
+    })
+
+    it('should throw error when appending table would exceed safety limit', async () => {
+      const stepper = getCurrentRouteStepper()
+      const smallTable = stepper.new().append([{ color: 'blue', shape: 'square' }])
+
+      expect(() => {
+        const largeTable = stepper
+          .new()
+          .append(Array(config.max_stepper_rows + 1).fill({ color: 'red', shape: 'circle' }))
+        smallTable.append(largeTable)
+      }).toThrow(/append\(\) would generate \d+ rows, which exceeds the safety limit of \d+/)
+    })
+
     it('should be chainable', async () => {
       const stepper = getCurrentRouteStepper()
 
@@ -400,6 +431,20 @@ describe('useHStepper composable', () => {
         }).toThrow('zip() requires an object with arrays as values')
       })
 
+      it('should throw error when zip would exceed safety limit', async () => {
+        const stepper = getCurrentRouteStepper()
+
+        // Create arrays that would exceed the limit when zipped
+        const trials = {
+          shape: Array(config.max_stepper_rows + 1).fill('circle'),
+          color: ['red', 'green'],
+        }
+
+        expect(() => {
+          stepper.new().zip(trials)
+        }).toThrow(/zip\(\) would generate \d+ rows, which exceeds the safety limit of \d+/)
+      })
+
       it('should be chainable with other methods', async () => {
         const stepper = getCurrentRouteStepper()
         const trials = {
@@ -488,7 +533,7 @@ describe('useHStepper composable', () => {
 
         expect(() => {
           stepper.new().outer(trials)
-        }).toThrow(/outer\(\) would generate 10000 combinations, which exceeds the safety limit of 5000/)
+        }).toThrow(/outer\(\) would generate 10000 combinations, which exceeds the safety limit of \d+/)
       })
 
       it('should allow combinations under the safety limit', async () => {
