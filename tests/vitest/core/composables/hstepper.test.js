@@ -1706,6 +1706,29 @@ describe('useHStepper composable', () => {
         expect(nestedTable.rows[i]).toEqual({ range: i })
       }
     })
+
+    it('should copy the nested table when repeating', async () => {
+      const stepper = getCurrentRouteStepper()
+      const trials = stepper.new().range(10)
+      const nestedTable = trials[3].new().range(3)
+      trials.repeat(2)
+
+      // Verify that the original nested table is still in place
+      expect(trials[3][Symbol.for('table')]).toBe(nestedTable)
+
+      // Verify that the repeated row has a different nested table instance
+      expect(trials[13][Symbol.for('table')]).not.toBe(nestedTable)
+
+      // Verify that the repeated nested table has the same data
+      expect(trials[13][Symbol.for('table')].rows).toHaveLength(3)
+      for (let i = 0; i < 3; i++) {
+        expect(trials[13][Symbol.for('table')].rows[i]).toEqual({ range: i })
+      }
+
+      // Verify that modifying the repeated nested table doesn't affect the original
+      trials[13][Symbol.for('table')].rows[0].value = 'modified'
+      expect(trials[3][Symbol.for('table')].rows[0].value).toBeUndefined()
+    })
   })
 
   describe('head functionality', () => {

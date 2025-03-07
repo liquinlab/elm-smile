@@ -359,7 +359,21 @@ export function useHStepper() {
           }
           const originalRows = [...this.rows]
           for (let i = 1; i < n; i++) {
-            this.rows = [...this.rows, ...originalRows]
+            // Deep copy each row and its nested table
+            const newRows = originalRows.map((row) => {
+              // Deep copy the row object first
+              const newRow = JSON.parse(JSON.stringify(row))
+              // If the row has a nested table, create a new one with deep copied data
+              const nestedTable = row[Symbol.for('table')]
+              if (nestedTable) {
+                const newNestedTable = api.new()
+                // Deep copy each row in the nested table
+                newNestedTable.rows = nestedTable.rows.map((nestedRow) => JSON.parse(JSON.stringify(nestedRow)))
+                newRow[Symbol.for('table')] = newNestedTable
+              }
+              return newRow
+            })
+            this.rows = [...this.rows, ...newRows]
           }
           return this
         },
