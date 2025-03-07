@@ -1633,4 +1633,113 @@ describe('useHStepper composable', () => {
       expect(anotherLevel3.rows).toHaveLength(2)
     })
   })
+  describe('head functionality', () => {
+    it('should throw error if head is called before new', async () => {
+      const stepper = getCurrentRouteStepper()
+      expect(() => {
+        stepper.head(5)
+      }).toThrow('head() must be called after new()')
+    })
+
+    it('should return first n elements', async () => {
+      const stepper = getCurrentRouteStepper()
+      const table = stepper.new().range(5)
+      table.head(3)
+      expect(table.rows).toHaveLength(3)
+      for (let i = 0; i < 3; i++) {
+        expect(table.rows[i]).toEqual({ range: i })
+      }
+    })
+
+    it('should return all elements if n is greater than length', async () => {
+      const stepper = getCurrentRouteStepper()
+      const table = stepper.new().range(3)
+      table.head(5) // n > length
+      expect(table.rows).toHaveLength(3)
+      for (let i = 0; i < 3; i++) {
+        expect(table.rows[i]).toEqual({ range: i })
+      }
+    })
+
+    it('should throw error if n <= 0', async () => {
+      const stepper = getCurrentRouteStepper()
+      const table = stepper.new().range(3)
+      expect(() => {
+        table.head(0)
+      }).toThrow('head() must be called with a positive integer')
+      expect(() => {
+        table.head(-1)
+      }).toThrow('head() must be called with a positive integer')
+    })
+
+    it('should be chainable with other methods', async () => {
+      const stepper = getCurrentRouteStepper()
+      const table = stepper
+        .new()
+        .range(5)
+        .head(3)
+        .forEach((row) => ({ ...row, type: 'test' }))
+
+      expect(table.rows).toHaveLength(3)
+      for (let i = 0; i < 3; i++) {
+        expect(table.rows[i]).toEqual({ range: i, type: 'test' })
+      }
+    })
+  })
+
+  describe('tail functionality', () => {
+    it('should throw error if tail is called before new', async () => {
+      const stepper = getCurrentRouteStepper()
+      expect(() => {
+        stepper.tail(5)
+      }).toThrow('tail() must be called after new()')
+    })
+
+    it('should return last n elements', async () => {
+      const stepper = getCurrentRouteStepper()
+      const table = stepper.new().range(5)
+      table.tail(3)
+      expect(table.rows).toHaveLength(3)
+      // The last 3 elements should be [2, 3, 4] in that order
+      expect(table.rows[0]).toEqual({ range: 2 })
+      expect(table.rows[1]).toEqual({ range: 3 })
+      expect(table.rows[2]).toEqual({ range: 4 })
+    })
+
+    it('should return all elements if n is greater than length', async () => {
+      const stepper = getCurrentRouteStepper()
+      const table = stepper.new().range(3)
+      table.tail(5) // n > length
+      expect(table.rows).toHaveLength(3)
+      for (let i = 0; i < 3; i++) {
+        expect(table.rows[i]).toEqual({ range: i })
+      }
+    })
+
+    it('should throw error if n <= 0', async () => {
+      const stepper = getCurrentRouteStepper()
+      const table = stepper.new().range(3)
+      expect(() => {
+        table.tail(0)
+      }).toThrow('tail() must be called with a positive integer')
+      expect(() => {
+        table.tail(-1)
+      }).toThrow('tail() must be called with a positive integer')
+    })
+
+    it('should be chainable with other methods', async () => {
+      const stepper = getCurrentRouteStepper()
+      const table = stepper
+        .new()
+        .range(5)
+        .tail(3)
+        .forEach((row) => ({ ...row, type: 'test' }))
+
+      expect(table.rows).toHaveLength(3)
+      // The last 3 elements should be [2,3,4] in that order, with added type
+      expect(table.rows[0]).toEqual({ range: 2, type: 'test' })
+      expect(table.rows[1]).toEqual({ range: 3, type: 'test' })
+      expect(table.rows[2]).toEqual({ range: 4, type: 'test' })
+    })
+  })
 })

@@ -97,6 +97,12 @@ export function useHStepper() {
     range() {
       throw new Error('range() must be called after new()')
     },
+    head() {
+      throw new Error('head() must be called after new()')
+    },
+    tail() {
+      throw new Error('tail() must be called after new()')
+    },
 
     // Chainable methods for trial building
     new() {
@@ -339,6 +345,22 @@ export function useHStepper() {
           for (let i = 1; i < n; i++) {
             this.rows = [...this.rows, ...originalRows]
           }
+          return this
+        },
+
+        head(n) {
+          if (n <= 0) {
+            throw new Error('head() must be called with a positive integer')
+          }
+          this.rows = this.rows.slice(0, n)
+          return this
+        },
+
+        tail(n) {
+          if (n <= 0) {
+            throw new Error('tail() must be called with a positive integer')
+          }
+          this.rows = this.rows.slice(-n)
           return this
         },
 

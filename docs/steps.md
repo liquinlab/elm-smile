@@ -100,8 +100,10 @@ Each row in a table can have its own nested table, and you can perform all the
 same operations on nested tables that you can on parent tables (append, range,
 forEach, etc.).
 
-::: tip Multiple Nested Tables You can create multiple nested tables for the
-same row. Only the most recently created table will be stored in the row:
+::: tip Multiple Nested Tables
+
+You can create multiple nested tables for the same row. Only the most recently
+created table will be stored in the row:
 
 ```js
 // Create two nested tables for the first trial
@@ -113,10 +115,14 @@ const nestedTable2 = trials[0].new().range(3)
 
 :::
 
-::: warning Data Serialization Nested tables follow the same serialization rules
-as regular tables. When storing nested tables, make sure all data is
-serializable according to the guidelines in the
-[Data Serialization Limitations](#data-serialization-limitations) section. :::
+::: warning Data Serialization
+
+Nested tables follow the same serialization rules as regular tables. When
+storing nested tables, make sure all data is serializable according to the
+guidelines in the
+[Data Serialization Limitations](#data-serialization-limitations) section.
+
+:::
 
 #### Array-like Access
 
@@ -360,6 +366,71 @@ const table = stepper
 
 The `range()` method requires a positive integer as its argument. It will throw
 an error if called with zero or a negative number.
+
+:::
+
+#### Taking First or Last Elements with head() and tail()
+
+The `head()` and `tail()` methods allow you to take a subset of trials from the
+beginning or end of your trial table:
+
+```js
+// Take the first 3 trials
+const headTable = stepper.new().range(5).head(3)
+
+// Results in:
+// [
+//   { range: 0 },
+//   { range: 1 },
+//   { range: 2 }
+// ]
+
+// Take the last 3 trials
+const tailTable = stepper.new().range(5).tail(3)
+
+// Results in:
+// [
+//   { range: 2 },
+//   { range: 3 },
+//   { range: 4 }
+// ]
+```
+
+Both methods maintain the original order of the trials. When using `tail()`, the
+last n elements are returned in their original sequence (not reversed).
+
+You can combine these methods with other operations:
+
+```js
+const table = stepper
+  .new()
+  .range(5)
+  .tail(3)
+  .forEach((row) => ({ ...row, condition: 'test' }))
+
+// Results in:
+// [
+//   { range: 2, condition: 'test' },
+//   { range: 3, condition: 'test' },
+//   { range: 4, condition: 'test' }
+// ]
+```
+
+::: warning Positive Numbers Only
+
+Both `head()` and `tail()` require a positive integer as their argument. They
+will throw an error if called with zero or a negative number.
+
+:::
+
+::: tip Handling Large n
+
+If n is greater than the length of the trial table:
+
+- `head(n)` will return all trials from the beginning
+- `tail(n)` will return all trials from the end
+
+In both cases, the original order of trials is preserved.
 
 :::
 
