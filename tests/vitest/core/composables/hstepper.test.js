@@ -1671,6 +1671,41 @@ describe('useHStepper composable', () => {
         expect(nestedTable.rows[i]).toEqual({ range: i })
       }
     })
+
+    it('should raise an error when modifying dimensionality of a table with nested tables', async () => {
+      const stepper = getCurrentRouteStepper()
+      const trials = stepper.new().range(10)
+      const nestedTable = trials[3].new().range(3)
+
+      // Test sample()
+      expect(() => {
+        trials.sample({
+          type: 'with-replacement',
+          size: 1,
+        })
+      }).toThrow('Cannot sample a table that has nested tables')
+
+      // Test head()
+      expect(() => {
+        trials.head(5)
+      }).toThrow('Cannot take head of a table that has nested tables')
+
+      // Test tail()
+      expect(() => {
+        trials.tail(5)
+      }).toThrow('Cannot take tail of a table that has nested tables')
+
+      // Test slice()
+      expect(() => {
+        trials.slice(0, 5)
+      }).toThrow('Cannot slice a table that has nested tables')
+
+      // Verify the nested table is still intact
+      expect(nestedTable.rows).toHaveLength(3)
+      for (let i = 0; i < 3; i++) {
+        expect(nestedTable.rows[i]).toEqual({ range: i })
+      }
+    })
   })
 
   describe('head functionality', () => {

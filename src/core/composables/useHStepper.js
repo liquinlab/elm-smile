@@ -60,6 +60,11 @@ export function useHStepper() {
     }
   }
 
+  // Add this helper function after the adjustArrayLength function
+  function hasNestedTables(rows) {
+    return rows.some((row) => row[Symbol.for('table')] !== undefined)
+  }
+
   // Create the chainable API
   const api = {
     next: nextStep,
@@ -127,6 +132,11 @@ export function useHStepper() {
         },
 
         slice(...args) {
+          if (hasNestedTables(this.rows)) {
+            throw new Error(
+              'Cannot slice a table that has nested tables. This would break the relationship between parent and child tables.'
+            )
+          }
           return this.rows.slice(...args)
         },
 
@@ -175,6 +185,12 @@ export function useHStepper() {
 
         sample(options = {}) {
           if (this.rows.length === 0) return this
+
+          if (hasNestedTables(this.rows)) {
+            throw new Error(
+              'Cannot sample a table that has nested tables. This would break the relationship between parent and child tables.'
+            )
+          }
 
           const type = options.type || 'without-replacement'
           const size = options.size
@@ -352,6 +368,11 @@ export function useHStepper() {
           if (n <= 0) {
             throw new Error('head() must be called with a positive integer')
           }
+          if (hasNestedTables(this.rows)) {
+            throw new Error(
+              'Cannot take head of a table that has nested tables. This would break the relationship between parent and child tables.'
+            )
+          }
           this.rows = this.rows.slice(0, n)
           return this
         },
@@ -359,6 +380,11 @@ export function useHStepper() {
         tail(n) {
           if (n <= 0) {
             throw new Error('tail() must be called with a positive integer')
+          }
+          if (hasNestedTables(this.rows)) {
+            throw new Error(
+              'Cannot take tail of a table that has nested tables. This would break the relationship between parent and child tables.'
+            )
           }
           this.rows = this.rows.slice(-n)
           return this

@@ -124,6 +124,21 @@ guidelines in the
 
 :::
 
+::: warning Dimensionality Changes
+
+Once you create nested tables within a parent table, you cannot modify the
+dimensionality of the parent table. Operations that would change the number of
+rows (like `sample()`, `head()`, `tail()`, and `slice()`) will throw an error
+with a message like "Cannot sample/take head/take tail/slice a table that has
+nested tables. This would break the relationship between parent and child
+tables."
+
+This restriction exists because changing the parent table's dimensionality could
+leave nested tables referencing rows that no longer exist. Instead, make sure to
+finalize your parent table's structure before creating any nested tables.
+
+:::
+
 #### Array-like Access
 
 Tables provide array-like access to their rows:
