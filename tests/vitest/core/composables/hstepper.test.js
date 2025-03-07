@@ -1633,6 +1633,46 @@ describe('useHStepper composable', () => {
       expect(anotherLevel3.rows).toHaveLength(2)
     })
   })
+
+  describe('complex tests', () => {
+    it('should handle nesting after shuffling', async () => {
+      // specifically
+      const stepper = getCurrentRouteStepper()
+      const trials = stepper.new().range(10).shuffle()
+      const nestedTable = trials[0].new().range(3)
+      expect(nestedTable.rows).toHaveLength(3)
+      for (let i = 0; i < 3; i++) {
+        expect(nestedTable.rows[i]).toEqual({ range: i })
+      }
+    })
+
+    it('should handle nesting after sampling', async () => {
+      // specifically
+      const stepper = getCurrentRouteStepper()
+      const trials = stepper.new().range(10)
+      trials.sample({
+        type: 'with-replacement',
+        size: 3,
+      })
+      const nestedTable = trials[0].new().range(3)
+      expect(nestedTable.rows).toHaveLength(3)
+      for (let i = 0; i < 3; i++) {
+        expect(nestedTable.rows[i]).toEqual({ range: i })
+      }
+    })
+
+    it('should handle shuffling at the top level after a nested table created', async () => {
+      const stepper = getCurrentRouteStepper()
+      const trials = stepper.new().range(10)
+      const nestedTable = trials[3].new().range(3)
+      trials.shuffle()
+      expect(nestedTable.rows).toHaveLength(3)
+      for (let i = 0; i < 3; i++) {
+        expect(nestedTable.rows[i]).toEqual({ range: i })
+      }
+    })
+  })
+
   describe('head functionality', () => {
     it('should throw error if head is called before new', async () => {
       const stepper = getCurrentRouteStepper()
