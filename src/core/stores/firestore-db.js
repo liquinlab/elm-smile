@@ -126,7 +126,7 @@ export const createDoc = async (data) => {
         code_name: appconfig.code_name,
         code_name_url: appconfig.code_name_url,
       })
-      console.log('FIRESTORE-DB: New experiment registered with ID: ', `${mode}/${appconfig.project_ref}`)
+      log.log('FIRESTORE-DB: New experiment registered with ID: ', `${mode}/${appconfig.project_ref}`)
     }
 
     log.log(`FIRESTORE-DB: trying to create a main document.`, appconfig.project_ref)
