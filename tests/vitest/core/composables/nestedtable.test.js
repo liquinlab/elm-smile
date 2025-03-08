@@ -190,7 +190,9 @@ describe('NestedTable', () => {
       table.range(3)
 
       expect(table.rows).toHaveLength(3)
-      expect(table.rows).toEqual([{ range: 0 }, { range: 1 }, { range: 2 }])
+      for (let i = 0; i < 3; i++) {
+        expect(table.rows[i]).toEqual({ range: i })
+      }
     })
 
     it('should support shuffle operation with a specific seed', () => {
@@ -371,6 +373,129 @@ describe('NestedTable', () => {
           .append(Array(config.max_stepper_rows + 1).fill({ color: 'red', shape: 'circle' }))
         smallTable.append(largeTable)
       }).toThrow(/append\(\) would generate \d+ rows, which exceeds the safety limit of \d+/)
+    })
+  })
+
+  describe('interleave functionality', () => {
+    it('should interleave two tables of equal length', () => {
+      const table1 = table.new().append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+      ])
+      const table2 = table.new().append([
+        { id: 3, value: 'c' },
+        { id: 4, value: 'd' },
+      ])
+
+      table1.interleave(table2)
+
+      expect(table1.rows).toHaveLength(4)
+      expect(table1.rows[0]).toEqual({ id: 1, value: 'a' })
+      expect(table1.rows[1]).toEqual({ id: 3, value: 'c' })
+      expect(table1.rows[2]).toEqual({ id: 2, value: 'b' })
+      expect(table1.rows[3]).toEqual({ id: 4, value: 'd' })
+    })
+
+    it('should interleave tables of different lengths', () => {
+      const table1 = table.new().append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+        { id: 3, value: 'c' },
+      ])
+      const table2 = table.new().append([
+        { id: 4, value: 'd' },
+        { id: 5, value: 'e' },
+      ])
+
+      table1.interleave(table2)
+
+      expect(table1.rows).toHaveLength(5)
+      expect(table1.rows[0]).toEqual({ id: 1, value: 'a' })
+      expect(table1.rows[1]).toEqual({ id: 4, value: 'd' })
+      expect(table1.rows[2]).toEqual({ id: 2, value: 'b' })
+      expect(table1.rows[3]).toEqual({ id: 5, value: 'e' })
+      expect(table1.rows[4]).toEqual({ id: 3, value: 'c' })
+    })
+
+    it('should interleave with an array input', () => {
+      const table1 = table.new().append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+      ])
+      const array = [
+        { id: 3, value: 'c' },
+        { id: 4, value: 'd' },
+      ]
+
+      table1.interleave(array)
+
+      expect(table1.rows).toHaveLength(4)
+      expect(table1.rows[0]).toEqual({ id: 1, value: 'a' })
+      expect(table1.rows[1]).toEqual({ id: 3, value: 'c' })
+      expect(table1.rows[2]).toEqual({ id: 2, value: 'b' })
+      expect(table1.rows[3]).toEqual({ id: 4, value: 'd' })
+    })
+
+    it('should interleave with a single object', () => {
+      const table1 = table.new().append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+      ])
+
+      table1.interleave({ id: 3, value: 'c' })
+
+      expect(table1.rows).toHaveLength(3)
+      expect(table1.rows[0]).toEqual({ id: 1, value: 'a' })
+      expect(table1.rows[1]).toEqual({ id: 3, value: 'c' })
+      expect(table1.rows[2]).toEqual({ id: 2, value: 'b' })
+    })
+
+    it('should throw error for invalid input', () => {
+      const table1 = table.new().append([{ id: 1, value: 'a' }])
+
+      expect(() => {
+        table1.interleave(null)
+      }).toThrow('interleave() requires an array, table, or object as input')
+
+      expect(() => {
+        table1.interleave(undefined)
+      }).toThrow('interleave() requires an array, table, or object as input')
+
+      expect(() => {
+        table1.interleave('not an object')
+      }).toThrow('interleave() requires an array, table, or object as input')
+    })
+
+    it('should throw error when result would exceed safety limit', () => {
+      const table1 = table.new().append(Array(config.max_stepper_rows - 1).fill({ value: 'a' }))
+      const table2 = table.new().append([{ value: 'b' }, { value: 'c' }])
+
+      expect(() => {
+        table1.interleave(table2)
+      }).toThrow(/interleave\(\) would generate \d+ rows, which exceeds the safety limit/)
+    })
+
+    it('should be chainable with other methods', () => {
+      const table1 = table.new().append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+      ])
+      const table2 = table.new().append([
+        { id: 3, value: 'c' },
+        { id: 4, value: 'd' },
+      ])
+
+      const result = table1
+        .interleave(table2)
+        .forEach((row) => ({ ...row, modified: true }))
+        .append({ id: 5, value: 'e', modified: true })
+
+      expect(result.rows).toHaveLength(5)
+      expect(result.rows[0]).toEqual({ id: 1, value: 'a', modified: true })
+      expect(result.rows[1]).toEqual({ id: 3, value: 'c', modified: true })
+      expect(result.rows[2]).toEqual({ id: 2, value: 'b', modified: true })
+      expect(result.rows[3]).toEqual({ id: 4, value: 'd', modified: true })
+      expect(result.rows[4]).toEqual({ id: 5, value: 'e', modified: true })
     })
   })
 

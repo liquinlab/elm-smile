@@ -156,6 +156,41 @@ export class NestedTable {
         return this
       },
 
+      interleave(input) {
+        let inputRows = []
+        if (Array.isArray(input)) {
+          inputRows = input
+        } else if (input && input.rows) {
+          inputRows = input.rows
+        } else if (input && typeof input === 'object') {
+          inputRows = [input]
+        } else {
+          throw new Error('interleave() requires an array, table, or object as input')
+        }
+
+        const newLength = this.rows.length + inputRows.length
+        if (newLength > config.max_stepper_rows) {
+          throw new Error(
+            `interleave() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to interleave.`
+          )
+        }
+
+        const maxLength = Math.max(this.rows.length, inputRows.length)
+        const result = []
+
+        for (let i = 0; i < maxLength; i++) {
+          if (i < this.rows.length) {
+            result.push(this.rows[i])
+          }
+          if (i < inputRows.length) {
+            result.push(inputRows[i])
+          }
+        }
+
+        this.rows = result
+        return this
+      },
+
       shuffle(seed) {
         // Only create a new RNG if a seed is provided
         // Otherwise use the global seeded RNG that was set by the router

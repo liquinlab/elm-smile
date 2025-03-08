@@ -384,6 +384,154 @@ an error if called with zero or a negative number.
 
 :::
 
+#### Printing Table Contents with print()
+
+The `print()` method provides a convenient way to inspect the contents of your
+trial table, including any nested tables. This is particularly useful during
+development and debugging:
+
+```js
+const table = stepper.new().append([
+  { shape: 'circle', color: 'red' },
+  { shape: 'square', color: 'blue' },
+])
+
+table.print()
+// Output:
+// Table with 2 rows:
+// [0]: { shape: 'circle', color: 'red' }
+// [1]: { shape: 'square', color: 'blue' }
+```
+
+The `print()` method also handles nested tables with proper indentation:
+
+```js
+const trials = stepper.new().range(2)
+trials[0].new().append([
+  { type: 'stim', value: 1 },
+  { type: 'feedback', value: 2 },
+])
+trials[1].new().append([{ type: 'stim', value: 3 }])
+
+trials.print()
+// Output:
+// Table with 2 rows:
+// [0]: { range: 0 }
+//   Table with 2 rows:
+//   [0]: { type: 'stim', value: 1 }
+//   [1]: { type: 'feedback', value: 2 }
+// [1]: { range: 1 }
+//   Table with 1 rows:
+//   [0]: { type: 'stim', value: 3 }
+```
+
+::: tip Method Chaining
+
+The `print()` method returns the table object, allowing it to be chained with
+other methods:
+
+```js
+const table = stepper
+  .new()
+  .append({ shape: 'circle' })
+  .print() // Print current state
+  .append({ shape: 'square' })
+  .print() // Print updated state
+```
+
+:::
+
+#### Interleaving Trials with interleave()
+
+The `interleave()` method combines two sets of trials by alternating between
+them. This is useful when you want to create a sequence that alternates between
+different trial types:
+
+```js
+const table1 = stepper.new().append([
+  { type: 'stim', id: 1 },
+  { type: 'stim', id: 2 },
+])
+
+const table2 = stepper.new().append([
+  { type: 'feedback', id: 3 },
+  { type: 'feedback', id: 4 },
+])
+
+table1.interleave(table2)
+// Results in:
+// [
+//   { type: 'stim', id: 1 },
+//   { type: 'feedback', id: 3 },
+//   { type: 'stim', id: 2 },
+//   { type: 'feedback', id: 4 }
+// ]
+```
+
+The method can handle tables of different lengths, arrays, or single objects:
+
+```js
+// Different length tables
+const table1 = stepper.new().append([
+  { type: 'stim', id: 1 },
+  { type: 'stim', id: 2 },
+  { type: 'stim', id: 3 },
+])
+
+const table2 = stepper.new().append([
+  { type: 'feedback', id: 4 },
+  { type: 'feedback', id: 5 },
+])
+
+table1.interleave(table2)
+// Results in:
+// [
+//   { type: 'stim', id: 1 },
+//   { type: 'feedback', id: 4 },
+//   { type: 'stim', id: 2 },
+//   { type: 'feedback', id: 5 },
+//   { type: 'stim', id: 3 }
+// ]
+
+// Array input
+table1.interleave([
+  { type: 'feedback', id: 4 },
+  { type: 'feedback', id: 5 },
+])
+
+// Single object
+table1.interleave({ type: 'feedback', id: 4 })
+```
+
+::: warning Safety Limit
+
+Like other table operations, `interleave()` has a safety limit of 5000 rows to
+prevent accidentally creating too many trials. If the combined length would
+exceed this limit, it will throw an error.
+
+:::
+
+::: tip Method Chaining
+
+The `interleave()` method returns the table object, allowing it to be chained
+with other methods:
+
+```js
+const table = stepper
+  .new()
+  .append([
+    { type: 'stim', id: 1 },
+    { type: 'stim', id: 2 },
+  ])
+  .interleave([
+    { type: 'feedback', id: 3 },
+    { type: 'feedback', id: 4 },
+  ])
+  .forEach((row) => ({ ...row, condition: 'test' }))
+```
+
+:::
+
 #### Taking First or Last Elements with head() and tail()
 
 The `head()` and `tail()` methods allow you to take a subset of trials from the
@@ -538,244 +686,3 @@ const table = stepper.new().append([
   { id: 4, shape: 'star', color: 'yellow' },
 ])
 ```
-
-##### With Replacement Sampling
-
-Sample trials with replacement, allowing each trial to be selected multiple
-times:
-
-```js
-// Sample 5 trials with replacement
-table.sample({ type: 'with-replacement', size: 5, seed: 'test-seed-123' })
-
-// Weighted sampling
-table.sample({
-  type: 'with-replacement',
-  size: 5,
-  weights: [0.5, 0.3, 0.2], // Higher weights = more likely to be selected
-  seed: 'test-seed-123',
-})
-```
-
-##### Without Replacement Sampling
-
-Sample trials without replacement, ensuring each trial appears at most once:
-
-```js
-// Sample 2 trials without replacement
-table.sample({ type: 'without-replacement', size: 2, seed: 'test-seed-123' })
-```
-
-##### Fixed Repetitions Sampling
-
-Repeat each trial a fixed number of times and shuffle the result:
-
-```js
-// Repeat each trial 3 times and shuffle
-table.sample({ type: 'fixed-repetitions', size: 3, seed: 'test-seed-123' })
-```
-
-##### Alternate Groups Sampling
-
-Sample trials by alternating between predefined groups:
-
-```js
-// Define groups and alternate between them
-table.sample({
-  type: 'alternate-groups',
-  groups: [
-    [0, 2], // First group: trials 1 and 3
-    [1, 3], // Second group: trials 2 and 4
-  ],
-  randomize_group_order: true, // Optional: randomize the order of groups
-  seed: 'test-seed-123',
-})
-```
-
-##### Custom Sampling
-
-Define your own sampling function:
-
-```js
-// Use a custom function to determine the order
-table.sample({
-  type: 'custom',
-  fn: (indices) => indices.reverse(), // Example: reverse the order
-})
-```
-
-::: tip Seeded Randomization
-
-All sampling operations use Smile's seeded randomization system (see
-[Randomization](/randomization) for details). When no seed is provided, it uses
-the current route-specific seed. This ensures that:
-
-1. Each participant gets a unique but reproducible sampling
-2. The sampling remains consistent if the page is refreshed
-3. You can recreate any participant's exact sampling using their seed ID
-
-:::
-
-::: warning Safety Limits
-
-The sampling operations have a safety limit of 5000 rows to prevent accidentally
-creating too many trials. If you exceed this limit, it will throw an error.
-
-:::
-
-### Stepping through the trials
-
-The trial stepper provides methods to navigate through your trials:
-
-- `stepper.next()`: Advance to the next trial
-- `stepper.prev()`: Go back to the previous trial
-- `stepper.index()`: Get the current trial index
-- `stepper.current()`: Get the current trial data
-- `stepper.reset()`: Reset back to the first trial
-
-Here's a complete example showing how to use the stepper in a Vue component:
-
-```vue
-<script setup>
-import { ref } from 'vue'
-import useAPI from '@/core/composables/useAPI'
-
-const api = useAPI()
-const stepper = api.useHStepper()
-
-// Create a table with multiple conditions
-const table = stepper
-  .new()
-  .outer({
-    shape: ['circle', 'square'],
-    color: ['red', 'green'],
-  })
-  .repeat(2)
-  .forEach((row) => ({ ...row, size: 'medium' }))
-
-// Reactive state for the current trial
-const currentTrial = ref(null)
-
-// Function to advance to next trial
-function nextTrial() {
-  currentTrial.value = stepper.current()
-  stepper.next()
-}
-
-// Initialize with first trial
-nextTrial()
-</script>
-
-<template>
-  <div class="experiment">
-    <div v-if="currentTrial">
-      <h2>Trial {{ stepper.index() + 1 }}</h2>
-      <div class="stimulus">
-        <div :class="currentTrial.shape" :style="{ color: currentTrial.color }">
-          {{ currentTrial.shape }}
-        </div>
-      </div>
-      <button @click="nextTrial">Next Trial</button>
-    </div>
-    <div v-else>
-      <h2>Experiment Complete!</h2>
-    </div>
-  </div>
-</template>
-
-<style scoped>
-.experiment {
-  max-width: 600px;
-  margin: 2rem auto;
-  text-align: center;
-}
-
-.stimulus {
-  margin: 2rem 0;
-  font-size: 2rem;
-}
-</style>
-```
-
-## Data Serialization Limitations
-
-When using the trial stepper, it's important to understand the limitations of
-data serialization. The stepper uses JSON serialization to persist trial data,
-which means certain JavaScript types cannot be properly stored and retrieved.
-
-### Non-serializable Types
-
-The following types of data will not serialize correctly:
-
-- Functions and methods
-- Vue components or other framework components
-- DOM elements
-- `undefined` values
-- Symbols
-- BigInt values
-- Regular expressions
-- Class instances (they lose their methods)
-- Circular references
-
-### Best Practices
-
-When storing data in your trials, follow these guidelines:
-
-1. Only store serializable data types:
-
-   - Plain objects
-   - Arrays
-   - Strings
-   - Numbers
-   - Booleans
-   - null
-
-2. For Vue components, store component information rather than the component
-   itself:
-
-```js
-// Instead of:
-stepper.new().append({ component: MyVueComponent })
-
-// Do:
-stepper.new().append({
-  componentName: 'MyComponent',
-  componentProps: {
-    /* serializable props */
-  },
-})
-```
-
-3. For function references, store the necessary data to recreate the behavior:
-
-```js
-// Instead of:
-stepper.new().append({ handler: () => console.log('hello') })
-
-// Do:
-stepper.new().append({
-  handlerType: 'log',
-  handlerMessage: 'hello',
-})
-```
-
-4. For complex objects, store only the essential serializable data:
-
-```js
-// Instead of:
-stepper.new().append({
-  complexObject: new ComplexClass(),
-})
-
-// Do:
-stepper.new().append({
-  objectType: 'ComplexClass',
-  objectData: {
-    /* serializable data */
-  },
-})
-```
-
-Remember that any time you reload the page or navigate away and return, the
-trial data will need to be deserialized. Plan your data structure accordingly to
-ensure all necessary information can be properly restored.
