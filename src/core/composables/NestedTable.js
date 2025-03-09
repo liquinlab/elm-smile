@@ -34,6 +34,17 @@ export class NestedTable {
                     return newTable
                   }
                 }
+                // Add cleaner access to nested table via .nested property
+                if (rowProp === 'nested') {
+                  return rowTarget[Symbol.for('table')]
+                }
+                // Handle numeric indexing for nested tables
+                if (typeof rowProp === 'string' && !isNaN(rowProp)) {
+                  const nestedTable = rowTarget[Symbol.for('table')]
+                  if (nestedTable) {
+                    return nestedTable.rows[parseInt(rowProp)]
+                  }
+                }
                 // Return the table if explicitly requested via Symbol
                 if (rowProp === Symbol.for('table')) {
                   return rowTarget[Symbol.for('table')]

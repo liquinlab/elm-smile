@@ -73,9 +73,15 @@ const table = stepper.new().append([
 
 #### Nested Tables
 
-You can create nested tables within individual rows. This is useful when you
-want to create hierarchical trial structures or when each trial needs its own
-sequence of sub-trials:
+You can create nested tables within individual rows. This is particularly useful
+when you want to create hierarchical trial structures or when each trial needs
+its own sequence of sub-trials.
+
+Each row in a table can have its own nested table, which you can access in two
+ways:
+
+1. Using the `.nested` property to directly access the nested table
+2. Using array-like indexing to access rows of the nested table
 
 ```js
 const stepper = api.useHStepper()
@@ -86,7 +92,14 @@ const trials = stepper.new().range(3)
 // Create nested tables for specific trials
 trials[0].new().range(3) // First trial gets 3 sub-trials
 trials[1].new().range(5) // Second trial gets 5 sub-trials
-trials[1].new().append({ color: 'red', shape: 'triangle' }) // Add another sub-trial
+
+// Access nested tables using .nested
+console.log(trials[0].nested.rows.length) // 3
+console.log(trials[1].nested.rows.length) // 5
+
+// Access nested table rows directly using array indexing
+console.log(trials[0][0]) // First row of first trial's nested table
+console.log(trials[1][2]) // Third row of second trial's nested table
 
 // You can chain operations on nested tables
 const nestedTable = trials[0]
@@ -96,21 +109,19 @@ const nestedTable = trials[0]
   .append([{ index: 3, type: 'extra' }])
 ```
 
-Each row in a table can have its own nested table, and you can perform all the
-same operations on nested tables that you can on parent tables (append, range,
-forEach, etc.).
-
 ::: tip Multiple Nested Tables
 
-You can create multiple nested tables for the same row. Only the most recently
-created table will be stored in the row:
+Each row can only have one nested table at a time. Creating a new nested table
+will overwrite any existing one:
 
 ```js
 // Create two nested tables for the first trial
 const nestedTable1 = trials[0].new().range(2)
 const nestedTable2 = trials[0].new().range(3)
 
-// trials[0] will now reference nestedTable2
+// trials[0].nested will now reference nestedTable2
+// nestedTable1 is no longer accessible through trials[0]
+console.log(trials[0].nested.rows.length) // 3
 ```
 
 :::
