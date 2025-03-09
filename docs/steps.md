@@ -622,6 +622,117 @@ const table = stepper
 // ]
 ```
 
+#### Mapping Over Trials with map()
+
+The `map()` method provides a simpler and more intuitive way to transform trials
+compared to `forEach()`. It supports two styles of usage:
+
+1. Using a regular function where `this` refers to the current row:
+
+```js
+const table = stepper
+  .new()
+  .append([
+    { shape: 'circle', color: 'red' },
+    { shape: 'square', color: 'green' },
+  ])
+  .map(function (index) {
+    // 'this' refers to the current row
+    return {
+      ...this, // Important: spread the original properties to preserve them
+      id: index,
+      color: this.shape === 'circle' ? 'blue' : this.color,
+    }
+  })
+```
+
+2. Using an arrow function that receives the row as a parameter:
+
+```js
+const table = stepper
+  .new()
+  .append([
+    { shape: 'circle', color: 'red' },
+    { shape: 'square', color: 'green' },
+  ])
+  .map((row, index) => ({
+    ...row, // Important: spread the original properties to preserve them
+    id: index,
+    color: row.shape === 'circle' ? 'blue' : row.color,
+  }))
+```
+
+Both approaches result in:
+
+```js
+// [
+//   { shape: 'circle', color: 'blue', id: 0 },
+//   { shape: 'square', color: 'green', id: 1 }
+// ]
+```
+
+::: tip Function Styles The `map()` method automatically detects which style
+you're using based on the number of parameters in your function:
+
+- If your function takes one parameter, it's treated as a regular function with
+  `this` binding
+- If your function takes two parameters, it's treated as an arrow function
+  receiving `(row, index)`
+
+Choose the style that best fits your coding preferences:
+
+```js
+// Style 1: Regular function with 'this'
+table.map(function (index) {
+  return { ...this, id: index }
+})
+
+// Style 2: Arrow function with row parameter
+table.map((row, index) => ({ ...row, id: index }))
+```
+
+:::
+
+::: warning Preserving Properties When returning a new object from your mapping
+function, make sure to spread the original properties (`...this` or `...row`) if
+you want to preserve them. Otherwise, they will be lost:
+
+```js
+// ❌ Original properties are lost
+table.map((row, index) => ({ id: index }))
+
+// ✅ Original properties are preserved
+table.map((row, index) => ({ ...row, id: index }))
+```
+
+:::
+
+::: tip Nested Tables Both styles support working with nested tables. With
+regular functions use `this.new()`, with arrow functions use `row.new()`. Nested
+tables are automatically preserved when you spread the original properties:
+
+```js
+// Using regular function
+trials.map(function (index) {
+  this.new().append([
+    { type: 'stim', trial: index },
+    { type: 'feedback', trial: index },
+  ])
+  return { ...this, block: Math.floor(index / 2) }
+})
+
+// Using arrow function
+trials.map((row, index) => {
+  row.new().append([
+    { type: 'stim', trial: index },
+    { type: 'feedback', trial: index },
+  ])
+  return { ...row, block: Math.floor(index / 2) }
+})
+```
+
+:::
+
 #### Shuffling Trials
 
 The `shuffle()` method allows you to randomize the order of trials. This is

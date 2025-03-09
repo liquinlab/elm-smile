@@ -447,6 +447,54 @@ export class NestedTable {
         return this
       },
 
+      map(fn) {
+        this.rows = this.rows.map((row, index) => {
+          // Create a proxy for the row to support nested table creation and method access
+          const proxiedRow = new Proxy(row, {
+            get(rowTarget, rowProp) {
+              if (rowProp === 'new') {
+                return () => {
+                  const nestedTable = api.new()
+                  rowTarget[Symbol.for('table')] = nestedTable
+                  return nestedTable
+                }
+              }
+              if (rowProp === Symbol.for('table')) {
+                return rowTarget[Symbol.for('table')]
+              }
+              if (rowProp === 'table') {
+                return undefined
+              }
+              if (rowProp === 'length') {
+                return 1
+              }
+              if (rowProp === 'append') {
+                return (input) => {
+                  if (Array.isArray(input)) {
+                    Object.assign(rowTarget, ...input)
+                  } else if (input && typeof input === 'object') {
+                    Object.assign(rowTarget, input)
+                  }
+                  return proxiedRow
+                }
+              }
+              return rowTarget[rowProp]
+            },
+          })
+
+          // Support both styles:
+          // 1. Regular function with 'this' binding: function(index) { return {...this, id: index} }
+          // 2. Arrow function with row param: (row, index) => ({...row, id: index})
+          const result =
+            fn.length > 1
+              ? fn(proxiedRow, index) // Arrow function style with row parameter
+              : fn.call(proxiedRow, index) // Regular function style with this binding
+
+          return result || row
+        })
+        return this
+      },
+
       zip(trials, options = {}) {
         if (typeof trials !== 'object' || trials === null) {
           throw new Error('zip() requires an object with arrays as values')
