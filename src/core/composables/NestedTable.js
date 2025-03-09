@@ -601,6 +601,36 @@ export class NestedTable {
         this.rows = this.rows.slice(-n)
         return this
       },
+
+      partition(n) {
+        if (n <= 0) {
+          throw new Error('partition() must be called with a positive integer')
+        }
+
+        if (this.rows.length === 0) {
+          return this
+        }
+
+        // Calculate chunk size (rounded up to ensure all items are included)
+        const chunkSize = Math.ceil(this.rows.length / n)
+
+        // Create chunks
+        const chunks = []
+        for (let i = 0; i < this.rows.length; i += chunkSize) {
+          chunks.push(this.rows.slice(i, i + chunkSize))
+        }
+
+        // Create new rows with nested tables
+        this.rows = chunks.map((chunk, i) => {
+          const row = { partition: i }
+          const nestedTable = api.new()
+          nestedTable.rows = chunk
+          row[Symbol.for('table')] = nestedTable
+          return row
+        })
+
+        return this
+      },
     }
   }
 }

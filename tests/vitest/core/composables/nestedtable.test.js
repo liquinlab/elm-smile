@@ -964,7 +964,91 @@ describe('NestedTable', () => {
     })
   })
 
-  describe('shuffle functionality', () => {
+  describe('partition()', () => {
+    it('should partition table into n chunks', () => {
+      const table1 = table.new().range(6)
+      table1.partition(2)
+
+      expect(table1.rows).toHaveLength(2)
+      expect(table1.rows[0].partition).toBe(0)
+      expect(table1.rows[1].partition).toBe(1)
+
+      // Check first partition
+      const partition1 = table1.rows[0][Symbol.for('table')]
+      expect(partition1.rows).toHaveLength(3)
+      expect(partition1.rows[0]).toEqual({ range: 0 })
+      expect(partition1.rows[1]).toEqual({ range: 1 })
+      expect(partition1.rows[2]).toEqual({ range: 2 })
+
+      // Check second partition
+      const partition2 = table1.rows[1][Symbol.for('table')]
+      expect(partition2.rows).toHaveLength(3)
+      expect(partition2.rows[0]).toEqual({ range: 3 })
+      expect(partition2.rows[1]).toEqual({ range: 4 })
+      expect(partition2.rows[2]).toEqual({ range: 5 })
+    })
+
+    it('should handle uneven partitions', () => {
+      const table1 = table.new().range(5)
+      table1.partition(2)
+
+      expect(table1.rows).toHaveLength(2)
+
+      // First partition should have 3 items (rounded up)
+      const partition1 = table1.rows[0][Symbol.for('table')]
+      expect(partition1.rows).toHaveLength(3)
+      expect(partition1.rows[0]).toEqual({ range: 0 })
+      expect(partition1.rows[1]).toEqual({ range: 1 })
+      expect(partition1.rows[2]).toEqual({ range: 2 })
+
+      // Second partition should have 2 items
+      const partition2 = table1.rows[1][Symbol.for('table')]
+      expect(partition2.rows).toHaveLength(2)
+      expect(partition2.rows[0]).toEqual({ range: 3 })
+      expect(partition2.rows[1]).toEqual({ range: 4 })
+    })
+
+    it('should handle empty table', () => {
+      const table1 = table.new()
+      table1.partition(2)
+      expect(table1.rows).toHaveLength(0)
+    })
+
+    it('should throw error if n <= 0', () => {
+      const table1 = table.new().range(6)
+      expect(() => {
+        table1.partition(0)
+      }).toThrow('partition() must be called with a positive integer')
+      expect(() => {
+        table1.partition(-1)
+      }).toThrow('partition() must be called with a positive integer')
+    })
+
+    it('should be chainable with other methods', () => {
+      const table1 = table
+        .new()
+        .range(6)
+        .partition(2)
+        .forEach((row) => {
+          row[Symbol.for('table')].forEach((item) => {
+            item.type = 'test'
+          })
+        })
+
+      // Check that forEach worked on nested tables
+      const partition1 = table1.rows[0][Symbol.for('table')]
+      const partition2 = table1.rows[1][Symbol.for('table')]
+
+      partition1.rows.forEach((row) => {
+        expect(row.type).toBe('test')
+      })
+      partition2.rows.forEach((row) => {
+        expect(row.type).toBe('test')
+      })
+    })
+  })
+
+  describe('shuffle()', () => {
     it('should shuffle rows with a specific seed', () => {
       const table1 = table.new().append([
         { id: 1, value: 'a' },
