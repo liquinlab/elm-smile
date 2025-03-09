@@ -350,4 +350,202 @@ describe('useHStepper composable', () => {
       })
     })
   })
+
+  describe('push() method', () => {
+    it.only('should push a table to the state machine', async () => {
+      const { step, table } = getCurrentRouteStepper()
+      const trials = table.new().range(10)
+      trials.print()
+      step.push(trials)
+      console.log(step.sm.getTreeDiagram())
+      expect(step.sm.current).toBe(trials)
+    })
+  })
+
+  describe.skip('stepper state machine integration', () => {
+    let smilestore
+
+    beforeEach(async () => {
+      // Reset mock state
+      vi.clearAllMocks()
+
+      // Create a fresh router for each test
+      router = createRouter({
+        history: createWebHashHistory(),
+        routes,
+      })
+
+      // Create pinia instance and set it as active
+      const pinia = createTestingPinia({
+        stubActions: false,
+        createSpy: vi.fn,
+      })
+      setActivePinia(pinia)
+
+      // Mount the test component
+      wrapper = mount(TestComponent, {
+        global: {
+          plugins: [pinia, router],
+          stubs: {
+            RouterLink: true,
+          },
+        },
+      })
+
+      // Navigate to the first route and wait for it to be ready
+      await router.push('/')
+      await router.isReady()
+      await flushPromises()
+
+      // Get API and smilestore instances
+      api = getCurrentRouteAPI()
+      smilestore = useSmileStore()
+
+      // Ensure page tracker is registered for the current route
+      const currentRoute = router.currentRoute.value
+      smilestore.registerPageTracker(currentRoute.name)
+    })
+
+    it('should correctly build and push trials to state machine', async () => {
+      const { step, table } = getCurrentRouteStepper()
+
+      // Build a simple trial structure
+      const trials = table
+        .new()
+        .append({ type: 'instruction' })
+        .append({ type: 'trial', id: 1 })
+        .append({ type: 'trial', id: 2 })
+
+      // Push trials to state machine
+      step.push(trials)
+
+      // Verify initial state
+      expect(step.sm).toBeDefined()
+      expect(step.index.value).toBe(0)
+
+      // Verify state machine contains correct trials
+      let currentTrial = step.next()
+      expect(currentTrial).toEqual({ type: 'instruction' })
+
+      currentTrial = step.next()
+      expect(currentTrial).toEqual({ type: 'trial', id: 1 })
+
+      currentTrial = step.next()
+      expect(currentTrial).toEqual({ type: 'trial', id: 2 })
+
+      // Verify we've reached the end
+      expect(step.next()).toBeNull()
+    })
+
+    it('should handle nested trial structures', async () => {
+      const { step, table } = getCurrentRouteStepper()
+
+      // Build a nested trial structure
+      const trials = table.new()
+      trials.append({ phase: 'training' })
+
+      // Add nested trials to the training phase
+      const nestedTrials = trials[0]
+        .new()
+        .append({ type: 'instruction' })
+        .append({ type: 'practice', id: 1 })
+        .append({ type: 'practice', id: 2 })
+
+      // Push trials to state machine
+      step.push(trials)
+
+      // Verify navigation through nested structure
+      let currentTrial = step.next()
+      expect(currentTrial).toEqual({ phase: 'training' })
+
+      // Push nested trials
+      step.push(nestedTrials)
+
+      // Verify nested trials
+      currentTrial = step.next()
+      expect(currentTrial).toEqual({ type: 'instruction' })
+
+      currentTrial = step.next()
+      expect(currentTrial).toEqual({ type: 'practice', id: 1 })
+
+      currentTrial = step.next()
+      expect(currentTrial).toEqual({ type: 'practice', id: 2 })
+    })
+
+    it('should persist state in smilestore', async () => {
+      const { step, table } = getCurrentRouteStepper()
+
+      // Build and push trials
+      const trials = table.new().append({ type: 'trial', id: 1 }).append({ type: 'trial', id: 2 })
+
+      step.push(trials)
+
+      // Navigate forward
+      const firstTrial = step.next()
+      expect(firstTrial).toEqual({ type: 'trial', id: 1 })
+
+      // Get current route and verify state is saved
+      const currentRoute = router.currentRoute.value
+      const pageData = smilestore.getPageTrackerData(currentRoute.name)
+      expect(pageData).toBeDefined()
+      expect(pageData.stepperState).toBeDefined()
+
+      // Create a new stepper instance (simulating page reload)
+      const { step: newStep } = getCurrentRouteStepper()
+
+      // Verify state is restored
+      const currentTrial = newStep.next()
+      expect(currentTrial).toEqual({ type: 'trial', id: 2 })
+    })
+
+    it('should handle reset correctly', async () => {
+      const { step, table } = getCurrentRouteStepper()
+
+      // Build and push trials
+      const trials = table.new().append({ type: 'trial', id: 1 }).append({ type: 'trial', id: 2 })
+
+      step.push(trials)
+
+      // Navigate forward
+      step.next()
+      step.next()
+
+      // Reset state
+      step.reset()
+
+      // Verify state machine is reset
+      expect(step.index.value).toBe(0)
+
+      // Verify state is cleared from smilestore
+      const currentRoute = router.currentRoute.value
+      const pageData = smilestore.getPageTrackerData(currentRoute.name)
+      expect(pageData).toBeDefined()
+      expect(pageData.stepperState).toBeNull()
+
+      // Verify we can navigate from beginning again
+      const firstTrial = step.next()
+      expect(firstTrial).toEqual({ type: 'trial', id: 1 })
+    })
+
+    // Add test for array input
+    it('should accept plain arrays as input', async () => {
+      const { step } = getCurrentRouteStepper()
+
+      // Create a plain array of trials
+      const trials = [
+        { type: 'trial', id: 1 },
+        { type: 'trial', id: 2 },
+      ]
+
+      // Push trials to state machine
+      step.push(trials)
+
+      // Verify navigation works
+      let currentTrial = step.next()
+      expect(currentTrial).toEqual({ type: 'trial', id: 1 })
+
+      currentTrial = step.next()
+      expect(currentTrial).toEqual({ type: 'trial', id: 2 })
+    })
+  })
 })
