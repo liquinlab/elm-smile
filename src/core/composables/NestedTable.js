@@ -7,6 +7,7 @@ export class NestedTable {
   constructor() {
     // Internal storage for nested tables
     this.tables = new Map()
+    this.readOnly = false
   }
 
   // Create a new table instance with chainable API
@@ -25,9 +26,12 @@ export class NestedTable {
             return new Proxy(row, {
               get(rowTarget, rowProp) {
                 // If the property is new(), return a function that creates a new table
-                if (rowProp === 'new') {
+                if (rowProp === 'table') {
                   return () => {
-                    const newTable = api.new()
+                    if (target.readOnly) {
+                      throw new Error('Table is read-only after push()')
+                    }
+                    const newTable = api.table()
                     // Store the new table in a Symbol to hide it from enumeration
                     const tableSymbol = Symbol.for('table')
                     rowTarget[tableSymbol] = newTable
@@ -42,7 +46,58 @@ export class NestedTable {
                 if (typeof rowProp === 'string' && !isNaN(rowProp)) {
                   const nestedTable = rowTarget[Symbol.for('table')]
                   if (nestedTable) {
-                    return nestedTable.rows[parseInt(rowProp)]
+                    const nestedRow = nestedTable.rows[parseInt(rowProp)]
+                    if (nestedRow) {
+                      // Return a proxy for the nested row that adds the chainable API
+                      return new Proxy(nestedRow, {
+                        get(nestedRowTarget, nestedRowProp) {
+                          if (nestedRowProp === 'table') {
+                            return () => {
+                              if (nestedTable.readOnly) {
+                                throw new Error('Table is read-only after push()')
+                              }
+                              const newTable = api.table()
+                              nestedRowTarget[Symbol.for('table')] = newTable
+                              return newTable
+                            }
+                          }
+                          if (nestedRowProp === Symbol.for('table')) {
+                            return nestedRowTarget[Symbol.for('table')]
+                          }
+                          if (nestedRowProp === 'table') {
+                            return undefined
+                          }
+                          if (nestedRowProp === 'data') {
+                            // Return the raw data stored at this node, excluding internal properties
+                            return Object.fromEntries(
+                              Object.entries(nestedRowTarget).filter(
+                                ([key]) => typeof key === 'string' && key !== 'table' && !nestedRowTarget[key]?.rows
+                              )
+                            )
+                          }
+                          if (nestedRowProp === 'length') {
+                            // For nested table rows, return null since they are nodes, not lists
+                            return null
+                          }
+                          // Add support for table methods
+                          if (nestedRowProp === 'append') {
+                            return (input) => {
+                              if (nestedTable.readOnly) {
+                                throw new Error('Table is read-only after push()')
+                              }
+                              if (Array.isArray(input)) {
+                                Object.assign(nestedRowTarget, ...input)
+                              } else if (input && typeof input === 'object') {
+                                Object.assign(nestedRowTarget, input)
+                              }
+                              return nestedRowTarget
+                            }
+                          }
+                          return nestedRowTarget[nestedRowProp]
+                        },
+                      })
+                    }
+                    return nestedRow
                   }
                 }
                 // Return the table if explicitly requested via Symbol
@@ -53,8 +108,22 @@ export class NestedTable {
                 if (rowProp === 'table') {
                   return undefined
                 }
+                if (rowProp === 'data') {
+                  // Return the raw data stored at this node, excluding internal properties
+                  return Object.fromEntries(
+                    Object.entries(rowTarget).filter(
+                      ([key]) => typeof key === 'string' && key !== 'table' && !rowTarget[key]?.rows
+                    )
+                  )
+                }
                 if (rowProp === 'length') {
-                  return 1
+                  // If the row has a nested table, return its length
+                  const nestedTable = rowTarget[Symbol.for('table')]
+                  if (nestedTable) {
+                    return nestedTable.rows.length
+                  }
+                  // For non-nested entries, return null since they are nodes, not lists
+                  return null
                 }
                 return rowTarget[rowProp]
               },
@@ -92,6 +161,14 @@ export class NestedTable {
   createTableAPI(api) {
     return {
       rows: [],
+      readOnly: false,
+
+      isReadOnly() {
+        if (this.readOnly) {
+          throw new Error('Table is read-only after push()')
+        }
+        return false
+      },
 
       get length() {
         return this.rows.length
@@ -125,7 +202,25 @@ export class NestedTable {
       },
 
       indexOf(...args) {
-        return this.rows.indexOf(...args)
+        const searchValue = args[0]
+        for (let i = 0; i < this.rows.length; i++) {
+          if (this.isEqual(this.rows[i], searchValue)) {
+            return i
+          }
+        }
+        return -1
+      },
+
+      // Helper method for deep object comparison
+      isEqual(obj1, obj2) {
+        if (obj1 === obj2) return true
+        if (obj1 == null || obj2 == null || typeof obj1 !== 'object' || typeof obj2 !== 'object') {
+          return obj1 === obj2
+        }
+        const keys1 = Object.keys(obj1)
+        const keys2 = Object.keys(obj2)
+        if (keys1.length !== keys2.length) return false
+        return keys1.every((key) => this.isEqual(obj1[key], obj2[key]))
       },
 
       slice(...args) {
@@ -138,6 +233,7 @@ export class NestedTable {
       },
 
       append(input) {
+        this.isReadOnly()
         if (Array.isArray(input)) {
           const newLength = this.rows.length + input.length
           if (newLength > config.max_stepper_rows) {
@@ -168,6 +264,7 @@ export class NestedTable {
       },
 
       interleave(input) {
+        this.isReadOnly()
         let inputRows = []
         if (Array.isArray(input)) {
           inputRows = input
@@ -203,6 +300,7 @@ export class NestedTable {
       },
 
       shuffle(seed) {
+        this.isReadOnly()
         // Only create a new RNG if a seed is provided
         // Otherwise use the global seeded RNG that was set by the router
         const rng = seed ? seedrandom(seed) : Math.random
@@ -216,6 +314,7 @@ export class NestedTable {
       },
 
       sample(options = {}) {
+        this.isReadOnly()
         if (this.rows.length === 0) return this
 
         if (hasNestedTables(this.rows)) {
@@ -382,6 +481,7 @@ export class NestedTable {
       },
 
       repeat(n) {
+        this.isReadOnly()
         if (n <= 0 || this.rows.length === 0) return this
         const totalRows = this.rows.length * n
         if (totalRows > config.max_stepper_rows) {
@@ -398,7 +498,7 @@ export class NestedTable {
             // If the row has a nested table, create a new one with deep copied data
             const nestedTable = row[Symbol.for('table')]
             if (nestedTable) {
-              const newNestedTable = api.new()
+              const newNestedTable = api.table()
               // Deep copy each row in the nested table
               newNestedTable.rows = nestedTable.rows.map((nestedRow) => JSON.parse(JSON.stringify(nestedRow)))
               newRow[Symbol.for('table')] = newNestedTable
@@ -415,27 +515,64 @@ export class NestedTable {
           // Use push_table to handle nested structure
           api.sm.push_table(this.rows)
         }
-        // Return a proxy that catches any attempts to chain methods after push()
-        return new Proxy(
-          {},
-          {
-            get(target, prop) {
-              throw new Error(
-                'No more table operations can be chained after push(). The push() method must be the final operation in the chain.'
-              )
-            },
+
+        // Set this table and all nested tables to read-only
+        this.readOnly = true
+        this.rows.forEach((row) => {
+          const nestedTable = row[Symbol.for('table')]
+          if (nestedTable) {
+            nestedTable.readOnly = true
+            // Recursively set nested tables to read-only
+            nestedTable.rows.forEach((nestedRow) => {
+              const deeperTable = nestedRow[Symbol.for('table')]
+              if (deeperTable) {
+                deeperTable.readOnly = true
+              }
+            })
           }
-        )
+        })
+
+        // Create a read-only proxy that allows read operations but blocks modifications
+        return new Proxy(this, {
+          get(target, prop) {
+            // Handle iterator specially
+            if (prop === Symbol.iterator) {
+              return target.rows[Symbol.iterator]
+            }
+
+            // Allow read-only operations
+            if (['length', 'print', 'indexOf', 'slice', Symbol.isConcatSpreadable].includes(prop)) {
+              const value = target[prop]
+              // If it's a method, bind it to the target
+              if (typeof value === 'function') {
+                return value.bind(target)
+              }
+              return value
+            }
+
+            // Allow numeric indexing for reading rows
+            if (typeof prop === 'string' && !isNaN(prop)) {
+              return target.rows[parseInt(prop)]
+            }
+
+            // Block all other operations
+            throw new Error('Table is read-only after push()')
+          },
+          set() {
+            throw new Error('Table is read-only after push()')
+          },
+        })
       },
 
       forEach(callback) {
+        this.isReadOnly()
         this.rows = this.rows.map((row, index) => {
           // Create a proxy for the row to support nested table creation
           const proxiedRow = new Proxy(row, {
             get(rowTarget, rowProp) {
-              if (rowProp === 'new') {
+              if (rowProp === 'table') {
                 return () => {
-                  const nestedTable = api.new()
+                  const nestedTable = api.table()
                   rowTarget[Symbol.for('table')] = nestedTable
                   return nestedTable
                 }
@@ -446,9 +583,22 @@ export class NestedTable {
               if (rowProp === 'table') {
                 return undefined
               }
+              if (rowProp === 'data') {
+                // Return the raw data stored at this node, excluding internal properties
+                return Object.fromEntries(
+                  Object.entries(rowTarget).filter(
+                    ([key]) => typeof key === 'string' && key !== 'table' && !rowTarget[key]?.rows
+                  )
+                )
+              }
               if (rowProp === 'length') {
-                // Return 1 since each row represents a single item
-                return 1
+                // If the row has a nested table, return its length
+                const nestedTable = rowTarget[Symbol.for('table')]
+                if (nestedTable) {
+                  return nestedTable.rows.length
+                }
+                // For non-nested entries, return null since they are nodes, not lists
+                return null
               }
               // Add support for table methods
               if (rowProp === 'append') {
@@ -472,13 +622,14 @@ export class NestedTable {
       },
 
       map(fn) {
+        this.isReadOnly()
         this.rows = this.rows.map((row, index) => {
           // Create a proxy for the row to support nested table creation and method access
           const proxiedRow = new Proxy(row, {
             get(rowTarget, rowProp) {
-              if (rowProp === 'new') {
+              if (rowProp === 'table') {
                 return () => {
-                  const nestedTable = api.new()
+                  const nestedTable = api.table()
                   rowTarget[Symbol.for('table')] = nestedTable
                   return nestedTable
                 }
@@ -489,8 +640,22 @@ export class NestedTable {
               if (rowProp === 'table') {
                 return undefined
               }
+              if (rowProp === 'data') {
+                // Return the raw data stored at this node, excluding internal properties
+                return Object.fromEntries(
+                  Object.entries(rowTarget).filter(
+                    ([key]) => typeof key === 'string' && key !== 'table' && !rowTarget[key]?.rows
+                  )
+                )
+              }
               if (rowProp === 'length') {
-                return 1
+                // If the row has a nested table, return its length
+                const nestedTable = rowTarget[Symbol.for('table')]
+                if (nestedTable) {
+                  return nestedTable.rows.length
+                }
+                // For non-nested entries, return null since they are nodes, not lists
+                return null
               }
               if (rowProp === 'append') {
                 return (input) => {
@@ -520,6 +685,7 @@ export class NestedTable {
       },
 
       zip(trials, options = {}) {
+        this.isReadOnly()
         if (typeof trials !== 'object' || trials === null) {
           throw new Error('zip() requires an object with arrays as values')
         }
@@ -593,6 +759,7 @@ export class NestedTable {
       },
 
       outer(trials, options = {}) {
+        this.isReadOnly()
         if (typeof trials !== 'object' || trials === null) {
           throw new Error('outer() requires an object with arrays as values')
         }
@@ -637,18 +804,20 @@ export class NestedTable {
         return this
       },
 
-      range(n) {
+      range(n, fieldName = 'range') {
+        this.isReadOnly()
         if (n <= 0) {
           throw new Error('range() must be called with a positive integer')
         }
         const rows = Array(n)
           .fill(null)
-          .map((_, i) => ({ range: i }))
+          .map((_, i) => ({ [fieldName]: i }))
         this.rows = [...this.rows, ...rows]
         return this
       },
 
       head(n) {
+        this.isReadOnly()
         if (n <= 0) {
           throw new Error('head() must be called with a positive integer')
         }
@@ -662,6 +831,7 @@ export class NestedTable {
       },
 
       tail(n) {
+        this.isReadOnly()
         if (n <= 0) {
           throw new Error('tail() must be called with a positive integer')
         }
@@ -675,6 +845,7 @@ export class NestedTable {
       },
 
       partition(n) {
+        this.isReadOnly()
         if (n <= 0) {
           throw new Error('partition() must be called with a positive integer')
         }
@@ -695,7 +866,7 @@ export class NestedTable {
         // Create new rows with nested tables
         this.rows = chunks.map((chunk, i) => {
           const row = { partition: i }
-          const nestedTable = api.new()
+          const nestedTable = api.table()
           nestedTable.rows = chunk
           row[Symbol.for('table')] = nestedTable
           return row

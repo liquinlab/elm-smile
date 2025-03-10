@@ -70,11 +70,11 @@ export class StepperStateMachine {
 
   /**
    * Gets data associated with the current node
-   * @returns {Object|null} Data object associated with the current node, or null if no data
+   * @returns {Array} Array containing data object associated with the current node, or empty array if no data
    */
   getData() {
     const pathData = this.getDataAlongPath()
-    return pathData.length > 0 ? pathData[pathData.length - 1] : null
+    return pathData.length > 0 ? [pathData[pathData.length - 1]] : []
   }
 
   /**
@@ -108,9 +108,12 @@ export class StepperStateMachine {
     }
 
     const processRows = (rows, parentState) => {
-      rows.forEach((row, index) => {
-        // Create a new state using the index as the value/path name
-        const state = parentState.push(index)
+      // Get the current length of states to continue indexing from there
+      const startIndex = parentState.states.length
+
+      rows.forEach((row, localIndex) => {
+        // Use the startIndex + localIndex to continue the sequence
+        const state = parentState.push(startIndex + localIndex)
 
         // Create a copy of the row data without the nested table property
         const rowData = { ...row }

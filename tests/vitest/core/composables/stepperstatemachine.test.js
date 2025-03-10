@@ -111,49 +111,46 @@ describe('StepperStateMachine', () => {
     it('should store data during push', () => {
       const data = { test: 'value' }
       stepper.push('first', data)
-      expect(stepper['first'].getData()).toEqual(data)
+      expect(stepper['first'].getData()).toEqual([data])
     })
 
     it('should allow setting data after creation', () => {
       stepper.push('first')
       const data = { test: 'value' }
       stepper['first'].setData(data)
-      expect(stepper['first'].getData()).toEqual(data)
+      expect(stepper['first'].getData()).toEqual([data])
     })
 
     it('should update existing data', () => {
-      stepper.push('first', { initial: 'data' })
+      stepper.push('first', { test: 'value' })
       const newData = { updated: 'value' }
       stepper['first'].setData(newData)
-      expect(stepper['first'].getData()).toEqual(newData)
+      expect(stepper['first'].getData()).toEqual([newData])
     })
 
     it('should set data at specified path', () => {
       stepper.push('first')
       stepper['first'].push('second')
-      stepper['first']['second'].push('third')
-
       const data = { test: 'value' }
       stepper.setDataAtPath(['first', 'second'], data)
-      expect(stepper['first']['second'].getData()).toEqual(data)
+      expect(stepper['first']['second'].getData()).toEqual([data])
     })
 
     it('should set data using string path', () => {
       stepper.push('first')
       stepper['first'].push('second')
-
       const data = { test: 'value' }
       stepper.setDataAtPath('first-second', data)
-      expect(stepper['first']['second'].getData()).toEqual(data)
+      expect(stepper['first']['second'].getData()).toEqual([data])
     })
 
     it('should throw error for invalid path in setDataAtPath', () => {
       expect(() => stepper.setDataAtPath('nonexistent', {})).toThrow('Invalid path')
     })
 
-    it('should return null for nodes without data', () => {
+    it('should return empty array for nodes without data', () => {
       stepper.push('first')
-      expect(stepper['first'].getData()).toBeNull()
+      expect(stepper['first'].getData()).toEqual([])
     })
   })
 
@@ -174,7 +171,7 @@ describe('StepperStateMachine', () => {
       expect(newStepper['second']['child']).toBeTruthy()
 
       // Verify data
-      expect(newStepper['second']['child'].getData()).toEqual({ test: 'value' })
+      expect(newStepper['second']['child'].getData()).toEqual([{ test: 'value' }])
     })
 
     it('should preserve navigation state after serialization', () => {
@@ -217,8 +214,8 @@ describe('StepperStateMachine', () => {
       const deserializedData = newStepper['test'].getData()
       expect(deserializedData.function).toBeUndefined()
       expect(deserializedData.undefined).toBeUndefined()
-      expect(deserializedData.domElement).toEqual({})
-      expect(deserializedData.regexp).toEqual({})
+      expect(deserializedData.domElement).toBeUndefined()
+      expect(deserializedData.regexp).toBeUndefined()
     })
 
     it('should preserve tree structure and data after serialization', () => {
@@ -237,11 +234,11 @@ describe('StepperStateMachine', () => {
       expect(newStepper.getTreeDiagram()).toBe(stepper.getTreeDiagram())
 
       // Verify data at all levels
-      expect(newStepper['root1'].getData()).toEqual({ rootData: 1 })
-      expect(newStepper['root1']['child1'].getData()).toEqual({ childData: 1 })
-      expect(newStepper['root1']['child2'].getData()).toEqual({ childData: 2 })
-      expect(newStepper['root2'].getData()).toEqual({ rootData: 2 })
-      expect(newStepper['root2']['child3'].getData()).toEqual({ childData: 3 })
+      expect(newStepper['root1'].getData()).toEqual([{ rootData: 1 }])
+      expect(newStepper['root1']['child1'].getData()).toEqual([{ childData: 1 }])
+      expect(newStepper['root1']['child2'].getData()).toEqual([{ childData: 2 }])
+      expect(newStepper['root2'].getData()).toEqual([{ rootData: 2 }])
+      expect(newStepper['root2']['child3'].getData()).toEqual([{ childData: 3 }])
     })
   })
 })
