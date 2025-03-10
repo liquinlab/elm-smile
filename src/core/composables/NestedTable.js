@@ -899,6 +899,3 @@ function adjustArrayLength(arr, targetLength, method = 'pad', padValue = undefin
 function hasNestedTables(rows) {
   return rows.some((row) => row[Symbol.for('table')] !== undefined)
 }
-
-// Export the class directly instead of a singleton
-export { NestedTable }
