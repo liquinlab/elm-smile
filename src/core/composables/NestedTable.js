@@ -411,8 +411,21 @@ export class NestedTable {
       },
 
       push() {
-        // To be implemented
-        return this
+        if (api.sm) {
+          // Use push_table to handle nested structure
+          api.sm.push_table(this.rows)
+        }
+        // Return a proxy that catches any attempts to chain methods after push()
+        return new Proxy(
+          {},
+          {
+            get(target, prop) {
+              throw new Error(
+                'No more table operations can be chained after push(). The push() method must be the final operation in the chain.'
+              )
+            },
+          }
+        )
       },
 
       forEach(callback) {

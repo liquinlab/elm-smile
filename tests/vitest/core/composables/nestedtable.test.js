@@ -1852,6 +1852,35 @@ describe('NestedTable', () => {
     })
   })
 
+  describe('push()', () => {
+    it('should have push method available', () => {
+      const table1 = table.new()
+      expect(table1.push).toBeInstanceOf(Function)
+    })
+
+    it('should allow push in method chains', () => {
+      const table1 = table.new()
+      expect(() => {
+        table1.range(3).push()
+      }).not.toThrow()
+    })
+
+    it('should throw error when trying to chain methods after push', () => {
+      const table1 = table.new()
+      expect(() => {
+        table1.range(3).push().append({ value: 1 })
+      }).toThrow(
+        'No more table operations can be chained after push(). The push() method must be the final operation in the chain.'
+      )
+
+      expect(() => {
+        table1.range(3).push().shuffle()
+      }).toThrow(
+        'No more table operations can be chained after push(). The push() method must be the final operation in the chain.'
+      )
+    })
+  })
+
   describe('recursive table functionality', () => {
     it('should allow creating nested tables on rows', () => {
       const trials = table.new().range(3)

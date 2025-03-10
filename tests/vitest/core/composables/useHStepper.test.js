@@ -39,8 +39,8 @@ const MockComponent = (text = 'Mock Component') =>
     name: 'MockComponent',
     setup() {
       const api = useAPI()
-      const { step, table } = api.useHStepper()
-      return { api, step, table }
+      const stepper = api.useHStepper()
+      return { api, stepper }
     },
     template: `<div>${text}</div>`,
   })
@@ -85,7 +85,7 @@ describe('useHStepper composable', () => {
     const currentRoute = router.currentRoute.value
     const mockComponent = wrapper.findComponent(currentRoute.matched[0].components.default)
     expect(mockComponent.exists()).toBe(true)
-    return { step: mockComponent.vm.step, table: mockComponent.vm.table }
+    return mockComponent.vm.stepper
   }
 
   beforeAll(() => {
@@ -132,22 +132,22 @@ describe('useHStepper composable', () => {
 
   describe.skip('basic interactive checks', () => {
     it('should make sense to use', () => {
-      const { step } = getCurrentRouteStepper()
-      expect(step).toBeDefined()
-      expect(step.next).toBeInstanceOf(Function)
-      expect(step.prev).toBeInstanceOf(Function)
-      expect(step.reset).toBeInstanceOf(Function)
+      const stepper = getCurrentRouteStepper()
+      expect(stepper).toBeDefined()
+      expect(stepper.next).toBeInstanceOf(Function)
+      expect(stepper.prev).toBeInstanceOf(Function)
+      expect(stepper.reset).toBeInstanceOf(Function)
     })
   })
 
   it('should provide the new() method', async () => {
-    const { table } = getCurrentRouteStepper()
-    expect(table.new).toBeInstanceOf(Function)
+    const stepper = getCurrentRouteStepper()
+    expect(stepper.new).toBeInstanceOf(Function)
   })
 
   it('should create a new table with chainable methods', async () => {
-    const { table } = getCurrentRouteStepper()
-    const t1 = table.new()
+    const stepper = getCurrentRouteStepper()
+    const t1 = stepper.new()
 
     expect(t1).toBeDefined()
     expect(t1.rows).toBeDefined()
@@ -174,14 +174,14 @@ describe('useHStepper composable', () => {
   })
 
   it('should throw errors if chain methods are called before new()', async () => {
-    const { table } = getCurrentRouteStepper()
+    const stepper = getCurrentRouteStepper()
 
     // Test all chainable methods
     const methods = ['append', 'shuffle', 'sample', 'repeat', 'push', 'forEach', 'zip', 'outer', 'range']
 
     methods.forEach((method) => {
       expect(() => {
-        table[method]()
+        stepper[method]()
       }).toThrow(`${method}() must be called after new()`)
     })
   })
@@ -194,358 +194,777 @@ describe('useHStepper composable', () => {
     })
 
     it('should create the stepper', async () => {
-      const { step } = getCurrentRouteStepper()
-      expect(step).toBeDefined()
-    })
-
-    it('should create the table api', async () => {
-      const { table } = getCurrentRouteStepper()
-      expect(table).toBeDefined()
+      const stepper = getCurrentRouteStepper()
+      expect(stepper).toBeDefined()
     })
 
     it('should include the key top-level functions in the stepper', async () => {
-      const { step } = getCurrentRouteStepper()
-      expect(step).toBeDefined()
-      expect(step.next).toBeInstanceOf(Function)
-      expect(step.prev).toBeInstanceOf(Function)
-      expect(step.reset).toBeInstanceOf(Function)
-      expect(step.index).toBeDefined()
-      expect(step.current).toBeDefined()
-      expect(step.sm).toBeInstanceOf(StepperStateMachine)
+      const stepper = getCurrentRouteStepper()
+      expect(stepper).toBeDefined()
+      expect(stepper.next).toBeInstanceOf(Function)
+      expect(stepper.prev).toBeInstanceOf(Function)
+      expect(stepper.reset).toBeInstanceOf(Function)
+      expect(stepper.index).toBeDefined()
+      expect(stepper.current).toBeDefined()
+      expect(stepper.sm).toBeInstanceOf(StepperStateMachine)
     })
 
     it('should create a StepperStateMachine instance', async () => {
-      const { step } = getCurrentRouteStepper()
-      expect(step.sm).toBeInstanceOf(StepperStateMachine)
+      const stepper = getCurrentRouteStepper()
+      expect(stepper.sm).toBeInstanceOf(StepperStateMachine)
+    })
+
+    it('should provide the new() method', async () => {
+      const stepper = getCurrentRouteStepper()
+      expect(stepper.new).toBeInstanceOf(Function)
+    })
+
+    it('should provide the table API after new()', async () => {
+      const stepper = getCurrentRouteStepper()
+      const table = stepper.new()
+      expect(table).toBeInstanceOf(Object)
+      expect(table.rows).toBeInstanceOf(Array)
+      expect(table.append).toBeInstanceOf(Function)
+      expect(table.shuffle).toBeInstanceOf(Function)
+      expect(table.sample).toBeInstanceOf(Function)
+      expect(table.repeat).toBeInstanceOf(Function)
+      expect(table.push).toBeInstanceOf(Function)
+      expect(table.forEach).toBeInstanceOf(Function)
+      expect(table.zip).toBeInstanceOf(Function)
+      expect(table.outer).toBeInstanceOf(Function)
+      expect(table.range).toBeInstanceOf(Function)
+      expect(table.print).toBeInstanceOf(Function)
+      expect(table.length).toBeDefined()
+      expect(table.indexOf).toBeInstanceOf(Function)
     })
   })
 
-  describe('complex tests', () => {
-    it('should handle nesting after shuffling', async () => {
-      // specifically
-      const { table } = getCurrentRouteStepper()
-      const trials = table.new().range(10).shuffle()
-      const nestedTable = trials[0].new().range(3)
-      expect(nestedTable.rows).toHaveLength(3)
-      for (let i = 0; i < 3; i++) {
-        expect(nestedTable.rows[i]).toEqual({ range: i })
+  describe('basic table operations', () => {
+    it('should create a table with the range method', async () => {
+      const stepper = getCurrentRouteStepper()
+      const table = stepper.new().range(10)
+      expect(table).toBeInstanceOf(Object)
+      expect(table.rows).toBeInstanceOf(Array)
+      expect(table.rows).toHaveLength(10)
+      for (let i = 0; i < 10; i++) {
+        expect(table.rows[i]).toEqual({ range: i })
       }
-    })
-
-    it('should handle nesting after sampling', async () => {
-      // specifically
-      const { table } = getCurrentRouteStepper()
-      const trials = table.new().range(10)
-      trials.sample({
-        type: 'with-replacement',
-        size: 3,
-      })
-      const nestedTable = trials[0].new().range(3)
-      expect(nestedTable.rows).toHaveLength(3)
-      for (let i = 0; i < 3; i++) {
-        expect(nestedTable.rows[i]).toEqual({ range: i })
-      }
-    })
-
-    it('should handle shuffling at the top level after a nested table created', async () => {
-      const { table } = getCurrentRouteStepper()
-      const trials = table.new().range(10)
-      const nestedTable = trials[3].new().range(3)
-      trials.shuffle()
-      expect(nestedTable.rows).toHaveLength(3)
-      for (let i = 0; i < 3; i++) {
-        expect(nestedTable.rows[i]).toEqual({ range: i })
-      }
-    })
-
-    it('should raise an error when modifying dimensionality of a table with nested tables', async () => {
-      const { table } = getCurrentRouteStepper()
-      const trials = table.new().range(10)
-      const nestedTable = trials[3].new().range(3)
-
-      // Test sample()
-      expect(() => {
-        trials.sample({
-          type: 'with-replacement',
-          size: 1,
-        })
-      }).toThrow('Cannot sample a table that has nested tables')
-
-      // Test head()
-      expect(() => {
-        trials.head(5)
-      }).toThrow('Cannot take head of a table that has nested tables')
-
-      // Test tail()
-      expect(() => {
-        trials.tail(5)
-      }).toThrow('Cannot take tail of a table that has nested tables')
-
-      // Test slice()
-      expect(() => {
-        trials.slice(0, 5)
-      }).toThrow('Cannot slice a table that has nested tables')
-
-      // Verify the nested table is still intact
-      expect(nestedTable.rows).toHaveLength(3)
-      for (let i = 0; i < 3; i++) {
-        expect(nestedTable.rows[i]).toEqual({ range: i })
-      }
-    })
-
-    it('should copy the nested table when repeating', async () => {
-      const { table } = getCurrentRouteStepper()
-      const trials = table.new().range(10)
-      const nestedTable = trials[3].new().range(3)
-      trials.repeat(2)
-
-      // Verify that the original nested table is still in place
-      expect(trials[3][Symbol.for('table')]).toBe(nestedTable)
-
-      // Verify that the repeated row has a different nested table instance
-      expect(trials[13][Symbol.for('table')]).not.toBe(nestedTable)
-
-      // Verify that the repeated nested table has the same data
-      expect(trials[13][Symbol.for('table')].rows).toHaveLength(3)
-      for (let i = 0; i < 3; i++) {
-        expect(trials[13][Symbol.for('table')].rows[i]).toEqual({ range: i })
-      }
-
-      // Verify that modifying the repeated nested table doesn't affect the original
-      trials[13][Symbol.for('table')].rows[0].value = 'modified'
-      expect(trials[3][Symbol.for('table')].rows[0].value).toBeUndefined()
-    })
-
-    it('should allow creating nested tables with repeat and forEach', async () => {
-      const { table } = getCurrentRouteStepper()
-      const trials = table.new().range(10) // allocate 10 units
-      expect(trials[0].length).toBe(1)
-      trials.forEach((row, i) => {
-        row.append({ trial: i })
-        row.new().append([
-          { type: 'stim', index: i },
-          { type: 'feedback', index: i },
-        ])
-      })
-      trials.shuffle('1234')
-      trials.print()
-
-      expect(trials[0].length).toBe(1)
-      expect(Object.keys(trials[0]).length).toBe(2)
-
-      // verify that shuffle worked
-      expect(trials[0].trial).not.toBe(0) // low probability of being in sequential order esp with this seed
-
-      // After shuffling, the trial property should still exist but will be in a different order
-      const trialValues = trials.rows.map((row) => row.trial).sort()
-      expect(trialValues).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-
-      // Each row should still have its nested table with the correct index
-      trials.rows.forEach((row) => {
-        const nestedTable = row[Symbol.for('table')]
-        expect(nestedTable).toBeDefined()
-        expect(nestedTable.rows).toHaveLength(2)
-        expect(nestedTable.rows[0].index).toBe(row.trial)
-        expect(nestedTable.rows[1].index).toBe(row.trial)
-      })
     })
   })
 
-  describe('push() method', () => {
-    it.only('should push a table to the state machine', async () => {
-      const { step, table } = getCurrentRouteStepper()
-      const trials = table.new().range(10)
-      trials.print()
-      step.push(trials)
-      console.log(step.sm.getTreeDiagram())
-      expect(step.sm.current).toBe(trials)
+  describe('table push() method', () => {
+    it('should push a table to the state machine and handle stepping correctly', async () => {
+      const stepper = getCurrentRouteStepper()
+      const table = stepper.new().range(10)
+
+      // Store original table values for comparison
+      const tableValues = table.rows.map((row, i) => [{ range: i }])
+
+      // Push table to state machine
+      table.push()
+      stepper.reset()
+
+      // Verify initial state - should be at first item
+      expect(stepper.current).toEqual(tableValues[0])
+      expect(stepper.index).toEqual('0')
+      expect(stepper.sm.stepState.currentIndex).toBe(0)
+      expect(stepper.sm.getData()).toEqual(tableValues[0])
+
+      // Step through remaining trials and verify values match
+      for (let i = 1; i < 10; i++) {
+        const nextValue = stepper.next()
+        expect(nextValue).toBe(i)
+        expect(stepper.current).toEqual(tableValues[i])
+        expect(stepper.index).toEqual(i.toString())
+        expect(stepper.sm.stepState.currentIndex).toBe(i)
+        expect(stepper.sm.getData()).toEqual(tableValues[i])
+      }
+
+      // Verify we're at the end
+      expect(stepper.next()).toBeNull()
+
+      // Step backwards and verify values
+      for (let i = 8; i >= 0; i--) {
+        const prevValue = stepper.prev()
+        expect(prevValue).toBe(i)
+        expect(stepper.current).toEqual(tableValues[i])
+        expect(stepper.index).toEqual(i.toString())
+        expect(stepper.sm.stepState.currentIndex).toBe(i)
+        expect(stepper.sm.getData()).toEqual(tableValues[i])
+      }
+
+      // Test reset - should go back to first item
+      stepper.reset()
+      expect(stepper.current).toEqual(tableValues[0])
+      expect(stepper.index).toEqual('0')
+      expect(stepper.sm.stepState.currentIndex).toBe(0)
+      expect(stepper.sm.getData()).toEqual(tableValues[0])
+
+      // Verify we can step forward again after reset
+      const nextValue = stepper.next()
+      expect(nextValue).toBe(1)
+      expect(stepper.current).toEqual(tableValues[1])
+      expect(stepper.index).toEqual('1')
+      expect(stepper.sm.stepState.currentIndex).toBe(1)
+      expect(stepper.sm.getData()).toEqual(tableValues[1])
     })
-  })
 
-  describe.skip('stepper state machine integration', () => {
-    let smilestore
+    it('should require push() to be the final operation in the chain', async () => {
+      const stepper = getCurrentRouteStepper()
+      const table = stepper.new().range(10)
 
-    beforeEach(async () => {
-      // Reset mock state
-      vi.clearAllMocks()
+      // Store original table values for comparison
+      const tableValues = table.rows.map((row, i) => [{ range: i }])
 
-      // Create a fresh router for each test
-      router = createRouter({
-        history: createWebHashHistory(),
-        routes,
-      })
+      // Push table to state machine
+      table.push()
 
-      // Create pinia instance and set it as active
-      const pinia = createTestingPinia({
-        stubActions: false,
-        createSpy: vi.fn,
-      })
-      setActivePinia(pinia)
+      // Verify initial state - should be at first item
+      expect(stepper.current).toEqual(tableValues[0])
+      expect(stepper.index).toEqual('0')
+      expect(stepper.sm.stepState.currentIndex).toBe(0)
+      expect(stepper.sm.getData()).toEqual(tableValues[0])
 
-      // Mount the test component
-      wrapper = mount(TestComponent, {
-        global: {
-          plugins: [pinia, router],
-          stubs: {
-            RouterLink: true,
-          },
-        },
-      })
+      // Step through remaining trials and verify values match
+      for (let i = 1; i < 10; i++) {
+        const nextValue = stepper.next()
+        expect(nextValue).toBe(i)
+        expect(stepper.current).toEqual(tableValues[i])
+        expect(stepper.index).toEqual(i.toString())
+        expect(stepper.sm.stepState.currentIndex).toBe(i)
+        expect(stepper.sm.getData()).toEqual(tableValues[i])
+      }
 
-      // Navigate to the first route and wait for it to be ready
-      await router.push('/')
-      await router.isReady()
-      await flushPromises()
+      // Verify we're at the end
+      expect(stepper.next()).toBeNull()
 
-      // Get API and smilestore instances
-      api = getCurrentRouteAPI()
-      smilestore = useSmileStore()
+      // Step backwards and verify values
+      for (let i = 8; i >= 0; i--) {
+        const prevValue = stepper.prev()
+        expect(prevValue).toBe(i)
+        expect(stepper.current).toEqual(tableValues[i])
+        expect(stepper.index).toEqual(i.toString())
+        expect(stepper.sm.stepState.currentIndex).toBe(i)
+        expect(stepper.sm.getData()).toEqual(tableValues[i])
+      }
 
-      // Ensure page tracker is registered for the current route
-      const currentRoute = router.currentRoute.value
-      smilestore.registerPageTracker(currentRoute.name)
+      // Test reset - should go back to first item
+      stepper.reset()
+      expect(stepper.current).toEqual(tableValues[0])
+      expect(stepper.index).toEqual('0')
+      expect(stepper.sm.stepState.currentIndex).toBe(0)
+      expect(stepper.sm.getData()).toEqual(tableValues[0])
+
+      // Verify we can step forward again after reset
+      const nextValue = stepper.next()
+      expect(nextValue).toBe(1)
+      expect(stepper.current).toEqual(tableValues[1])
+      expect(stepper.index).toEqual('1')
+      expect(stepper.sm.stepState.currentIndex).toBe(1)
+      expect(stepper.sm.getData()).toEqual(tableValues[1])
     })
 
-    it('should correctly build and push trials to state machine', async () => {
-      const { step, table } = getCurrentRouteStepper()
+    it('should handle basic navigation as shown in documentation', async () => {
+      const stepper = getCurrentRouteStepper()
 
-      // Build a simple trial structure
-      const trials = table
+      // Create and push some trials
+      stepper
         .new()
-        .append({ type: 'instruction' })
-        .append({ type: 'trial', id: 1 })
-        .append({ type: 'trial', id: 2 })
+        .append([
+          { shape: 'circle', color: 'red' },
+          { shape: 'square', color: 'blue' },
+        ])
+        .push()
 
-      // Push trials to state machine
-      step.push(trials)
+      // After push(), we're at the first trial
+      expect(stepper.current).toEqual([{ shape: 'circle', color: 'red' }])
+      expect(stepper.index).toBe('0')
+
+      // Move to next trial
+      stepper.next()
+      expect(stepper.current).toEqual([{ shape: 'square', color: 'blue' }])
+      expect(stepper.index).toBe('1')
+
+      // Go back
+      stepper.prev()
+      expect(stepper.current).toEqual([{ shape: 'circle', color: 'red' }])
+      expect(stepper.index).toBe('0')
+
+      // Reset always goes to the first trial
+      stepper.reset()
+      expect(stepper.current).toEqual([{ shape: 'circle', color: 'red' }])
+      expect(stepper.index).toBe('0')
+    })
+
+    it('should handle nested tables as well', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create a nested table using map
+      const trials = stepper
+        .new()
+        .range(2) // Create 2 parent trials
+        .map((row, i) => {
+          row.append({ phase: 'parent', id: i }) // Add data to parent
+          row.new().append([
+            { type: 'stim', index: 0 },
+            { type: 'feedback', index: 1 },
+            { type: 'rest', index: 2 },
+          ]) // Each parent has 3 nested trials
+        })
+      trials.print()
+      trials.push()
+
+      console.log(stepper.sm.getTreeDiagram())
+      // Verify initial state - should be at first child item
+      expect(stepper.index).toBe('0-0')
+      expect(stepper.current).toEqual([
+        { range: 0, phase: 'parent', id: 0 },
+        { type: 'stim', index: 0 },
+      ])
+
+      // Move to second nested trial of first parent
+      stepper.next()
+      expect(stepper.current).toEqual([
+        { range: 0, phase: 'parent', id: 0 },
+        { type: 'feedback', index: 1 },
+      ])
+      expect(stepper.index).toBe('0-1')
+
+      // Move to third nested trial of first parent
+      stepper.next()
+      expect(stepper.current).toEqual([
+        { range: 0, phase: 'parent', id: 0 },
+        { type: 'rest', index: 2 },
+      ])
+      expect(stepper.index).toBe('0-2')
+
+      // Move to first nested trial of second parent
+      stepper.next()
+      expect(stepper.current).toEqual([
+        { range: 1, phase: 'parent', id: 1 },
+        { type: 'stim', index: 0 },
+      ])
+      expect(stepper.index).toBe('1-0')
+
+      // Move to second nested trial of second parent
+      stepper.next()
+      expect(stepper.current).toEqual([
+        { range: 1, phase: 'parent', id: 1 },
+        { type: 'feedback', index: 1 },
+      ])
+      expect(stepper.index).toBe('1-1')
+
+      // Move to third nested trial of second parent
+      stepper.next()
+      expect(stepper.current).toEqual([
+        { range: 1, phase: 'parent', id: 1 },
+        { type: 'rest', index: 2 },
+      ])
+      expect(stepper.index).toBe('1-2')
+
+      // Verify we're at the end
+      expect(stepper.next()).toBeNull()
+
+      // Test going backwards
+      stepper.prev()
+      expect(stepper.current).toEqual([
+        { range: 1, phase: 'parent', id: 1 },
+        { type: 'feedback', index: 1 },
+      ])
+      expect(stepper.index).toBe('1-1')
+
+      // Reset should go back to first parent's first trial
+      stepper.reset()
+      expect(stepper.current).toEqual([
+        { range: 0, phase: 'parent', id: 0 },
+        { type: 'stim', index: 0 },
+      ])
+      expect(stepper.index).toBe('0-0')
+    })
+
+    it('should handle nodes with empty data objects', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create a table with empty objects and undefined/null data
+      const trials = stepper
+        .new()
+        .append([
+          {}, // Empty object
+          { data: null }, // Object with null
+          { data: undefined }, // Object with undefined
+          { data: {} }, // Object with empty nested object
+        ])
+        .push()
 
       // Verify initial state
-      expect(step.sm).toBeDefined()
-      expect(step.index.value).toBe(0)
+      expect(stepper.current).toEqual([{}])
+      expect(stepper.index).toBe('0')
 
-      // Verify state machine contains correct trials
-      let currentTrial = step.next()
-      expect(currentTrial).toEqual({ type: 'instruction' })
+      // Navigate through all states
+      stepper.next()
+      expect(stepper.current).toEqual([{ data: null }])
+      expect(stepper.index).toBe('1')
 
-      currentTrial = step.next()
-      expect(currentTrial).toEqual({ type: 'trial', id: 1 })
+      stepper.next()
+      expect(stepper.current).toEqual([{ data: undefined }])
+      expect(stepper.index).toBe('2')
 
-      currentTrial = step.next()
-      expect(currentTrial).toEqual({ type: 'trial', id: 2 })
-
-      // Verify we've reached the end
-      expect(step.next()).toBeNull()
+      stepper.next()
+      expect(stepper.current).toEqual([{ data: {} }])
+      expect(stepper.index).toBe('3')
     })
 
-    it('should handle nested trial structures', async () => {
-      const { step, table } = getCurrentRouteStepper()
+    it('should handle nodes with missing data in the path', async () => {
+      const stepper = getCurrentRouteStepper()
 
-      // Build a nested trial structure
-      const trials = table.new()
-      trials.append({ phase: 'training' })
-
-      // Add nested trials to the training phase
-      const nestedTrials = trials[0]
+      // Create a nested structure where some nodes have no data
+      const trials = stepper
         .new()
-        .append({ type: 'instruction' })
-        .append({ type: 'practice', id: 1 })
-        .append({ type: 'practice', id: 2 })
+        .range(2) // Creates parent nodes with only range data
+        .map((row, i) => {
+          // First parent gets no additional data, second gets data
+          if (i === 1) {
+            row.append({ phase: 'parent' })
+          }
 
-      // Push trials to state machine
-      step.push(trials)
+          // Create nested trials with some missing data
+          row.new().append([
+            { type: 'stim' }, // Has data
+            {}, // No data
+            { type: 'feedback' }, // Has data
+          ])
+        })
+        .push()
 
-      // Verify navigation through nested structure
-      let currentTrial = step.next()
-      expect(currentTrial).toEqual({ phase: 'training' })
+      // Check first parent (only range data) with first child
+      expect(stepper.current).toEqual([{ range: 0 }, { type: 'stim' }])
+      expect(stepper.index).toBe('0-0')
 
-      // Push nested trials
-      step.push(nestedTrials)
+      // Move to empty data child
+      stepper.next()
+      expect(stepper.current).toEqual([{ range: 0 }, {}])
+      expect(stepper.index).toBe('0-1')
 
-      // Verify nested trials
-      currentTrial = step.next()
-      expect(currentTrial).toEqual({ type: 'instruction' })
-
-      currentTrial = step.next()
-      expect(currentTrial).toEqual({ type: 'practice', id: 1 })
-
-      currentTrial = step.next()
-      expect(currentTrial).toEqual({ type: 'practice', id: 2 })
+      // Move to second parent (has additional data) with first child
+      stepper.next()
+      stepper.next()
+      expect(stepper.current).toEqual([{ range: 1, phase: 'parent' }, { type: 'stim' }])
+      expect(stepper.index).toBe('1-0')
     })
 
-    it('should persist state in smilestore', async () => {
-      const { step, table } = getCurrentRouteStepper()
+    it('should handle deep nesting (3+ levels)', async () => {
+      const stepper = getCurrentRouteStepper()
 
-      // Build and push trials
-      const trials = table.new().append({ type: 'trial', id: 1 }).append({ type: 'trial', id: 2 })
+      // Create a deeply nested structure
+      const trials = stepper
+        .new()
+        .range(2)
+        .map((block, blockId) => {
+          block.append({ type: 'block', id: blockId })
 
-      step.push(trials)
+          // Level 2: Create trials within blocks
+          block
+            .new()
+            .range(2)
+            .map((trial, trialId) => {
+              trial.append({ type: 'trial', id: trialId })
 
-      // Navigate forward
-      const firstTrial = step.next()
-      expect(firstTrial).toEqual({ type: 'trial', id: 1 })
+              // Level 3: Create phases within trials
+              trial.new().append([
+                { type: 'stimulus', phase: 1 },
+                { type: 'response', phase: 2 },
+              ])
+            })
+        })
+        .push()
 
-      // Get current route and verify state is saved
-      const currentRoute = router.currentRoute.value
-      const pageData = smilestore.getPageTrackerData(currentRoute.name)
-      expect(pageData).toBeDefined()
-      expect(pageData.stepperState).toBeDefined()
+      // Verify initial state (first block, first trial, first phase)
+      expect(stepper.current).toEqual([
+        { range: 0, type: 'block', id: 0 },
+        { range: 0, type: 'trial', id: 0 },
+        { type: 'stimulus', phase: 1 },
+      ])
+      expect(stepper.index).toBe('0-0-0')
 
-      // Create a new stepper instance (simulating page reload)
-      const { step: newStep } = getCurrentRouteStepper()
+      // Navigate through the structure
+      stepper.next()
+      expect(stepper.current).toEqual([
+        { range: 0, type: 'block', id: 0 },
+        { range: 0, type: 'trial', id: 0 },
+        { type: 'response', phase: 2 },
+      ])
+      expect(stepper.index).toBe('0-0-1')
 
-      // Verify state is restored
-      const currentTrial = newStep.next()
-      expect(currentTrial).toEqual({ type: 'trial', id: 2 })
+      // Move to next trial's first phase
+      stepper.next()
+      expect(stepper.current).toEqual([
+        { range: 0, type: 'block', id: 0 },
+        { range: 1, type: 'trial', id: 1 },
+        { type: 'stimulus', phase: 1 },
+      ])
+      expect(stepper.index).toBe('0-1-0')
+
+      // Move to next block
+      stepper.next()
+      stepper.next()
+      expect(stepper.current).toEqual([
+        { range: 1, type: 'block', id: 1 },
+        { range: 0, type: 'trial', id: 0 },
+        { type: 'stimulus', phase: 1 },
+      ])
+      expect(stepper.index).toBe('1-0-0')
     })
 
-    it('should handle reset correctly', async () => {
-      const { step, table } = getCurrentRouteStepper()
+    it('should handle error cases and invalid paths', async () => {
+      const stepper = getCurrentRouteStepper()
 
-      // Build and push trials
-      const trials = table.new().append({ type: 'trial', id: 1 }).append({ type: 'trial', id: 2 })
+      // Create a simple nested structure
+      const trials = stepper
+        .new()
+        .range(2)
+        .map((row, i) => {
+          row.append({ phase: 'parent', id: i })
+          row.new().append([{ type: 'stim' }, { type: 'feedback' }])
+        })
+        .push()
 
-      step.push(trials)
+      // Test accessing invalid indices
+      expect(stepper.sm[999]).toBeUndefined()
+      expect(stepper.sm['nonexistent']).toBeUndefined()
 
-      // Navigate forward
-      step.next()
-      step.next()
+      // Test navigating beyond bounds
+      stepper.reset()
+      for (let i = 0; i < 10; i++) {
+        stepper.next() // Should eventually reach end without error
+      }
+      expect(stepper.next()).toBeNull() // Should handle going past end gracefully
 
-      // Reset state
-      step.reset()
+      // Test navigating backwards beyond start
+      stepper.reset()
+      expect(stepper.prev()).toBeNull() // Should handle going before start gracefully
 
-      // Verify state machine is reset
-      expect(step.index.value).toBe(0)
-
-      // Verify state is cleared from smilestore
-      const currentRoute = router.currentRoute.value
-      const pageData = smilestore.getPageTrackerData(currentRoute.name)
-      expect(pageData).toBeDefined()
-      expect(pageData.stepperState).toBeNull()
-
-      // Verify we can navigate from beginning again
-      const firstTrial = step.next()
-      expect(firstTrial).toEqual({ type: 'trial', id: 1 })
-    })
-
-    // Add test for array input
-    it('should accept plain arrays as input', async () => {
-      const { step } = getCurrentRouteStepper()
-
-      // Create a plain array of trials
-      const trials = [
-        { type: 'trial', id: 1 },
-        { type: 'trial', id: 2 },
-      ]
-
-      // Push trials to state machine
-      step.push(trials)
-
-      // Verify navigation works
-      let currentTrial = step.next()
-      expect(currentTrial).toEqual({ type: 'trial', id: 1 })
-
-      currentTrial = step.next()
-      expect(currentTrial).toEqual({ type: 'trial', id: 2 })
+      // Test resetting at various positions
+      stepper.next()
+      stepper.next()
+      stepper.reset()
+      expect(stepper.current).toEqual([{ range: 0, phase: 'parent', id: 0 }, { type: 'stim' }])
+      expect(stepper.index).toBe('0-0')
     })
   })
+
+  // describe.skip('complex tests', () => {
+  //   it('should handle nesting after shuffling', async () => {
+  //     const stepper = getCurrentRouteStepper()
+  //     const trials = stepper.new().range(10).shuffle()
+  //     const nestedTable = trials[0].new().range(3)
+  //     expect(nestedTable.rows).toHaveLength(3)
+  //     for (let i = 0; i < 3; i++) {
+  //       expect(nestedTable.rows[i]).toEqual({ range: i })
+  //     }
+  //   })
+
+  //   it('should handle nesting after sampling', async () => {
+  //     const stepper = getCurrentRouteStepper()
+  //     const trials = stepper.new().range(10)
+  //     trials.sample({
+  //       type: 'with-replacement',
+  //       size: 3,
+  //     })
+  //     const nestedTable = trials[0].new().range(3)
+  //     expect(nestedTable.rows).toHaveLength(3)
+  //     for (let i = 0; i < 3; i++) {
+  //       expect(nestedTable.rows[i]).toEqual({ range: i })
+  //     }
+  //   })
+
+  //   it('should handle shuffling at the top level after a nested table created', async () => {
+  //     const stepper = getCurrentRouteStepper()
+  //     const trials = stepper.new().range(10)
+  //     const nestedTable = trials[3].new().range(3)
+  //     trials.shuffle()
+  //     expect(nestedTable.rows).toHaveLength(3)
+  //     for (let i = 0; i < 3; i++) {
+  //       expect(nestedTable.rows[i]).toEqual({ range: i })
+  //     }
+  //   })
+
+  //   it('should raise an error when modifying dimensionality of a table with nested tables', async () => {
+  //     const stepper = getCurrentRouteStepper()
+  //     const trials = stepper.new().range(10)
+  //     const nestedTable = trials[3].new().range(3)
+
+  //     // Test sample()
+  //     expect(() => {
+  //       trials.sample({
+  //         type: 'with-replacement',
+  //         size: 1,
+  //       })
+  //     }).toThrow('Cannot sample a table that has nested tables')
+
+  //     // Test head()
+  //     expect(() => {
+  //       trials.head(5)
+  //     }).toThrow('Cannot take head of a table that has nested tables')
+
+  //     // Test tail()
+  //     expect(() => {
+  //       trials.tail(5)
+  //     }).toThrow('Cannot take tail of a table that has nested tables')
+
+  //     // Test slice()
+  //     expect(() => {
+  //       trials.slice(0, 5)
+  //     }).toThrow('Cannot slice a table that has nested tables')
+
+  //     // Verify the nested table is still intact
+  //     expect(nestedTable.rows).toHaveLength(3)
+  //     for (let i = 0; i < 3; i++) {
+  //       expect(nestedTable.rows[i]).toEqual({ range: i })
+  //     }
+  //   })
+
+  //   it('should copy the nested table when repeating', async () => {
+  //     const stepper = getCurrentRouteStepper()
+  //     const trials = stepper.new().range(10)
+  //     const nestedTable = trials[3].new().range(3)
+  //     trials.repeat(2)
+
+  //     // Verify that the original nested table is still in place
+  //     expect(trials[3][Symbol.for('table')]).toBe(nestedTable)
+
+  //     // Verify that the repeated row has a different nested table instance
+  //     expect(trials[13][Symbol.for('table')]).not.toBe(nestedTable)
+
+  //     // Verify that the repeated nested table has the same data
+  //     expect(trials[13][Symbol.for('table')].rows).toHaveLength(3)
+  //     for (let i = 0; i < 3; i++) {
+  //       expect(trials[13][Symbol.for('table')].rows[i]).toEqual({ range: i })
+  //     }
+
+  //     // Verify that modifying the repeated nested table doesn't affect the original
+  //     trials[13][Symbol.for('table')].rows[0].value = 'modified'
+  //     expect(trials[3][Symbol.for('table')].rows[0].value).toBeUndefined()
+  //   })
+
+  //   it('should allow creating nested tables with repeat and forEach', async () => {
+  //     const stepper = getCurrentRouteStepper()
+  //     const trials = stepper.new().range(10) // allocate 10 units
+  //     expect(trials[0].length).toBe(1)
+  //     trials.forEach((row, i) => {
+  //       row.append({ trial: i })
+  //       row.new().append([
+  //         { type: 'stim', index: i },
+  //         { type: 'feedback', index: i },
+  //       ])
+  //     })
+  //     trials.shuffle('1234')
+  //     trials.print()
+
+  //     expect(trials[0].length).toBe(1)
+  //     expect(Object.keys(trials[0]).length).toBe(2)
+
+  //     // verify that shuffle worked
+  //     expect(trials[0].trial).not.toBe(0) // low probability of being in sequential order esp with this seed
+
+  //     // After shuffling, the trial property should still exist but will be in a different order
+  //     const trialValues = trials.rows.map((row) => row.trial).sort()
+  //     expect(trialValues).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+  //     // Each row should still have its nested table with the correct index
+  //     trials.rows.forEach((row) => {
+  //       const nestedTable = row[Symbol.for('table')]
+  //       expect(nestedTable).toBeDefined()
+  //       expect(nestedTable.rows).toHaveLength(2)
+  //       expect(nestedTable.rows[0].index).toBe(row.trial)
+  //       expect(nestedTable.rows[1].index).toBe(row.trial)
+  //     })
+  //   })
+  // })
+
+  // describe.skip('stepper state machine integration', () => {
+  //   let smilestore
+
+  //   beforeEach(async () => {
+  //     // Reset mock state
+  //     vi.clearAllMocks()
+
+  //     // Create a fresh router for each test
+  //     router = createRouter({
+  //       history: createWebHashHistory(),
+  //       routes,
+  //     })
+
+  //     // Create pinia instance and set it as active
+  //     const pinia = createTestingPinia({
+  //       stubActions: false,
+  //       createSpy: vi.fn,
+  //     })
+  //     setActivePinia(pinia)
+
+  //     // Mount the test component
+  //     wrapper = mount(TestComponent, {
+  //       global: {
+  //         plugins: [pinia, router],
+  //         stubs: {
+  //           RouterLink: true,
+  //         },
+  //       },
+  //     })
+
+  //     // Navigate to the first route and wait for it to be ready
+  //     await router.push('/')
+  //     await router.isReady()
+  //     await flushPromises()
+
+  //     // Get API and smilestore instances
+  //     api = getCurrentRouteAPI()
+  //     smilestore = useSmileStore()
+
+  //     // Ensure page tracker is registered for the current route
+  //     const currentRoute = router.currentRoute.value
+  //     smilestore.registerPageTracker(currentRoute.name)
+  //   })
+
+  //   it('should correctly build and push trials to state machine', async () => {
+  //     const stepper = getCurrentRouteStepper()
+
+  //     // Build a simple trial structure
+  //     const trials = stepper
+  //       .new()
+  //       .append({ type: 'instruction' })
+  //       .append({ type: 'trial', id: 1 })
+  //       .append({ type: 'trial', id: 2 })
+
+  //     // Push trials to state machine
+  //     stepper.push(trials)
+
+  //     // Verify initial state
+  //     expect(stepper.sm).toBeDefined()
+  //     expect(stepper.index.value).toBe(0)
+
+  //     // Verify state machine contains correct trials
+  //     let currentTrial = stepper.next()
+  //     expect(currentTrial).toEqual({ type: 'instruction' })
+
+  //     currentTrial = stepper.next()
+  //     expect(currentTrial).toEqual({ type: 'trial', id: 1 })
+
+  //     currentTrial = stepper.next()
+  //     expect(currentTrial).toEqual({ type: 'trial', id: 2 })
+
+  //     // Verify we've reached the end
+  //     expect(stepper.next()).toBeNull()
+  //   })
+
+  //   it('should handle nested trial structures', async () => {
+  //     const stepper = getCurrentRouteStepper()
+
+  //     // Build a nested trial structure
+  //     const trials = stepper.new()
+  //     trials.append({ phase: 'training' })
+
+  //     // Add nested trials to the training phase
+  //     const nestedTrials = trials[0]
+  //       .new()
+  //       .append({ type: 'instruction' })
+  //       .append({ type: 'practice', id: 1 })
+  //       .append({ type: 'practice', id: 2 })
+
+  //     // Push trials to state machine
+  //     stepper.push(trials)
+
+  //     // Verify navigation through nested structure
+  //     let currentTrial = stepper.next()
+  //     expect(currentTrial).toEqual({ phase: 'training' })
+
+  //     // Push nested trials
+  //     stepper.push(nestedTrials)
+
+  //     // Verify nested trials
+  //     currentTrial = stepper.next()
+  //     expect(currentTrial).toEqual({ type: 'instruction' })
+
+  //     currentTrial = stepper.next()
+  //     expect(currentTrial).toEqual({ type: 'practice', id: 1 })
+
+  //     currentTrial = stepper.next()
+  //     expect(currentTrial).toEqual({ type: 'practice', id: 2 })
+  //   })
+
+  //   it('should persist state in smilestore', async () => {
+  //     const stepper = getCurrentRouteStepper()
+
+  //     // Build and push trials
+  //     const trials = stepper.new().append({ type: 'trial', id: 1 }).append({ type: 'trial', id: 2 })
+
+  //     stepper.push(trials)
+
+  //     // Navigate forward
+  //     const firstTrial = stepper.next()
+  //     expect(firstTrial).toEqual({ type: 'trial', id: 1 })
+
+  //     // Get current route and verify state is saved
+  //     const currentRoute = router.currentRoute.value
+  //     const pageData = smilestore.getPageTrackerData(currentRoute.name)
+  //     expect(pageData).toBeDefined()
+  //     expect(pageData.stepperState).toBeDefined()
+
+  //     // Create a new stepper instance (simulating page reload)
+  //     const newStepper = getCurrentRouteStepper()
+
+  //     // Verify state is restored
+  //     const currentTrial = newStepper.next()
+  //     expect(currentTrial).toEqual({ type: 'trial', id: 2 })
+  //   })
+
+  //   it('should handle reset correctly', async () => {
+  //     const stepper = getCurrentRouteStepper()
+
+  //     // Build and push trials
+  //     const trials = stepper.new().append({ type: 'trial', id: 1 }).append({ type: 'trial', id: 2 })
+
+  //     stepper.push(trials)
+
+  //     // Navigate forward
+  //     stepper.next()
+  //     stepper.next()
+
+  //     // Reset state
+  //     stepper.reset()
+
+  //     // Verify state machine is reset
+  //     expect(stepper.index.value).toBe(0)
+
+  //     // Verify state is cleared from smilestore
+  //     const currentRoute = router.currentRoute.value
+  //     const pageData = smilestore.getPageTrackerData(currentRoute.name)
+  //     expect(pageData).toBeDefined()
+  //     expect(pageData.stepperState).toBeNull()
+
+  //     // Verify we can navigate from beginning again
+  //     const firstTrial = stepper.next()
+  //     expect(firstTrial).toEqual({ type: 'trial', id: 1 })
+  //   })
+
+  //   // Add test for array input
+  //   it('should accept plain arrays as input', async () => {
+  //     const stepper = getCurrentRouteStepper()
+
+  //     // Create a plain array of trials
+  //     const trials = [
+  //       { type: 'trial', id: 1 },
+  //       { type: 'trial', id: 2 },
+  //     ]
+
+  //     // Push trials to state machine
+  //     stepper.push(trials)
+
+  //     // Verify navigation works
+  //     let currentTrial = stepper.next()
+  //     expect(currentTrial).toEqual({ type: 'trial', id: 1 })
+
+  //     currentTrial = stepper.next()
+  //     expect(currentTrial).toEqual({ type: 'trial', id: 2 })
+  //   })
+  // })
 })

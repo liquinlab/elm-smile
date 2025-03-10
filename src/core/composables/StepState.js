@@ -365,6 +365,43 @@ export class StepState {
   getData() {
     return this.data
   }
+
+  /**
+   * Gets an array of data objects from all nodes along the current path, from root to leaf.
+   * @returns {Array} Array of data objects, where each element is the complete data from a node along the path
+   */
+  getDataAlongPath() {
+    const dataArray = []
+    let current = this
+
+    // First collect data from root to current node
+    const ancestors = []
+    while (current.parent !== null) {
+      ancestors.unshift(current)
+      current = current.parent
+    }
+    // Add root node data if it exists and isn't '/'
+    if (current.value !== '/' && current.data) {
+      dataArray.push(current.data)
+    }
+    // Add ancestor data
+    ancestors.forEach((node) => {
+      if (node.data) {
+        dataArray.push(node.data)
+      }
+    })
+
+    // Now traverse down through selected children
+    current = this
+    while (current.currentIndex !== -1 && current.states.length > 0) {
+      current = current.states[current.currentIndex]
+      if (current.data) {
+        dataArray.push(current.data)
+      }
+    }
+
+    return dataArray
+  }
 }
 
 export default StepState

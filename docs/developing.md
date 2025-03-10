@@ -34,14 +34,6 @@ make modifications to your code. That's all you need to get started.
     On Mac if you press the Command (⌘) key while clicking the link it will open
     in a new tab.
 
-:::tip Translating from psiTurk
-
-If you have experience with psiTurk you will be familiar with the commands
-`psiturk server` and `psiturk debug` which created a local webserver for
-testing. `npm run dev` provides the same basic purpose with additional features.
-
-:::
-
 ## Smile developer bar
 
 When you are viewing your website on the development server there is a special

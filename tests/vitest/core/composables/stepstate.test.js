@@ -392,6 +392,77 @@ describe('StepState', () => {
       stepper.setData(null)
       expect(stepper.getData()).toBeNull()
     })
+
+    describe('getDataAlongPath', () => {
+      it('should collect data from all nodes along current path', () => {
+        // Set up a path with data
+        const child1 = stepper.push('child1')
+        const child2 = stepper.push('child2')
+        const grandchild = child1.push('grandchild')
+
+        child1.setData({ level: 1 })
+        grandchild.setData({ level: 2 })
+
+        // Navigate to grandchild
+        stepper.next() // moves to grandchild
+
+        // Should get data from child1 and grandchild
+        expect(stepper.getDataAlongPath()).toEqual([{ level: 1 }, { level: 2 }])
+      })
+
+      it('should skip nodes without data', () => {
+        const child1 = stepper.push('child1')
+        const child2 = stepper.push('child2')
+        const grandchild = child1.push('grandchild')
+
+        // Only set data on grandchild
+        grandchild.setData({ data: 'test' })
+
+        // Navigate to grandchild
+        stepper.next() // moves to grandchild
+
+        // Should only get grandchild data
+        expect(stepper.getDataAlongPath()).toEqual([{ data: 'test' }])
+      })
+
+      it('should ignore root node data', () => {
+        stepper.setData({ root: 'data' })
+        const child = stepper.push('child')
+        child.setData({ child: 'data' })
+
+        stepper.next() // move to child
+
+        // Should not include root data
+        expect(stepper.getDataAlongPath()).toEqual([{ child: 'data' }])
+      })
+
+      it('should handle complex paths with multiple data points', () => {
+        const child1 = stepper.push('child1')
+        const child2 = stepper.push('child2')
+        const grandchild1 = child1.push('grandchild1')
+        const greatgrandchild = grandchild1.push('greatgrandchild')
+
+        child1.setData({ level: 1 })
+        grandchild1.setData({ level: 2 })
+        greatgrandchild.setData({ level: 3 })
+        child2.setData({ unused: 'data' }) // This shouldn't appear in result
+
+        // Navigate to greatgrandchild
+        stepper.next() // moves to greatgrandchild
+
+        // Should get data from the path child1 -> grandchild1 -> greatgrandchild
+        expect(stepper.getDataAlongPath()).toEqual([{ level: 1 }, { level: 2 }, { level: 3 }])
+      })
+
+      it('should return empty array when no data exists along path', () => {
+        const child = stepper.push('child')
+        const grandchild = child.push('grandchild')
+
+        stepper.next() // move to grandchild
+
+        expect(stepper.getDataAlongPath()).toEqual([])
+      })
+    })
   })
 
   describe('data serialization', () => {

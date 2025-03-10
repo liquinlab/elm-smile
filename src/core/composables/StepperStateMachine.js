@@ -2,10 +2,6 @@ import { StepState } from './StepState'
 
 // todo items
 // -- get position by giving a path and then testing you can step foward correctly
-// -- instead of initalizing off of push give an array or nested array and
-// build the timeline that way
-// -- jspsych compatibility mode?
-// -- should have option to append
 // -- delete tree and start over
 // -- check serializing
 
@@ -65,11 +61,20 @@ export class StepperStateMachine {
   }
 
   /**
+   * Gets data associated with the current node and all its ancestors in the current path
+   * @returns {Array} Array of data objects from all nodes along the current path
+   */
+  getDataAlongPath() {
+    return this.stepState.getDataAlongPath()
+  }
+
+  /**
    * Gets data associated with the current node
-   * @returns {Object|null} The node's data or null if none exists
+   * @returns {Object|null} Data object associated with the current node, or null if no data
    */
   getData() {
-    return this.stepState.getData()
+    const pathData = this.getDataAlongPath()
+    return pathData.length > 0 ? pathData[pathData.length - 1] : null
   }
 
   /**
@@ -93,6 +98,55 @@ export class StepperStateMachine {
   }
 
   /**
+   * Pushes a nested table structure into the state machine, preserving hierarchy
+   * @param {Array} rows - Array of row objects that may contain nested tables
+   * @returns {StepState} The root state that was created
+   */
+  push_table(rows) {
+    if (!Array.isArray(rows)) {
+      throw new Error('push_table() requires an array of rows')
+    }
+
+    const processRows = (rows, parentState) => {
+      rows.forEach((row, index) => {
+        // Create a new state using the index as the value/path name
+        const state = parentState.push(index)
+
+        // Create a copy of the row data without the nested table property
+        const rowData = { ...row }
+
+        // Check for nested table using Symbol
+        const nestedTable = row[Symbol.for('table')]
+        if (nestedTable && nestedTable.rows) {
+          delete rowData[Symbol.for('table')]
+          processRows(nestedTable.rows, state)
+        }
+
+        // Store the row data in the state
+        state.setData(rowData)
+      })
+    }
+
+    // Start processing from the root
+    processRows(rows, this.stepState)
+
+    // Initialize all levels to their first state
+    const initializeState = (state) => {
+      if (state.states.length > 0) {
+        state.currentIndex = 0
+        initializeState(state.states[0])
+      }
+    }
+
+    // Move to the first state at all levels
+    if (this.stepState.states.length > 0) {
+      initializeState(this.stepState)
+    }
+
+    return this.stepState
+  }
+
+  /**
    * Moves to and returns the next state value in the sequence
    * @returns {*} The next state value or null if no next state exists
    */
@@ -109,10 +163,14 @@ export class StepperStateMachine {
   }
 
   /**
-   * Resets the traversal state
+   * Resets the traversal state to the first item
    */
   reset() {
     this.stepState.reset()
+    // Initialize to before first state
+    if (this.stepState.states.length > 0) {
+      this.stepState.currentIndex = -1
+    }
   }
 
   /**
