@@ -199,14 +199,11 @@ describe('NestedTable', () => {
       expect(table.interleave).toBeInstanceOf(Function)
       expect(table.partition).toBeInstanceOf(Function)
       expect(table.shuffle).toBeInstanceOf(Function)
-      // expect(table.sample).toBeInstanceOf(Function)
+      expect(table.sample).toBeInstanceOf(Function)
 
       // expect(table.push).toBeInstanceOf(Function)
       expect(table.print).toBeInstanceOf(Function)
       // expect(table.pop).toBeInstanceOf(Function)
-
-      expect(table.head).toBeInstanceOf(Function)
-      expect(table.tail).toBeInstanceOf(Function)
     })
 
     it('should provide array-like access to rows', () => {
@@ -888,7 +885,7 @@ describe('NestedTable', () => {
         .append([{ shape: 'triangle', color: 'blue', size: 'large' }])
 
       expect(table1.length).toBe(5)
-      table1.print()
+      //table1.print()
       expect(table1[0].data).toEqual({ shape: 'circle', color: 'red', size: 'medium' })
       expect(table1[1].data).toEqual({ shape: 'circle', color: 'green', size: 'medium' })
       expect(table1[2].data).toEqual({ shape: 'square', color: 'red', size: 'medium' })
@@ -1549,7 +1546,7 @@ describe('NestedTable', () => {
     it('should partition table into n chunks', () => {
       const table1 = table.range(6)
       table1.partition(2)
-      table1.print()
+      //table1.print()
       expect(table1.length).toBe(2)
       expect(table1[0].data).toEqual({ partition: 0 })
       expect(table1[1].data).toEqual({ partition: 1 })
@@ -1631,569 +1628,581 @@ describe('NestedTable', () => {
     })
   })
 
-  // describe.skip('sample()', () => {
-  //   it('should handle empty table', () => {
-  //     const table1 = table.table()
-  //     table1.sample({ type: 'without-replacement', size: 5 })
-  //     expect(table1.rows).toEqual([])
-  //   })
-
-  //   it('should throw error for invalid sampling type', () => {
-  //     const table1 = table.table().append([
-  //       { id: 1, value: 'a' },
-  //       { id: 2, value: 'b' },
-  //     ])
-
-  //     expect(() => {
-  //       table1.sample({ type: 'invalid-type' })
-  //     }).toThrow('Invalid sampling type: invalid-type')
-  //   })
-
-  //   it('should throw error when exceeding safety limit', () => {
-  //     const table1 = table.table().append([
-  //       { id: 1, value: 'a' },
-  //       { id: 2, value: 'b' },
-  //     ])
-
-  //     expect(() => {
-  //       table1.sample({
-  //         type: 'with-replacement',
-  //         size: config.max_stepper_rows + 1,
-  //       })
-  //     }).toThrow(/sample\(\) would generate \d+ rows, which exceeds the safety limit/)
-  //   })
-
-  //   describe('with-replacement sampling', () => {
-  //     it('should require size parameter', () => {
-  //       const table1 = table.table().append([
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //       ])
-
-  //       expect(() => {
-  //         table1.sample({ type: 'with-replacement' })
-  //       }).toThrow('size parameter is required for with-replacement sampling')
-  //     })
-
-  //     it('should sample with replacement', () => {
-  //       const data = [
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //         { id: 3, value: 'c' },
-  //       ]
-
-  //       const table1 = table.table().append(data)
-  //       table1.sample({ type: 'with-replacement', size: 5 })
-
-  //       expect(table1.rows).toHaveLength(5)
-  //       // Check that all sampled items are from the original data
-  //       table1.rows.forEach((row) => {
-  //         expect(data).toContainEqual(row)
-  //       })
-  //     })
-
-  //     it('should produce consistent results with same seed', () => {
-  //       const data = [
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //         { id: 3, value: 'c' },
-  //       ]
-
-  //       // Create two tables with same data
-  //       const table1 = table.table().append(data)
-  //       const table2 = table.table().append(data)
-
-  //       // Sample both with same seed
-  //       table1.sample({ type: 'with-replacement', size: 5, seed: 'test-seed-123' })
-  //       table2.sample({ type: 'with-replacement', size: 5, seed: 'test-seed-123' })
-
-  //       // They should have the same order
-  //       expect(table1.rows.map((r) => r.id)).toEqual(table2.rows.map((r) => r.id))
-  //     })
-
-  //     it('should handle weighted sampling', () => {
-  //       const data = [
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //         { id: 3, value: 'c' },
-  //       ]
-
-  //       const table1 = table.table().append(data)
-  //       table1.sample({
-  //         type: 'with-replacement',
-  //         size: 1000,
-  //         weights: [0.5, 0.3, 0.2],
-  //         seed: 'test-seed-123',
-  //       })
-
-  //       // Count occurrences
-  //       const counts = table1.rows.reduce((acc, row) => {
-  //         acc[row.id] = (acc[row.id] || 0) + 1
-  //         return acc
-  //       }, {})
-
-  //       // With these weights, we expect roughly:
-  //       // id 1: ~500 occurrences
-  //       // id 2: ~300 occurrences
-  //       // id 3: ~200 occurrences
-  //       expect(counts[1]).toBeGreaterThan(450)
-  //       expect(counts[1]).toBeLessThan(550)
-  //       expect(counts[2]).toBeGreaterThan(250)
-  //       expect(counts[2]).toBeLessThan(350)
-  //       expect(counts[3]).toBeGreaterThan(150)
-  //       expect(counts[3]).toBeLessThan(250)
-  //     })
-
-  //     it('should throw error when weights length does not match table length', () => {
-  //       const data = [
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //         { id: 3, value: 'c' },
-  //       ]
-
-  //       const table1 = table.table().append(data)
-
-  //       // Test with too few weights
-  //       expect(() => {
-  //         table1.sample({
-  //           type: 'with-replacement',
-  //           size: 5,
-  //           weights: [0.5, 0.3], // Only 2 weights for 3 items
-  //           seed: 'test-seed-123',
-  //         })
-  //       }).toThrow('Weights array length must match the number of trials')
-
-  //       // Test with too many weights
-  //       expect(() => {
-  //         table1.sample({
-  //           type: 'with-replacement',
-  //           size: 5,
-  //           weights: [0.5, 0.3, 0.2, 0.1], // 4 weights for 3 items
-  //           seed: 'test-seed-123',
-  //         })
-  //       }).toThrow('Weights array length must match the number of trials')
-  //     })
-  //   })
-
-  //   describe('without-replacement sampling', () => {
-  //     it('should require size parameter', () => {
-  //       const table1 = table.table().append([
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //       ])
-
-  //       expect(() => {
-  //         table1.sample({ type: 'without-replacement' })
-  //       }).toThrow('size parameter is required for without-replacement sampling')
-  //     })
-
-  //     it('should not allow size larger than available trials', () => {
-  //       const table1 = table.table().append([
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //       ])
-
-  //       expect(() => {
-  //         table1.sample({ type: 'without-replacement', size: 3 })
-  //       }).toThrow('Sample size cannot be larger than the number of available trials')
-  //     })
-
-  //     it('should sample without replacement', () => {
-  //       const data = [
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //         { id: 3, value: 'c' },
-  //         { id: 4, value: 'd' },
-  //       ]
-
-  //       const table1 = table.table().append(data)
-  //       table1.sample({ type: 'without-replacement', size: 2 })
-
-  //       expect(table1.rows).toHaveLength(2)
-  //       // Check that no item appears twice
-  //       const ids = table1.rows.map((r) => r.id)
-  //       expect(new Set(ids).size).toBe(2)
-  //       // Check that all sampled items are from the original data
-  //       table1.rows.forEach((row) => {
-  //         expect(data).toContainEqual(row)
-  //       })
-  //     })
-
-  //     it('should produce consistent results with same seed', () => {
-  //       const data = [
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //         { id: 3, value: 'c' },
-  //         { id: 4, value: 'd' },
-  //       ]
-
-  //       // Create two tables with same data
-  //       const table1 = table.table().append(data)
-  //       const table2 = table.table().append(data)
-
-  //       // Sample both with same seed
-  //       table1.sample({ type: 'without-replacement', size: 2, seed: 'test-seed-123' })
-  //       table2.sample({ type: 'without-replacement', size: 2, seed: 'test-seed-123' })
-
-  //       // They should have the same order
-  //       expect(table1.rows.map((r) => r.id)).toEqual(table2.rows.map((r) => r.id))
-  //     })
-  //   })
-
-  //   describe('fixed-repetitions sampling', () => {
-  //     it('should require size parameter', () => {
-  //       const table1 = table.table().append([
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //       ])
-
-  //       expect(() => {
-  //         table1.sample({ type: 'fixed-repetitions' })
-  //       }).toThrow('size parameter is required for fixed-repetitions sampling')
-  //     })
-
-  //     it('should repeat each trial size times', () => {
-  //       const data = [
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //       ]
-
-  //       const table1 = table.table().append(data)
-  //       table1.sample({ type: 'fixed-repetitions', size: 3 })
-
-  //       expect(table1.rows).toHaveLength(6) // 2 trials * 3 repetitions
-  //       // Count occurrences of each trial
-  //       const counts = table1.rows.reduce((acc, row) => {
-  //         acc[row.id] = (acc[row.id] || 0) + 1
-  //         return acc
-  //       }, {})
-  //       expect(counts[1]).toBe(3)
-  //       expect(counts[2]).toBe(3)
-  //     })
-
-  //     it('should shuffle the result', () => {
-  //       const data = [
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //       ]
-
-  //       const table1 = table.table().append(data)
-  //       table1.sample({ type: 'fixed-repetitions', size: 3, seed: 'test-seed-123' })
-
-  //       // The order should be different from the original
-  //       expect(table1.rows.map((r) => r.id)).not.toEqual([1, 1, 1, 2, 2, 2])
-  //     })
-
-  //     it('should produce consistent results with same seed', () => {
-  //       const data = [
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //       ]
-
-  //       // Create two tables with same data
-  //       const table1 = table.table().append(data)
-  //       const table2 = table.table().append(data)
-
-  //       // Sample both with same seed
-  //       table1.sample({ type: 'fixed-repetitions', size: 3, seed: 'test-seed-123' })
-  //       table2.sample({ type: 'fixed-repetitions', size: 3, seed: 'test-seed-123' })
-
-  //       // They should have the same order
-  //       expect(table1.rows.map((r) => r.id)).toEqual(table2.rows.map((r) => r.id))
-  //     })
-  //   })
-
-  //   describe('alternate-groups sampling', () => {
-  //     it('should require groups parameter', () => {
-  //       const table1 = table.table().append([
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //       ])
-
-  //       expect(() => {
-  //         table1.sample({ type: 'alternate-groups' })
-  //       }).toThrow('groups parameter is required for alternate-groups sampling')
-  //     })
-
-  //     it('should require at least two groups', () => {
-  //       const table1 = table.table().append([
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //       ])
-
-  //       expect(() => {
-  //         table1.sample({ type: 'alternate-groups', groups: [[0]] })
-  //       }).toThrow('groups must be an array with at least two groups')
-  //     })
-
-  //     it('should alternate between groups', () => {
-  //       const data = [
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //         { id: 3, value: 'c' },
-  //         { id: 4, value: 'd' },
-  //       ]
-
-  //       const table1 = table.table().append(data)
-  //       table1.sample({
-  //         type: 'alternate-groups',
-  //         groups: [
-  //           [0, 2],
-  //           [1, 3],
-  //         ], // Group 1: [a, c], Group 2: [b, d]
-  //       })
-
-  //       // Should alternate between groups: [a, b, c, d]
-  //       expect(table1.rows.map((r) => r.id)).toEqual([1, 2, 3, 4])
-  //     })
-
-  //     it('should handle groups of different sizes', () => {
-  //       const data = [
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //         { id: 3, value: 'c' },
-  //         { id: 4, value: 'd' },
-  //         { id: 5, value: 'e' },
-  //       ]
-
-  //       const table1 = table.table().append(data)
-  //       table1.sample({
-  //         type: 'alternate-groups',
-  //         groups: [
-  //           [0, 1],
-  //           [2, 3, 4],
-  //         ], // Group 1: [a, b], Group 2: [c, d, e]
-  //       })
-
-  //       // Should alternate between groups until shortest group is exhausted
-  //       // and then continue with remaining elements from longer group
-  //       expect(table1.rows.map((r) => r.id)).toEqual([1, 3, 2, 4, 5])
-  //     })
-
-  //     it('should randomize group order when requested', () => {
-  //       const data = [
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //         { id: 3, value: 'c' },
-  //         { id: 4, value: 'd' },
-  //       ]
-
-  //       const table1 = table.table().append(data)
-  //       table1.sample({
-  //         type: 'alternate-groups',
-  //         groups: [
-  //           [0, 2],
-  //           [1, 3],
-  //         ],
-  //         randomize_group_order: true,
-  //         seed: 'test-seed-123',
-  //       })
-
-  //       // The order should be different from the default
-  //       // With this seed, the groups should be in reverse order
-  //       expect(table1.rows.map((r) => r.id)).toEqual([2, 4, 1, 3])
-  //     })
-
-  //     it('should produce consistent results with same seed', () => {
-  //       const data = [
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //         { id: 3, value: 'c' },
-  //         { id: 4, value: 'd' },
-  //       ]
-
-  //       // Create two tables with same data
-  //       const table1 = table.table().append(data)
-  //       const table2 = table.table().append(data)
-
-  //       // Sample both with same seed
-  //       const options = {
-  //         type: 'alternate-groups',
-  //         groups: [
-  //           [0, 2],
-  //           [1, 3],
-  //         ],
-  //         randomize_group_order: true,
-  //         seed: 'test-seed-123',
-  //       }
-  //       table1.sample(options)
-  //       table2.sample(options)
-
-  //       // They should have the same order
-  //       expect(table1.rows.map((r) => r.id)).toEqual(table2.rows.map((r) => r.id))
-  //     })
-
-  //     it('should validate group indices', () => {
-  //       const table1 = table.table().append([
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //       ])
-
-  //       expect(() => {
-  //         table1.sample({
-  //           type: 'alternate-groups',
-  //           groups: [[0, 2], [1]], // Invalid index 2
-  //         })
-  //       }).toThrow('Invalid index 2 in group 0')
-  //     })
-  //   })
-
-  //   describe('custom sampling', () => {
-  //     it('should require fn parameter', () => {
-  //       const table1 = table.table().append([
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //       ])
-
-  //       expect(() => {
-  //         table1.sample({ type: 'custom' })
-  //       }).toThrow('fn parameter is required for custom sampling')
-  //     })
-
-  //     it('should require fn to be a function', () => {
-  //       const table1 = table.table().append([
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //       ])
-
-  //       expect(() => {
-  //         table1.sample({ type: 'custom', fn: 'not a function' })
-  //       }).toThrow('fn must be a function')
-  //     })
-
-  //     it('should use custom sampling function', () => {
-  //       const data = [
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //         { id: 3, value: 'c' },
-  //       ]
-
-  //       const table1 = table.table().append(data)
-  //       table1.sample({
-  //         type: 'custom',
-  //         fn: (indices) => indices.reverse(), // Reverse the order
-  //       })
-
-  //       expect(table1.rows.map((r) => r.id)).toEqual([3, 2, 1])
-  //     })
-
-  //     it('should validate custom function output', () => {
-  //       const table1 = table.table().append([
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //       ])
-
-  //       expect(() => {
-  //         table1.sample({
-  //           type: 'custom',
-  //           fn: () => 'not an array',
-  //         })
-  //       }).toThrow('Custom sampling function must return an array')
-  //     })
-
-  //     it('should validate custom function indices', () => {
-  //       const table1 = table.table().append([
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //       ])
-
-  //       expect(() => {
-  //         table1.sample({
-  //           type: 'custom',
-  //           fn: () => [2], // Invalid index
-  //         })
-  //       }).toThrow('Invalid index 2 returned by custom sampling function')
-  //     })
-  //   })
-  // })
-
-  // describe.skip('head()', () => {
-  //   it('should return first n elements', () => {
-  //     const table1 = table.table().range(5)
-  //     table1.head(3)
-  //     expect(table1.rows).toHaveLength(3)
-  //     for (let i = 0; i < 3; i++) {
-  //       expect(table1[i]).toEqual({ range: i })
-  //     }
-  //   })
-
-  //   it('should return all elements if n is greater than length', () => {
-  //     const table1 = table.table().range(3)
-  //     table1.head(5) // n > length
-  //     expect(table1.rows).toHaveLength(3)
-  //     for (let i = 0; i < 3; i++) {
-  //       expect(table1[i]).toEqual({ range: i })
-  //     }
-  //   })
-
-  //   it('should throw error if n <= 0', () => {
-  //     const table1 = table.table().range(3)
-  //     expect(() => {
-  //       table1.head(0)
-  //     }).toThrow('head() must be called with a positive integer')
-  //     expect(() => {
-  //       table1.head(-1)
-  //     }).toThrow('head() must be called with a positive integer')
-  //   })
-
-  //   it('should be chainable with other methods', () => {
-  //     const table1 = table
-  //       .table()
-  //       .range(5)
-  //       .head(3)
-  //       .forEach((row) => ({ ...row, type: 'test' }))
-
-  //     expect(table1.rows).toHaveLength(3)
-  //     for (let i = 0; i < 3; i++) {
-  //       expect(table1[i]).toEqual({ range: i, type: 'test' })
-  //     }
-  //   })
-  // })
-
-  // describe.skip('tail()', () => {
-  //   it('should return last n elements', () => {
-  //     const table1 = table.table().range(5)
-  //     table1.tail(3)
-  //     expect(table1.rows).toHaveLength(3)
-  //     // The last 3 elements should be [2, 3, 4] in that order
-  //     expect(table1[0]).toEqual({ range: 2 })
-  //     expect(table1[1]).toEqual({ range: 3 })
-  //     expect(table1[2]).toEqual({ range: 4 })
-  //   })
-
-  //   it('should return all elements if n is greater than length', () => {
-  //     const table1 = table.table().range(3)
-  //     table1.tail(5) // n > length
-  //     expect(table1.rows).toHaveLength(3)
-  //     for (let i = 0; i < 3; i++) {
-  //       expect(table1[i]).toEqual({ range: i })
-  //     }
-  //   })
-
-  //   it('should throw error if n <= 0', () => {
-  //     const table1 = table.table().range(3)
-  //     expect(() => {
-  //       table1.tail(0)
-  //     }).toThrow('tail() must be called with a positive integer')
-  //     expect(() => {
-  //       table1.tail(-1)
-  //     }).toThrow('tail() must be called with a positive integer')
-  //   })
-
-  //   it('should be chainable with other methods', () => {
-  //     const table1 = table
-  //       .table()
-  //       .range(5)
-  //       .tail(3)
-  //       .forEach((row) => ({ ...row, type: 'test' }))
-
-  //     expect(table1.rows).toHaveLength(3)
-  //     // The last 3 elements should be [2,3,4] in that order, with added type
-  //     expect(table1[0]).toEqual({ range: 2, type: 'test' })
-  //     expect(table1[1]).toEqual({ range: 3, type: 'test' })
-  //     expect(table1[2]).toEqual({ range: 4, type: 'test' })
-  //   })
-  // })
+  describe('sample()', () => {
+    it('should handle empty table', () => {
+      const table1 = table
+      table1.sample({ type: 'without-replacement', size: 5 })
+      expect(table1.rowsdata).toEqual([])
+    })
+
+    it('should throw error for invalid sampling type', () => {
+      const table1 = table.append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+      ])
+
+      expect(() => {
+        table1.sample({ type: 'invalid-type' })
+      }).toThrow('Invalid sampling type: invalid-type')
+    })
+
+    it('should throw error when exceeding safety limit', () => {
+      const table1 = table.append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+      ])
+
+      expect(() => {
+        table1.sample({
+          type: 'with-replacement',
+          size: config.max_stepper_rows + 1,
+        })
+      }).toThrow(/sample\(\) would generate \d+ rows, which exceeds the safety limit/)
+    })
+
+    describe('with-replacement sampling', () => {
+      it('should require size parameter', () => {
+        const table1 = table.append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ])
+
+        expect(() => {
+          table1.sample({ type: 'with-replacement' })
+        }).toThrow('size parameter is required for with-replacement sampling')
+      })
+
+      it('should sample with replacement', () => {
+        const data = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+        ]
+
+        const table1 = table.append(data)
+        table1.sample({ type: 'with-replacement', size: 5 })
+
+        expect(table1.rowsdata).toHaveLength(5)
+        // Check that all sampled items are from the original data
+        table1.rowsdata.forEach((row) => {
+          expect(data).toContainEqual(row)
+        })
+      })
+
+      it('should produce consistent results with same seed', () => {
+        const data = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+        ]
+
+        // Create two tables with same data
+        const table1 = table.append(data)
+        const table2 = table.append(data)
+
+        // Sample both with same seed
+        table1.sample({ type: 'with-replacement', size: 5, seed: 'test-seed-123' })
+        table2.sample({ type: 'with-replacement', size: 5, seed: 'test-seed-123' })
+
+        // They should have the same order
+        expect(table1.rowsdata.map((r) => r.id)).toEqual(table2.rowsdata.map((r) => r.id))
+      })
+
+      it('should handle weighted sampling', () => {
+        const data = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+        ]
+
+        const table1 = table.append(data)
+        table1.sample({
+          type: 'with-replacement',
+          size: 1000,
+          weights: [0.5, 0.3, 0.2],
+          seed: 'test-seed-123',
+        })
+
+        // Count occurrences
+        const counts = table1.rowsdata.reduce((acc, row) => {
+          acc[row.id] = (acc[row.id] || 0) + 1
+          return acc
+        }, {})
+
+        // With these weights, we expect roughly:
+        // id 1: ~500 occurrences
+        // id 2: ~300 occurrences
+        // id 3: ~200 occurrences
+        expect(counts[1]).toBeGreaterThan(450)
+        expect(counts[1]).toBeLessThan(550)
+        expect(counts[2]).toBeGreaterThan(250)
+        expect(counts[2]).toBeLessThan(350)
+        expect(counts[3]).toBeGreaterThan(150)
+        expect(counts[3]).toBeLessThan(250)
+      })
+
+      it('should throw error when weights length does not match table length', () => {
+        const data = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+        ]
+
+        const table1 = table.append(data)
+
+        // Test with too few weights
+        expect(() => {
+          table1.sample({
+            type: 'with-replacement',
+            size: 5,
+            weights: [0.5, 0.3], // Only 2 weights for 3 items
+            seed: 'test-seed-123',
+          })
+        }).toThrow('Weights array length must match the number of row')
+
+        // Test with too many weights
+        expect(() => {
+          table1.sample({
+            type: 'with-replacement',
+            size: 5,
+            weights: [0.5, 0.3, 0.2, 0.1], // 4 weights for 3 items
+            seed: 'test-seed-123',
+          })
+        }).toThrow('Weights array length must match the number of rows')
+      })
+    })
+
+    describe('without-replacement sampling', () => {
+      it('should require size parameter', () => {
+        const table1 = table.append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ])
+
+        expect(() => {
+          table1.sample({ type: 'without-replacement' })
+        }).toThrow('size parameter is required for without-replacement sampling')
+      })
+
+      it('should not allow size larger than available trials', () => {
+        const table1 = table.append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ])
+
+        expect(() => {
+          table1.sample({ type: 'without-replacement', size: 3 })
+        }).toThrow('Sample size cannot be larger than the number of available rows')
+      })
+
+      it('should sample without replacement', () => {
+        const data = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+          { id: 4, value: 'd' },
+        ]
+
+        const table1 = table.append(data)
+        table1.sample({ type: 'without-replacement', size: 2 })
+
+        expect(table1.rows).toHaveLength(2)
+        // Check that no item appears twice
+        const ids = table1.rowsdata.map((r) => r.id)
+        expect(new Set(ids).size).toBe(2)
+        // Check that all sampled items are from the original data
+        table1.rowsdata.forEach((row) => {
+          expect(data).toContainEqual(row)
+        })
+      })
+
+      it('should produce consistent results with same seed', () => {
+        const data = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+          { id: 4, value: 'd' },
+        ]
+
+        // Create two tables with same data
+        const table1 = table.append(data)
+        const table2 = table.append(data)
+
+        // Sample both with same seed
+        table1.sample({ type: 'without-replacement', size: 2, seed: 'test-seed-123' })
+        table2.sample({ type: 'without-replacement', size: 2, seed: 'test-seed-123' })
+
+        // They should have the same order
+        expect(table1.rowsdata.map((r) => r.id)).toEqual(table2.rowsdata.map((r) => r.id))
+      })
+    })
+
+    describe('fixed-repetitions sampling', () => {
+      it('should require size parameter', () => {
+        const table1 = table.append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ])
+
+        expect(() => {
+          table1.sample({ type: 'fixed-repetitions' })
+        }).toThrow('size parameter is required for fixed-repetitions sampling')
+      })
+
+      it('should repeat each trial size times', () => {
+        const data = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ]
+
+        const table1 = table.append(data)
+        table1.sample({ type: 'fixed-repetitions', size: 3 })
+
+        expect(table1.rowsdata).toHaveLength(6) // 2 trials * 3 repetitions
+        // Count occurrences of each trial
+        const counts = table1.rowsdata.reduce((acc, row) => {
+          acc[row.id] = (acc[row.id] || 0) + 1
+          return acc
+        }, {})
+        expect(counts[1]).toBe(3)
+        expect(counts[2]).toBe(3)
+      })
+
+      it('should shuffle the result', () => {
+        const data = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ]
+
+        const table1 = table.append(data)
+        table1.sample({ type: 'fixed-repetitions', size: 3, seed: 'test-seed-123' })
+
+        // The order should be different from the original
+        expect(table1.rowsdata.map((r) => r.id)).not.toEqual([1, 1, 1, 2, 2, 2])
+      })
+
+      it('should produce consistent results with same seed', () => {
+        const data = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ]
+
+        // Create two tables with same data
+        const table1 = table.append(data)
+        const table2 = table.append(data)
+
+        // Sample both with same seed
+        table1.sample({ type: 'fixed-repetitions', size: 3, seed: 'test-seed-123' })
+        table2.sample({ type: 'fixed-repetitions', size: 3, seed: 'test-seed-123' })
+
+        // They should have the same order
+        expect(table1.rowsdata.map((r) => r.id)).toEqual(table2.rowsdata.map((r) => r.id))
+      })
+    })
+
+    describe('alternate-groups sampling', () => {
+      it('should require groups parameter', () => {
+        const table1 = table.append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ])
+
+        expect(() => {
+          table1.sample({ type: 'alternate-groups' })
+        }).toThrow('groups parameter is required for alternate-groups sampling')
+      })
+
+      it('should require at least two groups', () => {
+        const table1 = table.append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ])
+
+        expect(() => {
+          table1.sample({ type: 'alternate-groups', groups: [[0]] })
+        }).toThrow('groups must be an array with at least two groups')
+      })
+
+      it('should alternate between groups', () => {
+        const data = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+          { id: 4, value: 'd' },
+        ]
+
+        const table1 = table.append(data)
+        table1.sample({
+          type: 'alternate-groups',
+          groups: [
+            [0, 2],
+            [1, 3],
+          ], // Group 1: [a, c], Group 2: [b, d]
+        })
+
+        // Should alternate between groups: [a, b, c, d]
+        expect(table1.rowsdata.map((r) => r.id)).toEqual([1, 2, 3, 4])
+      })
+
+      it('should handle groups of different sizes', () => {
+        const data = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+          { id: 4, value: 'd' },
+          { id: 5, value: 'e' },
+        ]
+
+        const table1 = table.append(data)
+        table1.sample({
+          type: 'alternate-groups',
+          groups: [
+            [0, 1],
+            [2, 3, 4],
+          ], // Group 1: [a, b], Group 2: [c, d, e]
+        })
+
+        // Should alternate between groups until shortest group is exhausted
+        // and then continue with remaining elements from longer group
+        expect(table1.rowsdata.map((r) => r.id)).toEqual([1, 3, 2, 4, 5])
+      })
+
+      it('should randomize group order when requested', () => {
+        const data = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+          { id: 4, value: 'd' },
+        ]
+
+        const table1 = table.append(data)
+        table1.sample({
+          type: 'alternate-groups',
+          groups: [
+            [0, 2],
+            [1, 3],
+          ],
+          randomize_group_order: true,
+          seed: 'test-seed-12334',
+        })
+
+        // The order should be different from the default
+        // With this seed, the groups should be in reverse order
+        expect(table1.rowsdata.map((r) => r.id)).toEqual([2, 4, 1, 3])
+      })
+
+      it('should produce consistent results with same seed', () => {
+        const data = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+          { id: 4, value: 'd' },
+        ]
+
+        // Create two tables with same data
+        const table1 = table.append(data)
+        const table2 = table.append(data)
+
+        // Sample both with same seed
+        const options = {
+          type: 'alternate-groups',
+          groups: [
+            [0, 2],
+            [1, 3],
+          ],
+          randomize_group_order: true,
+          seed: 'test-seed-123',
+        }
+        table1.sample(options)
+        table2.sample(options)
+
+        // They should have the same order
+        expect(table1.rowsdata.map((r) => r.id)).toEqual(table2.rowsdata.map((r) => r.id))
+      })
+
+      it('should validate group indices', () => {
+        const table1 = table.append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ])
+
+        expect(() => {
+          table1.sample({
+            type: 'alternate-groups',
+            groups: [[0, 2], [1]], // Invalid index 2
+          })
+        }).toThrow('Invalid index 2 in group 0')
+      })
+    })
+
+    describe('custom sampling', () => {
+      it('should require fn parameter', () => {
+        const table1 = table.append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ])
+
+        expect(() => {
+          table1.sample({ type: 'custom' })
+        }).toThrow('fn parameter is required for custom sampling')
+      })
+
+      it('should require fn to be a function', () => {
+        const table1 = table.append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ])
+
+        expect(() => {
+          table1.sample({ type: 'custom', fn: 'not a function' })
+        }).toThrow('fn must be a function')
+      })
+
+      it('should use custom sampling function', () => {
+        const data = [
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+        ]
+
+        const table1 = table.append(data)
+        table1.sample({
+          type: 'custom',
+          fn: (indices) => indices.reverse(), // Reverse the order
+        })
+
+        expect(table1.rowsdata.map((r) => r.id)).toEqual([3, 2, 1])
+      })
+
+      it('should validate custom function output', () => {
+        const table1 = table.append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ])
+
+        expect(() => {
+          table1.sample({
+            type: 'custom',
+            fn: () => 'not an array',
+          })
+        }).toThrow('Custom sampling function must return an array')
+      })
+
+      it('should validate custom function indices', () => {
+        const table1 = table.append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+        ])
+
+        expect(() => {
+          table1.sample({
+            type: 'custom',
+            fn: () => [2], // Invalid index
+          })
+        }).toThrow('Invalid index 2 returned by custom sampling function')
+      })
+    })
+  })
+
+  describe.skip('Complex Nested Operations', () => {
+    it('should maintain correct parent-child relationships in complex structures', () => {
+      // Create a deep structure with multiple operations
+      table.append(1)
+      table[0].append(2)
+      table[0][0].append(3)
+      table[0][0][0].append(4)
+      table[0][0][0][0].append(5)
+
+      // Create a parallel branch
+      table.append(10)
+      table[1].append(20)
+      table[1][0].append(30)
+
+      // Validate the entire tree
+      validateTreeConsistency(table)
+
+      // Add more complexity by appending at different levels
+      table[0].append(6) // Second child of root's first child
+      table[1][0].append(40) // Second child of the parallel branch
+
+      // Validate again after modifications
+      validateTreeConsistency(table)
+
+      // Check specific parent-child relationships
+      expect(table[0]._parent).toBe(table)
+      expect(table[0][0]._parent).toBe(table[0])
+      expect(table[0][0][0]._parent).toBe(table[0][0])
+      expect(table[0][0][0][0]._parent).toBe(table[0][0][0])
+      expect(table[0][0][0][0][0]._parent).toBe(table[0][0][0][0])
+
+      expect(table[1]._parent).toBe(table)
+      expect(table[1][0]._parent).toBe(table[1])
+      expect(table[1][0][0]._parent).toBe(table[1][0])
+      expect(table[1][0][1]._parent).toBe(table[1][0])
+
+      // Check data integrity
+      expect(table[0].data).toBe(1)
+      expect(table[0][0].data).toBe(2)
+      expect(table[0][0][0].data).toBe(3)
+      expect(table[0][0][0][0].data).toBe(4)
+      expect(table[0][0][0][0][0].data).toBe(5)
+      expect(table[0][1].data).toBe(6)
+
+      expect(table[1].data).toBe(10)
+      expect(table[1][0].data).toBe(20)
+      expect(table[1][0][0].data).toBe(30)
+      expect(table[1][0][1].data).toBe(40)
+    })
+
+    it('should handle complex operations that could affect parent-child relationships', () => {
+      // Create a nested structure
+      table.range(3)
+
+      // Add nested items to each row
+      table[0].append(10)
+      table[0].append(11)
+      table[1].append(20)
+      table[1].append(21)
+      table[2].append(30)
+
+      // Add another level of nesting
+      table[0][0].append(100)
+      table[1][0].append(200)
+      table[2][0].append(300)
+
+      // Validate initial structure
+      validateTreeConsistency(table)
+
+      // Perform repeat operation which should deep copy nested structures
+      const repeatedTable = table.repeat(2)
+
+      // Validate after repeat
+      validateTreeConsistency(repeatedTable)
+
+      // Check that original nodes and repeated nodes have correct relationships
+      // Original nodes (first 3)
+      for (let i = 0; i < 3; i++) {
+        expect(repeatedTable[i]._parent).toBe(repeatedTable)
+        for (let j = 0; j < repeatedTable[i]._items.length; j++) {
+          expect(repeatedTable[i][j]._parent).toBe(repeatedTable[i])
+          for (let k = 0; k < repeatedTable[i][j]._items.length; k++) {
+            expect(repeatedTable[i][j][k]._parent).toBe(repeatedTable[i][j])
+          }
+        }
+      }
+
+      // Repeated nodes (last 3)
+      for (let i = 3; i < 6; i++) {
+        expect(repeatedTable[i]._parent).toBe(repeatedTable)
+        for (let j = 0; j < repeatedTable[i]._items.length; j++) {
+          expect(repeatedTable[i][j]._parent).toBe(repeatedTable[i])
+          for (let k = 0; k < repeatedTable[i][j]._items.length; k++) {
+            expect(repeatedTable[i][j][k]._parent).toBe(repeatedTable[i][j])
+          }
+        }
+      }
+    })
+  })
 
   // describe.skip('push()', () => {
   //   it('should have push method available', () => {
@@ -2582,104 +2591,4 @@ describe('NestedTable', () => {
   //   expect(() => almostFullTable.append(sourceTable)).toThrow(/exceeds the safety limit/)
   // })
   //})
-
-  describe.skip('Complex Nested Operations', () => {
-    it('should maintain correct parent-child relationships in complex structures', () => {
-      // Create a deep structure with multiple operations
-      table.append(1)
-      table[0].append(2)
-      table[0][0].append(3)
-      table[0][0][0].append(4)
-      table[0][0][0][0].append(5)
-
-      // Create a parallel branch
-      table.append(10)
-      table[1].append(20)
-      table[1][0].append(30)
-
-      // Validate the entire tree
-      validateTreeConsistency(table)
-
-      // Add more complexity by appending at different levels
-      table[0].append(6) // Second child of root's first child
-      table[1][0].append(40) // Second child of the parallel branch
-
-      // Validate again after modifications
-      validateTreeConsistency(table)
-
-      // Check specific parent-child relationships
-      expect(table[0]._parent).toBe(table)
-      expect(table[0][0]._parent).toBe(table[0])
-      expect(table[0][0][0]._parent).toBe(table[0][0])
-      expect(table[0][0][0][0]._parent).toBe(table[0][0][0])
-      expect(table[0][0][0][0][0]._parent).toBe(table[0][0][0][0])
-
-      expect(table[1]._parent).toBe(table)
-      expect(table[1][0]._parent).toBe(table[1])
-      expect(table[1][0][0]._parent).toBe(table[1][0])
-      expect(table[1][0][1]._parent).toBe(table[1][0])
-
-      // Check data integrity
-      expect(table[0].data).toBe(1)
-      expect(table[0][0].data).toBe(2)
-      expect(table[0][0][0].data).toBe(3)
-      expect(table[0][0][0][0].data).toBe(4)
-      expect(table[0][0][0][0][0].data).toBe(5)
-      expect(table[0][1].data).toBe(6)
-
-      expect(table[1].data).toBe(10)
-      expect(table[1][0].data).toBe(20)
-      expect(table[1][0][0].data).toBe(30)
-      expect(table[1][0][1].data).toBe(40)
-    })
-
-    it('should handle complex operations that could affect parent-child relationships', () => {
-      // Create a nested structure
-      table.range(3)
-
-      // Add nested items to each row
-      table[0].append(10)
-      table[0].append(11)
-      table[1].append(20)
-      table[1].append(21)
-      table[2].append(30)
-
-      // Add another level of nesting
-      table[0][0].append(100)
-      table[1][0].append(200)
-      table[2][0].append(300)
-
-      // Validate initial structure
-      validateTreeConsistency(table)
-
-      // Perform repeat operation which should deep copy nested structures
-      const repeatedTable = table.repeat(2)
-
-      // Validate after repeat
-      validateTreeConsistency(repeatedTable)
-
-      // Check that original nodes and repeated nodes have correct relationships
-      // Original nodes (first 3)
-      for (let i = 0; i < 3; i++) {
-        expect(repeatedTable[i]._parent).toBe(repeatedTable)
-        for (let j = 0; j < repeatedTable[i]._items.length; j++) {
-          expect(repeatedTable[i][j]._parent).toBe(repeatedTable[i])
-          for (let k = 0; k < repeatedTable[i][j]._items.length; k++) {
-            expect(repeatedTable[i][j][k]._parent).toBe(repeatedTable[i][j])
-          }
-        }
-      }
-
-      // Repeated nodes (last 3)
-      for (let i = 3; i < 6; i++) {
-        expect(repeatedTable[i]._parent).toBe(repeatedTable)
-        for (let j = 0; j < repeatedTable[i]._items.length; j++) {
-          expect(repeatedTable[i][j]._parent).toBe(repeatedTable[i])
-          for (let k = 0; k < repeatedTable[i][j]._items.length; k++) {
-            expect(repeatedTable[i][j][k]._parent).toBe(repeatedTable[i][j])
-          }
-        }
-      }
-    })
-  })
 })

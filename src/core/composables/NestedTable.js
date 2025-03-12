@@ -587,6 +587,218 @@ class NestedTable {
           }
         }
 
+        if (prop === 'sample') {
+          /**
+           * Samples rows from the table according to the specified sampling method.
+           * Creates deep copies of the sampled items and preserves parent relationships.
+           *
+           * @param {Object} options - Options for the sampling operation
+           * @param {string} [options.type='without-replacement'] - Sampling type: 'with-replacement', 'without-replacement', 'fixed-repetitions', 'alternate-groups', or 'custom'
+           * @param {number} [options.size] - Number of samples to take (required for most sampling types)
+           * @param {Array<number>} [options.weights] - Optional weights for weighted sampling
+           * @param {Array<Array<number>>} [options.groups] - Required for 'alternate-groups' sampling
+           * @param {boolean} [options.randomize_group_order=false] - Whether to randomize group order in 'alternate-groups' sampling
+           * @param {Function} [options.fn] - Required for 'custom' sampling
+           * @param {string} [options.seed] - Optional seed for deterministic sampling
+           * @returns {NestedTable} The current instance for chaining
+           * @throws {Error} If invalid options are provided or operation would exceed max rows
+           */
+          return (options = {}) => {
+            if (target._items.length === 0) return selfProxy
+
+            const type = options.type || 'without-replacement'
+            const size = options.size
+            const weights = options.weights
+            const groups = options.groups
+            const randomize_group_order = options.randomize_group_order || false
+            const fn = options.fn
+            const seed = options.seed
+
+            // Only create a new RNG if a seed is provided
+            // Otherwise use the global Math.random
+            const rng = seed ? seedrandom(seed) : Math.random
+
+            // Check safety limit first
+            if (size && size > config.max_stepper_rows) {
+              throw new Error(
+                `sample() would generate ${size} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the sample size.`
+              )
+            }
+
+            // Helper function to deep copy a NestedTable node
+            const deepCopyNode = (node) => {
+              // Create new node with copied data
+              const newNode = new NestedTable(node.sm, JSON.parse(JSON.stringify(node.data)), target, [...target._path])
+
+              // Deep copy all child items
+              newNode._items = node._items.map((child) => deepCopyNode(child))
+
+              // Update parent references and paths for children
+              newNode._items.forEach((child, index) => {
+                child._parent = newNode
+                child._path = [...newNode._path, index]
+              })
+
+              return newNode
+            }
+
+            // Array to hold the indices of sampled rows
+            let sampledIndices = []
+
+            switch (type) {
+              case 'with-replacement':
+                if (!size) throw new Error('size parameter is required for with-replacement sampling')
+                sampledIndices = Array(size)
+                  .fill(null)
+                  .map(() => {
+                    if (weights) {
+                      // Validate weights array length
+                      if (weights.length !== target._items.length) {
+                        throw new Error('Weights array length must match the number of rows')
+                      }
+                      // Weighted sampling
+                      const totalWeight = weights.reduce((a, b) => a + b, 0)
+                      let random = rng() * totalWeight
+                      for (let i = 0; i < weights.length; i++) {
+                        random -= weights[i]
+                        if (random <= 0) return i
+                      }
+                      return target._items.length - 1 // Fallback
+                    }
+                    return Math.floor(rng() * target._items.length)
+                  })
+                break
+
+              case 'without-replacement':
+                if (!size) throw new Error('size parameter is required for without-replacement sampling')
+                if (size > target._items.length) {
+                  throw new Error('Sample size cannot be larger than the number of available rows')
+                }
+                sampledIndices = Array.from({ length: target._items.length }, (_, i) => i)
+                // Fisher-Yates shuffle
+                for (let i = sampledIndices.length - 1; i > 0; i--) {
+                  const j = Math.floor(rng() * (i + 1))
+                  ;[sampledIndices[i], sampledIndices[j]] = [sampledIndices[j], sampledIndices[i]]
+                }
+                sampledIndices = sampledIndices.slice(0, size)
+                break
+
+              case 'fixed-repetitions':
+                if (!size) throw new Error('size parameter is required for fixed-repetitions sampling')
+                sampledIndices = []
+                for (let i = 0; i < target._items.length; i++) {
+                  for (let j = 0; j < size; j++) {
+                    sampledIndices.push(i)
+                  }
+                }
+                // Shuffle the result
+                for (let i = sampledIndices.length - 1; i > 0; i--) {
+                  const j = Math.floor(rng() * (i + 1))
+                  ;[sampledIndices[i], sampledIndices[j]] = [sampledIndices[j], sampledIndices[i]]
+                }
+                break
+
+              case 'alternate-groups':
+                if (!groups) throw new Error('groups parameter is required for alternate-groups sampling')
+                if (!Array.isArray(groups) || groups.length < 2) {
+                  throw new Error('groups must be an array with at least two groups')
+                }
+
+                // Validate group indices
+                groups.forEach((group, groupIndex) => {
+                  if (!Array.isArray(group)) {
+                    throw new Error(`Group ${groupIndex} must be an array`)
+                  }
+                  group.forEach((index) => {
+                    if (index < 0 || index >= target._items.length) {
+                      throw new Error(`Invalid index ${index} in group ${groupIndex}`)
+                    }
+                  })
+                })
+
+                // Randomize group order if requested
+                const groupOrder = randomize_group_order
+                  ? (() => {
+                      const indices = Array.from({ length: groups.length }, (_, i) => i)
+                      for (let i = indices.length - 1; i > 0; i--) {
+                        const j = Math.floor(rng() * (i + 1))
+                        ;[indices[i], indices[j]] = [indices[j], indices[i]]
+                      }
+                      return indices
+                    })()
+                  : Array.from({ length: groups.length }, (_, i) => i)
+
+                sampledIndices = []
+                const maxGroupSize = Math.max(...groups.map((g) => g.length))
+
+                if (randomize_group_order) {
+                  // When randomizing group order, take all items from each group in sequence
+                  for (const groupIndex of groupOrder) {
+                    const group = groups[groupIndex]
+                    for (let i = 0; i < group.length; i++) {
+                      sampledIndices.push(group[i])
+                    }
+                  }
+                } else {
+                  // When not randomizing, alternate between groups one item at a time
+                  for (let i = 0; i < maxGroupSize; i++) {
+                    for (const groupIndex of groupOrder) {
+                      const group = groups[groupIndex]
+                      if (i < group.length) {
+                        sampledIndices.push(group[i])
+                      }
+                    }
+                  }
+                }
+                break
+
+              case 'custom':
+                if (!fn) throw new Error('fn parameter is required for custom sampling')
+                if (typeof fn !== 'function') {
+                  throw new Error('fn must be a function')
+                }
+                const customIndices = Array.from({ length: target._items.length }, (_, i) => i)
+                const customOrder = fn(customIndices, rng)
+                if (!Array.isArray(customOrder)) {
+                  throw new Error('Custom sampling function must return an array')
+                }
+                // Validate custom indices instead of filtering them
+                customOrder.forEach((i) => {
+                  if (i < 0 || i >= target._items.length) {
+                    throw new Error(`Invalid index ${i} returned by custom sampling function`)
+                  }
+                })
+                sampledIndices = customOrder
+                break
+
+              default:
+                throw new Error(
+                  `Invalid sampling type: ${type}. Must be one of: with-replacement, without-replacement, fixed-repetitions, alternate-groups, custom`
+                )
+            }
+
+            // Store original items
+            const originalItems = [...target._items]
+
+            // Create new items based on the sampled indices
+            const newItems = sampledIndices.map((index, newIndex) => {
+              const originalItem = originalItems[index]
+              const newItem = deepCopyNode(originalItem)
+
+              // Update the path for the new position
+              newItem._path = [...target._path, newIndex]
+              newItem._parent = target
+
+              return newItem
+            })
+
+            // Replace the items with the sampled ones
+            target._items = newItems
+
+            return selfProxy
+          }
+        }
+
         if (prop === 'interleave') {
           return (input) => {
             let inputItems = []
@@ -1054,32 +1266,6 @@ class NestedTable {
 
     // Return data values from the selected range
     return this._items.slice(actualStart, finalEnd).map((item) => item.data)
-  }
-
-  /**
-   * Returns an array containing the data fields from the first n items in the table.
-   * If n is greater than the table length, returns all items' data.
-   * If n is negative, returns empty array.
-   *
-   * @param {number} [n=1] - Number of items to return from the start
-   * @returns {Array} Array of data values from the first n items
-   */
-  head(n = 1) {
-    if (n <= 0) return []
-    return this._items.slice(0, n).map((item) => item.data)
-  }
-
-  /**
-   * Returns an array containing the data fields from the last n items in the table.
-   * If n is greater than the table length, returns all items' data.
-   * If n is negative, returns empty array.
-   *
-   * @param {number} [n=1] - Number of items to return from the end
-   * @returns {Array} Array of data values from the last n items
-   */
-  tail(n = 1) {
-    if (n <= 0) return []
-    return this._items.slice(-n).map((item) => item.data)
   }
 
   /**
