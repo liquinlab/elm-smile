@@ -18,7 +18,8 @@ The trial stepper system consists of two main components:
 
 1. A **step controller** that manages navigation through your trials (moving
    forward/backward)
-2. A **table builder** that helps you create complex sequences of trials
+2. A powerful **table builder** that helps you create complex sequences of
+   trials
 
 This separation allows you to first build up your trial sequence using the
 powerful table API, and then control how you move through those trials using the
@@ -61,10 +62,10 @@ The `stepper` object provides methods for controlling trial navigation:
 - `prev()` - Go back to the previous trial. Returns the index of the previous
   state or `null` if at the beginning
 - `reset()` - Reset to the beginning, positioning at the first trial
-- `current` - The data object of the current trial (e.g.,
-  `{ shape: 'circle', color: 'red' }`)
+- `current` - An array of data objects along the current path (e.g.,
+  `[{ shape: 'circle', color: 'red' }]`)
 - `index` - The path to the current trial as a string (e.g., "0" for first
-  trial, "0.1" for nested trials)
+  trial, "0-0" for nested trials)
 
 For example:
 
@@ -81,22 +82,22 @@ const trials = stepper
   .push()
 
 // After push(), we're at the first trial
-console.log(stepper.current) // { shape: 'circle', color: 'red' }
+console.log(stepper.current) // [{ shape: 'circle', color: 'red' }]
 console.log(stepper.index) // "0"
 
 // Move to next trial
 stepper.next()
-console.log(stepper.current) // { shape: 'square', color: 'blue' }
+console.log(stepper.current) // [{ shape: 'square', color: 'blue' }]
 console.log(stepper.index) // "1"
 
 // Go back
 stepper.prev()
-console.log(stepper.current) // { shape: 'circle', color: 'red' }
+console.log(stepper.current) // [{ shape: 'circle', color: 'red' }]
 console.log(stepper.index) // "0"
 
 // Reset always goes to the first trial
 stepper.reset()
-console.log(stepper.current) // { shape: 'circle', color: 'red' }
+console.log(stepper.current) // [{ shape: 'circle', color: 'red' }]
 console.log(stepper.index) // "0"
 ```
 
@@ -111,19 +112,13 @@ trials[0].table().append([{ type: 'stim' }, { type: 'feedback' }])
 
 trials.push()
 
-console.log(stepper.current) // { range: 0 }
-console.log(stepper.index) // "0"
+console.log(stepper.current) // [{ range: 0 }, { type: 'stim' }]
+console.log(stepper.index) // "0-0"
 
 stepper.next()
-console.log(stepper.current) // { type: 'stim' }
-console.log(stepper.index) // "0.0"
-
-stepper.next()
-console.log(stepper.current) // { type: 'feedback' }
-console.log(stepper.index) // "0.1"
+console.log(stepper.current) // [{ range: 0 }, { type: 'feedback' }]
+console.log(stepper.index) // "0-1"
 ```
-
-::: tip Reactive Properties
 
 Both `current` and `index` are reactive properties that automatically update
 when you navigate through trials. You can use them directly in your Vue
@@ -132,12 +127,13 @@ templates:
 ```vue
 <template>
   <div>
-    Current trial: {{ stepper.current }} Current path: {{ stepper.index }}
+    Current trial data: {{ stepper.current }}
+    <!-- Returns array of data objects -->
+    Current path: {{ stepper.index }}
+    <!-- Returns path string like "0" or "0-0" -->
   </div>
 </template>
 ```
-
-:::
 
 The `stepper` also provides methods for building trial sequences through its
 `table()` method, which we'll cover next.

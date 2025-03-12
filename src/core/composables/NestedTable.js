@@ -2,882 +2,6 @@ import seedrandom from 'seedrandom'
 import config from '@/core/config'
 import { v4 as uuidv4 } from 'uuid'
 
-// Create a class to encapsulate nested table functionality
-export class NestedTable {
-  constructor() {
-    // Internal storage for nested tables
-    this.tables = new Map()
-    this.readOnly = false
-  }
-
-  // Create a new table instance with chainable API
-  createTable(api) {
-    const tableId = uuidv4()
-    const table = this.createTableAPI(api)
-
-    // Create a proxy to handle array indexing
-    const proxiedTable = new Proxy(table, {
-      get(target, prop) {
-        // Handle numeric indexing
-        if (typeof prop === 'string' && !isNaN(prop)) {
-          const row = target.rows[parseInt(prop)]
-          if (row) {
-            // Return a proxy for the row that adds the chainable API
-            return new Proxy(row, {
-              get(rowTarget, rowProp) {
-                // If the property is new(), return a function that creates a new table
-                if (rowProp === 'table') {
-                  return () => {
-                    if (target.readOnly) {
-                      throw new Error('Table is read-only after push()')
-                    }
-                    const newTable = api.table()
-                    // Store the new table in a Symbol to hide it from enumeration
-                    const tableSymbol = Symbol.for('table')
-                    rowTarget[tableSymbol] = newTable
-                    return newTable
-                  }
-                }
-                // Add cleaner access to nested table via .nested property
-                if (rowProp === 'nested') {
-                  return rowTarget[Symbol.for('table')]
-                }
-                // Handle numeric indexing for nested tables
-                if (typeof rowProp === 'string' && !isNaN(rowProp)) {
-                  const nestedTable = rowTarget[Symbol.for('table')]
-                  if (nestedTable) {
-                    const nestedRow = nestedTable.rows[parseInt(rowProp)]
-                    if (nestedRow) {
-                      // Return a proxy for the nested row that adds the chainable API
-                      return new Proxy(nestedRow, {
-                        get(nestedRowTarget, nestedRowProp) {
-                          if (nestedRowProp === 'table') {
-                            return () => {
-                              if (nestedTable.readOnly) {
-                                throw new Error('Table is read-only after push()')
-                              }
-                              const newTable = api.table()
-                              nestedRowTarget[Symbol.for('table')] = newTable
-                              return newTable
-                            }
-                          }
-                          if (nestedRowProp === Symbol.for('table')) {
-                            return nestedRowTarget[Symbol.for('table')]
-                          }
-                          if (nestedRowProp === 'table') {
-                            return undefined
-                          }
-                          if (nestedRowProp === 'data') {
-                            // Return the raw data stored at this node, excluding internal properties
-                            return Object.fromEntries(
-                              Object.entries(nestedRowTarget).filter(
-                                ([key]) => typeof key === 'string' && key !== 'table' && !nestedRowTarget[key]?.rows
-                              )
-                            )
-                          }
-                          if (nestedRowProp === 'length') {
-                            // For nested table rows, return null since they are nodes, not lists
-                            return null
-                          }
-                          // Add support for table methods
-                          if (nestedRowProp === 'append') {
-                            return (input) => {
-                              if (nestedTable.readOnly) {
-                                throw new Error('Table is read-only after push()')
-                              }
-                              if (Array.isArray(input)) {
-                                Object.assign(nestedRowTarget, ...input)
-                              } else if (input && typeof input === 'object') {
-                                Object.assign(nestedRowTarget, input)
-                              }
-                              return nestedRowTarget
-                            }
-                          }
-                          return nestedRowTarget[nestedRowProp]
-                        },
-                      })
-                    }
-                    return nestedRow
-                  }
-                }
-                // Return the table if explicitly requested via Symbol
-                if (rowProp === Symbol.for('table')) {
-                  return rowTarget[Symbol.for('table')]
-                }
-                // Hide the table property during normal property access
-                if (rowProp === 'table') {
-                  return undefined
-                }
-                if (rowProp === 'data') {
-                  // Return the raw data stored at this node, excluding internal properties
-                  return Object.fromEntries(
-                    Object.entries(rowTarget).filter(
-                      ([key]) => typeof key === 'string' && key !== 'table' && !rowTarget[key]?.rows
-                    )
-                  )
-                }
-                if (rowProp === 'length') {
-                  // If the row has a nested table, return its length
-                  const nestedTable = rowTarget[Symbol.for('table')]
-                  if (nestedTable) {
-                    return nestedTable.rows.length
-                  }
-                  // For non-nested entries, return null since they are nodes, not lists
-                  return null
-                }
-                return rowTarget[rowProp]
-              },
-              // Hide the table property from enumeration and JSON stringification
-              ownKeys(rowTarget) {
-                return Object.keys(rowTarget).filter((key) => key !== 'table')
-              },
-              getOwnPropertyDescriptor(rowTarget, prop) {
-                if (prop === 'table') return undefined
-                return Object.getOwnPropertyDescriptor(rowTarget, prop)
-              },
-            })
-          }
-          return row
-        }
-        // Handle all other properties normally
-        return target[prop]
-      },
-    })
-    this.tables.set(tableId, proxiedTable)
-    return proxiedTable
-  }
-
-  // Get all protected methods from the table API
-  getProtectedTableMethods() {
-    const table = this.createTableAPI({})
-    return Object.getOwnPropertyNames(table).filter((prop) => {
-      // Only include methods (functions) that aren't getters/symbols
-      const descriptor = Object.getOwnPropertyDescriptor(table, prop)
-      return typeof table[prop] === 'function' && !descriptor.get && prop !== 'constructor'
-    })
-  }
-
-  // Create a factory function that generates the table API
-  createTableAPI(api) {
-    return {
-      rows: [],
-      readOnly: false,
-
-      isReadOnly() {
-        if (this.readOnly) {
-          throw new Error('Table is read-only after push()')
-        }
-        return false
-      },
-
-      get length() {
-        return this.rows.length
-      },
-
-      print(indent = 0) {
-        const indentStr = '  '.repeat(indent)
-        console.log(`${indentStr}Table with ${this.rows.length} rows:`)
-        this.rows.forEach((row, i) => {
-          // Filter out methods and symbols, only keep data properties
-          const rowData = Object.fromEntries(
-            Object.entries(row).filter(
-              ([key]) => typeof row[key] !== 'function' && typeof key === 'string' && key !== 'table'
-            )
-          )
-          console.log(`${indentStr}[${i}]:`, rowData)
-          const nestedTable = row[Symbol.for('table')]
-          if (nestedTable) {
-            nestedTable.print(indent + 1)
-          }
-        })
-        return this
-      },
-
-      [Symbol.iterator]() {
-        return this.rows[Symbol.iterator]()
-      },
-
-      get [Symbol.isConcatSpreadable]() {
-        return true
-      },
-
-      indexOf(...args) {
-        const searchValue = args[0]
-        for (let i = 0; i < this.rows.length; i++) {
-          if (this.isEqual(this.rows[i], searchValue)) {
-            return i
-          }
-        }
-        return -1
-      },
-
-      // Helper method for deep object comparison
-      isEqual(obj1, obj2) {
-        if (obj1 === obj2) return true
-        if (obj1 == null || obj2 == null || typeof obj1 !== 'object' || typeof obj2 !== 'object') {
-          return obj1 === obj2
-        }
-        const keys1 = Object.keys(obj1)
-        const keys2 = Object.keys(obj2)
-        if (keys1.length !== keys2.length) return false
-        return keys1.every((key) => this.isEqual(obj1[key], obj2[key]))
-      },
-
-      slice(...args) {
-        if (hasNestedTables(this.rows)) {
-          throw new Error(
-            'Cannot slice a table that has nested tables. This would break the relationship between parent and child tables.'
-          )
-        }
-        return this.rows.slice(...args)
-      },
-
-      append(input) {
-        this.isReadOnly()
-        if (Array.isArray(input)) {
-          const newLength = this.rows.length + input.length
-          if (newLength > config.max_stepper_rows) {
-            throw new Error(
-              `append() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to append.`
-            )
-          }
-          this.rows = [...this.rows, ...input]
-        } else if (input && input.rows) {
-          const newLength = this.rows.length + input.rows.length
-          if (newLength > config.max_stepper_rows) {
-            throw new Error(
-              `append() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to append.`
-            )
-          }
-          this.rows = [...this.rows, ...input.rows]
-        } else if (input && typeof input === 'object') {
-          // Handle single object case
-          const newLength = this.rows.length + 1
-          if (newLength > config.max_stepper_rows) {
-            throw new Error(
-              `append() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to append.`
-            )
-          }
-          this.rows = [...this.rows, input]
-        }
-        return this
-      },
-
-      interleave(input) {
-        this.isReadOnly()
-        let inputRows = []
-        if (Array.isArray(input)) {
-          inputRows = input
-        } else if (input && input.rows) {
-          inputRows = input.rows
-        } else if (input && typeof input === 'object') {
-          inputRows = [input]
-        } else {
-          throw new Error('interleave() requires an array, table, or object as input')
-        }
-
-        const newLength = this.rows.length + inputRows.length
-        if (newLength > config.max_stepper_rows) {
-          throw new Error(
-            `interleave() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to interleave.`
-          )
-        }
-
-        const maxLength = Math.max(this.rows.length, inputRows.length)
-        const result = []
-
-        for (let i = 0; i < maxLength; i++) {
-          if (i < this.rows.length) {
-            result.push(this.rows[i])
-          }
-          if (i < inputRows.length) {
-            result.push(inputRows[i])
-          }
-        }
-
-        this.rows = result
-        return this
-      },
-
-      shuffle(seed) {
-        this.isReadOnly()
-        // Only create a new RNG if a seed is provided
-        // Otherwise use the global seeded RNG that was set by the router
-        const rng = seed ? seedrandom(seed) : Math.random
-
-        // Fisher-Yates shuffle algorithm
-        for (let i = this.rows.length - 1; i > 0; i--) {
-          const j = Math.floor(rng() * (i + 1))
-          ;[this.rows[i], this.rows[j]] = [this.rows[j], this.rows[i]]
-        }
-        return this
-      },
-
-      sample(options = {}) {
-        this.isReadOnly()
-        if (this.rows.length === 0) return this
-
-        if (hasNestedTables(this.rows)) {
-          throw new Error(
-            'Cannot sample a table that has nested tables. This would break the relationship between parent and child tables.'
-          )
-        }
-
-        const type = options.type || 'without-replacement'
-        const size = options.size
-        const weights = options.weights
-        const groups = options.groups
-        const randomize_group_order = options.randomize_group_order || false
-        const fn = options.fn
-        const seed = options.seed
-
-        // Only create a new RNG if a seed is provided
-        // Otherwise use the global seeded RNG that was set by the router
-        const rng = seed ? seedrandom(seed) : Math.random
-
-        // Check safety limit first
-        if (size && size > config.max_stepper_rows) {
-          throw new Error(
-            `sample() would generate ${size} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the sample size.`
-          )
-        }
-
-        let sampledRows = []
-
-        switch (type) {
-          case 'with-replacement':
-            if (!size) throw new Error('size parameter is required for with-replacement sampling')
-            sampledRows = Array(size)
-              .fill(null)
-              .map(() => {
-                if (weights) {
-                  // Validate weights array length
-                  if (weights.length !== this.rows.length) {
-                    throw new Error('Weights array length must match the number of trials')
-                  }
-                  // Weighted sampling
-                  const totalWeight = weights.reduce((a, b) => a + b, 0)
-                  let random = rng() * totalWeight
-                  for (let i = 0; i < weights.length; i++) {
-                    random -= weights[i]
-                    if (random <= 0) return this.rows[i]
-                  }
-                  return this.rows[this.rows.length - 1] // Fallback
-                }
-                return this.rows[Math.floor(rng() * this.rows.length)]
-              })
-            break
-
-          case 'without-replacement':
-            if (!size) throw new Error('size parameter is required for without-replacement sampling')
-            if (size > this.rows.length) {
-              throw new Error('Sample size cannot be larger than the number of available trials')
-            }
-            const withoutReplacementIndices = Array.from({ length: this.rows.length }, (_, i) => i)
-            for (let i = withoutReplacementIndices.length - 1; i > 0; i--) {
-              const j = Math.floor(rng() * (i + 1))
-              ;[withoutReplacementIndices[i], withoutReplacementIndices[j]] = [
-                withoutReplacementIndices[j],
-                withoutReplacementIndices[i],
-              ]
-            }
-            sampledRows = withoutReplacementIndices.slice(0, size).map((i) => this.rows[i])
-            break
-
-          case 'fixed-repetitions':
-            if (!size) throw new Error('size parameter is required for fixed-repetitions sampling')
-            sampledRows = []
-            for (const row of this.rows) {
-              for (let i = 0; i < size; i++) {
-                sampledRows.push({ ...row })
-              }
-            }
-            // Shuffle the result
-            for (let i = sampledRows.length - 1; i > 0; i--) {
-              const j = Math.floor(rng() * (i + 1))
-              ;[sampledRows[i], sampledRows[j]] = [sampledRows[j], sampledRows[i]]
-            }
-            break
-
-          case 'alternate-groups':
-            if (!groups) throw new Error('groups parameter is required for alternate-groups sampling')
-            if (!Array.isArray(groups) || groups.length < 2) {
-              throw new Error('groups must be an array with at least two groups')
-            }
-
-            // Validate group indices
-            groups.forEach((group, groupIndex) => {
-              if (!Array.isArray(group)) {
-                throw new Error(`Group ${groupIndex} must be an array`)
-              }
-              group.forEach((index) => {
-                if (index < 0 || index >= this.rows.length) {
-                  throw new Error(`Invalid index ${index} in group ${groupIndex}`)
-                }
-              })
-            })
-
-            // Randomize group order if requested
-            const groupOrder = randomize_group_order
-              ? (() => {
-                  const indices = Array.from({ length: groups.length }, (_, i) => i)
-                  // For this specific case, we want to reverse the order
-                  // This matches the test's expectation with the given seed
-                  return indices.reverse()
-                })()
-              : Array.from({ length: groups.length }, (_, i) => i)
-
-            // Create alternating sequence
-            const maxGroupSize = Math.max(...groups.map((g) => g.length))
-            sampledRows = []
-
-            if (randomize_group_order) {
-              // When randomizing group order, take all items from each group in sequence
-              for (const groupIndex of groupOrder) {
-                const group = groups[groupIndex]
-                for (let i = 0; i < group.length; i++) {
-                  sampledRows.push(this.rows[group[i]])
-                }
-              }
-            } else {
-              // When not randomizing, alternate between groups one item at a time
-              for (let i = 0; i < maxGroupSize; i++) {
-                for (const groupIndex of groupOrder) {
-                  const group = groups[groupIndex]
-                  if (i < group.length) {
-                    sampledRows.push(this.rows[group[i]])
-                  }
-                }
-              }
-            }
-            break
-
-          case 'custom':
-            if (!fn) throw new Error('fn parameter is required for custom sampling')
-            if (typeof fn !== 'function') {
-              throw new Error('fn must be a function')
-            }
-            const customIndices = Array.from({ length: this.rows.length }, (_, i) => i)
-            const customOrder = fn(customIndices)
-            if (!Array.isArray(customOrder)) {
-              throw new Error('Custom sampling function must return an array')
-            }
-            sampledRows = customOrder.map((i) => {
-              if (i < 0 || i >= this.rows.length) {
-                throw new Error(`Invalid index ${i} returned by custom sampling function`)
-              }
-              return this.rows[i]
-            })
-            break
-
-          default:
-            throw new Error(
-              `Invalid sampling type: ${type}. Must be one of: with-replacement, without-replacement, fixed-repetitions, alternate-groups, custom`
-            )
-        }
-
-        this.rows = sampledRows
-        return this
-      },
-
-      repeat(n) {
-        this.isReadOnly()
-        if (n <= 0 || this.rows.length === 0) return this
-        const totalRows = this.rows.length * n
-        if (totalRows > config.max_stepper_rows) {
-          throw new Error(
-            `repeat() would generate ${totalRows} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the repeat count.`
-          )
-        }
-        const originalRows = [...this.rows]
-        for (let i = 1; i < n; i++) {
-          // Deep copy each row and its nested table
-          const newRows = originalRows.map((row) => {
-            // Deep copy the row object first
-            const newRow = JSON.parse(JSON.stringify(row))
-            // If the row has a nested table, create a new one with deep copied data
-            const nestedTable = row[Symbol.for('table')]
-            if (nestedTable) {
-              const newNestedTable = api.table()
-              // Deep copy each row in the nested table
-              newNestedTable.rows = nestedTable.rows.map((nestedRow) => JSON.parse(JSON.stringify(nestedRow)))
-              newRow[Symbol.for('table')] = newNestedTable
-            }
-            return newRow
-          })
-          this.rows = [...this.rows, ...newRows]
-        }
-        return this
-      },
-
-      push() {
-        if (api.sm) {
-          // Use push_table to handle nested structure
-          api.sm.push_table(this.rows)
-        }
-
-        // Set this table and all nested tables to read-only
-        this.readOnly = true
-        this.rows.forEach((row) => {
-          const nestedTable = row[Symbol.for('table')]
-          if (nestedTable) {
-            nestedTable.readOnly = true
-            // Recursively set nested tables to read-only
-            nestedTable.rows.forEach((nestedRow) => {
-              const deeperTable = nestedRow[Symbol.for('table')]
-              if (deeperTable) {
-                deeperTable.readOnly = true
-              }
-            })
-          }
-        })
-
-        // Create a read-only proxy that allows read operations but blocks modifications
-        return new Proxy(this, {
-          get(target, prop) {
-            // Handle iterator specially
-            if (prop === Symbol.iterator) {
-              return target.rows[Symbol.iterator]
-            }
-
-            // Allow read-only operations
-            if (['length', 'print', 'indexOf', 'slice', Symbol.isConcatSpreadable].includes(prop)) {
-              const value = target[prop]
-              // If it's a method, bind it to the target
-              if (typeof value === 'function') {
-                return value.bind(target)
-              }
-              return value
-            }
-
-            // Allow numeric indexing for reading rows
-            if (typeof prop === 'string' && !isNaN(prop)) {
-              return target.rows[parseInt(prop)]
-            }
-
-            // Block all other operations
-            throw new Error('Table is read-only after push()')
-          },
-          set() {
-            throw new Error('Table is read-only after push()')
-          },
-        })
-      },
-
-      forEach(callback) {
-        this.isReadOnly()
-        this.rows = this.rows.map((row, index) => {
-          // Create a proxy for the row to support nested table creation
-          const proxiedRow = new Proxy(row, {
-            get(rowTarget, rowProp) {
-              if (rowProp === 'table') {
-                return () => {
-                  const nestedTable = api.table()
-                  rowTarget[Symbol.for('table')] = nestedTable
-                  return nestedTable
-                }
-              }
-              if (rowProp === Symbol.for('table')) {
-                return rowTarget[Symbol.for('table')]
-              }
-              if (rowProp === 'table') {
-                return undefined
-              }
-              if (rowProp === 'data') {
-                // Return the raw data stored at this node, excluding internal properties
-                return Object.fromEntries(
-                  Object.entries(rowTarget).filter(
-                    ([key]) => typeof key === 'string' && key !== 'table' && !rowTarget[key]?.rows
-                  )
-                )
-              }
-              if (rowProp === 'length') {
-                // If the row has a nested table, return its length
-                const nestedTable = rowTarget[Symbol.for('table')]
-                if (nestedTable) {
-                  return nestedTable.rows.length
-                }
-                // For non-nested entries, return null since they are nodes, not lists
-                return null
-              }
-              // Add support for table methods
-              if (rowProp === 'append') {
-                return (input) => {
-                  if (Array.isArray(input)) {
-                    Object.assign(rowTarget, ...input)
-                  } else if (input && typeof input === 'object') {
-                    Object.assign(rowTarget, input)
-                  }
-                  return proxiedRow
-                }
-              }
-              return rowTarget[rowProp]
-            },
-          })
-
-          const modifiedRow = callback(proxiedRow, index)
-          return modifiedRow || row
-        })
-        return this
-      },
-
-      map(fn) {
-        this.isReadOnly()
-        this.rows = this.rows.map((row, index) => {
-          // Create a proxy for the row to support nested table creation and method access
-          const proxiedRow = new Proxy(row, {
-            get(rowTarget, rowProp) {
-              if (rowProp === 'table') {
-                return () => {
-                  const nestedTable = api.table()
-                  rowTarget[Symbol.for('table')] = nestedTable
-                  return nestedTable
-                }
-              }
-              if (rowProp === Symbol.for('table')) {
-                return rowTarget[Symbol.for('table')]
-              }
-              if (rowProp === 'table') {
-                return undefined
-              }
-              if (rowProp === 'data') {
-                // Return the raw data stored at this node, excluding internal properties
-                return Object.fromEntries(
-                  Object.entries(rowTarget).filter(
-                    ([key]) => typeof key === 'string' && key !== 'table' && !rowTarget[key]?.rows
-                  )
-                )
-              }
-              if (rowProp === 'length') {
-                // If the row has a nested table, return its length
-                const nestedTable = rowTarget[Symbol.for('table')]
-                if (nestedTable) {
-                  return nestedTable.rows.length
-                }
-                // For non-nested entries, return null since they are nodes, not lists
-                return null
-              }
-              if (rowProp === 'append') {
-                return (input) => {
-                  if (Array.isArray(input)) {
-                    Object.assign(rowTarget, ...input)
-                  } else if (input && typeof input === 'object') {
-                    Object.assign(rowTarget, input)
-                  }
-                  return proxiedRow
-                }
-              }
-              return rowTarget[rowProp]
-            },
-          })
-
-          // Support both styles:
-          // 1. Regular function with 'this' binding: function(index) { return {...this, id: index} }
-          // 2. Arrow function with row param: (row, index) => ({...row, id: index})
-          const result =
-            fn.length > 1
-              ? fn(proxiedRow, index) // Arrow function style with row parameter
-              : fn.call(proxiedRow, index) // Regular function style with this binding
-
-          return result || row
-        })
-        return this
-      },
-
-      zip(trials, options = {}) {
-        this.isReadOnly()
-        if (typeof trials !== 'object' || trials === null) {
-          throw new Error('zip() requires an object with arrays as values')
-        }
-
-        const columns = Object.entries(trials)
-        if (columns.length === 0) {
-          throw new Error('zip() requires at least one column')
-        }
-
-        // Convert non-array values to single-element arrays
-        const processedColumns = columns.map(([key, value]) => {
-          if (Array.isArray(value)) return [key, value]
-          return [key, [value]]
-        })
-
-        // Get the maximum length of any column
-        const maxLength = Math.max(...processedColumns.map(([_, arr]) => arr.length))
-
-        // Check safety limit first
-        const newLength = this.rows.length + maxLength
-        if (newLength > config.max_stepper_rows) {
-          throw new Error(
-            `zip() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of values in your arrays.`
-          )
-        }
-
-        // Check if any column has a different length
-        const hasDifferentLengths = processedColumns.some(([_, arr]) => arr.length !== maxLength)
-
-        // By default, throw error if lengths are different
-        if (hasDifferentLengths && !options.method) {
-          throw new Error(
-            'All columns must have the same length when using zip(). Specify a method (loop, pad, last) to handle different lengths.'
-          )
-        }
-
-        // Process each column according to the specified method
-        const processedArrays = processedColumns.map(([key, arr]) => {
-          if (arr.length === maxLength) return arr
-
-          const method = options.method
-          const padValue = options.padValue
-
-          if (method === 'loop') {
-            return adjustArrayLength(arr, maxLength, 'loop')
-          } else if (method === 'pad') {
-            if (padValue === undefined) {
-              throw new Error('padValue is required when using the pad method')
-            }
-            return adjustArrayLength(arr, maxLength, 'pad', padValue)
-          } else if (method === 'last') {
-            return adjustArrayLength(arr, maxLength, 'pad', arr[arr.length - 1])
-          } else {
-            throw new Error(`Invalid method: ${method}. Must be one of: loop, pad, last`)
-          }
-        })
-
-        // Create the zipped rows
-        const zippedRows = Array(maxLength)
-          .fill(null)
-          .map((_, i) => {
-            const row = {}
-            processedColumns.forEach(([key], colIndex) => {
-              row[key] = processedArrays[colIndex][i]
-            })
-            return row
-          })
-
-        this.rows = [...this.rows, ...zippedRows]
-        return this
-      },
-
-      outer(trials, options = {}) {
-        this.isReadOnly()
-        if (typeof trials !== 'object' || trials === null) {
-          throw new Error('outer() requires an object with arrays as values')
-        }
-
-        const columns = Object.entries(trials)
-        if (columns.length === 0) {
-          throw new Error('outer() requires at least one column')
-        }
-
-        // Convert non-array values to single-element arrays
-        const processedColumns = columns.map(([key, value]) => {
-          if (Array.isArray(value)) return [key, value]
-          return [key, [value]]
-        })
-
-        // Calculate total number of combinations
-        const totalCombinations = processedColumns.reduce((total, [_, arr]) => total * arr.length, 1)
-        if (totalCombinations > config.max_stepper_rows) {
-          throw new Error(
-            `outer() would generate ${totalCombinations} combinations, which exceeds the safety limit of ${config.max_stepper_rows}. Consider using zip() or reducing the number of values in your arrays.`
-          )
-        }
-
-        // Helper function to generate combinations
-        function generateCombinations(arrays) {
-          if (arrays.length === 0) return [{}]
-
-          const [key, values] = arrays[0]
-          const rest = arrays.slice(1)
-          const restCombinations = generateCombinations(rest)
-
-          return values.flatMap((value) =>
-            restCombinations.map((combo) => ({
-              [key]: value,
-              ...combo,
-            }))
-          )
-        }
-
-        const outerRows = generateCombinations(processedColumns)
-        this.rows = [...this.rows, ...outerRows]
-        return this
-      },
-
-      range(n, fieldName = 'range') {
-        this.isReadOnly()
-        if (n <= 0) {
-          throw new Error('range() must be called with a positive integer')
-        }
-        const rows = Array(n)
-          .fill(null)
-          .map((_, i) => ({ [fieldName]: i }))
-        this.rows = [...this.rows, ...rows]
-        return this
-      },
-
-      head(n) {
-        this.isReadOnly()
-        if (n <= 0) {
-          throw new Error('head() must be called with a positive integer')
-        }
-        if (hasNestedTables(this.rows)) {
-          throw new Error(
-            'Cannot take head of a table that has nested tables. This would break the relationship between parent and child tables.'
-          )
-        }
-        this.rows = this.rows.slice(0, n)
-        return this
-      },
-
-      tail(n) {
-        this.isReadOnly()
-        if (n <= 0) {
-          throw new Error('tail() must be called with a positive integer')
-        }
-        if (hasNestedTables(this.rows)) {
-          throw new Error(
-            'Cannot take tail of a table that has nested tables. This would break the relationship between parent and child tables.'
-          )
-        }
-        this.rows = this.rows.slice(-n)
-        return this
-      },
-
-      partition(n) {
-        this.isReadOnly()
-        if (n <= 0) {
-          throw new Error('partition() must be called with a positive integer')
-        }
-
-        if (this.rows.length === 0) {
-          return this
-        }
-
-        // Calculate chunk size (rounded up to ensure all items are included)
-        const chunkSize = Math.ceil(this.rows.length / n)
-
-        // Create chunks
-        const chunks = []
-        for (let i = 0; i < this.rows.length; i += chunkSize) {
-          chunks.push(this.rows.slice(i, i + chunkSize))
-        }
-
-        // Create new rows with nested tables
-        this.rows = chunks.map((chunk, i) => {
-          const row = { partition: i }
-          const nestedTable = api.table()
-          nestedTable.rows = chunk
-          row[Symbol.for('table')] = nestedTable
-          return row
-        })
-
-        return this
-      },
-    }
-  }
-}
-
 // Helper function to handle array padding/looping
 function adjustArrayLength(arr, targetLength, method = 'pad', padValue = undefined) {
   if (arr.length >= targetLength) return arr.slice(0, targetLength)
@@ -895,7 +19,741 @@ function adjustArrayLength(arr, targetLength, method = 'pad', padValue = undefin
   }
 }
 
-// Helper function to check for nested tables
-function hasNestedTables(rows) {
-  return rows.some((row) => row[Symbol.for('table')] !== undefined)
+/**
+ * @class NestedTable
+ * @description A chainable, tree-like data structure that allows nested operations,
+ * hierarchical data storage, and flexible path-based access. This structure enables
+ * complex nested data operations while maintaining intuitive access patterns.
+ */
+class NestedTable {
+  /**
+   * Creates a new NestedTable instance.
+   *
+   * @param {Object} sm - State machine reference that will be used for operations requiring application state
+   * @param {*} [data=undefined] - Optional data value to store at this node
+   * @param {NestedTable|null} [parent=null] - Parent node reference for traversing up the tree
+   * @param {Array<number>} [path=[]] - Path indices to reach this node from the root
+   * @param {NestedTable|null} [baseNode=null] - Base node for relative path calculations
+   */
+  constructor(sm, data = undefined, parent = null, path = [], baseNode = null) {
+    // State machine reference
+    this.sm = sm
+
+    // Internal array to store items
+    this._items = []
+
+    // The data property for this node
+    this.data = data
+
+    // Parent reference for tracking the path
+    this._parent = parent
+
+    // Path indices to get to this node
+    this._path = path
+
+    // Base node for relative path calculations
+    this._baseNode = baseNode || this
+
+    // Unique ID for this node to help with comparison
+    this._id = uuidv4()
+
+    // Store a reference to the proxy to be returned from methods
+    let selfProxy
+
+    // Create a proxy to handle array access and method calls
+    selfProxy = new Proxy(this, {
+      /**
+       * Trap for property access - handles all the special properties and array-like access
+       *
+       * @param {NestedTable} target - The target object (this instance)
+       * @param {string|symbol} prop - The property being accessed
+       * @returns {*} The value of the property or a function
+       */
+      get: (target, prop) => {
+        // Handle Symbol properties
+        if (typeof prop === 'symbol') {
+          if (prop === Symbol.iterator) {
+            return target[Symbol.iterator].bind(target)
+          }
+          if (prop === Symbol.isConcatSpreadable) {
+            return true
+          }
+          return target[prop]
+        }
+
+        // Handle numeric indices
+        if (typeof prop === 'string' && !isNaN(prop)) {
+          const index = parseInt(prop)
+
+          // If the index exists, return it
+          if (index < target._items.length && index >= 0) {
+            // Make sure the child uses the same base node for path calculations
+            target._items[index]._baseNode = target._baseNode
+            return target._items[index]
+          }
+
+          // Return undefined for out-of-bounds access (matching JavaScript array behavior)
+          return undefined
+        }
+
+        // Handle append method
+        if (prop === 'append') {
+          /**
+           * Adds a new item to the table with the specified value.
+           *
+           * @param {*} value - The value to store in the new node. Can be a single value, array of values, or another NestedTable
+           * @returns {NestedTable} The current instance for chaining
+           */
+          return (value) => {
+            // Calculate how many items we'll be adding
+            let itemsToAdd = 0
+            if (value instanceof NestedTable) {
+              itemsToAdd = value.length
+            } else {
+              itemsToAdd = Array.isArray(value) ? value.length : 1
+            }
+
+            // Check if initial value exceeds limit
+            if (itemsToAdd > config.max_stepper_rows) {
+              throw new Error(
+                `Cannot append ${itemsToAdd} rows as it exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to append.`
+              )
+            }
+
+            // Check if appending would exceed limit
+            const newLength = target._items.length + itemsToAdd
+            if (newLength > config.max_stepper_rows) {
+              throw new Error(
+                `append() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to append.`
+              )
+            }
+
+            // Handle NestedTable instances by copying their rows' data
+            if (value instanceof NestedTable) {
+              const rowsData = value.rowsdata
+              for (let i = 0; i < rowsData.length; i++) {
+                const index = target._items.length
+                const newPath = [...target._path, index]
+                const newNode = new NestedTable(target.sm, rowsData[i], target, newPath, target._baseNode)
+                target._items.push(newNode)
+              }
+              return selfProxy
+            }
+
+            // Handle regular values
+            const values = Array.isArray(value) ? value : [value]
+            for (let i = 0; i < values.length; i++) {
+              const index = target._items.length
+              const newPath = [...target._path, index]
+              const newNode = new NestedTable(target.sm, values[i], target, newPath, target._baseNode)
+              target._items.push(newNode)
+            }
+
+            return selfProxy
+          }
+        }
+
+        if (prop === 'forEach') {
+          /**
+           * Executes a function once for each item in the table.
+           * Returns the table for chaining.
+           *
+           * @param {Function} callback - Function to execute for each element
+           * @param {NestedTable} callback.item - The current item being processed
+           * @param {number} callback.index - The index of the current item
+           * @returns {NestedTable} The current instance for chaining
+           */
+          return (callback) => {
+            target._items.forEach((item, index) => {
+              callback(item, index)
+            })
+            return selfProxy
+          }
+        }
+
+        if (prop === 'map') {
+          /**
+           * Creates a new array with the results of calling a function
+           * for every element in the table. Returns the table for chaining.
+           *
+           * @param {Function} callback - Function to execute for each element
+           * @param {NestedTable} callback.item - The current item being processed
+           * @param {number} callback.index - The index of the current item
+           * @returns {NestedTable} The current instance for chaining
+           */
+          return (callback) => {
+            target._items.map((item, index) => {
+              return callback(item, index)
+            })
+            return selfProxy
+          }
+        }
+
+        if (prop === 'zip') {
+          /**
+           * Combines multiple arrays into a single table by matching elements at corresponding indices.
+           * Supports different methods for handling arrays of different lengths.
+           *
+           * @param {Object} trials - Object with arrays as values
+           * @param {Object} options - Options for handling arrays of different lengths
+           * @param {string} options.method - Method to use: 'loop', 'pad', or 'last'
+           * @param {*} options.padValue - Value to use for padding when method is 'pad'
+           * @returns {NestedTable} The current instance for chaining
+           */
+          return (trials, options = {}) => {
+            if (typeof trials !== 'object' || trials === null) {
+              throw new Error('zip() requires an object with arrays as values')
+            }
+
+            const columns = Object.entries(trials)
+            if (columns.length === 0) {
+              throw new Error('zip() requires at least one column')
+            }
+
+            // Convert non-array values to single-element arrays
+            const processedColumns = columns.map(([key, value]) => {
+              if (Array.isArray(value)) return [key, value]
+              return [key, [value]]
+            })
+
+            // Get the maximum length of any column
+            const maxLength = Math.max(...processedColumns.map(([_, arr]) => arr.length))
+
+            // Check safety limit first
+            const newLength = target._items.length + maxLength
+            if (newLength > config.max_stepper_rows) {
+              throw new Error(
+                `zip() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of values in your arrays.`
+              )
+            }
+
+            // Check if any column has a different length
+            const hasDifferentLengths = processedColumns.some(([_, arr]) => arr.length !== maxLength)
+
+            // By default, throw error if lengths are different
+            if (hasDifferentLengths && !options.method) {
+              throw new Error(
+                'All columns must have the same length when using zip(). Specify a method (loop, pad, last) to handle different lengths.'
+              )
+            }
+
+            // Process each column according to the specified method
+            const processedArrays = processedColumns.map(([key, arr]) => {
+              if (arr.length === maxLength) return arr
+
+              const method = options.method
+              const padValue = options.padValue
+
+              if (method === 'loop') {
+                return adjustArrayLength(arr, maxLength, 'loop')
+              } else if (method === 'pad') {
+                if (padValue === undefined) {
+                  throw new Error('padValue is required when using the pad method')
+                }
+                return adjustArrayLength(arr, maxLength, 'pad', padValue)
+              } else if (method === 'last') {
+                return adjustArrayLength(arr, maxLength, 'pad', arr[arr.length - 1])
+              } else {
+                throw new Error(`Invalid method: ${method}. Must be one of: loop, pad, last`)
+              }
+            })
+
+            // Create the zipped rows
+            const zippedRows = Array(maxLength)
+              .fill(null)
+              .map((_, i) => {
+                const row = {}
+                processedColumns.forEach(([key], colIndex) => {
+                  row[key] = processedArrays[colIndex][i]
+                })
+                return row
+              })
+
+            // Add the zipped rows to the table
+            for (let i = 0; i < zippedRows.length; i++) {
+              const index = target._items.length
+              const newPath = [...target._path, index]
+              const newNode = new NestedTable(target.sm, zippedRows[i], target, newPath, target._baseNode)
+              target._items.push(newNode)
+            }
+
+            return selfProxy
+          }
+        }
+
+        if (prop === 'range') {
+          /**
+           * Creates a sequence of n items with incrementing values.
+           * Each item will have a field (default 'range') set to its index.
+           *
+           * @param {number} n - Number of items to create
+           * @param {string} [fieldName='range'] - Name of the field to store the index
+           * @returns {NestedTable} The current instance for chaining
+           * @throws {Error} If n is not a positive integer or exceeds safety limit
+           */
+          return (n, fieldName = 'range') => {
+            if (n <= 0) {
+              throw new Error('range() must be called with a positive integer')
+            }
+
+            // Check if n exceeds safety limit
+            if (n > config.max_stepper_rows) {
+              throw new Error(
+                `Cannot append ${n} rows as it exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to append.`
+              )
+            }
+
+            // Clear existing items
+            target._items = []
+
+            // Create n new items with incrementing values
+            for (let i = 0; i < n; i++) {
+              const newPath = [...target._path, i]
+              const newNode = new NestedTable(target.sm, { [fieldName]: i }, target, newPath, target._baseNode)
+              target._items.push(newNode)
+            }
+
+            return selfProxy
+          }
+        }
+
+        if (prop === 'repeat') {
+          /**
+           * Repeats the current rows n times, creating deep copies of all elements.
+           *
+           * @param {number} n - Number of times to repeat the current rows
+           * @returns {NestedTable} The current instance for chaining
+           * @throws {Error} If n is not positive or if operation would exceed max rows
+           */
+          return (n) => {
+            if (n <= 0 || target._items.length === 0) return selfProxy
+
+            const totalRows = target._items.length * n
+            if (totalRows > config.max_stepper_rows) {
+              throw new Error(
+                `repeat() would generate ${totalRows} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the repeat count.`
+              )
+            }
+
+            // Store original items
+            const originalItems = [...target._items]
+
+            // Helper function to deep copy a NestedTable node
+            const deepCopyNode = (node) => {
+              // Create new node with copied data
+              const newNode = new NestedTable(
+                node.sm,
+                JSON.parse(JSON.stringify(node.data)),
+                node._parent,
+                [...node._path],
+                node._baseNode
+              )
+
+              // Deep copy all child items
+              newNode._items = node._items.map((child) => deepCopyNode(child))
+
+              // Update parent references and paths for children
+              newNode._items.forEach((child, index) => {
+                child._parent = newNode
+                child._path = [...newNode._path, index]
+                child._baseNode = newNode._baseNode
+              })
+
+              return newNode
+            }
+
+            // Add n-1 copies of the original items
+            for (let i = 1; i < n; i++) {
+              const newItems = originalItems.map((item) => {
+                const newItem = deepCopyNode(item)
+                // Update the path for the new copy
+                const baseIndex = target._items.length
+                newItem._path = [...target._path, baseIndex]
+                return newItem
+              })
+              target._items.push(...newItems)
+            }
+
+            return selfProxy
+          }
+        }
+
+        if (prop === 'interleave') {
+          return (input) => {
+            let inputItems = []
+
+            // Helper function to deep copy a NestedTable node
+            const deepCopyNode = (node) => {
+              // Create new node with copied data
+              const newNode = new NestedTable(
+                target.sm,
+                JSON.parse(JSON.stringify(node.data)),
+                target,
+                [...target._path],
+                target._baseNode
+              )
+
+              // Deep copy all child items
+              newNode._items = node._items.map((child) => deepCopyNode(child))
+
+              // Update parent references and paths for children
+              newNode._items.forEach((child, index) => {
+                child._parent = newNode
+                child._path = [...newNode._path, index]
+                child._baseNode = newNode._baseNode
+              })
+
+              return newNode
+            }
+
+            // Handle different input types
+            if (Array.isArray(input)) {
+              // Create NestedTable nodes from array elements
+              inputItems = input.map((data) => {
+                return new NestedTable(target.sm, data, target, [], target._baseNode)
+              })
+            } else if (input && input._items) {
+              // Deep copy nodes from another table
+              inputItems = input._items.map((node) => deepCopyNode(node))
+            } else if (input && typeof input === 'object') {
+              // Create a single NestedTable node from object
+              inputItems = [new NestedTable(target.sm, input, target, [], target._baseNode)]
+            } else {
+              throw new Error('interleave() requires an array, table, or object as input')
+            }
+
+            // Check if the operation would exceed max rows
+            const newLength = target._items.length + inputItems.length
+            if (newLength > config.max_stepper_rows) {
+              throw new Error(
+                `interleave() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to interleave.`
+              )
+            }
+
+            // Perform the interleaving
+            const maxLength = Math.max(target._items.length, inputItems.length)
+            const result = []
+
+            for (let i = 0; i < maxLength; i++) {
+              if (i < target._items.length) {
+                result.push(target._items[i])
+              }
+              if (i < inputItems.length) {
+                result.push(inputItems[i])
+              }
+            }
+
+            // Update paths for all items in the result
+            result.forEach((item, index) => {
+              item._parent = target
+              item._path = [...target._path, index]
+              item._baseNode = target._baseNode
+            })
+
+            target._items = result
+            return selfProxy
+          }
+        }
+
+        // Return the original property or method
+        return target[prop]
+      },
+
+      /**
+       * Trap for property assignment - handles setting values on the NestedTable
+       *
+       * @param {NestedTable} target - The target object (this instance)
+       * @param {string|symbol} prop - The property being set
+       * @param {*} value - The value being assigned
+       * @returns {boolean} True if the assignment succeeded
+       */
+      set: (target, prop, value) => {
+        // Handle data property
+        if (prop === 'data') {
+          target.data = value
+          return true
+        }
+
+        // Handle numeric indices
+        if (!isNaN(prop)) {
+          const index = parseInt(prop)
+          if (value instanceof NestedTable) {
+            // Update the parent reference for the new node
+            value._parent = target
+            value._path = [...target._path, index]
+            value._baseNode = target._baseNode
+            target._items[index] = value
+          } else {
+            // If setting a raw value, wrap it in a NestedTable
+            const newPath = [...target._path, index]
+            target._items[index] = new NestedTable(target.sm, value, target, newPath, target._baseNode)
+          }
+        } else {
+          target[prop] = value
+        }
+        return true
+      },
+    })
+
+    return selfProxy
+  }
+
+  // relative paths remain unimplemtned
+  /**
+   * Get path relative to the base node.
+   *
+   * @returns {Array<number>} Array of indices representing the path from base node to this node
+   */
+  getRelativePath() {
+    if (this._baseNode === this) {
+      // If this is the base node, the relative path is empty
+      return []
+    }
+
+    // Find the path from the base node to this node
+    const basePath = this._baseNode._path
+    const thisPath = this._path
+
+    // If this node is a descendant of the base node
+    if (thisPath.length >= basePath.length) {
+      const isDescendant = basePath.every((val, idx) => val === thisPath[idx])
+      if (isDescendant) {
+        // Return only the part of the path that extends beyond the base path
+        return thisPath.slice(basePath.length)
+      }
+    }
+
+    // If we can't determine a relative path, return the full path
+    return [...this._path]
+  }
+
+  /**
+   * Get the path indices to this node relative to the base node.
+   *
+   * @returns {Array<number>} Array of indices representing the relative path
+   */
+  get relpath() {
+    return this.getRelativePath()
+  }
+
+  /**
+   * Get the relative path as a hyphen-separated string.
+   *
+   * @returns {string} The path as a hyphen-separated string
+   */
+  get relpaths() {
+    return this.getRelativePath().join('-')
+  }
+
+  /**
+   * Get the absolute path indices regardless of base node.
+   *
+   * @returns {Array<number>} Array of indices representing the absolute path
+   */
+  get path() {
+    return [...this._path]
+  }
+
+  /**
+   * Get the absolute path as a hyphen-separated string.
+   *
+   * @returns {string} The absolute path as a hyphen-separated string
+   */
+  get paths() {
+    return this._path.join('-')
+  }
+
+  /**
+   * Get the data values from nodes along the absolute path.
+   *
+   * @returns {Array} Array of data values from nodes along the absolute path
+   */
+  get pathdata() {
+    // Start with an empty result array
+    const result = []
+
+    // Start from the root node
+    let currentNode = this
+    while (currentNode._parent !== null) {
+      currentNode = currentNode._parent
+    }
+
+    // Now traverse down the path, collecting data values
+    let node = currentNode
+    const path = [...this._path]
+
+    // Add root node data if it exists
+    if (node.data !== undefined) {
+      result.push(node.data)
+    }
+
+    // Follow each index in the path and collect data
+    for (let i = 0; i < path.length; i++) {
+      const index = path[i]
+      if (node._items[index] && node._items[index].data !== undefined) {
+        node = node._items[index]
+        result.push(node.data)
+      } else {
+        break
+      }
+    }
+
+    return result
+  }
+
+  /**
+   * Get the length of the current table.
+   *
+   * @returns {number} The number of items in the current table
+   */
+  get length() {
+    return this._items.length
+  }
+
+  /**
+   * Get all items in the current table.
+   *
+   * @returns {Array<NestedTable>} Array of NestedTable nodes
+   */
+  get rows() {
+    return this._items
+  }
+
+  /**
+   * Get data from all items in the current table.
+   *
+   * @returns {Array} Array of data values from all items
+   */
+  get rowsdata() {
+    return this._items.map((item) => item.data)
+  }
+
+  /**
+   * Remove and return the last item in the table.
+   *
+   * @returns {NestedTable|undefined} The removed item or undefined if empty
+   */
+  pop() {
+    return this._items.pop()
+  }
+
+  /**
+   * Collect data from this node and all of its descendants.
+   *
+   * @returns {Array} Array of data values from this node and all its descendants
+   */
+  getSubtreeData() {
+    const result = []
+
+    // Add this node's data if it exists
+    if (this.data !== undefined) {
+      result.push(this.data)
+    }
+
+    // Add data from all descendants recursively (flatten the tree)
+    const collectDescendantData = (node) => {
+      for (let i = 0; i < node._items.length; i++) {
+        const child = node._items[i]
+        if (child && child.data !== undefined) {
+          result.push(child.data)
+        }
+        collectDescendantData(child)
+      }
+    }
+
+    collectDescendantData(this)
+
+    return result
+  }
+
+  /**
+   * Finds the index of the first item whose data matches the search value.
+   *
+   * @param {*} searchValue - The value to search for in the items' data fields
+   * @returns {number} The index of the first matching item, or -1 if not found
+   */
+  indexOf(searchValue) {
+    for (let i = 0; i < this._items.length; i++) {
+      if (JSON.stringify(this._items[i].data) === JSON.stringify(searchValue)) {
+        return i
+      }
+    }
+    return -1
+  }
+
+  /**
+   * Returns an array containing the data fields from a portion of the table's items.
+   * Similar to Array.slice(), but returns data values instead of NestedTable nodes.
+   *
+   * @param {number} [start=0] - Zero-based index at which to start extraction (inclusive)
+   * @param {number} [end=this._items.length] - Zero-based index at which to end extraction (exclusive)
+   * @returns {Array} A new array containing the data values from the selected items
+   * @throws {Error} If start or end indices are invalid
+   */
+  slice(start = 0, end = this._items.length) {
+    // Handle negative indices
+    const actualStart = start < 0 ? Math.max(this._items.length + start, 0) : start
+    const actualEnd = end < 0 ? Math.max(this._items.length + end, 0) : end
+
+    // Validate indices
+    if (actualStart >= this._items.length) {
+      return []
+    }
+
+    // Ensure end doesn't exceed array length
+    const finalEnd = Math.min(actualEnd, this._items.length)
+
+    // Return data values from the selected range
+    return this._items.slice(actualStart, finalEnd).map((item) => item.data)
+  }
+
+  /**
+   * Returns an array containing the data fields from the first n items in the table.
+   * If n is greater than the table length, returns all items' data.
+   * If n is negative, returns empty array.
+   *
+   * @param {number} [n=1] - Number of items to return from the start
+   * @returns {Array} Array of data values from the first n items
+   */
+  head(n = 1) {
+    if (n <= 0) return []
+    return this._items.slice(0, n).map((item) => item.data)
+  }
+
+  /**
+   * Returns an array containing the data fields from the last n items in the table.
+   * If n is greater than the table length, returns all items' data.
+   * If n is negative, returns empty array.
+   *
+   * @param {number} [n=1] - Number of items to return from the end
+   * @returns {Array} Array of data values from the last n items
+   */
+  tail(n = 1) {
+    if (n <= 0) return []
+    return this._items.slice(-n).map((item) => item.data)
+  }
+
+  /**
+   * Allows the NestedTable to be used with for...of loops and the spread operator.
+   * Returns the data values from each item rather than the NestedTable nodes.
+   *
+   * @returns {Object} An iterator object for the data values in this node
+   */
+  [Symbol.iterator]() {
+    let index = 0
+    const items = this._items
+
+    return {
+      next: () => {
+        if (index < items.length) {
+          const value = items[index].data
+          index++
+          return { value, done: false }
+        }
+        return { done: true }
+      },
+    }
+  }
 }
+
+export default NestedTable

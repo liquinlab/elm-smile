@@ -3,6 +3,7 @@ import useSmileStore from '@/core/stores/smilestore'
 import { useRoute } from 'vue-router'
 import { StepperStateMachine } from '@/core/composables/StepperStateMachine'
 import { NestedTable } from '@/core/composables/NestedTable'
+import { v4 as uuidv4 } from 'uuid'
 
 export function useHStepper() {
   const smilestore = useSmileStore()
@@ -14,7 +15,9 @@ export function useHStepper() {
 
   // Create instances of our state managers
   const sm = new StepperStateMachine()
-  const nestedTable = new NestedTable()
+
+  // Internal table management
+  const tables = new Map()
 
   // Register page tracker if not already registered
   smilestore.registerPageTracker(page)
@@ -26,8 +29,8 @@ export function useHStepper() {
   //   sm.loadFromJSON(savedState)
   // }
 
-  // Get all methods from table API that should be protected
-  const PROTECTED_METHODS = nestedTable.getProtectedTableMethods()
+  // Get all protected methods from a temporary table instance
+  const PROTECTED_METHODS = new NestedTable({}).getProtectedTableMethods()
 
   // Internal reactive refs
   const _currentValue = ref(null)
@@ -77,18 +80,23 @@ export function useHStepper() {
 
     // Create new table instance with access to stepper for nested tables
     table: () => {
-      const table = nestedTable.createTable({ table: stepper.table, sm })
-      // Add a method to handle initialization after push
+      const tableId = uuidv4()
+      const table = new NestedTable({ table: stepper.table, sm })
+
+      // Store the table in our internal map
+      tables.set(tableId, table)
+
+      // Add cleanup on push to remove the table from our map
+      const originalPush = table.push
       table.push = () => {
-        // Push the table to the state machine
-        sm.push_table(table.rows)
+        // Call the original push method which handles read-only state
+        const result = originalPush.call(table)
         // Initialize stepper's current value to match state machine
         if (sm.stepState.states.length > 0) {
           _currentValue.value = sm.getDataAlongPath()
           _currentPath.value = sm.getCurrentPathStr()
         }
-        // Return the table for chaining
-        return table
+        return result
       }
       return table
     },
