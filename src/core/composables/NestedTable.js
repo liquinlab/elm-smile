@@ -33,9 +33,8 @@ class NestedTable {
    * @param {*} [data=undefined] - Optional data value to store at this node
    * @param {NestedTable|null} [parent=null] - Parent node reference for traversing up the tree
    * @param {Array<number>} [path=[]] - Path indices to reach this node from the root
-   * @param {NestedTable|null} [baseNode=null] - Base node for relative path calculations
    */
-  constructor(sm, data = undefined, parent = null, path = [], baseNode = null) {
+  constructor(sm, data = undefined, parent = null, path = []) {
     // State machine reference
     this.sm = sm
 
@@ -50,9 +49,6 @@ class NestedTable {
 
     // Path indices to get to this node
     this._path = path
-
-    // Base node for relative path calculations
-    this._baseNode = baseNode || this
 
     // Unique ID for this node to help with comparison
     this._id = uuidv4()
@@ -87,8 +83,6 @@ class NestedTable {
 
           // If the index exists, return it
           if (index < target._items.length && index >= 0) {
-            // Make sure the child uses the same base node for path calculations
-            target._items[index]._baseNode = target._baseNode
             return target._items[index]
           }
 
@@ -134,7 +128,7 @@ class NestedTable {
               for (let i = 0; i < rowsData.length; i++) {
                 const index = target._items.length
                 const newPath = [...target._path, index]
-                const newNode = new NestedTable(target.sm, rowsData[i], target, newPath, target._baseNode)
+                const newNode = new NestedTable(target.sm, rowsData[i], target, newPath)
                 target._items.push(newNode)
               }
               return selfProxy
@@ -145,7 +139,7 @@ class NestedTable {
             for (let i = 0; i < values.length; i++) {
               const index = target._items.length
               const newPath = [...target._path, index]
-              const newNode = new NestedTable(target.sm, values[i], target, newPath, target._baseNode)
+              const newNode = new NestedTable(target.sm, values[i], target, newPath)
               target._items.push(newNode)
             }
 
@@ -165,7 +159,51 @@ class NestedTable {
            */
           return (callback) => {
             target._items.forEach((item, index) => {
-              callback(item, index)
+              // Create a proxy for the item that handles property mutations and method access
+              const itemProxy = new Proxy(item, {
+                get: (itemTarget, itemProp) => {
+                  // Handle data property access
+                  if (itemProp === 'data') {
+                    return itemTarget.data
+                  }
+                  // Handle chainable methods
+                  if (typeof itemTarget[itemProp] === 'function') {
+                    return itemTarget[itemProp].bind(itemTarget)
+                  }
+                  // Handle data property direct access
+                  if (itemTarget.data && itemProp in itemTarget.data) {
+                    return itemTarget.data[itemProp]
+                  }
+                  // Pass through any other properties
+                  return itemTarget[itemProp]
+                },
+                set: (itemTarget, itemProp, value) => {
+                  if (itemProp === 'data') {
+                    itemTarget.data = value
+                  } else {
+                    itemTarget.data = { ...itemTarget.data, [itemProp]: value }
+                  }
+                  return true
+                },
+              })
+
+              // Call the callback and check if it returns a new value
+              const result = callback(itemProxy, index)
+              if (result !== undefined) {
+                // If result is an object with properties from the proxy, extract just the data properties
+                if (typeof result === 'object' && result !== null) {
+                  const newData = {}
+                  // Only copy over properties that exist in the original data
+                  Object.keys(item.data).forEach((key) => {
+                    if (key in result) {
+                      newData[key] = result[key]
+                    } else {
+                      newData[key] = item.data[key]
+                    }
+                  })
+                  item.data = newData
+                }
+              }
             })
             return selfProxy
           }
@@ -177,14 +215,150 @@ class NestedTable {
            * for every element in the table. Returns the table for chaining.
            *
            * @param {Function} callback - Function to execute for each element
-           * @param {NestedTable} callback.item - The current item being processed
+           * @param {*} callback.this - When using regular function, 'this' is bound to the row
+           * @param {NestedTable} callback.row - When using arrow function, the row is passed as first parameter
            * @param {number} callback.index - The index of the current item
            * @returns {NestedTable} The current instance for chaining
            */
           return (callback) => {
-            target._items.map((item, index) => {
-              return callback(item, index)
+            target._items.forEach((item, index) => {
+              // Create a proxy for the item that handles property mutations and method access
+              const itemProxy = new Proxy(item, {
+                get: (itemTarget, itemProp) => {
+                  // Handle table method for nested tables
+                  if (itemProp === 'table') {
+                    return () => {
+                      // Create a new nested table
+                      const nestedTable = new NestedTable(target.sm, undefined, itemTarget, [
+                        ...itemTarget._path,
+                        'nested',
+                      ])
+                      itemTarget._nestedTable = nestedTable
+                      return nestedTable
+                    }
+                  }
+
+                  // Return existing nested table
+                  if (itemProp === '_nestedTable' || itemProp === 'nested') {
+                    return itemTarget._nestedTable
+                  }
+
+                  // Handle data property access
+                  if (itemProp === 'data') {
+                    return itemTarget.data
+                  }
+
+                  // Handle direct data property access - when accessing properties directly on the row
+                  if (itemTarget.data && itemProp in itemTarget.data) {
+                    return itemTarget.data[itemProp]
+                  }
+
+                  // Handle length for nested tables
+                  if (itemProp === 'length') {
+                    if (itemTarget._nestedTable) {
+                      return itemTarget._nestedTable.length
+                    }
+                    return null
+                  }
+
+                  // Handle append for item
+                  if (itemProp === 'append') {
+                    return (input) => {
+                      if (Array.isArray(input)) {
+                        // Handle appending arrays of trial data to the item itself
+                        for (let i = 0; i < input.length; i++) {
+                          const newIndex = itemTarget._items.length
+                          const newPath = [...itemTarget._path, newIndex]
+                          const newNode = new NestedTable(itemTarget.sm, input[i], itemTarget, newPath)
+                          itemTarget._items.push(newNode)
+                        }
+                      } else if (input && typeof input === 'object') {
+                        // Handle appending a single object
+                        const newIndex = itemTarget._items.length
+                        const newPath = [...itemTarget._path, newIndex]
+                        const newNode = new NestedTable(itemTarget.sm, input, itemTarget, newPath)
+                        itemTarget._items.push(newNode)
+                      }
+                      return itemProxy
+                    }
+                  }
+
+                  // Handle chainable methods
+                  if (typeof itemTarget[itemProp] === 'function') {
+                    return itemTarget[itemProp].bind(itemTarget)
+                  }
+
+                  // Pass through any other properties
+                  return itemTarget[itemProp]
+                },
+                set: (itemTarget, itemProp, value) => {
+                  if (itemProp === 'data') {
+                    itemTarget.data = value
+                  } else if (itemProp === '_nestedTable' || itemProp === 'nested') {
+                    itemTarget._nestedTable = value
+                  } else {
+                    // Create or update a property on the data object
+                    itemTarget.data = { ...itemTarget.data, [itemProp]: value }
+                  }
+                  return true
+                },
+              })
+
+              // Support both function styles:
+              // 1. Regular function with 'this' binding: function(index) { return {...this, id: index} }
+              // 2. Arrow function with row param: (row, index) => ({...row, id: index})
+              let result
+              if (callback.length > 1) {
+                // Arrow function style with row parameter
+                result = callback(itemProxy, index)
+              } else {
+                // Regular function style with this binding
+                result = callback.call(itemProxy, index)
+              }
+
+              // If the function returned a value, update the item's data
+              if (result !== undefined) {
+                if (typeof result === 'object' && result !== null) {
+                  // Create a new data object with the properties from the result object
+                  const newData = {}
+
+                  // First, extract any existing data properties
+                  if (item.data && typeof item.data === 'object') {
+                    Object.assign(newData, item.data)
+                  }
+
+                  // Then extract values from the raw result object (which might actually be the proxy)
+                  for (const key in result) {
+                    if (
+                      key !== '_nestedTable' &&
+                      key !== 'nested' &&
+                      key !== '_items' &&
+                      key !== '_parent' &&
+                      key !== '_path' &&
+                      key !== '_id' &&
+                      key !== 'sm' &&
+                      key !== 'data' &&
+                      typeof result[key] !== 'function'
+                    ) {
+                      // Copy the property to the new data object
+                      newData[key] = result[key]
+                    }
+                  }
+
+                  // Preserve nested table if present
+                  const nestedTable = item._nestedTable
+
+                  // Update the item's data with the new combined data
+                  item.data = newData
+
+                  // Restore nested table
+                  if (nestedTable) {
+                    item._nestedTable = nestedTable
+                  }
+                }
+              }
             })
+
             return selfProxy
           }
         }
@@ -273,7 +447,7 @@ class NestedTable {
             for (let i = 0; i < zippedRows.length; i++) {
               const index = target._items.length
               const newPath = [...target._path, index]
-              const newNode = new NestedTable(target.sm, zippedRows[i], target, newPath, target._baseNode)
+              const newNode = new NestedTable(target.sm, zippedRows[i], target, newPath)
               target._items.push(newNode)
             }
 
@@ -309,7 +483,7 @@ class NestedTable {
             // Create n new items with incrementing values
             for (let i = 0; i < n; i++) {
               const newPath = [...target._path, i]
-              const newNode = new NestedTable(target.sm, { [fieldName]: i }, target, newPath, target._baseNode)
+              const newNode = new NestedTable(target.sm, { [fieldName]: i }, target, newPath)
               target._items.push(newNode)
             }
 
@@ -341,13 +515,9 @@ class NestedTable {
             // Helper function to deep copy a NestedTable node
             const deepCopyNode = (node) => {
               // Create new node with copied data
-              const newNode = new NestedTable(
-                node.sm,
-                JSON.parse(JSON.stringify(node.data)),
-                node._parent,
-                [...node._path],
-                node._baseNode
-              )
+              const newNode = new NestedTable(node.sm, JSON.parse(JSON.stringify(node.data)), node._parent, [
+                ...node._path,
+              ])
 
               // Deep copy all child items
               newNode._items = node._items.map((child) => deepCopyNode(child))
@@ -356,7 +526,6 @@ class NestedTable {
               newNode._items.forEach((child, index) => {
                 child._parent = newNode
                 child._path = [...newNode._path, index]
-                child._baseNode = newNode._baseNode
               })
 
               return newNode
@@ -378,6 +547,35 @@ class NestedTable {
           }
         }
 
+        if (prop === 'shuffle') {
+          /**
+           * Shuffles the current rows using the Fisher-Yates algorithm.
+           * If a seed is provided, ensures deterministic shuffling.
+           *
+           * @param {string} [seed] - Optional seed for deterministic shuffling
+           * @returns {NestedTable} The current instance for chaining
+           */
+          return (seed) => {
+            if (target._items.length <= 1) return selfProxy
+
+            // Only create a new RNG if a seed is provided
+            // Otherwise use the global Math.random
+            const rng = seed ? seedrandom(seed) : Math.random
+
+            // Fisher-Yates shuffle algorithm
+            for (let i = target._items.length - 1; i > 0; i--) {
+              const j = Math.floor(rng() * (i + 1))
+              ;[target._items[i], target._items[j]] = [target._items[j], target._items[i]]
+
+              // Update paths to reflect new positions
+              target._items[i]._path = [...target._path, i]
+              target._items[j]._path = [...target._path, j]
+            }
+
+            return selfProxy
+          }
+        }
+
         if (prop === 'interleave') {
           return (input) => {
             let inputItems = []
@@ -385,13 +583,9 @@ class NestedTable {
             // Helper function to deep copy a NestedTable node
             const deepCopyNode = (node) => {
               // Create new node with copied data
-              const newNode = new NestedTable(
-                target.sm,
-                JSON.parse(JSON.stringify(node.data)),
-                target,
-                [...target._path],
-                target._baseNode
-              )
+              const newNode = new NestedTable(target.sm, JSON.parse(JSON.stringify(node.data)), target, [
+                ...target._path,
+              ])
 
               // Deep copy all child items
               newNode._items = node._items.map((child) => deepCopyNode(child))
@@ -400,7 +594,6 @@ class NestedTable {
               newNode._items.forEach((child, index) => {
                 child._parent = newNode
                 child._path = [...newNode._path, index]
-                child._baseNode = newNode._baseNode
               })
 
               return newNode
@@ -410,14 +603,14 @@ class NestedTable {
             if (Array.isArray(input)) {
               // Create NestedTable nodes from array elements
               inputItems = input.map((data) => {
-                return new NestedTable(target.sm, data, target, [], target._baseNode)
+                return new NestedTable(target.sm, data, target, [])
               })
             } else if (input && input._items) {
               // Deep copy nodes from another table
               inputItems = input._items.map((node) => deepCopyNode(node))
             } else if (input && typeof input === 'object') {
               // Create a single NestedTable node from object
-              inputItems = [new NestedTable(target.sm, input, target, [], target._baseNode)]
+              inputItems = [new NestedTable(target.sm, input, target, [])]
             } else {
               throw new Error('interleave() requires an array, table, or object as input')
             }
@@ -447,10 +640,129 @@ class NestedTable {
             result.forEach((item, index) => {
               item._parent = target
               item._path = [...target._path, index]
-              item._baseNode = target._baseNode
             })
 
             target._items = result
+            return selfProxy
+          }
+        }
+
+        if (prop === 'outer') {
+          /**
+           * Creates a factorial combination (Cartesian product) of all provided arrays.
+           * Each combination will be a row in the resulting table.
+           *
+           * @param {Object} trials - Object with arrays as values
+           * @param {Object} options - Options for handling the operation (reserved for future use)
+           * @returns {NestedTable} The current instance for chaining
+           * @throws {Error} If the operation would exceed the max rows limit
+           */
+          return (trials, options = {}) => {
+            if (typeof trials !== 'object' || trials === null) {
+              throw new Error('outer() requires an object with arrays as values')
+            }
+
+            const columns = Object.entries(trials)
+            if (columns.length === 0) {
+              throw new Error('outer() requires at least one column')
+            }
+
+            // Convert non-array values to single-element arrays
+            const processedColumns = columns.map(([key, value]) => {
+              if (Array.isArray(value)) return [key, value]
+              return [key, [value]]
+            })
+
+            // Calculate total number of combinations
+            const totalCombinations = processedColumns.reduce((total, [_, arr]) => total * arr.length, 1)
+
+            // Check safety limit first
+            const newLength = target._items.length + totalCombinations
+            if (newLength > config.max_stepper_rows) {
+              throw new Error(
+                `outer() would generate ${totalCombinations} combinations, which exceeds the safety limit of ${config.max_stepper_rows}. Consider using zip() or reducing the number of values in your arrays.`
+              )
+            }
+
+            // Helper function to generate combinations
+            function generateCombinations(arrays) {
+              if (arrays.length === 0) return [{}]
+
+              const [key, values] = arrays[0]
+              const rest = arrays.slice(1)
+              const restCombinations = generateCombinations(rest)
+
+              return values.flatMap((value) =>
+                restCombinations.map((combo) => ({
+                  [key]: value,
+                  ...combo,
+                }))
+              )
+            }
+
+            const outerRows = generateCombinations(processedColumns)
+
+            // Add the generated combinations as rows to the table
+            for (let i = 0; i < outerRows.length; i++) {
+              const index = target._items.length
+              const newPath = [...target._path, index]
+              const newNode = new NestedTable(target.sm, outerRows[i], target, newPath)
+              target._items.push(newNode)
+            }
+
+            return selfProxy
+          }
+        }
+
+        if (prop === 'print') {
+          /**
+           * Prints the table structure to the console with proper indentation for nested tables.
+           *
+           * @param {number} [indent=0] - The indentation level to start with
+           * @returns {NestedTable} The current instance for chaining
+           */
+          return (indent = 0) => {
+            const indentStr = '  '.repeat(indent)
+            console.log(`${indentStr}Table with ${target._items.length} rows:`)
+
+            // Helper function to format data for display
+            const formatData = (data) => {
+              if (data === undefined) return 'undefined'
+              if (data === null) return 'null'
+              if (typeof data === 'object') {
+                // Filter out methods and symbols, only keep data properties
+                const cleanData = {}
+                for (const key in data) {
+                  // Skip methods and symbols
+                  if (typeof data[key] !== 'function' && typeof key === 'string') {
+                    cleanData[key] = data[key]
+                  }
+                }
+                return cleanData
+              }
+              return data
+            }
+
+            // Helper function to print a nested table
+            const printNestedTable = (node, level) => {
+              const levelIndent = '  '.repeat(level)
+
+              // Print each item at this level
+              node._items.forEach((item, idx) => {
+                console.log(`${levelIndent}[${idx}]:`, formatData(item.data))
+
+                // If this item has children, recursively print them
+                if (item._items && item._items.length > 0) {
+                  console.log(`${levelIndent}  Nested table with ${item._items.length} rows:`)
+                  printNestedTable(item, level + 1)
+                }
+              })
+            }
+
+            // Start the recursive printing
+            printNestedTable(target, indent)
+
+            // Return the proxy for chaining
             return selfProxy
           }
         }
@@ -481,12 +793,11 @@ class NestedTable {
             // Update the parent reference for the new node
             value._parent = target
             value._path = [...target._path, index]
-            value._baseNode = target._baseNode
             target._items[index] = value
           } else {
             // If setting a raw value, wrap it in a NestedTable
             const newPath = [...target._path, index]
-            target._items[index] = new NestedTable(target.sm, value, target, newPath, target._baseNode)
+            target._items[index] = new NestedTable(target.sm, value, target, newPath)
           }
         } else {
           target[prop] = value
@@ -496,53 +807,6 @@ class NestedTable {
     })
 
     return selfProxy
-  }
-
-  // relative paths remain unimplemtned
-  /**
-   * Get path relative to the base node.
-   *
-   * @returns {Array<number>} Array of indices representing the path from base node to this node
-   */
-  getRelativePath() {
-    if (this._baseNode === this) {
-      // If this is the base node, the relative path is empty
-      return []
-    }
-
-    // Find the path from the base node to this node
-    const basePath = this._baseNode._path
-    const thisPath = this._path
-
-    // If this node is a descendant of the base node
-    if (thisPath.length >= basePath.length) {
-      const isDescendant = basePath.every((val, idx) => val === thisPath[idx])
-      if (isDescendant) {
-        // Return only the part of the path that extends beyond the base path
-        return thisPath.slice(basePath.length)
-      }
-    }
-
-    // If we can't determine a relative path, return the full path
-    return [...this._path]
-  }
-
-  /**
-   * Get the path indices to this node relative to the base node.
-   *
-   * @returns {Array<number>} Array of indices representing the relative path
-   */
-  get relpath() {
-    return this.getRelativePath()
-  }
-
-  /**
-   * Get the relative path as a hyphen-separated string.
-   *
-   * @returns {string} The path as a hyphen-separated string
-   */
-  get relpaths() {
-    return this.getRelativePath().join('-')
   }
 
   /**

@@ -10,6 +10,35 @@ vi.mock('@/core/config', () => ({
   },
 }))
 
+/**
+ * Recursively validates the parent-child relationships in a NestedTable structure.
+ * Verifies that each node's _parent field correctly points to its parent node.
+ *
+ * @param {NestedTable} node - The node to start validation from
+ * @param {NestedTable|null} expectedParent - The expected parent of this node (null for root)
+ * @param {string} path - Current path string for error reporting
+ * @returns {void} - Throws an error if any inconsistency is found
+ */
+function validateTreeConsistency(node, expectedParent = null, path = 'root') {
+  // Verify this node's parent reference
+  if (node._parent?._id !== expectedParent?._id && node._parent !== expectedParent) {
+    console.log('Node ID:', node._id)
+    console.log('Actual parent ID:', node._parent?._id)
+    console.log('Expected parent ID:', expectedParent?._id)
+    throw new Error(
+      `Parent reference is incorrect at path ${path}. Expected parent: ${expectedParent?._id}, Actual parent: ${node._parent?._id}`
+    )
+  }
+
+  // Recursively check children
+  for (let i = 0; i < node.length; i++) {
+    const childPath = `${path}[${i}]`
+
+    // Child's parent should be this node
+    validateTreeConsistency(node[i], node, childPath)
+  }
+}
+
 describe('NestedTable', () => {
   let table
   let sm
@@ -48,8 +77,9 @@ describe('NestedTable', () => {
       expect(table[0][0][0][0].path).toEqual([0, 0, 0, 0])
       expect(table[0][0][0][0].paths).toBe('0-0-0-0')
 
-      // Test relative paths
+      // Test absolute paths from pointers
       const secondLevel = table[0][0]
+      console.log(secondLevel._baseNode)
       expect(secondLevel[0].data).toBe(3)
       expect(secondLevel[0].pathdata).toEqual([1, 2, 3])
       expect(secondLevel[0].path).toEqual([0, 0, 0])
@@ -158,19 +188,22 @@ describe('NestedTable', () => {
       expect(table.append).toBeInstanceOf(Function)
       expect(table.indexOf).toBeInstanceOf(Function)
       expect(table.slice).toBeInstanceOf(Function)
-      expect(table.forEach).toBeInstanceOf(Function) // untested currently
+      expect(table.forEach).toBeInstanceOf(Function)
       expect(table.map).toBeInstanceOf(Function)
       expect(table.range).toBeInstanceOf(Function)
-      expect(table.repeat).toBeInstanceOf(Function) // might need some extra tests
+      expect(table.repeat).toBeInstanceOf(Function)
 
       // not implemented yet
       expect(table.zip).toBeInstanceOf(Function)
-      // expect(table.outer).toBeInstanceOf(Function)
+      expect(table.outer).toBeInstanceOf(Function)
       expect(table.interleave).toBeInstanceOf(Function)
-      // expect(table.shuffle).toBeInstanceOf(Function)
+      // expect(table.partition).toBeInstanceOf(Function)
+      expect(table.shuffle).toBeInstanceOf(Function)
       // expect(table.sample).toBeInstanceOf(Function)
+
       // expect(table.push).toBeInstanceOf(Function)
-      // expect(table.print).toBeInstanceOf(Function)
+      expect(table.print).toBeInstanceOf(Function)
+      // expect(table.pop).toBeInstanceOf(Function)
 
       expect(table.head).toBeInstanceOf(Function)
       expect(table.tail).toBeInstanceOf(Function)
@@ -218,6 +251,36 @@ describe('NestedTable', () => {
       expect(t1[0]).toBeUndefined()
       expect(t1[1]).toBeUndefined()
       expect(t1[-1]).toBeUndefined()
+    })
+  })
+
+  describe('Tree Consistency Validation', () => {
+    it('should correctly validate parent-child relationships', () => {
+      // Create a simple hierarchical structure
+      table.append(1)
+      table[0].append(2)
+      table[0][0].append(3)
+
+      // This should not throw an error
+      validateTreeConsistency(table)
+
+      // Check each level individually
+      validateTreeConsistency(table[0], table)
+      validateTreeConsistency(table[0][0], table[0])
+      validateTreeConsistency(table[0][0][0], table[0][0])
+    })
+
+    it('should detect incorrect parent references', () => {
+      // Create a structure with a deliberate error
+      table.append(1)
+      table[0].append(2)
+      table[0][0].append(3)
+
+      // Manually break the parent reference
+      table[0][0]._parent = table // This is wrong, should be table[0]
+
+      // This should throw an error
+      expect(() => validateTreeConsistency(table)).toThrow(/Parent reference is incorrect/)
     })
   })
 
@@ -317,6 +380,9 @@ describe('NestedTable', () => {
         { color: 'blue', shape: 'square' },
       ])
 
+      // verify that the parent-child relationship is correct
+      validateTreeConsistency(table1)
+
       // Verify that modifying table2 doesn't affect table1 (copy not reference)
       table2.append({ color: 'green', shape: 'circle' })
       expect(table1.length).toBe(2) // Should still be 2
@@ -325,6 +391,10 @@ describe('NestedTable', () => {
         { color: 'blue', shape: 'square' },
         { color: 'green', shape: 'circle' },
       ])
+
+      // verify the paths are correct
+      expect(table1[0].paths).toEqual('0')
+      expect(table1[1].paths).toEqual('1')
 
       // verify that paths are correct
       expect(table1[0].path).toEqual([0])
@@ -523,6 +593,7 @@ describe('NestedTable', () => {
         { color: 'red', shape: 'triangle' },
         { color: 'blue', shape: 'square' },
       ])
+      validateTreeConsistency(table1)
     })
 
     it('should handle empty table', () => {
@@ -681,6 +752,34 @@ describe('NestedTable', () => {
       expect(table3.rows[2].data).toEqual({ shape: 'circle', color: 'blue', size: 'small' })
     })
 
+    it('should handle non-array values as single-element arrays', () => {
+      const trials = {
+        shape: 'circle',
+        color: ['red', 'green', 'blue'],
+      }
+
+      const table1 = table.zip(trials, { method: 'loop' })
+
+      expect(table1.length).toBe(3)
+      expect(table1[0].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(table1[1].data).toEqual({ shape: 'circle', color: 'green' })
+      expect(table1[2].data).toEqual({ shape: 'circle', color: 'blue' })
+    })
+
+    it('should handle multiple non-array values', () => {
+      const trials = {
+        shape: 'circle',
+        color: 'red',
+        size: ['small', 'medium'],
+      }
+
+      const table1 = table.zip(trials, { method: 'loop' })
+
+      expect(table1.length).toBe(2)
+      expect(table1[0].data).toEqual({ shape: 'circle', color: 'red', size: 'small' })
+      expect(table1[1].data).toEqual({ shape: 'circle', color: 'red', size: 'medium' })
+    })
+
     it('should repeat last value when using last method', () => {
       const trials = {
         shape: ['circle', 'square'],
@@ -704,6 +803,16 @@ describe('NestedTable', () => {
       expect(() => {
         table.zip(trials, { method: 'invalid' })
       }).toThrow('Invalid method: invalid. Must be one of: loop, pad, last')
+    })
+
+    it('should throw error for invalid input', () => {
+      expect(() => {
+        table.zip(null)
+      }).toThrow('zip() requires an object with arrays as values')
+
+      expect(() => {
+        table.zip({})
+      }).toThrow('zip() requires at least one column')
     })
 
     it('should throw error when zip would exceed safety limit', () => {
@@ -733,7 +842,61 @@ describe('NestedTable', () => {
     })
   })
 
-  describe.skip('interleave()', () => {
+  describe('forEach()', () => {
+    it('should handle forEach with no return value', () => {
+      const trials = [
+        { color: 'red', shape: 'triangle' },
+        { color: 'blue', shape: 'square' },
+      ]
+
+      table.append(trials).forEach((row) => {
+        row.color = 'green' // Direct mutation
+      })
+
+      expect(table.rows).toHaveLength(2)
+      expect(table[0].data).toEqual({ color: 'green', shape: 'triangle' })
+      expect(table[1].data).toEqual({ color: 'green', shape: 'square' })
+    })
+
+    it('should allow modifying rows with forEach', () => {
+      const trials = [
+        { color: 'red', shape: 'triangle' },
+        { color: 'blue', shape: 'square' },
+      ]
+
+      table.append(trials).forEach((row, index) => {
+        if (index === 0) {
+          return { ...row, color: 'green' }
+        }
+        return row
+      })
+
+      expect(table.length).toBe(2)
+      expect(table[0].data).toEqual({ color: 'green', shape: 'triangle' })
+      expect(table[1].data).toEqual({ color: 'blue', shape: 'square' })
+    })
+
+    it('should allow forEach to be chained with other methods', () => {
+      const trials = {
+        shape: ['circle', 'square'],
+        color: ['red', 'green'],
+      }
+
+      const table1 = table
+        .outer(trials)
+        .forEach((row) => ({ ...row, size: 'medium' }))
+        .append([{ shape: 'triangle', color: 'blue', size: 'large' }])
+
+      expect(table1.length).toBe(5)
+      expect(table1[0].data).toEqual({ shape: 'circle', color: 'red', size: 'medium' })
+      expect(table1[1].data).toEqual({ shape: 'circle', color: 'green', size: 'medium' })
+      expect(table1[2].data).toEqual({ shape: 'square', color: 'red', size: 'medium' })
+      expect(table1[3].data).toEqual({ shape: 'square', color: 'green', size: 'medium' })
+      expect(table1[4].data).toEqual({ shape: 'triangle', color: 'blue', size: 'large' })
+    })
+  })
+
+  describe('interleave()', () => {
     it('should interleave two tables of equal length', () => {
       const table1 = new NestedTable(sm)
       table1.append([
@@ -767,12 +930,18 @@ describe('NestedTable', () => {
         { id: 4, value: 'd' },
       ])
 
+      validateTreeConsistency(table1)
+      validateTreeConsistency(table2)
+
       table1.interleave(table2)
 
       // Verify all elements in the interleaved result point to table1 as their parent
       expect(table1.rows).toHaveLength(4)
       table1.rows.forEach((row) => {
-        expect(row._parent).toBe(table1)
+        expect(row._parent).toBeDefined()
+        expect(table1._id).toBeDefined()
+        expect(row._parent._id).toBe(table1._id)
+        //console.log(row._parent._id, table1._id)
       })
 
       // Verify paths are sequential
@@ -788,29 +957,34 @@ describe('NestedTable', () => {
       expect(table1.rows[3].data).toEqual({ id: 4, value: 'd' })
     })
 
-    it.skip('should interleave tables of different lengths', () => {
-      const table1 = table.table().append([
+    it('should interleave tables of different lengths', () => {
+      const table1 = new NestedTable(sm)
+      table1.append([
         { id: 1, value: 'a' },
         { id: 2, value: 'b' },
         { id: 3, value: 'c' },
       ])
-      const table2 = table.table().append([
+      const table2 = new NestedTable(sm)
+      table2.append([
         { id: 4, value: 'd' },
         { id: 5, value: 'e' },
       ])
 
       table1.interleave(table2)
 
-      expect(table1.rows).toHaveLength(5)
-      expect(table1.rows[0]).toEqual({ id: 1, value: 'a' })
-      expect(table1.rows[1]).toEqual({ id: 4, value: 'd' })
-      expect(table1.rows[2]).toEqual({ id: 2, value: 'b' })
-      expect(table1.rows[3]).toEqual({ id: 5, value: 'e' })
-      expect(table1.rows[4]).toEqual({ id: 3, value: 'c' })
+      console.log(table1.rowsdata)
+      expect(table1.length).toBe(5)
+      expect(table1.rows[0].data).toEqual({ id: 1, value: 'a' })
+      expect(table1.rows[1].data).toEqual({ id: 4, value: 'd' })
+      expect(table1.rows[2].data).toEqual({ id: 2, value: 'b' })
+      expect(table1.rows[3].data).toEqual({ id: 5, value: 'e' })
+      expect(table1.rows[4].data).toEqual({ id: 3, value: 'c' })
+
+      validateTreeConsistency(table1)
     })
 
-    it.skip('should interleave with an array input', () => {
-      const table1 = table.table().append([
+    it('should interleave with an array input', () => {
+      const table1 = table.append([
         { id: 1, value: 'a' },
         { id: 2, value: 'b' },
       ])
@@ -822,14 +996,14 @@ describe('NestedTable', () => {
       table1.interleave(array)
 
       expect(table1.rows).toHaveLength(4)
-      expect(table1.rows[0]).toEqual({ id: 1, value: 'a' })
-      expect(table1.rows[1]).toEqual({ id: 3, value: 'c' })
-      expect(table1.rows[2]).toEqual({ id: 2, value: 'b' })
-      expect(table1.rows[3]).toEqual({ id: 4, value: 'd' })
+      expect(table1[0].data).toEqual({ id: 1, value: 'a' })
+      expect(table1[1].data).toEqual({ id: 3, value: 'c' })
+      expect(table1[2].data).toEqual({ id: 2, value: 'b' })
+      expect(table1[3].data).toEqual({ id: 4, value: 'd' })
     })
 
-    it.skip('should interleave with a single object', () => {
-      const table1 = table.table().append([
+    it('should interleave with a single object', () => {
+      const table1 = table.append([
         { id: 1, value: 'a' },
         { id: 2, value: 'b' },
       ])
@@ -837,13 +1011,13 @@ describe('NestedTable', () => {
       table1.interleave({ id: 3, value: 'c' })
 
       expect(table1.rows).toHaveLength(3)
-      expect(table1.rows[0]).toEqual({ id: 1, value: 'a' })
-      expect(table1.rows[1]).toEqual({ id: 3, value: 'c' })
-      expect(table1.rows[2]).toEqual({ id: 2, value: 'b' })
+      expect(table1[0].data).toEqual({ id: 1, value: 'a' })
+      expect(table1[1].data).toEqual({ id: 3, value: 'c' })
+      expect(table1[2].data).toEqual({ id: 2, value: 'b' })
     })
 
-    it.skip('should throw error for invalid input', () => {
-      const table1 = table.table().append([{ id: 1, value: 'a' }])
+    it('should throw error for invalid input', () => {
+      const table1 = table.append([{ id: 1, value: 'a' }])
 
       expect(() => {
         table1.interleave(null)
@@ -858,406 +1032,515 @@ describe('NestedTable', () => {
       }).toThrow('interleave() requires an array, table, or object as input')
     })
 
-    it.skip('should throw error when result would exceed safety limit', () => {
-      const table1 = table.table().append(Array(config.max_stepper_rows - 1).fill({ value: 'a' }))
-      const table2 = table.table().append([{ value: 'b' }, { value: 'c' }])
+    it('should throw error when result would exceed safety limit', () => {
+      const table1 = new NestedTable(sm)
+      table1.append(Array(config.max_stepper_rows - 1).fill({ value: 'a' }))
+      const table2 = new NestedTable(sm)
+      table2.append([{ value: 'b' }, { value: 'c' }])
 
       expect(() => {
         table1.interleave(table2)
       }).toThrow(/interleave\(\) would generate \d+ rows, which exceeds the safety limit/)
     })
 
-    it.skip('should be chainable with other methods', () => {
-      const table1 = table.table().append([
+    it('should be chainable with other methods', () => {
+      const table1 = new NestedTable(sm)
+      table1.append([
         { id: 1, value: 'a' },
         { id: 2, value: 'b' },
       ])
-      const table2 = table.table().append([
+      const table2 = new NestedTable(sm)
+      table2.append([
         { id: 3, value: 'c' },
         { id: 4, value: 'd' },
       ])
 
       const result = table1
         .interleave(table2)
-        .forEach((row) => ({ ...row, modified: true }))
+        .forEach((row) => {
+          row.modified = true
+        })
         .append({ id: 5, value: 'e', modified: true })
 
       expect(result.rows).toHaveLength(5)
-      expect(result.rows[0]).toEqual({ id: 1, value: 'a', modified: true })
-      expect(result.rows[1]).toEqual({ id: 3, value: 'c', modified: true })
-      expect(result.rows[2]).toEqual({ id: 2, value: 'b', modified: true })
-      expect(result.rows[3]).toEqual({ id: 4, value: 'd', modified: true })
-      expect(result.rows[4]).toEqual({ id: 5, value: 'e', modified: true })
+      expect(result[0].data).toEqual({ id: 1, value: 'a', modified: true })
+      expect(result[1].data).toEqual({ id: 3, value: 'c', modified: true })
+      expect(result[2].data).toEqual({ id: 2, value: 'b', modified: true })
+      expect(result[3].data).toEqual({ id: 4, value: 'd', modified: true })
+      expect(result[4].data).toEqual({ id: 5, value: 'e', modified: true })
     })
   })
 
-  // describe.skip('map()', () => {
-  //   it('should transform trials using regular function with this binding', () => {
-  //     const table1 = table.table().append([
-  //       { shape: 'circle', color: 'red' },
-  //       { shape: 'square', color: 'green' },
-  //     ])
+  describe('outer()', () => {
+    it('should create factorial combinations of columns', () => {
+      const trials = {
+        shape: ['circle', 'square'],
+        color: ['red', 'green'],
+      }
 
-  //     table1.map(function (index) {
-  //       return {
-  //         ...this,
-  //         id: index,
-  //         color: this.shape === 'circle' ? 'blue' : this.color,
-  //       }
-  //     })
+      const table1 = table.outer(trials)
 
-  //     expect(table1.rows).toEqual([
-  //       { shape: 'circle', color: 'blue', id: 0 },
-  //       { shape: 'square', color: 'green', id: 1 },
-  //     ])
-  //   })
+      expect(table1.length).toBe(4)
+      expect(table1.rowsdata).toEqual([
+        { shape: 'circle', color: 'red' },
+        { shape: 'circle', color: 'green' },
+        { shape: 'square', color: 'red' },
+        { shape: 'square', color: 'green' },
+      ])
+    })
 
-  //   it('should transform trials using arrow function with row parameter', () => {
-  //     const table1 = table.table().append([
-  //       { shape: 'circle', color: 'red' },
-  //       { shape: 'square', color: 'green' },
-  //     ])
+    it('should handle three or more columns', () => {
+      const trials = {
+        shape: ['circle', 'square'],
+        color: ['red', 'green'],
+        size: ['small', 'large'],
+      }
 
-  //     table1.map((row, index) => ({
-  //       ...row,
-  //       id: index,
-  //       color: row.shape === 'circle' ? 'blue' : row.color,
-  //     }))
+      const table1 = table.outer(trials)
 
-  //     expect(table1.rows).toEqual([
-  //       { shape: 'circle', color: 'blue', id: 0 },
-  //       { shape: 'square', color: 'green', id: 1 },
-  //     ])
-  //   })
+      expect(table1.length).toBe(8)
+      expect(table1.rowsdata).toEqual([
+        { shape: 'circle', color: 'red', size: 'small' },
+        { shape: 'circle', color: 'red', size: 'large' },
+        { shape: 'circle', color: 'green', size: 'small' },
+        { shape: 'circle', color: 'green', size: 'large' },
+        { shape: 'square', color: 'red', size: 'small' },
+        { shape: 'square', color: 'red', size: 'large' },
+        { shape: 'square', color: 'green', size: 'small' },
+        { shape: 'square', color: 'green', size: 'large' },
+      ])
+    })
 
-  //   it('should support nested tables with regular function', () => {
-  //     const trials = table.table().range(2)
-  //     trials.map(function (index) {
-  //       this.table().append([
-  //         { type: 'stim', trial: index },
-  //         { type: 'feedback', trial: index },
-  //       ])
-  //       return { ...this, block: Math.floor(index / 2) }
-  //     })
+    it('should handle non-array values as single-element arrays', () => {
+      const trials = {
+        shape: 'circle',
+        color: ['red', 'green'],
+      }
 
-  //     // Check parent table structure (excluding Symbol properties)
-  //     const row0 = trials[0]
-  //     const row1 = trials[1]
-  //     expect({
-  //       range: row0.range,
-  //       block: row0.block,
-  //     }).toEqual({ range: 0, block: 0 })
-  //     expect({
-  //       range: row1.range,
-  //       block: row1.block,
-  //     }).toEqual({ range: 1, block: 0 })
+      const table1 = table.outer(trials)
 
-  //     // Check nested tables
-  //     const nested1 = trials[0].nested
-  //     const nested2 = trials[1].nested
+      expect(table1.length).toBe(2)
+      expect(table1.rowsdata).toEqual([
+        { shape: 'circle', color: 'red' },
+        { shape: 'circle', color: 'green' },
+      ])
+    })
 
-  //     expect(nested1.rows).toEqual([
-  //       { type: 'stim', trial: 0 },
-  //       { type: 'feedback', trial: 0 },
-  //     ])
-  //     expect(nested2.rows).toEqual([
-  //       { type: 'stim', trial: 1 },
-  //       { type: 'feedback', trial: 1 },
-  //     ])
-  //   })
+    it('should handle multiple non-array values', () => {
+      const trials = {
+        shape: 'circle',
+        color: 'red',
+        size: ['small', 'medium'],
+      }
 
-  //   it('should support nested tables with arrow function', () => {
-  //     const trials = table.table().range(2)
-  //     trials.map((row, index) => {
-  //       row.table().append([
-  //         { type: 'stim', trial: index },
-  //         { type: 'feedback', trial: index },
-  //       ])
-  //       return { ...row, block: Math.floor(index / 2) }
-  //     })
+      const table1 = table.outer(trials)
 
-  //     // Check parent table structure (excluding Symbol properties)
-  //     const row0 = trials.rows[0]
-  //     const row1 = trials.rows[1]
-  //     expect({
-  //       range: row0.range,
-  //       block: row0.block,
-  //     }).toEqual({ range: 0, block: 0 })
-  //     expect({
-  //       range: row1.range,
-  //       block: row1.block,
-  //     }).toEqual({ range: 1, block: 0 })
+      expect(table1.length).toBe(2)
+      expect(table1.rowsdata).toEqual([
+        { shape: 'circle', color: 'red', size: 'small' },
+        { shape: 'circle', color: 'red', size: 'medium' },
+      ])
+    })
 
-  //     // Check nested tables
-  //     const nested1 = trials[0].nested
-  //     const nested2 = trials[1].nested
+    it('should throw error for invalid input', () => {
+      expect(() => {
+        table.outer(null)
+      }).toThrow('outer() requires an object with arrays as values')
 
-  //     expect(nested1.rows).toEqual([
-  //       { type: 'stim', trial: 0 },
-  //       { type: 'feedback', trial: 0 },
-  //     ])
-  //     expect(nested2.rows).toEqual([
-  //       { type: 'stim', trial: 1 },
-  //       { type: 'feedback', trial: 1 },
-  //     ])
-  //   })
+      expect(() => {
+        table.outer({})
+      }).toThrow('outer() requires at least one column')
+    })
 
-  //   it('should preserve existing nested tables when mapping', () => {
-  //     const trials = table.table().range(2)
+    it('should throw error when combinations would exceed safety limit', () => {
+      // This will generate 100 * 100 = 10000 combinations
+      const trials = {
+        x: Array(100).fill('x'),
+        y: Array(100).fill('y'),
+      }
 
-  //     // Create nested tables first
-  //     trials[0].table().append({ type: 'original' })
-  //     trials[1].table().append({ type: 'original' })
+      expect(() => {
+        table.outer(trials)
+      }).toThrow(/outer\(\) would generate 10000 combinations, which exceeds the safety limit of \d+/)
+    })
 
-  //     // Map over trials, making sure to preserve the Symbol property
-  //     trials.map((row, index) => {
-  //       const nested = row.nested // Save reference to nested table
-  //       return {
-  //         ...row,
-  //         nested, // Restore nested table reference
-  //         mapped: true,
-  //       }
-  //     })
+    it('should allow combinations under the safety limit', () => {
+      // This will generate 70 * 70 = 4900 combinations (under the 5000 limit)
+      const trials = {
+        x: Array(70).fill('x'),
+        y: Array(70).fill('y'),
+      }
 
-  //     // Check that nested tables are preserved
-  //     const row0 = trials[0]
-  //     const row1 = trials[1]
+      const table1 = table.outer(trials)
+      expect(table1.length).toBe(4900)
+    })
 
-  //     // Check nested table contents separately from row data
-  //     expect(row0.nested.rows).toEqual([{ type: 'original' }])
-  //     expect(row1.nested.rows).toEqual([{ type: 'original' }])
+    it('should be chainable with other methods', () => {
+      const trials = {
+        shape: ['circle', 'square'],
+        color: ['red', 'green'],
+      }
 
-  //     // Check row data without the Symbol properties
-  //     expect({
-  //       range: row0.range,
-  //       mapped: row0.mapped,
-  //     }).toEqual({ range: 0, mapped: true })
-  //     expect({
-  //       range: row1.range,
-  //       mapped: row1.mapped,
-  //     }).toEqual({ range: 1, mapped: true })
-  //   })
-  // })
+      const table1 = table.outer(trials).append([{ shape: 'triangle', color: 'blue' }])
 
-  // describe.skip('forEach()', () => {
-  //   it('should handle forEach with no return value', () => {
-  //     const trials = [
-  //       { color: 'red', shape: 'triangle' },
-  //       { color: 'blue', shape: 'square' },
-  //     ]
+      expect(table1.length).toBe(5)
+      expect(table1[0].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(table1[1].data).toEqual({ shape: 'circle', color: 'green' })
+      expect(table1[2].data).toEqual({ shape: 'square', color: 'red' })
+      expect(table1[3].data).toEqual({ shape: 'square', color: 'green' })
+      expect(table1[4].data).toEqual({ shape: 'triangle', color: 'blue' })
+    })
+  })
 
-  //     table.append(trials).forEach((row) => {
-  //       row.color = 'green' // Direct mutation
-  //     })
+  describe('map()', () => {
+    it('should transform trials using regular function with this binding', () => {
+      const table1 = table.append([
+        { shape: 'circle', color: 'red' },
+        { shape: 'square', color: 'green' },
+      ])
 
-  //     expect(table.rows).toHaveLength(2)
-  //     expect(table.rows[0]).toEqual({ color: 'green', shape: 'triangle' })
-  //     expect(table.rows[1]).toEqual({ color: 'green', shape: 'square' })
-  //   })
+      table1.map(function (index) {
+        return {
+          ...this,
+          id: index,
+          color: this.shape === 'circle' ? 'blue' : this.color,
+        }
+      })
 
-  //   it('should allow modifying rows with forEach', () => {
-  //     const trials = [
-  //       { color: 'red', shape: 'triangle' },
-  //       { color: 'blue', shape: 'square' },
-  //     ]
+      expect(table1.rowsdata).toEqual([
+        { shape: 'circle', color: 'blue', id: 0 },
+        { shape: 'square', color: 'green', id: 1 },
+      ])
+    })
 
-  //     table.append(trials).forEach((row, index) => {
-  //       if (index === 0) {
-  //         return { ...row, color: 'green' }
-  //       }
-  //       return row
-  //     })
+    it('should transform trials using arrow function with row parameter', () => {
+      const table1 = table.append([
+        { shape: 'circle', color: 'red' },
+        { shape: 'square', color: 'green' },
+      ])
 
-  //     expect(table.rows).toHaveLength(2)
-  //     expect(table.rows[0]).toEqual({ color: 'green', shape: 'triangle' })
-  //     expect(table.rows[1]).toEqual({ color: 'blue', shape: 'square' })
-  //   })
+      table1.map((row, index) => ({
+        ...row,
+        id: index,
+        color: row.shape === 'circle' ? 'blue' : row.color,
+      }))
 
-  //   it('should allow forEach to be chained with other methods', () => {
-  //     const trials = {
-  //       shape: ['circle', 'square'],
-  //       color: ['red', 'green'],
-  //     }
+      expect(table1.rowsdata).toEqual([
+        { shape: 'circle', color: 'blue', id: 0 },
+        { shape: 'square', color: 'green', id: 1 },
+      ])
+    })
 
-  //     const table1 = table
-  //       .table()
-  //       .outer(trials)
-  //       .forEach((row) => ({ ...row, size: 'medium' }))
-  //       .append([{ shape: 'triangle', color: 'blue', size: 'large' }])
+    it('should support nested tables with regular function', () => {
+      const trials = table.range(2)
+      trials.map(function (index) {
+        this.append([
+          { type: 'stim', trial: index },
+          { type: 'feedback', trial: index },
+        ])
+        return { ...this, block: Math.floor(index / 2) }
+      })
 
-  //     expect(table1.rows).toHaveLength(5)
-  //     expect(table1[0]).toEqual({ shape: 'circle', color: 'red', size: 'medium' })
-  //     expect(table1[1]).toEqual({ shape: 'circle', color: 'green', size: 'medium' })
-  //     expect(table1[2]).toEqual({ shape: 'square', color: 'red', size: 'medium' })
-  //     expect(table1[3]).toEqual({ shape: 'square', color: 'green', size: 'medium' })
-  //     expect(table1[4]).toEqual({ shape: 'triangle', color: 'blue', size: 'large' })
-  //   })
-  // })
+      // Check parent table structure (excluding Symbol properties)
+      const row0 = trials[0].data
+      const row1 = trials[1].data
+      expect({
+        range: row0.range,
+        block: row0.block,
+      }).toEqual({ range: 0, block: 0 })
+      expect({
+        range: row1.range,
+        block: row1.block,
+      }).toEqual({ range: 1, block: 0 })
 
-  //   it('should handle non-array values as single-element arrays', () => {
-  //     const trials = {
-  //       shape: 'circle',
-  //       color: ['red', 'green', 'blue'],
-  //     }
+      // Check nested tables
+      const nested1 = trials[0]
+      const nested2 = trials[1]
 
-  //     const table1 = table.table().zip(trials, { method: 'loop' })
+      expect(nested1.rowsdata).toEqual([
+        { type: 'stim', trial: 0 },
+        { type: 'feedback', trial: 0 },
+      ])
+      expect(nested2.rowsdata).toEqual([
+        { type: 'stim', trial: 1 },
+        { type: 'feedback', trial: 1 },
+      ])
+    })
 
-  //     expect(table1.rows).toHaveLength(3)
-  //     expect(table1[0]).toEqual({ shape: 'circle', color: 'red' })
-  //     expect(table1[1]).toEqual({ shape: 'circle', color: 'green' })
-  //     expect(table1[2]).toEqual({ shape: 'circle', color: 'blue' })
-  //   })
+    it('should support nested tables with arrow function', () => {
+      const trials = table.range(2)
+      trials.map((row, index) => {
+        row.append([
+          { type: 'stim', trial: index },
+          { type: 'feedback', trial: index },
+        ])
+        return { ...row, block: Math.floor(index / 2) }
+      })
 
-  //   it('should handle multiple non-array values', () => {
-  //     const trials = {
-  //       shape: 'circle',
-  //       color: 'red',
-  //       size: ['small', 'medium'],
-  //     }
+      // Check parent table structure (excluding Symbol properties)
+      const row0 = trials[0].data
+      const row1 = trials[1].data
+      expect({
+        range: row0.range,
+        block: row0.block,
+      }).toEqual({ range: 0, block: 0 })
+      expect({
+        range: row1.range,
+        block: row1.block,
+      }).toEqual({ range: 1, block: 0 })
 
-  //     const table1 = table.table().zip(trials, { method: 'loop' })
+      // Check nested tables
+      const nested1 = trials[0]
+      const nested2 = trials[1]
 
-  //     expect(table1.rows).toHaveLength(2)
-  //     expect(table1[0]).toEqual({ shape: 'circle', color: 'red', size: 'small' })
-  //     expect(table1[1]).toEqual({ shape: 'circle', color: 'red', size: 'medium' })
-  //   })
+      expect(nested1.rowsdata).toEqual([
+        { type: 'stim', trial: 0 },
+        { type: 'feedback', trial: 0 },
+      ])
+      expect(nested2.rowsdata).toEqual([
+        { type: 'stim', trial: 1 },
+        { type: 'feedback', trial: 1 },
+      ])
+    })
 
-  //   it('should throw error for invalid input', () => {
-  //     expect(() => {
-  //       table.table().zip(null)
-  //     }).toThrow('zip() requires an object with arrays as values')
+    it('should preserve existing nested tables when mapping', () => {
+      const trials = table.range(2)
 
-  //     expect(() => {
-  //       table.table().zip({})
-  //     }).toThrow('zip() requires at least one column')
-  //   })
-  // })
+      // Create nested tables first
+      trials[0].append({ type: 'original' })
+      trials[1].append({ type: 'original' })
 
-  // describe.skip('outer()', () => {
-  //   it('should create factorial combinations of columns', () => {
-  //     const trials = {
-  //       shape: ['circle', 'square'],
-  //       color: ['red', 'green'],
-  //     }
+      // Map over trials, making sure to preserve the Symbol property
+      trials.map((row, index) => {
+        const nested = row // Save reference to nested table
+        return {
+          ...row,
+          nested, // Restore nested table reference
+          mapped: true,
+        }
+      })
 
-  //     const table1 = table.table().outer(trials)
+      // Check that nested tables are preserved
+      const row0 = trials[0]
+      const row1 = trials[1]
 
-  //     expect(table1.rows).toHaveLength(4)
-  //     expect(table1.rows).toEqual([
-  //       { shape: 'circle', color: 'red' },
-  //       { shape: 'circle', color: 'green' },
-  //       { shape: 'square', color: 'red' },
-  //       { shape: 'square', color: 'green' },
-  //     ])
-  //   })
+      // Check nested table contents separately from row data
+      expect(row0.nested.rows).toEqual([{ type: 'original' }])
+      expect(row1.nested.rows).toEqual([{ type: 'original' }])
 
-  //   it('should handle three or more columns', () => {
-  //     const trials = {
-  //       shape: ['circle', 'square'],
-  //       color: ['red', 'green'],
-  //       size: ['small', 'large'],
-  //     }
+      // Check row data without the Symbol properties
+      expect({
+        range: row0.range,
+        mapped: row0.mapped,
+      }).toEqual({ range: 0, mapped: true })
+      expect({
+        range: row1.range,
+        mapped: row1.mapped,
+      }).toEqual({ range: 1, mapped: true })
+    })
 
-  //     const table1 = table.table().outer(trials)
+    it.skip('should allow chaining with other methods', () => {
+      const trials = table.range(2)
+      trials
+        .map((row, index) => {
+          row.append([
+            { type: 'stim', trial: index },
+            { type: 'feedback', trial: index },
+          ])
+          return { ...row, block: Math.floor(index / 2) }
+        })
+        .forEach((row) => {
+          row.append({ type: 'original' })
+        })
 
-  //     expect(table1.rows).toHaveLength(8)
-  //     expect(table1.rows).toEqual([
-  //       { shape: 'circle', color: 'red', size: 'small' },
-  //       { shape: 'circle', color: 'red', size: 'large' },
-  //       { shape: 'circle', color: 'green', size: 'small' },
-  //       { shape: 'circle', color: 'green', size: 'large' },
-  //       { shape: 'square', color: 'red', size: 'small' },
-  //       { shape: 'square', color: 'red', size: 'large' },
-  //       { shape: 'square', color: 'green', size: 'small' },
-  //       { shape: 'square', color: 'green', size: 'large' },
-  //     ])
-  //   })
+      expect(trials.rowsdata).toEqual([{ type: 'stim', trial: 0, block: 0 }])
+    })
+  })
 
-  //   it('should handle non-array values as single-element arrays', () => {
-  //     const trials = {
-  //       shape: 'circle',
-  //       color: ['red', 'green'],
-  //     }
+  describe.only('shuffle()', () => {
+    it('should shuffle rows with a specific seed', () => {
+      const table1 = table.append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+        { id: 3, value: 'c' },
+        { id: 4, value: 'd' },
+        { id: 5, value: 'e' },
+      ])
 
-  //     const table1 = table.table().outer(trials)
+      // Shuffle with a specific seed
+      table1.shuffle('test-seed-123')
 
-  //     expect(table1.rows).toHaveLength(2)
-  //     expect(table1.rows).toEqual([
-  //       { shape: 'circle', color: 'red' },
-  //       { shape: 'circle', color: 'green' },
-  //     ])
-  //   })
+      // The order should be deterministic with this seed
+      expect(table1.rowsdata.map((r) => r.id)).toEqual([3, 1, 5, 2, 4])
+    })
 
-  //   it('should handle multiple non-array values', () => {
-  //     const trials = {
-  //       shape: 'circle',
-  //       color: 'red',
-  //       size: ['small', 'medium'],
-  //     }
+    it('should produce consistent order with same seed', () => {
+      const data = [
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+        { id: 3, value: 'c' },
+        { id: 4, value: 'd' },
+        { id: 5, value: 'e' },
+      ]
 
-  //     const table1 = table.table().outer(trials)
+      // Create two tables with same data
+      const table1 = table.append(data)
+      const table2 = table.append(data)
 
-  //     expect(table1.rows).toHaveLength(2)
-  //     expect(table1.length).toBe(2)
-  //     expect(table1.rows).toEqual([
-  //       { shape: 'circle', color: 'red', size: 'small' },
-  //       { shape: 'circle', color: 'red', size: 'medium' },
-  //     ])
-  //   })
+      // Shuffle both with same seed
+      table1.shuffle('test-seed-123')
+      table2.shuffle('test-seed-123')
 
-  //   it('should throw error for invalid input', () => {
-  //     expect(() => {
-  //       table.table().outer(null)
-  //     }).toThrow('outer() requires an object with arrays as values')
+      // They should have the same order
+      expect(table1.rowsdata.map((r) => r.id)).toEqual(table2.rowsdata.map((r) => r.id))
+    })
 
-  //     expect(() => {
-  //       table.table().outer({})
-  //     }).toThrow('outer() requires at least one column')
-  //   })
+    it('should use global seeded RNG when no seed is provided', () => {
+      const table1 = table.append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+        { id: 3, value: 'c' },
+        { id: 4, value: 'd' },
+        { id: 5, value: 'e' },
+      ])
 
-  //   it('should throw error when combinations would exceed safety limit', () => {
-  //     // This will generate 100 * 100 = 10000 combinations
-  //     const trials = {
-  //       x: Array(100).fill('x'),
-  //       y: Array(100).fill('y'),
-  //     }
+      // Set up global seed
+      seedrandom('global-test-seed', { global: true })
 
-  //     expect(() => {
-  //       table.table().outer(trials)
-  //     }).toThrow(/outer\(\) would generate 10000 combinations, which exceeds the safety limit of \d+/)
-  //   })
+      // Shuffle without a seed
+      table1.shuffle()
 
-  //   it('should allow combinations under the safety limit', () => {
-  //     // This will generate 70 * 70 = 4900 combinations (under the 5000 limit)
-  //     const trials = {
-  //       x: Array(70).fill('x'),
-  //       y: Array(70).fill('y'),
-  //     }
+      // The order should be deterministic with the global seed
+      expect(table1.rowsdata.map((r) => r.id)).toEqual([5, 2, 4, 1, 3])
+    })
 
-  //     const table1 = table.table().outer(trials)
-  //     expect(table1.rows).toHaveLength(4900)
-  //   })
+    it('should preserve all elements after shuffling', () => {
+      const originalData = [
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+        { id: 3, value: 'c' },
+        { id: 4, value: 'd' },
+        { id: 5, value: 'e' },
+      ]
 
-  //   it('should be chainable with other methods', () => {
-  //     const trials = {
-  //       shape: ['circle', 'square'],
-  //       color: ['red', 'green'],
-  //     }
+      const table1 = table.append(originalData)
+      const originalIds = [...table1.rowsdata.map((r) => r.id)].sort()
 
-  //     const table1 = table
-  //       .table()
-  //       .outer(trials)
-  //       .append([{ shape: 'triangle', color: 'blue' }])
+      // Shuffle with a specific seed
+      table1.shuffle('test-seed-123')
+      const shuffledIds = [...table1.rowsdata.map((r) => r.id)].sort()
 
-  //     expect(table1.rows).toHaveLength(5)
-  //     expect(table1[0]).toEqual({ shape: 'circle', color: 'red' })
-  //     expect(table1[1]).toEqual({ shape: 'circle', color: 'green' })
-  //     expect(table1[2]).toEqual({ shape: 'square', color: 'red' })
-  //     expect(table1[3]).toEqual({ shape: 'square', color: 'green' })
-  //     expect(table1[4]).toEqual({ shape: 'triangle', color: 'blue' })
-  //   })
-  // })
+      // All elements should still be present, just in different order
+      expect(shuffledIds).toEqual(originalIds)
+    })
 
+    it('should handle empty table', () => {
+      const table1 = table
+      table1.shuffle('test-seed-123')
+      expect(table1.rowsdata).toEqual([])
+    })
+
+    it('should handle single element table', () => {
+      const table1 = table.append([{ id: 1, value: 'a' }])
+      table1.shuffle('test-seed-123')
+      expect(table1.rowsdata).toEqual([{ id: 1, value: 'a' }])
+    })
+
+    it('should be chainable with other methods', () => {
+      const table1 = table
+        .append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+        ])
+        .shuffle('test-seed-123')
+        .append([{ id: 4, value: 'd' }])
+
+      expect(table1.rowsdata).toHaveLength(4)
+      expect(table1[3].data).toEqual({ id: 4, value: 'd' })
+    })
+  })
+
+  describe('print()', () => {
+    let consoleSpy
+
+    beforeEach(() => {
+      // Spy on console.log
+      consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    })
+
+    afterEach(() => {
+      // Clear the spy
+      consoleSpy.mockRestore()
+    })
+
+    it('should print a simple table', () => {
+      const table1 = table.append([
+        { color: 'red', shape: 'triangle' },
+        { color: 'blue', shape: 'square' },
+      ])
+
+      table1.print()
+
+      expect(consoleSpy).toHaveBeenCalledTimes(3)
+      expect(consoleSpy).toHaveBeenNthCalledWith(1, 'Table with 2 rows:')
+      expect(consoleSpy).toHaveBeenNthCalledWith(2, '[0]:', { color: 'red', shape: 'triangle' })
+      expect(consoleSpy).toHaveBeenNthCalledWith(3, '[1]:', { color: 'blue', shape: 'square' })
+    })
+
+    it('should print nested tables with proper indentation', () => {
+      const trials = table.range(2)
+      trials[0].append([
+        { type: 'stim', value: 1 },
+        { type: 'feedback', value: 2 },
+      ])
+      trials[1].append([{ type: 'stim', value: 3 }])
+
+      trials.print()
+
+      expect(consoleSpy).toHaveBeenCalledTimes(8)
+      expect(consoleSpy).toHaveBeenNthCalledWith(1, 'Table with 2 rows:')
+      expect(consoleSpy).toHaveBeenNthCalledWith(2, '[0]:', { range: 0 })
+      expect(consoleSpy).toHaveBeenNthCalledWith(3, '  Nested table with 2 rows:')
+      expect(consoleSpy).toHaveBeenNthCalledWith(4, '  [0]:', { type: 'stim', value: 1 })
+      expect(consoleSpy).toHaveBeenNthCalledWith(5, '  [1]:', { type: 'feedback', value: 2 })
+      expect(consoleSpy).toHaveBeenNthCalledWith(6, '[1]:', { range: 1 })
+      expect(consoleSpy).toHaveBeenNthCalledWith(7, '  Nested table with 1 rows:')
+      expect(consoleSpy).toHaveBeenNthCalledWith(8, '  [0]:', { type: 'stim', value: 3 })
+    })
+
+    it('should handle empty tables', () => {
+      const emptyTable = table
+      emptyTable.print()
+
+      expect(consoleSpy).toHaveBeenCalledTimes(1)
+      expect(consoleSpy).toHaveBeenCalledWith('Table with 0 rows:')
+    })
+
+    it('should return this for chaining', () => {
+      const table1 = table.append([{ value: 1 }])
+      const result = table1.print()
+
+      expect(result).toBe(table1)
+      expect(consoleSpy).toHaveBeenCalled()
+    })
+
+    it('should filter out methods and symbols from output', () => {
+      const table1 = table.append([
+        {
+          value: 1,
+          method: () => {},
+          [Symbol('test')]: 'symbol value',
+        },
+      ])
+
+      table1.print()
+
+      expect(consoleSpy).toHaveBeenCalledTimes(2)
+      expect(consoleSpy).toHaveBeenNthCalledWith(1, 'Table with 1 rows:')
+      expect(consoleSpy).toHaveBeenNthCalledWith(2, '[0]:', { value: 1 })
+    })
+  })
   // describe.skip('partition()', () => {
   //   it('should partition table into n chunks', () => {
   //     const table1 = table.table().range(6)
@@ -1339,111 +1622,6 @@ describe('NestedTable', () => {
   //     partition2.rows.forEach((row) => {
   //       expect(row.type).toBe('test')
   //     })
-  //   })
-  // })
-
-  // describe.skip('shuffle()', () => {
-  //   it('should shuffle rows with a specific seed', () => {
-  //     const table1 = table.table().append([
-  //       { id: 1, value: 'a' },
-  //       { id: 2, value: 'b' },
-  //       { id: 3, value: 'c' },
-  //       { id: 4, value: 'd' },
-  //       { id: 5, value: 'e' },
-  //     ])
-
-  //     // Shuffle with a specific seed
-  //     table1.shuffle('test-seed-123')
-
-  //     // The order should be deterministic with this seed
-  //     expect(table1.rows.map((r) => r.id)).toEqual([3, 1, 5, 2, 4])
-  //   })
-
-  //   it('should produce consistent order with same seed', () => {
-  //     const data = [
-  //       { id: 1, value: 'a' },
-  //       { id: 2, value: 'b' },
-  //       { id: 3, value: 'c' },
-  //       { id: 4, value: 'd' },
-  //       { id: 5, value: 'e' },
-  //     ]
-
-  //     // Create two tables with same data
-  //     const table1 = table.table().append(data)
-  //     const table2 = table.table().append(data)
-
-  //     // Shuffle both with same seed
-  //     table1.shuffle('test-seed-123')
-  //     table2.shuffle('test-seed-123')
-
-  //     // They should have the same order
-  //     expect(table1.rows.map((r) => r.id)).toEqual(table2.rows.map((r) => r.id))
-  //   })
-
-  //   it('should use global seeded RNG when no seed is provided', () => {
-  //     const table1 = table.table().append([
-  //       { id: 1, value: 'a' },
-  //       { id: 2, value: 'b' },
-  //       { id: 3, value: 'c' },
-  //       { id: 4, value: 'd' },
-  //       { id: 5, value: 'e' },
-  //     ])
-
-  //     // Set up global seed
-  //     seedrandom('global-test-seed', { global: true })
-
-  //     // Shuffle without a seed
-  //     table1.shuffle()
-
-  //     // The order should be deterministic with the global seed
-  //     expect(table1.rows.map((r) => r.id)).toEqual([5, 2, 4, 1, 3])
-  //   })
-
-  //   it('should preserve all elements after shuffling', () => {
-  //     const originalData = [
-  //       { id: 1, value: 'a' },
-  //       { id: 2, value: 'b' },
-  //       { id: 3, value: 'c' },
-  //       { id: 4, value: 'd' },
-  //       { id: 5, value: 'e' },
-  //     ]
-
-  //     const table1 = table.table().append(originalData)
-  //     const originalIds = [...table1.rows.map((r) => r.id)].sort()
-
-  //     // Shuffle with a specific seed
-  //     table1.shuffle('test-seed-123')
-  //     const shuffledIds = [...table1.rows.map((r) => r.id)].sort()
-
-  //     // All elements should still be present, just in different order
-  //     expect(shuffledIds).toEqual(originalIds)
-  //   })
-
-  //   it('should handle empty table', () => {
-  //     const table1 = table.table()
-  //     table1.shuffle('test-seed-123')
-  //     expect(table1.rows).toEqual([])
-  //   })
-
-  //   it('should handle single element table', () => {
-  //     const table1 = table.table().append([{ id: 1, value: 'a' }])
-  //     table1.shuffle('test-seed-123')
-  //     expect(table1.rows).toEqual([{ id: 1, value: 'a' }])
-  //   })
-
-  //   it('should be chainable with other methods', () => {
-  //     const table1 = table
-  //       .table()
-  //       .append([
-  //         { id: 1, value: 'a' },
-  //         { id: 2, value: 'b' },
-  //         { id: 3, value: 'c' },
-  //       ])
-  //       .shuffle('test-seed-123')
-  //       .append([{ id: 4, value: 'd' }])
-
-  //     expect(table1.rows).toHaveLength(4)
-  //     expect(table1.rows[3]).toEqual({ id: 4, value: 'd' })
   //   })
   // })
 
@@ -2011,87 +2189,6 @@ describe('NestedTable', () => {
   //   })
   // })
 
-  // describe.skip('print()', () => {
-  //   let consoleSpy
-
-  //   beforeEach(() => {
-  //     // Spy on console.log
-  //     consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
-  //   })
-
-  //   afterEach(() => {
-  //     // Clear the spy
-  //     consoleSpy.mockRestore()
-  //   })
-
-  //   it('should print a simple table', () => {
-  //     const table1 = table.table().append([
-  //       { color: 'red', shape: 'triangle' },
-  //       { color: 'blue', shape: 'square' },
-  //     ])
-
-  //     table1.print()
-
-  //     expect(consoleSpy).toHaveBeenCalledTimes(3)
-  //     expect(consoleSpy).toHaveBeenNthCalledWith(1, 'Table with 2 rows:')
-  //     expect(consoleSpy).toHaveBeenNthCalledWith(2, '[0]:', { color: 'red', shape: 'triangle' })
-  //     expect(consoleSpy).toHaveBeenNthCalledWith(3, '[1]:', { color: 'blue', shape: 'square' })
-  //   })
-
-  //   it('should print nested tables with proper indentation', () => {
-  //     const trials = table.table().range(2)
-  //     trials[0].table().append([
-  //       { type: 'stim', value: 1 },
-  //       { type: 'feedback', value: 2 },
-  //     ])
-  //     trials[1].table().append([{ type: 'stim', value: 3 }])
-
-  //     trials.print()
-
-  //     expect(consoleSpy).toHaveBeenCalledTimes(8)
-  //     expect(consoleSpy).toHaveBeenNthCalledWith(1, 'Table with 2 rows:')
-  //     expect(consoleSpy).toHaveBeenNthCalledWith(2, '[0]:', { range: 0 })
-  //     expect(consoleSpy).toHaveBeenNthCalledWith(3, '  Table with 2 rows:')
-  //     expect(consoleSpy).toHaveBeenNthCalledWith(4, '  [0]:', { type: 'stim', value: 1 })
-  //     expect(consoleSpy).toHaveBeenNthCalledWith(5, '  [1]:', { type: 'feedback', value: 2 })
-  //     expect(consoleSpy).toHaveBeenNthCalledWith(6, '[1]:', { range: 1 })
-  //     expect(consoleSpy).toHaveBeenNthCalledWith(7, '  Table with 1 rows:')
-  //     expect(consoleSpy).toHaveBeenNthCalledWith(8, '  [0]:', { type: 'stim', value: 3 })
-  //   })
-
-  //   it('should handle empty tables', () => {
-  //     const emptyTable = table.table()
-  //     emptyTable.print()
-
-  //     expect(consoleSpy).toHaveBeenCalledTimes(1)
-  //     expect(consoleSpy).toHaveBeenCalledWith('Table with 0 rows:')
-  //   })
-
-  //   it('should return this for chaining', () => {
-  //     const table1 = table.table().append([{ value: 1 }])
-  //     const result = table1.print()
-
-  //     expect(result).toBe(table1)
-  //     expect(consoleSpy).toHaveBeenCalled()
-  //   })
-
-  //   it('should filter out methods and symbols from output', () => {
-  //     const table1 = table.table().append([
-  //       {
-  //         value: 1,
-  //         method: () => {},
-  //         [Symbol('test')]: 'symbol value',
-  //       },
-  //     ])
-
-  //     table1.print()
-
-  //     expect(consoleSpy).toHaveBeenCalledTimes(2)
-  //     expect(consoleSpy).toHaveBeenNthCalledWith(1, 'Table with 1 rows:')
-  //     expect(consoleSpy).toHaveBeenNthCalledWith(2, '[0]:', { value: 1 })
-  //   })
-  // })
-
   // describe.skip('push()', () => {
   //   it('should have push method available', () => {
   //     const table1 = table.table()
@@ -2478,4 +2575,105 @@ describe('NestedTable', () => {
   //   sourceTable.append([{ value: 1 }, { value: 2 }])
   //   expect(() => almostFullTable.append(sourceTable)).toThrow(/exceeds the safety limit/)
   // })
+  //})
+
+  describe.skip('Complex Nested Operations', () => {
+    it('should maintain correct parent-child relationships in complex structures', () => {
+      // Create a deep structure with multiple operations
+      table.append(1)
+      table[0].append(2)
+      table[0][0].append(3)
+      table[0][0][0].append(4)
+      table[0][0][0][0].append(5)
+
+      // Create a parallel branch
+      table.append(10)
+      table[1].append(20)
+      table[1][0].append(30)
+
+      // Validate the entire tree
+      validateTreeConsistency(table)
+
+      // Add more complexity by appending at different levels
+      table[0].append(6) // Second child of root's first child
+      table[1][0].append(40) // Second child of the parallel branch
+
+      // Validate again after modifications
+      validateTreeConsistency(table)
+
+      // Check specific parent-child relationships
+      expect(table[0]._parent).toBe(table)
+      expect(table[0][0]._parent).toBe(table[0])
+      expect(table[0][0][0]._parent).toBe(table[0][0])
+      expect(table[0][0][0][0]._parent).toBe(table[0][0][0])
+      expect(table[0][0][0][0][0]._parent).toBe(table[0][0][0][0])
+
+      expect(table[1]._parent).toBe(table)
+      expect(table[1][0]._parent).toBe(table[1])
+      expect(table[1][0][0]._parent).toBe(table[1][0])
+      expect(table[1][0][1]._parent).toBe(table[1][0])
+
+      // Check data integrity
+      expect(table[0].data).toBe(1)
+      expect(table[0][0].data).toBe(2)
+      expect(table[0][0][0].data).toBe(3)
+      expect(table[0][0][0][0].data).toBe(4)
+      expect(table[0][0][0][0][0].data).toBe(5)
+      expect(table[0][1].data).toBe(6)
+
+      expect(table[1].data).toBe(10)
+      expect(table[1][0].data).toBe(20)
+      expect(table[1][0][0].data).toBe(30)
+      expect(table[1][0][1].data).toBe(40)
+    })
+
+    it('should handle complex operations that could affect parent-child relationships', () => {
+      // Create a nested structure
+      table.range(3)
+
+      // Add nested items to each row
+      table[0].append(10)
+      table[0].append(11)
+      table[1].append(20)
+      table[1].append(21)
+      table[2].append(30)
+
+      // Add another level of nesting
+      table[0][0].append(100)
+      table[1][0].append(200)
+      table[2][0].append(300)
+
+      // Validate initial structure
+      validateTreeConsistency(table)
+
+      // Perform repeat operation which should deep copy nested structures
+      const repeatedTable = table.repeat(2)
+
+      // Validate after repeat
+      validateTreeConsistency(repeatedTable)
+
+      // Check that original nodes and repeated nodes have correct relationships
+      // Original nodes (first 3)
+      for (let i = 0; i < 3; i++) {
+        expect(repeatedTable[i]._parent).toBe(repeatedTable)
+        for (let j = 0; j < repeatedTable[i]._items.length; j++) {
+          expect(repeatedTable[i][j]._parent).toBe(repeatedTable[i])
+          for (let k = 0; k < repeatedTable[i][j]._items.length; k++) {
+            expect(repeatedTable[i][j][k]._parent).toBe(repeatedTable[i][j])
+          }
+        }
+      }
+
+      // Repeated nodes (last 3)
+      for (let i = 3; i < 6; i++) {
+        expect(repeatedTable[i]._parent).toBe(repeatedTable)
+        for (let j = 0; j < repeatedTable[i]._items.length; j++) {
+          expect(repeatedTable[i][j]._parent).toBe(repeatedTable[i])
+          for (let k = 0; k < repeatedTable[i][j]._items.length; k++) {
+            expect(repeatedTable[i][j][k]._parent).toBe(repeatedTable[i][j])
+          }
+        }
+      }
+    })
+  })
 })

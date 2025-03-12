@@ -87,63 +87,27 @@ console.log(table.rows) // Array of NestedTable nodes containing values 1 and 2
 All path properties provide information about the location of a node in the
 tree, but in different formats and with different reference points.
 
-### Relative Path Properties (relative to the current reference point)
-
-#### `.path`
-
-Returns an array of indices representing the path from the base node to the
-current node.
-
-```javascript
-table.append(1)
-table[0].append(2)
-console.log(table[0][0].path) // [0, 0]
-
-const level1 = table[0].ref()
-console.log(level1[0].path) // [0] (relative to level1)
-```
-
-#### `.paths`
-
-Returns the path as a hyphen-separated string.
-
-```javascript
-console.log(table[0][0].paths) // "0-0"
-```
-
 ### Absolute Path Properties (from root, regardless of reference point)
 
-#### `.abspath`
+#### `.path`
 
 Returns an array of indices representing the absolute path from the root to the
 current node.
 
 ```javascript
 const level1 = table[0].ref()
-console.log(level1[0].abspath) // [0, 0] (absolute path)
+console.log(level1[0].path) // [0, 0] (absolute path)
 ```
 
-#### `.abspaths`
+#### `.paths`
 
 Returns the absolute path as a hyphen-separated string.
 
 ```javascript
-console.log(level1[0].abspaths) // "0-0"
+console.log(level1[0].paths) // "0-0"
 ```
 
 ## Data Collection Properties
-
-### `.subtreedata`
-
-Returns an array containing all data values from the current node and all its
-descendants.
-
-```javascript
-table.append(1)
-table[0].append(2)
-table[0][0].append(3)
-console.log(table[0].subtreedata) // [1, 2, 3]
-```
 
 ### `.pathdata`
 
@@ -152,19 +116,6 @@ the current node.
 
 ```javascript
 console.log(table[0][0].pathdata) // [1, 2]
-
-const level1 = table[0].ref()
-console.log(level1[0].pathdata) // [1, 2] (data along relative path)
-```
-
-### `.abspathdata`
-
-Returns an array of data values along the absolute path from the root to the
-current node.
-
-```javascript
-const level1 = table[0].ref()
-console.log(level1[0].abspathdata) // [1, 2] (data along absolute path)
 ```
 
 ## Iteration Methods
