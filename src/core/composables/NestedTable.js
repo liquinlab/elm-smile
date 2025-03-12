@@ -192,15 +192,26 @@ class NestedTable {
               if (result !== undefined) {
                 // If result is an object with properties from the proxy, extract just the data properties
                 if (typeof result === 'object' && result !== null) {
-                  const newData = {}
-                  // Only copy over properties that exist in the original data
-                  Object.keys(item.data).forEach((key) => {
-                    if (key in result) {
+                  // Create a new data object by starting with the original data
+                  const newData = { ...item.data }
+
+                  // Add or update properties from the result object
+                  // This allows new properties to be added that weren't in the original data
+                  Object.keys(result).forEach((key) => {
+                    // Only copy properties that are not internal properties of the NestedTable
+                    if (
+                      key !== '_id' &&
+                      key !== '_items' &&
+                      key !== '_parent' &&
+                      key !== '_path' &&
+                      key !== 'sm' &&
+                      key !== 'data' &&
+                      typeof result[key] !== 'function'
+                    ) {
                       newData[key] = result[key]
-                    } else {
-                      newData[key] = item.data[key]
                     }
                   })
+
                   item.data = newData
                 }
               }
@@ -763,6 +774,80 @@ class NestedTable {
             printNestedTable(target, indent)
 
             // Return the proxy for chaining
+            return selfProxy
+          }
+        }
+
+        if (prop === 'partition') {
+          /**
+           * Partitions the current table into n groups, reorganizing the structure.
+           * Creates a new set of rows, each containing an equal number of the original items.
+           *
+           * @param {number} n - Number of partitions to create
+           * @returns {NestedTable} The current instance for chaining
+           * @throws {Error} If the table size is not divisible by n or n <= 0
+           */
+          return (n) => {
+            if (n <= 0) {
+              throw new Error('partition() must be called with a positive integer')
+            }
+
+            const origItemCount = target._items.length
+
+            // If table is empty or n=1, do nothing and return
+            if (origItemCount === 0 || n === 1) {
+              return selfProxy
+            }
+
+            // Check if table size is divisible by n
+            if (origItemCount % n !== 0) {
+              throw new Error(`Table size (${origItemCount}) is not divisible by ${n}`)
+            }
+
+            // Calculate how many items per partition
+            const itemsPerPartition = Math.floor(origItemCount / n)
+
+            // Store the original items
+            const originalItems = [...target._items]
+
+            // Helper function to deep copy a NestedTable node
+            const deepCopyNode = (node, newParent, newPath) => {
+              // Create new node with copied data
+              const newNode = new NestedTable(node.sm, JSON.parse(JSON.stringify(node.data)), newParent, newPath)
+
+              // Deep copy all child items
+              newNode._items = node._items.map((child, childIndex) => {
+                return deepCopyNode(child, newNode, [...newPath, childIndex])
+              })
+
+              return newNode
+            }
+
+            // Clear existing items
+            target._items = []
+
+            // Create n new partition rows
+            for (let i = 0; i < n; i++) {
+              const partitionPath = [...target._path, i]
+              const partition = new NestedTable(target.sm, { partition: i }, target, partitionPath)
+              target._items.push(partition)
+
+              // Add the appropriate original items to this partition
+              const startIdx = i * itemsPerPartition
+              const endIdx = startIdx + itemsPerPartition
+
+              for (let j = startIdx; j < endIdx; j++) {
+                const originalItem = originalItems[j]
+                const newItemPath = [...partitionPath, j - startIdx]
+
+                // Deep copy the item and its children
+                const newItem = deepCopyNode(originalItem, partition, newItemPath)
+
+                // Add to the partition
+                partition._items.push(newItem)
+              }
+            }
+
             return selfProxy
           }
         }

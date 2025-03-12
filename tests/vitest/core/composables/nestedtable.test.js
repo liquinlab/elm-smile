@@ -22,9 +22,9 @@ vi.mock('@/core/config', () => ({
 function validateTreeConsistency(node, expectedParent = null, path = 'root') {
   // Verify this node's parent reference
   if (node._parent?._id !== expectedParent?._id && node._parent !== expectedParent) {
-    console.log('Node ID:', node._id)
-    console.log('Actual parent ID:', node._parent?._id)
-    console.log('Expected parent ID:', expectedParent?._id)
+    // console.log('Node ID:', node._id)
+    // console.log('Actual parent ID:', node._parent?._id)
+    // console.log('Expected parent ID:', expectedParent?._id)
     throw new Error(
       `Parent reference is incorrect at path ${path}. Expected parent: ${expectedParent?._id}, Actual parent: ${node._parent?._id}`
     )
@@ -79,7 +79,7 @@ describe('NestedTable', () => {
 
       // Test absolute paths from pointers
       const secondLevel = table[0][0]
-      console.log(secondLevel._baseNode)
+      //console.log(secondLevel._baseNode)
       expect(secondLevel[0].data).toBe(3)
       expect(secondLevel[0].pathdata).toEqual([1, 2, 3])
       expect(secondLevel[0].path).toEqual([0, 0, 0])
@@ -197,7 +197,7 @@ describe('NestedTable', () => {
       expect(table.zip).toBeInstanceOf(Function)
       expect(table.outer).toBeInstanceOf(Function)
       expect(table.interleave).toBeInstanceOf(Function)
-      // expect(table.partition).toBeInstanceOf(Function)
+      expect(table.partition).toBeInstanceOf(Function)
       expect(table.shuffle).toBeInstanceOf(Function)
       // expect(table.sample).toBeInstanceOf(Function)
 
@@ -888,6 +888,7 @@ describe('NestedTable', () => {
         .append([{ shape: 'triangle', color: 'blue', size: 'large' }])
 
       expect(table1.length).toBe(5)
+      table1.print()
       expect(table1[0].data).toEqual({ shape: 'circle', color: 'red', size: 'medium' })
       expect(table1[1].data).toEqual({ shape: 'circle', color: 'green', size: 'medium' })
       expect(table1[2].data).toEqual({ shape: 'square', color: 'red', size: 'medium' })
@@ -972,7 +973,6 @@ describe('NestedTable', () => {
 
       table1.interleave(table2)
 
-      console.log(table1.rowsdata)
       expect(table1.length).toBe(5)
       expect(table1.rows[0].data).toEqual({ id: 1, value: 'a' })
       expect(table1.rows[1].data).toEqual({ id: 4, value: 'd' })
@@ -1325,21 +1325,21 @@ describe('NestedTable', () => {
       const row1 = trials[1]
 
       // Check nested table contents separately from row data
-      expect(row0.nested.rows).toEqual([{ type: 'original' }])
-      expect(row1.nested.rows).toEqual([{ type: 'original' }])
+      expect(row0.rowsdata).toEqual([{ type: 'original' }])
+      expect(row1.rowsdata).toEqual([{ type: 'original' }])
 
       // Check row data without the Symbol properties
       expect({
-        range: row0.range,
-        mapped: row0.mapped,
+        range: row0.data.range,
+        mapped: row0.data.mapped,
       }).toEqual({ range: 0, mapped: true })
       expect({
-        range: row1.range,
-        mapped: row1.mapped,
+        range: row1.data.range,
+        mapped: row1.data.mapped,
       }).toEqual({ range: 1, mapped: true })
     })
 
-    it.skip('should allow chaining with other methods', () => {
+    it('should allow chaining with other methods', () => {
       const trials = table.range(2)
       trials
         .map((row, index) => {
@@ -1353,11 +1353,14 @@ describe('NestedTable', () => {
           row.append({ type: 'original' })
         })
 
-      expect(trials.rowsdata).toEqual([{ type: 'stim', trial: 0, block: 0 }])
+      expect(trials.rowsdata).toEqual([
+        { range: 0, block: 0 },
+        { range: 1, block: 0 },
+      ])
     })
   })
 
-  describe.only('shuffle()', () => {
+  describe('shuffle()', () => {
     it('should shuffle rows with a specific seed', () => {
       const table1 = table.append([
         { id: 1, value: 'a' },
@@ -1541,89 +1544,92 @@ describe('NestedTable', () => {
       expect(consoleSpy).toHaveBeenNthCalledWith(2, '[0]:', { value: 1 })
     })
   })
-  // describe.skip('partition()', () => {
-  //   it('should partition table into n chunks', () => {
-  //     const table1 = table.table().range(6)
-  //     table1.partition(2)
 
-  //     expect(table1.rows).toHaveLength(2)
-  //     expect(table1[0].partition).toBe(0)
-  //     expect(table1[1].partition).toBe(1)
+  describe('partition()', () => {
+    it('should partition table into n chunks', () => {
+      const table1 = table.range(6)
+      table1.partition(2)
+      table1.print()
+      expect(table1.length).toBe(2)
+      expect(table1[0].data).toEqual({ partition: 0 })
+      expect(table1[1].data).toEqual({ partition: 1 })
 
-  //     // Check first partition
-  //     const partition1 = table1.rows[0][Symbol.for('table')]
-  //     expect(partition1.rows).toHaveLength(3)
-  //     expect(partition1[0]).toEqual({ range: 0 })
-  //     expect(partition1[1]).toEqual({ range: 1 })
-  //     expect(partition1[2]).toEqual({ range: 2 })
+      // Check first partition
+      const partition1 = table1[0]
+      expect(partition1.rows).toHaveLength(3)
+      expect(partition1[0].data).toEqual({ range: 0 })
+      expect(partition1[1].data).toEqual({ range: 1 })
+      expect(partition1[2].data).toEqual({ range: 2 })
 
-  //     // Check second partition
-  //     const partition2 = table1.rows[1][Symbol.for('table')]
-  //     expect(partition2.rows).toHaveLength(3)
-  //     expect(partition2[0]).toEqual({ range: 3 })
-  //     expect(partition2[1]).toEqual({ range: 4 })
-  //     expect(partition2[2]).toEqual({ range: 5 })
-  //   })
+      // Check second partition
+      const partition2 = table1.rows[1]
+      expect(partition2.rows).toHaveLength(3)
+      expect(partition2[0].data).toEqual({ range: 3 })
+      expect(partition2[1].data).toEqual({ range: 4 })
+      expect(partition2[2].data).toEqual({ range: 5 })
+    })
 
-  //   it('should handle uneven partitions', () => {
-  //     const table1 = table.table().range(5)
-  //     table1.partition(2)
+    it('should throw error for uneven partitions', () => {
+      const table1 = table.range(5)
+      expect(() => {
+        table1.partition(2)
+      }).toThrow('Table size (5) is not divisible by 2')
+    })
 
-  //     expect(table1.rows).toHaveLength(2)
+    it('should handle empty table', () => {
+      const table1 = table
+      table1.partition(2)
+      expect(table1.rows).toHaveLength(0)
+    })
 
-  //     // First partition should have 3 items (rounded up)
-  //     const partition1 = table1.rows[0][Symbol.for('table')]
-  //     expect(partition1.rows).toHaveLength(3)
-  //     expect(partition1[0]).toEqual({ range: 0 })
-  //     expect(partition1[1]).toEqual({ range: 1 })
-  //     expect(partition1[2]).toEqual({ range: 2 })
+    it('should handle n=1 by doing nothing', () => {
+      const table1 = table.range(6)
+      const originalItems = [...table1.rows]
 
-  //     // Second partition should have 2 items
-  //     const partition2 = table1.rows[1][Symbol.for('table')]
-  //     expect(partition2.rows).toHaveLength(2)
-  //     expect(partition2[0]).toEqual({ range: 3 })
-  //     expect(partition2[1]).toEqual({ range: 4 })
-  //   })
+      // Partition with n=1 should not change the table
+      table1.partition(1)
 
-  //   it('should handle empty table', () => {
-  //     const table1 = table.table()
-  //     table1.partition(2)
-  //     expect(table1.rows).toHaveLength(0)
-  //   })
+      // Verify length is unchanged
+      expect(table1.rows).toHaveLength(originalItems.length)
 
-  //   it('should throw error if n <= 0', () => {
-  //     const table1 = table.table().range(6)
-  //     expect(() => {
-  //       table1.partition(0)
-  //     }).toThrow('partition() must be called with a positive integer')
-  //     expect(() => {
-  //       table1.partition(-1)
-  //     }).toThrow('partition() must be called with a positive integer')
-  //   })
+      // Verify the data is unchanged
+      for (let i = 0; i < originalItems.length; i++) {
+        expect(table1[i].data).toEqual(originalItems[i].data)
+      }
+    })
 
-  //   it('should be chainable with other methods', () => {
-  //     const table1 = table
-  //       .table()
-  //       .range(6)
-  //       .partition(2)
-  //       .forEach((row) => {
-  //         row[Symbol.for('table')].forEach((item) => {
-  //           item.type = 'test'
-  //         })
-  //       })
+    it('should throw error if n <= 0', () => {
+      const table1 = table.range(6)
+      expect(() => {
+        table1.partition(0)
+      }).toThrow('partition() must be called with a positive integer')
+      expect(() => {
+        table1.partition(-1)
+      }).toThrow('partition() must be called with a positive integer')
+    })
 
-  //     // Check that forEach worked on nested tables
-  //     const partition1 = table1[0].nested
-  //     const partition2 = table1[1].nested
+    it('should be chainable with other methods', () => {
+      const table1 = table
+        .range(6)
+        .partition(2)
+        .forEach((row) => {
+          row.forEach((item) => {
+            item.type = 'test'
+          })
+        })
 
-  //     partition1.rows.forEach((row) => {
-  //       expect(row.type).toBe('test')
-  //     })
-  //     partition2.rows.forEach((row) => {
-  //       expect(row.type).toBe('test')
-  //     })
-  //   })
-  // })
+      // Check that forEach worked on nested tables
+      const partition1 = table1[0]
+      const partition2 = table1[1]
+
+      partition1.forEach((row) => {
+        expect(row.type).toBe('test')
+      })
+      partition2.forEach((row) => {
+        expect(row.type).toBe('test')
+      })
+    })
+  })
 
   // describe.skip('sample()', () => {
   //   it('should handle empty table', () => {
