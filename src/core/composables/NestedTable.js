@@ -33,8 +33,9 @@ class NestedTable {
    * @param {*} [data=undefined] - Optional data value to store at this node
    * @param {NestedTable|null} [parent=null] - Parent node reference for traversing up the tree
    * @param {Array<number>} [path=[]] - Path indices to reach this node from the root
+   * @param {boolean} [readOnly=false] - Whether the table is read-only (prevents modifications)
    */
-  constructor(sm, data = undefined, parent = null, path = []) {
+  constructor(sm, data = undefined, parent = null, path = [], readOnly = false) {
     // State machine reference
     this.sm = sm
 
@@ -52,6 +53,9 @@ class NestedTable {
 
     // Unique ID for this node to help with comparison
     this._id = uuidv4()
+
+    // Read-only status - inherit from parent if parent is read-only
+    this._readOnly = readOnly || (parent && parent._readOnly) || false
 
     // Store a reference to the proxy to be returned from methods
     let selfProxy
@@ -99,6 +103,9 @@ class NestedTable {
            * @returns {NestedTable} The current instance for chaining
            */
           return (value) => {
+            // Check if table is read-only
+            target._checkReadOnly()
+
             // Calculate how many items we'll be adding
             let itemsToAdd = 0
             if (value instanceof NestedTable) {
@@ -128,7 +135,7 @@ class NestedTable {
               for (let i = 0; i < rowsData.length; i++) {
                 const index = target._items.length
                 const newPath = [...target._path, index]
-                const newNode = new NestedTable(target.sm, rowsData[i], target, newPath)
+                const newNode = new NestedTable(target.sm, rowsData[i], target, newPath, target._readOnly)
                 target._items.push(newNode)
               }
               return selfProxy
@@ -139,7 +146,7 @@ class NestedTable {
             for (let i = 0; i < values.length; i++) {
               const index = target._items.length
               const newPath = [...target._path, index]
-              const newNode = new NestedTable(target.sm, values[i], target, newPath)
+              const newNode = new NestedTable(target.sm, values[i], target, newPath, target._readOnly)
               target._items.push(newNode)
             }
 
@@ -158,6 +165,9 @@ class NestedTable {
            * @returns {NestedTable} The current instance for chaining
            */
           return (callback) => {
+            // Check if table is read-only
+            target._checkReadOnly()
+
             target._items.forEach((item, index) => {
               // Create a proxy for the item that handles property mutations and method access
               const itemProxy = new Proxy(item, {
@@ -206,6 +216,7 @@ class NestedTable {
                       key !== '_path' &&
                       key !== 'sm' &&
                       key !== 'data' &&
+                      key !== '_readOnly' &&
                       typeof result[key] !== 'function'
                     ) {
                       newData[key] = result[key]
@@ -232,6 +243,9 @@ class NestedTable {
            * @returns {NestedTable} The current instance for chaining
            */
           return (callback) => {
+            // Check if table is read-only
+            target._checkReadOnly()
+
             target._items.forEach((item, index) => {
               // Create a proxy for the item that handles property mutations and method access
               const itemProxy = new Proxy(item, {
@@ -240,10 +254,13 @@ class NestedTable {
                   if (itemProp === 'table') {
                     return () => {
                       // Create a new nested table
-                      const nestedTable = new NestedTable(target.sm, undefined, itemTarget, [
-                        ...itemTarget._path,
-                        'nested',
-                      ])
+                      const nestedTable = new NestedTable(
+                        target.sm,
+                        undefined,
+                        itemTarget,
+                        [...itemTarget._path, 'nested'],
+                        itemTarget._readOnly
+                      )
                       itemTarget._nestedTable = nestedTable
                       return nestedTable
                     }
@@ -280,14 +297,20 @@ class NestedTable {
                         for (let i = 0; i < input.length; i++) {
                           const newIndex = itemTarget._items.length
                           const newPath = [...itemTarget._path, newIndex]
-                          const newNode = new NestedTable(itemTarget.sm, input[i], itemTarget, newPath)
+                          const newNode = new NestedTable(
+                            itemTarget.sm,
+                            input[i],
+                            itemTarget,
+                            newPath,
+                            itemTarget._readOnly
+                          )
                           itemTarget._items.push(newNode)
                         }
                       } else if (input && typeof input === 'object') {
                         // Handle appending a single object
                         const newIndex = itemTarget._items.length
                         const newPath = [...itemTarget._path, newIndex]
-                        const newNode = new NestedTable(itemTarget.sm, input, itemTarget, newPath)
+                        const newNode = new NestedTable(itemTarget.sm, input, itemTarget, newPath, itemTarget._readOnly)
                         itemTarget._items.push(newNode)
                       }
                       return itemProxy
@@ -349,6 +372,7 @@ class NestedTable {
                       key !== '_id' &&
                       key !== 'sm' &&
                       key !== 'data' &&
+                      key !== '_readOnly' &&
                       typeof result[key] !== 'function'
                     ) {
                       // Copy the property to the new data object
@@ -386,6 +410,9 @@ class NestedTable {
            * @returns {NestedTable} The current instance for chaining
            */
           return (trials, options = {}) => {
+            // Check if table is read-only
+            target._checkReadOnly()
+
             if (typeof trials !== 'object' || trials === null) {
               throw new Error('zip() requires an object with arrays as values')
             }
@@ -458,7 +485,7 @@ class NestedTable {
             for (let i = 0; i < zippedRows.length; i++) {
               const index = target._items.length
               const newPath = [...target._path, index]
-              const newNode = new NestedTable(target.sm, zippedRows[i], target, newPath)
+              const newNode = new NestedTable(target.sm, zippedRows[i], target, newPath, target._readOnly)
               target._items.push(newNode)
             }
 
@@ -477,6 +504,9 @@ class NestedTable {
            * @throws {Error} If n is not a positive integer or exceeds safety limit
            */
           return (n, fieldName = 'range') => {
+            // Check if table is read-only
+            target._checkReadOnly()
+
             if (n <= 0) {
               throw new Error('range() must be called with a positive integer')
             }
@@ -494,7 +524,7 @@ class NestedTable {
             // Create n new items with incrementing values
             for (let i = 0; i < n; i++) {
               const newPath = [...target._path, i]
-              const newNode = new NestedTable(target.sm, { [fieldName]: i }, target, newPath)
+              const newNode = new NestedTable(target.sm, { [fieldName]: i }, target, newPath, target._readOnly)
               target._items.push(newNode)
             }
 
@@ -511,6 +541,9 @@ class NestedTable {
            * @throws {Error} If n is not positive or if operation would exceed max rows
            */
           return (n) => {
+            // Check if table is read-only
+            target._checkReadOnly()
+
             if (n <= 0 || target._items.length === 0) return selfProxy
 
             const totalRows = target._items.length * n
@@ -526,9 +559,13 @@ class NestedTable {
             // Helper function to deep copy a NestedTable node
             const deepCopyNode = (node) => {
               // Create new node with copied data
-              const newNode = new NestedTable(node.sm, JSON.parse(JSON.stringify(node.data)), node._parent, [
-                ...node._path,
-              ])
+              const newNode = new NestedTable(
+                node.sm,
+                JSON.parse(JSON.stringify(node.data)),
+                node._parent,
+                [...node._path],
+                node._readOnly
+              )
 
               // Deep copy all child items
               newNode._items = node._items.map((child) => deepCopyNode(child))
@@ -567,6 +604,9 @@ class NestedTable {
            * @returns {NestedTable} The current instance for chaining
            */
           return (seed) => {
+            // Check if table is read-only
+            target._checkReadOnly()
+
             if (target._items.length <= 1) return selfProxy
 
             // Only create a new RNG if a seed is provided
@@ -604,6 +644,9 @@ class NestedTable {
            * @throws {Error} If invalid options are provided or operation would exceed max rows
            */
           return (options = {}) => {
+            // Check if table is read-only
+            target._checkReadOnly()
+
             if (target._items.length === 0) return selfProxy
 
             const type = options.type || 'without-replacement'
@@ -628,7 +671,13 @@ class NestedTable {
             // Helper function to deep copy a NestedTable node
             const deepCopyNode = (node) => {
               // Create new node with copied data
-              const newNode = new NestedTable(node.sm, JSON.parse(JSON.stringify(node.data)), target, [...target._path])
+              const newNode = new NestedTable(
+                node.sm,
+                JSON.parse(JSON.stringify(node.data)),
+                target,
+                [...target._path],
+                target._readOnly
+              )
 
               // Deep copy all child items
               newNode._items = node._items.map((child) => deepCopyNode(child))
@@ -801,14 +850,21 @@ class NestedTable {
 
         if (prop === 'interleave') {
           return (input) => {
+            // Check if table is read-only
+            target._checkReadOnly()
+
             let inputItems = []
 
             // Helper function to deep copy a NestedTable node
             const deepCopyNode = (node) => {
               // Create new node with copied data
-              const newNode = new NestedTable(target.sm, JSON.parse(JSON.stringify(node.data)), target, [
-                ...target._path,
-              ])
+              const newNode = new NestedTable(
+                target.sm,
+                JSON.parse(JSON.stringify(node.data)),
+                target,
+                [...target._path],
+                target._readOnly
+              )
 
               // Deep copy all child items
               newNode._items = node._items.map((child) => deepCopyNode(child))
@@ -826,14 +882,14 @@ class NestedTable {
             if (Array.isArray(input)) {
               // Create NestedTable nodes from array elements
               inputItems = input.map((data) => {
-                return new NestedTable(target.sm, data, target, [])
+                return new NestedTable(target.sm, data, target, [], target._readOnly)
               })
             } else if (input && input._items) {
               // Deep copy nodes from another table
               inputItems = input._items.map((node) => deepCopyNode(node))
             } else if (input && typeof input === 'object') {
               // Create a single NestedTable node from object
-              inputItems = [new NestedTable(target.sm, input, target, [])]
+              inputItems = [new NestedTable(target.sm, input, target, [], target._readOnly)]
             } else {
               throw new Error('interleave() requires an array, table, or object as input')
             }
@@ -881,6 +937,9 @@ class NestedTable {
            * @throws {Error} If the operation would exceed the max rows limit
            */
           return (trials, options = {}) => {
+            // Check if table is read-only
+            target._checkReadOnly()
+
             if (typeof trials !== 'object' || trials === null) {
               throw new Error('outer() requires an object with arrays as values')
             }
@@ -929,7 +988,7 @@ class NestedTable {
             for (let i = 0; i < outerRows.length; i++) {
               const index = target._items.length
               const newPath = [...target._path, index]
-              const newNode = new NestedTable(target.sm, outerRows[i], target, newPath)
+              const newNode = new NestedTable(target.sm, outerRows[i], target, newPath, target._readOnly)
               target._items.push(newNode)
             }
 
@@ -1000,6 +1059,9 @@ class NestedTable {
            * @throws {Error} If the table size is not divisible by n or n <= 0
            */
           return (n) => {
+            // Check if table is read-only
+            target._checkReadOnly()
+
             if (n <= 0) {
               throw new Error('partition() must be called with a positive integer')
             }
@@ -1025,7 +1087,13 @@ class NestedTable {
             // Helper function to deep copy a NestedTable node
             const deepCopyNode = (node, newParent, newPath) => {
               // Create new node with copied data
-              const newNode = new NestedTable(node.sm, JSON.parse(JSON.stringify(node.data)), newParent, newPath)
+              const newNode = new NestedTable(
+                node.sm,
+                JSON.parse(JSON.stringify(node.data)),
+                newParent,
+                newPath,
+                node._readOnly
+              )
 
               // Deep copy all child items
               newNode._items = node._items.map((child, childIndex) => {
@@ -1041,7 +1109,7 @@ class NestedTable {
             // Create n new partition rows
             for (let i = 0; i < n; i++) {
               const partitionPath = [...target._path, i]
-              const partition = new NestedTable(target.sm, { partition: i }, target, partitionPath)
+              const partition = new NestedTable(target.sm, { partition: i }, target, partitionPath, target._readOnly)
               target._items.push(partition)
 
               // Add the appropriate original items to this partition
@@ -1064,6 +1132,43 @@ class NestedTable {
           }
         }
 
+        if (prop === 'setReadOnly') {
+          /**
+           * Sets the table to read-only mode, preventing further modifications.
+           * Navigates to the root parent first to ensure the entire nested structure becomes read-only.
+           *
+           * @param {boolean} [recursive=true] - Whether to also set all child tables to read-only
+           * @returns {NestedTable} The current instance for chaining
+           */
+          return (recursive = true) => {
+            // Find the root parent node
+            let rootNode = target
+            while (rootNode._parent !== null) {
+              rootNode = rootNode._parent
+            }
+
+            // Set the root node to read-only
+            rootNode._readOnly = true
+
+            // Recursively set all child tables to read-only if requested
+            if (recursive) {
+              const setChildrenReadOnly = (node) => {
+                if (node._items && node._items.length > 0) {
+                  node._items.forEach((item) => {
+                    item._readOnly = true
+                    setChildrenReadOnly(item)
+                  })
+                }
+              }
+
+              // Start the recursive setting from the root
+              setChildrenReadOnly(rootNode)
+            }
+
+            return selfProxy
+          }
+        }
+
         // Return the original property or method
         return target[prop]
       },
@@ -1077,6 +1182,9 @@ class NestedTable {
        * @returns {boolean} True if the assignment succeeded
        */
       set: (target, prop, value) => {
+        // Check if table is read-only
+        target._checkReadOnly()
+
         // Handle data property
         if (prop === 'data') {
           target.data = value
@@ -1094,7 +1202,7 @@ class NestedTable {
           } else {
             // If setting a raw value, wrap it in a NestedTable
             const newPath = [...target._path, index]
-            target._items[index] = new NestedTable(target.sm, value, target, newPath)
+            target._items[index] = new NestedTable(target.sm, value, target, newPath, target._readOnly)
           }
         } else {
           target[prop] = value
@@ -1104,6 +1212,32 @@ class NestedTable {
     })
 
     return selfProxy
+  }
+
+  /**
+   * Checks if the table is read-only and throws an error if it is.
+   *
+   * @param {string} operation - The name of the operation being attempted
+   * @throws {Error} If the table is read-only
+   * @private
+   */
+  _checkReadOnly() {
+    if (this._readOnly) {
+      throw new Error('Table is read-only')
+    }
+  }
+
+  /**
+   * Checks if the table is read-only.
+   *
+   * @returns {boolean} True if the table is read-only, false otherwise
+   */
+  get isReadOnly() {
+    return this._readOnly
+  }
+
+  get readOnly() {
+    return this._readOnly
   }
 
   /**
@@ -1195,6 +1329,7 @@ class NestedTable {
    * @returns {NestedTable|undefined} The removed item or undefined if empty
    */
   pop() {
+    this._checkReadOnly()
     return this._items.pop()
   }
 

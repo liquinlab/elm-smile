@@ -203,8 +203,9 @@ describe('NestedTable', () => {
 
       // expect(table.push).toBeInstanceOf(Function)
       expect(table.print).toBeInstanceOf(Function)
-      // expect(table.pop).toBeInstanceOf(Function)
       expect(table.pop).toBeInstanceOf(Function)
+
+      expect(table.setReadOnly).toBeInstanceOf(Function)
     })
 
     it('should provide array-like access to rows', () => {
@@ -2121,6 +2122,64 @@ describe('NestedTable', () => {
           })
         }).toThrow('Invalid index 2 returned by custom sampling function')
       })
+    })
+  })
+
+  describe('setReadOnly()', () => {
+    it('should set the read-only status of the table', () => {
+      const table1 = table.append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+      ])
+
+      table1.setReadOnly(true)
+
+      expect(table1.isReadOnly).toBe(true)
+    })
+
+    it('should set the read-only status of nested tables', () => {
+      const table1 = table.append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+      ])
+      table1[0].setReadOnly(true)
+
+      expect(table1[0].isReadOnly).toBe(true)
+    })
+
+    it('should not allow setting read-only status of a read-only table', () => {
+      const table1 = table.append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+      ])
+      table1.setReadOnly(true)
+
+      expect(() => table1[0].setReadOnly(true)).toThrow('Table is read-only')
+    })
+
+    it('should not allow setting read-only status of a nested table', () => {
+      const table1 = table.append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+      ])
+
+      // First add an item to table1[0] so table1[0][0] exists
+      table1[0].append({ id: 3, value: 'c' })
+
+      table1[0].setReadOnly(true)
+
+      expect(() => table1[0][0].setReadOnly(true)).toThrow('Table is read-only')
+    })
+
+    it('should now allow modifications to a read-only table', () => {
+      const table1 = table.append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+      ])
+      table1.setReadOnly(true)
+
+      expect(() => table1.append({ id: 3, value: 'c' })).toThrow('Table is read-only')
+      expect(() => table1[0].append({ id: 3, value: 'c' })).toThrow('Table is read-only')
     })
   })
 
