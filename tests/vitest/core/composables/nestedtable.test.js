@@ -204,6 +204,7 @@ describe('NestedTable', () => {
       // expect(table.push).toBeInstanceOf(Function)
       expect(table.print).toBeInstanceOf(Function)
       // expect(table.pop).toBeInstanceOf(Function)
+      expect(table.pop).toBeInstanceOf(Function)
     })
 
     it('should provide array-like access to rows', () => {
@@ -525,6 +526,25 @@ describe('NestedTable', () => {
         { color: 'blue', shape: 'square' },
         { color: 'green', shape: 'circle' },
       ])
+    })
+  })
+
+  describe('pop()', () => {
+    it('should remove and return the last item', () => {
+      const table1 = table.append([{ value: 1 }, { value: 2 }, { value: 3 }])
+      const lastItem = table1.pop()
+      expect(lastItem.data).toEqual({ value: 3 })
+      expect(table1.rows).toHaveLength(2)
+      expect(table1.rowsdata).toEqual([{ value: 1 }, { value: 2 }])
+    })
+
+    it('should return undefined if the table is empty', () => {
+      const table1 = table
+
+      const lastItem = table1.pop()
+      expect(lastItem).toBeUndefined()
+      expect(table1.rows).toHaveLength(0)
+      expect(table1.rowsdata).toEqual([])
     })
   })
 
