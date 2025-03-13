@@ -2,7 +2,7 @@ import { ref, computed } from 'vue'
 import useSmileStore from '@/core/stores/smilestore'
 import { useRoute } from 'vue-router'
 import { StepperStateMachine } from '@/core/composables/StepperStateMachine'
-import { NestedTable } from '@/core/composables/NestedTable'
+import NestedTable from '@/core/composables/NestedTable'
 import { v4 as uuidv4 } from 'uuid'
 
 export function useHStepper() {
@@ -30,7 +30,7 @@ export function useHStepper() {
   // }
 
   // Get all protected methods from a temporary table instance
-  const PROTECTED_METHODS = new NestedTable({}).getProtectedTableMethods()
+  const PROTECTED_METHODS = new NestedTable(sm).getProtectedTableMethods()
 
   // Internal reactive refs
   const _currentValue = ref(null)
@@ -81,7 +81,7 @@ export function useHStepper() {
     // Create new table instance with access to stepper for nested tables
     table: () => {
       const tableId = uuidv4()
-      const table = new NestedTable({ table: stepper.table, sm })
+      const table = new NestedTable(sm)
 
       // Store the table in our internal map
       tables.set(tableId, table)
