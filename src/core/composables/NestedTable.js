@@ -1062,7 +1062,6 @@ class NestedTable {
       'shuffle',
       'sample',
       'repeat',
-      'push',
       'forEach',
       'zip',
       'outer',

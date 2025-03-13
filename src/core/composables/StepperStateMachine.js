@@ -98,58 +98,6 @@ export class StepperStateMachine {
   }
 
   /**
-   * Pushes a nested table structure into the state machine, preserving hierarchy
-   * @param {Array} rows - Array of row objects that may contain nested tables
-   * @returns {StepState} The root state that was created
-   */
-  push_table(rows) {
-    if (!Array.isArray(rows)) {
-      throw new Error('push_table() requires an array of rows')
-    }
-
-    const processRows = (rows, parentState) => {
-      // Get the current length of states to continue indexing from there
-      const startIndex = parentState.states.length
-
-      rows.forEach((row, localIndex) => {
-        // Use the startIndex + localIndex to continue the sequence
-        const state = parentState.push(startIndex + localIndex)
-
-        // Create a copy of the row data without the nested table property
-        const rowData = { ...row }
-
-        // Check for nested table using Symbol
-        const nestedTable = row[Symbol.for('table')]
-        if (nestedTable && nestedTable.rows) {
-          delete rowData[Symbol.for('table')]
-          processRows(nestedTable.rows, state)
-        }
-
-        // Store the row data in the state
-        state.setData(rowData)
-      })
-    }
-
-    // Start processing from the root
-    processRows(rows, this.stepState)
-
-    // Initialize all levels to their first state
-    const initializeState = (state) => {
-      if (state.states.length > 0) {
-        state.currentIndex = 0
-        initializeState(state.states[0])
-      }
-    }
-
-    // Move to the first state at all levels
-    if (this.stepState.states.length > 0) {
-      initializeState(this.stepState)
-    }
-
-    return this.stepState
-  }
-
-  /**
    * Moves to and returns the next state value in the sequence
    * @returns {*} The next state value or null if no next state exists
    */
