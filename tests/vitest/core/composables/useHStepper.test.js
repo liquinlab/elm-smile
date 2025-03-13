@@ -271,7 +271,7 @@ describe('useHStepper composable', () => {
           row.range(10)
           //return row // Return the row to ensure changes are captured
         })
-      table.print()
+      //table.print()
       expect(table).toBeInstanceOf(NestedTable)
       expect(table.length).toBe(10) // preferred way to access
       expect(table.rows).toBeInstanceOf(Array)
@@ -457,7 +457,7 @@ describe('useHStepper composable', () => {
             { type: 'rest', index: 2 },
           ]) // Each parent has 3 nested trials
         })
-      trials.print()
+      //trials.print()
       trials.push()
 
       console.log(stepper.sm.getTreeDiagram())
@@ -870,7 +870,7 @@ describe('useHStepper composable', () => {
         ])
       })
       trials.shuffle('1234')
-      trials.print()
+      //trials.print()
 
       expect(trials[0].length).toBe(1)
       expect(Object.keys(trials[0]).length).toBe(2)
