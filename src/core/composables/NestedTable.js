@@ -1075,8 +1075,8 @@ class NestedTable {
       'getSubtreeData',
 
       // Getters
-      'path',
-      'paths',
+      //'path',
+      //'paths',
       'length',
       'rows',
       'rowsdata',

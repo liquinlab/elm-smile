@@ -34,7 +34,8 @@ export function useHStepper() {
 
   // Internal reactive refs
   const _currentValue = ref(null)
-  const _currentPath = ref('')
+  const _currentPath = ref(null)
+  const _currentPathStr = ref('')
 
   // Create the stepper object that will be returned
   const stepper = {
@@ -43,9 +44,11 @@ export function useHStepper() {
       const nextValue = sm.next()
       if (nextValue !== null) {
         _currentValue.value = sm.getDataAlongPath()
-        _currentPath.value = sm.getCurrentPathStr()
+        _currentPathStr.value = sm.getCurrentPathStr()
+        _currentPath.value = sm.getCurrentPath()
       } else {
         _currentValue.value = null
+        _currentPathStr.value = null
         _currentPath.value = null
       }
       return nextValue
@@ -54,9 +57,11 @@ export function useHStepper() {
       const prevValue = sm.prev()
       if (prevValue !== null) {
         _currentValue.value = sm.getDataAlongPath()
-        _currentPath.value = sm.getCurrentPathStr()
+        _currentPathStr.value = sm.getCurrentPathStr()
+        _currentPath.value = sm.getCurrentPath()
       } else {
         _currentValue.value = null
+        _currentPathStr.value = null
         _currentPath.value = null
       }
       return prevValue
@@ -66,10 +71,12 @@ export function useHStepper() {
       if (sm.stepState.states.length > 0) {
         sm.next() // Move to first state after reset
         _currentValue.value = sm.getDataAlongPath()
-        _currentPath.value = sm.getCurrentPathStr()
+        _currentPathStr.value = sm.getCurrentPathStr()
+        _currentPath.value = sm.getCurrentPath()
       } else {
         _currentValue.value = null
-        _currentPath.value = ''
+        _currentPathStr.value = null
+        _currentPath.value = null
       }
     },
     // Push method for directly pushing a table to the state machine
@@ -147,7 +154,8 @@ export function useHStepper() {
 
         // Update the current value and path
         _currentValue.value = sm.getDataAlongPath()
-        _currentPath.value = sm.getCurrentPathStr()
+        _currentPathStr.value = sm.getCurrentPathStr()
+        _currentPath.value = sm.getCurrentPath()
       }
 
       return table
@@ -157,6 +165,12 @@ export function useHStepper() {
       return _currentValue.value === null ? null : _currentValue.value || []
     },
     get index() {
+      return _currentPathStr.value
+    },
+    get paths() {
+      return _currentPathStr.value
+    },
+    get path() {
       return _currentPath.value
     },
     // Expose state machine with wrapped getData
