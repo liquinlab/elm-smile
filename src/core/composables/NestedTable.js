@@ -1048,6 +1048,46 @@ class NestedTable {
   }
 
   /**
+   * Returns a list of methods that should only be called after a table is created.
+   * These are the chainable methods that operate on the table's rows.
+   *
+   * @returns {Array<string>} Array of method names
+   */
+  getProtectedTableMethods() {
+    // Return a hardcoded list of protected methods and getters
+    // This is more reliable than introspection for this use case
+    return [
+      // Methods
+      'append',
+      'shuffle',
+      'sample',
+      'repeat',
+      'push',
+      'forEach',
+      'zip',
+      'outer',
+      'range',
+      'print',
+      'slice',
+      'partition',
+      'indexOf',
+      'interleave',
+      'pop',
+      'getSubtreeData',
+
+      // Getters
+      'path',
+      'paths',
+      'length',
+      'rows',
+      'rowsdata',
+      'isReadOnly',
+      'readOnly',
+      'pathdata',
+    ]
+  }
+
+  /**
    * Checks if the table is read-only and throws an error if it is.
    *
    * @param {string} operation - The name of the operation being attempted

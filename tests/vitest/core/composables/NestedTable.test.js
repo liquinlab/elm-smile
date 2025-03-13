@@ -2501,4 +2501,35 @@ describe('NestedTable', () => {
   //   expect(() => almostFullTable.append(sourceTable)).toThrow(/exceeds the safety limit/)
   // })
   //})
+
+  describe('getProtectedTableMethods', () => {
+    it('should include all public methods and getters of NestedTable', () => {
+      const table = new NestedTable({})
+      const protectedMethods = table.getProtectedTableMethods()
+
+      // Get all method names from the instance
+      const actualMethods = []
+
+      // Get method names
+      const methodNames = Object.getOwnPropertyNames(Object.getPrototypeOf(table)).filter(
+        (name) =>
+          name !== 'constructor' &&
+          name !== '_checkReadOnly' && // Skip private methods
+          name !== 'getProtectedTableMethods' && // Exclude the method itself
+          !name.startsWith('_') &&
+          typeof table[name] === 'function'
+      )
+      actualMethods.push(...methodNames)
+
+      // Get getter names (excluding Symbol properties)
+      const descriptors = Object.getOwnPropertyDescriptors(Object.getPrototypeOf(table))
+      const getterNames = Object.keys(descriptors).filter((key) => descriptors[key].get && !key.startsWith('_'))
+      actualMethods.push(...getterNames)
+
+      // Check that all actual methods are included in protected methods
+      actualMethods.forEach((method) => {
+        expect(protectedMethods).toContain(method, `Missing method in protectedMethods: ${method}`)
+      })
+    })
+  })
 })
