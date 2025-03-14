@@ -21,7 +21,18 @@ stepper.push(trials)
     <button @click="stepper.prev()" class="button is-primary m-2">Prev</button>
     <button @click="stepper.reset()" class="button is-danger m-2">Reset</button>
     <button @click="stepper.next()" class="button is-primary m-2">Next</button>
+    <br />
+    Tree diagram:
+    <div class="treediagram">
+      <pre>{{ stepper.sm.getTreeDiagram() }}</pre>
+    </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.treediagram {
+  text-align: left;
+  width: 200px;
+  margin: 0 auto;
+}
+</style>
