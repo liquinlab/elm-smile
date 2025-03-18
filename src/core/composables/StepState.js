@@ -358,6 +358,16 @@ export class StepState {
     return this.getCurrentPath().join('-')
   }
 
+  /**
+   * Gets the path string for this node by walking up the parent chain.
+   * Returns a hyphen-separated string of values representing each node's value,
+   * excluding the root node ('/').
+   * @returns {string} Hyphen-separated string representing the path to this node
+   */
+  getPathStr() {
+    return this.getPath().join('-')
+  }
+
   setData(data) {
     this.data = data
   }

@@ -145,6 +145,36 @@ describe('StepState', () => {
       stepper.next() // moves to named child
       expect(stepper.getCurrentPathStr()).toBe('child2-named')
     })
+
+    describe('getPath and getPathStr', () => {
+      it('should get empty path for root node', () => {
+        expect(stepper.getPath()).toEqual([])
+        expect(stepper.getPathStr()).toBe('')
+      })
+
+      it('should get correct path and pathStr for single level', () => {
+        const child = stepper.push('child')
+        expect(child.getPath()).toEqual(['child'])
+        expect(child.getPathStr()).toBe('child')
+      })
+
+      it('should get correct path and pathStr for multiple levels', () => {
+        const child = stepper.push('child')
+        const grandchild = child.push('grandchild')
+        const greatgrandchild = grandchild.push('great')
+
+        expect(greatgrandchild.getPath()).toEqual(['child', 'grandchild', 'great'])
+        expect(greatgrandchild.getPathStr()).toBe('child-grandchild-great')
+      })
+
+      it('should handle numeric values in path', () => {
+        const child = stepper.push() // Will be 0 (number)
+        const grandchild = child.push('named')
+
+        expect(grandchild.getPath()).toEqual([0, 'named']) // Changed from ['0', 'named']
+        expect(grandchild.getPathStr()).toBe('0-named')
+      })
+    })
   })
 
   describe('navigation', () => {
