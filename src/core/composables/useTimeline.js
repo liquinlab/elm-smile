@@ -44,7 +44,7 @@ export default function useTimeline() {
     return null
   }
 
-  const gotoView = async (view, force = true) => {
+  const goToView = async (view, force = true) => {
     // unfortunately this is required because the router
     // doesn't allow you to pass configuration options
     // directly to the router.push() function
@@ -79,5 +79,5 @@ export default function useTimeline() {
     navigateTo(prevView())
   }
 
-  return { goNextView, goPrevView, gotoView, lookupNext }
+  return { goNextView, goPrevView, goToView, lookupNext }
 }

@@ -50,10 +50,10 @@ watch(altKeyState, (value) => {
 function navigate(route) {
   if (forceMode.value) {
     log.warn(`DEV MODE: user requested to FORCE navigate to ${route}`)
-    api.gotoView(route, true)
+    api.goToView(route, true)
   } else {
     log.warn(`DEV MODE: user requested to navigate to ${route}`)
-    api.gotoView(route, false)
+    api.goToView(route, false)
   }
   // dismiss hover if open but not if panel is set to remain visible.
   //api.dev.route_panel.visible = false

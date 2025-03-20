@@ -54,7 +54,9 @@ Because SPAs load the entire app from a single URL, the solution to this for
 SPAs is known as a **router**. A router is a piece of software running in the
 browser which interprets URL requests and programmatically changes the visible
 content on the webpage, mimicking normal browser requests for specific pages. In
-<SmileText/>, routing is handled by the [Vue Router](https://router.vuejs.org), which is a powerful open-source project built for routing in [Vue](https://vuejs.org) applications.
+<SmileText/>, routing is handled by the [Vue Router](https://router.vuejs.org),
+which is a powerful open-source project built for routing in
+[Vue](https://vuejs.org) applications.
 
 <SmileText/> does all of the router set-up for you, so
 [all you need to do](/timeline#timeline) is provide a list of Views, as well as
@@ -529,7 +531,7 @@ View to the next?
 In each View, we need to tell the Timeline when that component is "finished,"
 allowing the Timeline to pass control to the next View in the sequence. To do
 this, the [API](/api) includes three navigation functions: `goNextView()`,
-`goPrevView()`, and `gotoView(view_name)`.
+`goPrevView()`, and `goToView(view_name)`.
 
 Here is a complete, simple SFC component that imports the API and uses it to
 advance to the next route in the sequence when the user clicks a button (calling
@@ -596,7 +598,7 @@ const api = useAPI()
 
 function go_to_instructions() {
   console.log('go')
-  api.gotoView('instructions')
+  api.goToView('instructions')
 }
 ```
 

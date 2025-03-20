@@ -22,7 +22,7 @@ import { useStepper } from '@/core/composables/useStepper'
 import useLog from '@/core/stores/log'
 
 export default function useAPI() {
-  const { goNextView, goPrevView, gotoView } = useTimeline()
+  const { goNextView, goPrevView, goToView } = useTimeline()
   const route = useRoute()
   const router = useRouter()
   const smilestore = useSmileStore()
@@ -39,7 +39,7 @@ export default function useAPI() {
     router: router,
     goNextView: goNextView,
     goPrevView: goPrevView,
-    gotoView: gotoView,
+    goToView: goToView,
     faker: faker_distributions,
     hasNextView: () => route.meta.next && route.meta.sequential,
     hasPrevView: () => route.meta.prev && route.meta.sequential,
@@ -58,9 +58,6 @@ export default function useAPI() {
     },
     isResetApp: () => {
       return smilestore.local.reset
-    },
-    resetStore: () => {
-      smilestore.resetLocal()
     },
     resetLocalState() {
       localStorage.removeItem(api.config.local_storage_key) // delete the local store
@@ -296,8 +293,7 @@ export default function useAPI() {
         })
       }, 1)
     },
-    completeConsent: async () => {
-      api.setConsented()
+    createDBRecord: async () => {
       if (!api.local.knownUser) {
         await api.setKnown() // set new user and add document, then assign conditions
       }

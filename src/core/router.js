@@ -21,7 +21,8 @@ function addGuards(r) {
 
     // check if status change on previous
     if (from.meta !== undefined && from.meta.setConsented !== undefined && from.meta.setConsented) {
-      api.completeConsent()
+      api.setConsented()
+      api.createDBRecord()
     }
 
     if (from.meta !== undefined && from.meta.setDone !== undefined && from.meta.setDone) {
@@ -116,7 +117,7 @@ function addGuards(r) {
         'ROUTER GUARD: Allowing direct, out-of-order navigation to /' +
           to.name +
           //to.meta.allowAlways +,
-          '.  This is being forced by api.gotoView().'
+          '.  This is being forced by api.goToView().'
       )
       smilestore.setLastRoute(to.name)
       smilestore.recordRoute(to.name)

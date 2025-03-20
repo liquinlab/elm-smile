@@ -21,51 +21,54 @@ available methods and their descriptions.
 
 ## Navigation
 
-- `goNextView()`: Advances to the next view in the experiment.
-- `goPrevView()`: Returns to the previous view in the experiment.
-- `gotoView(view)`: Navigates to a specific view.
-- `goBack()`: Returns to the previous page.
-- `hasNextView()`: Checks if there's a next view available.
-- `hasPrevView()`: Checks if there's a previous view available.
+- `goNextView()`: Advances to the next View in the timeline.
+- `goPrevView()`: Returns to the previous View in the timeline.
+- `goToView(view)`: Navigates to a specific View (by name).
+- `hasNextView()`: Checks if there's a next View available.
+- `hasPrevView()`: Checks if there's a previous View available.
 
 ## State Management
 
-- `resetStore()`: Resets the local store.
-- `resetLocalState()`: Resets the local state and redirects to the landing page.
-- `setKnown()`: Marks the user as known.
+- `resetLocalState()`: Clears all locally stored data, and redirects to the
+  landing page.
+- `setKnown()`: Marks the user as known (has begun the experiment).
 - `setDone()`: Marks the experiment as done.
 - `setConsented()`: Marks that the user has consented.
-- `setWithdrawn(forminfo)`: Marks that the user has withdrawn and saves form
-  information.
-- `verifyVisibility(value)`: Sets the verified visibility state.
-- `saveForm(name, data)`: Saves form data.
-- `getVerifiedVisibility()`: Retrieves the verified visibility state.
-- `setCompletionCode(code)`: Sets the completion code for the experiment.
+- `setWithdrawn(forminfo)`: Marks that the user has withdrawn and saves
+  information from withdrawal form.
+- `verifyVisibility(value)`: Marks that the user can/can't see the whole
+  experiment page (see [WindowSizer](views#window-sizer)).
+- `getVerifiedVisibility()`: Retrieves the verified visibility state (true or
+  false).
+- `setCompletionCode(code)`: Sets the completion code for the experiment to
+  `code`.
 - `resetApp()`: Resets the entire application state.
 - `isResetApp()`: Checks if the app has been reset.
+
+## Name this section
+
 - `setAppComponent(key, value)`: Sets a global component configuration.
 - `getAppComponent(key)`: Retrieves a global component configuration.
 - `setRuntimeConfig(key, value)`: Sets a runtime configuration option.
 - `getConfig(key)`: Retrieves a configuration option (first searches config then
   runtime)
+- `getConditionByName(name)`: Retrieves a condition by its name.
 
 ## Data and Configuration Access
 
 - `config`: Accesses the configuration.
 - `data`: Accesses the data store.
+- `private`: Accesses private data store.
+- `all_data`: Accesses combined private and data stores.
 - `local`: Accesses local storage.
 - `global`: Accesses global settings.
 - `dev`: Accesses development-only settings.
 - `route`: Accesses the current route.
 - `router`: Accesses the router object.
 - `urls`: Accesses URL configurations.
-- `private`: Accesses private data store.
-- `all_data`: Accesses combined private and data stores.
 
 ## Utility Functions
 
-- `faker`: Provides access to faker distributions for generating random data.
-- `shuffle`: Shuffles an array.
 - `useStepper`: Provides trial stepper functionality.
 - `isBrowserTooSmall()`: Checks if the browser window is too small.
 - `setPageAutofill(autofill)`: Sets up page autofill (development mode only).
@@ -88,17 +91,18 @@ available methods and their descriptions.
   by the smile library in `src/assets`. See
   [Images and Video](/imagesvideo#referring-to-static-assets-using-code) for
   more information.
+
+## Randomization Functions
+
 - `randomSeed(seed)`: Sets a new global random seed that will remain in use
   until the next route.
 - `randomAssignCondition(conditionObject)`: Randomly assigns a condition based
   on the provided condition object. Supports weighted randomization.
-- `getConditionByName(name)`: Retrieves a condition by its name.
+- `shuffle`: Shuffles an array.
 - `randomInt()`: Generates a random integer.
 - `sampleWithReplacement()`: Samples items from an array with replacement.
 - `sampleWithoutReplacement()`: Samples items from an array without replacement.
-- `setRuntimeConfig(key, value)`: Sets a runtime configuration option.
-- `getConfig(key)`: Retrieves a configuration option (first searches config then
-  runtime)
+- `faker`: Accesses faker distributions for generating random data.
 
 ## Logging and Debugging
 
@@ -109,16 +113,15 @@ available methods and their descriptions.
 
 ## Data Recording
 
+- `createDBRecord()`: Creates a record in the Firestore database for the
+  participant.
 - `recordWindowEvent(type, event_data = null)`: Records a window event.
 - `incrementTrial()`: Increments the trial counter.
 - `decrementTrial()`: Decrements the trial counter.
 - `resetTrial()`: Resets the trial counter.
 - `saveData(force)`: Saves the current data (force save if specified).
+- `saveForm(name, data)`: Saves form data for any arbitrarily named form (see
+  [DemographicSurvey](views#demographic-survey) for an example).
 - `recordTrialData(data)`: Records trial-specific data. This does not save the
   data to the database, but it does record it in the local state. The next call
   to `saveData()` will save the data to the database.
-
-## Consent Management
-
-- `completeConsent()`: Completes the consent process, setting the user as known
-  and consented.

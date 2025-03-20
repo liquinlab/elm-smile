@@ -15,7 +15,7 @@ const router = useRouter()
     <p class="control" v-if="api.hasPrevView()">
       <button
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
-        v-on:click="api.gotoView(route?.meta?.prev)"
+        v-on:click="api.goToView(route?.meta?.prev)"
         data-tooltip="Previous page"
       >
         <span>
