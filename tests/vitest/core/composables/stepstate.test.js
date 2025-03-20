@@ -96,6 +96,100 @@ describe('StepState', () => {
     })
   })
 
+  describe('insert operations', () => {
+    it('should insert at beginning with index 0', () => {
+      const root = new StepState()
+      const first = root.push('first')
+      const inserted = root.insert('inserted', 0)
+
+      expect(root.states[0].value).toBe('inserted')
+      expect(root.states[1].value).toBe('first')
+      expect(inserted.parent).toBe(root)
+    })
+
+    it('should insert at end with -1', () => {
+      const root = new StepState()
+      const first = root.push('first')
+      const inserted = root.insert('inserted', -1)
+
+      expect(root.states[0].value).toBe('first')
+      expect(root.states[1].value).toBe('inserted')
+      expect(inserted.parent).toBe(root)
+    })
+
+    it('should insert at end with -1', () => {
+      const root = new StepState()
+      const first = root.push('first')
+      const second = root.push('second')
+      const inserted = root.insert('inserted', -1)
+
+      expect(root.states[0].value).toBe('first')
+      expect(root.states[1].value).toBe('second')
+      expect(root.states[2].value).toBe('inserted')
+      expect(inserted.parent).toBe(root)
+    })
+
+    it('should insert at second to end with -2', () => {
+      const root = new StepState()
+      const first = root.push('first')
+      const second = root.push('second')
+      const inserted = root.insert('inserted', -2)
+
+      expect(root.states[0].value).toBe('first')
+      expect(root.states[1].value).toBe('inserted')
+      expect(root.states[2].value).toBe('second')
+      expect(inserted.parent).toBe(root)
+    })
+
+    it('should insert at second position with index 1', () => {
+      const root = new StepState()
+      const first = root.push('first')
+      const third = root.push('third')
+      const inserted = root.insert('inserted', 1)
+
+      expect(root.states[0].value).toBe('first')
+      expect(root.states[1].value).toBe('inserted')
+      expect(root.states[2].value).toBe('third')
+      expect(inserted.parent).toBe(root)
+    })
+
+    it('should handle inserting beyond list length', () => {
+      const root = new StepState()
+      const first = root.push('first')
+      const inserted = root.insert('inserted', 5)
+
+      expect(root.states[0].value).toBe('first')
+      expect(root.states[1].value).toBe('inserted')
+      expect(inserted.parent).toBe(root)
+    })
+
+    it('should handle negative indices beyond list length', () => {
+      const root = new StepState()
+      const first = root.push('first')
+      const inserted = root.insert('inserted', -5)
+
+      expect(root.states[0].value).toBe('inserted')
+      expect(root.states[1].value).toBe('first')
+      expect(inserted.parent).toBe(root)
+    })
+
+    it('should not allow inserting duplicate values', () => {
+      const root = new StepState()
+      root.push('A')
+
+      expect(() => root.insert('A', 0)).toThrow('State with value "A" already exists in this node')
+      expect(() => root.insert('A', -1)).toThrow('State with value "A" already exists in this node')
+    })
+
+    it('should auto-generate values when value is null', () => {
+      const root = new StepState()
+      root.push('first')
+      const inserted = root.insert(null, 0)
+
+      expect(inserted.value).toBe(1) // Should use states.length as value
+    })
+  })
+
   describe('path operations', () => {
     it('should get correct path', () => {
       const child = stepper.push('child')

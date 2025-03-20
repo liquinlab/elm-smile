@@ -31,6 +31,19 @@ export class StepState {
    * @throws {Error} If a state with the given value already exists
    */
   push(value = null) {
+    return this.insert(value, -1)
+  }
+
+  /**
+   * Inserts a new state at the specified position in the list of children.
+   * @param {*} value - Optional value for the new state. If null, uses states.length
+   * @param {number} index - Position to insert at. Can be positive (0-based) or negative (from end).
+   *                         If positive and beyond list length, appends to end.
+   *                         If negative and beyond list length, prepends to start.
+   * @returns {StepState} The newly created child state
+   * @throws {Error} If a state with the given value already exists
+   */
+  insert(value = null, index = 0) {
     const autoValue = value === null ? this.states.length : value
 
     // Check for existing state with same value
@@ -39,7 +52,18 @@ export class StepState {
     }
 
     const state = new StepState(autoValue, this)
-    this.states.push(state)
+
+    // Handle negative indices
+    if (index < 0) {
+      index = this.states.length + index + 1
+    }
+
+    // Handle positive indices beyond list length
+    if (index > this.states.length) {
+      index = this.states.length
+    }
+
+    this.states.splice(index, 0, state)
     return state
   }
 
