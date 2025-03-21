@@ -17,16 +17,6 @@ const buttonstyle = computed(() => {
 
 <template>
   <div class="field has-addons">
-    <p class="control">
-      <button
-        class="button is-small is-jump-bar has-tooltip-arrow has-tooltip-bottom"
-        data-tooltip="Current trial counter"
-        :disabled="api.store.dev.page_provides_trial_stepper == false"
-      >
-        <span class="counter">{{ api.getPageTrackerIndex(api.currentRouteName()) }}</span>
-      </button>
-    </p>
-
     <p class="control" v-if="api.hasAutofill()">
       <button
         class="button is-small is-jump-bar has-tooltip-arrow has-tooltip-bottom"
@@ -38,6 +28,44 @@ const buttonstyle = computed(() => {
         </span>
       </button>
     </p>
+    <p class="control" v-if="api.hasPrevView()">
+      <button
+        class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
+        v-on:click="api.gotoView(api.route?.meta?.prev)"
+        data-tooltip="Previous page"
+      >
+        <span>
+          <FAIcon icon="fa-solid fa-angles-left" />
+        </span>
+      </button>
+    </p>
+    <p class="control" v-else>
+      <button class="button is-small devbar-button" disabled>
+        <span>
+          <FAIcon icon="fa-solid fa-angles-left" />
+        </span>
+      </button>
+    </p>
+
+    <p class="control" v-if="api.hasNextView()">
+      <button
+        class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
+        v-on:click="api.goNextView()"
+        data-tooltip="Step page forward"
+      >
+        <span>
+          <FAIcon icon="fa-solid fa-angles-right" />
+        </span>
+      </button>
+    </p>
+    <p class="control" v-else>
+      <button class="button is-small devbar-button" disabled>
+        <span>
+          <FAIcon icon="fa-solid fa-angles-right" />
+        </span>
+      </button>
+    </p>
+
     <div class="dropdown is-hoverable is-right" :class="{ 'is-active': api.store.dev.route_panel.visible }">
       <div class="dropdown-trigger">
         <p class="control is-route">
