@@ -41,28 +41,22 @@ export function useHStepper() {
   const stepper = {
     // Navigation methods
     next: () => {
-      const nextValue = sm.next()
+      let nextValue = sm.next() // we can trust as StepperStateMachine handles EOS
+
       if (nextValue !== null) {
-        _currentValue.value = sm.getDataAlongPath()
-        _currentPathStr.value = sm.getCurrentPathStr()
-        _currentPath.value = sm.getCurrentPath()
-      } else {
-        _currentValue.value = null
-        _currentPathStr.value = null
-        _currentPath.value = null
+        _currentValue.value = sm.pathdata
+        _currentPathStr.value = sm.currentPaths
+        _currentPath.value = sm.currentPath
       }
       return nextValue
     },
     prev: () => {
-      const prevValue = sm.prev()
+      let prevValue = sm.prev() // we can trust as StepperStateMachine handles SOS
+
       if (prevValue !== null) {
-        _currentValue.value = sm.getDataAlongPath()
-        _currentPathStr.value = sm.getCurrentPathStr()
-        _currentPath.value = sm.getCurrentPath()
-      } else {
-        _currentValue.value = null
-        _currentPathStr.value = null
-        _currentPath.value = null
+        _currentValue.value = sm.pathdata
+        _currentPathStr.value = sm.currentPaths
+        _currentPath.value = sm.currentPath
       }
       return prevValue
     },
@@ -70,13 +64,9 @@ export function useHStepper() {
       sm.reset()
       if (sm.stepState.states.length > 0) {
         sm.next() // Move to first state after reset
-        _currentValue.value = sm.getDataAlongPath()
-        _currentPathStr.value = sm.getCurrentPathStr()
-        _currentPath.value = sm.getCurrentPath()
-      } else {
-        _currentValue.value = null
-        _currentPathStr.value = null
-        _currentPath.value = null
+        _currentValue.value = sm.pathdata
+        _currentPathStr.value = sm.currentPaths
+        _currentPath.value = sm.currentPath
       }
     },
     // Push method for directly pushing a table to the state machine
@@ -93,19 +83,24 @@ export function useHStepper() {
 
       // Recursive function to process NestedTable structure
       const processTable = (nestedTable, parentState, level = 0) => {
-        // Get the starting index for appending new items (preserves existing items)
-        const startIndex = parentState.states.length
+        // Get the starting index for appending new items (excludes SOS/EOS nodes)
+        const startIndex = parentState.states.filter((state) => state.value !== 'SOS' && state.value !== 'EOS').length
 
         // Get all items at this level
         for (let i = 0; i < nestedTable._items.length; i++) {
           const item = nestedTable._items[i]
 
           // Create a new state in the state machine, using startIndex + i to ensure unique indices
-          const state = parentState.push(startIndex + i)
+          let state
+          if (level == 0) {
+            state = parentState.insert(startIndex + i, -2)
+          } else {
+            state = parentState.push(startIndex + i)
+          }
 
           // Set data for this item
           if (item.data !== undefined) {
-            state.setData(item.data)
+            state.data = item.data
           }
 
           // Process child items if they exist - need to handle all nested elements
@@ -153,9 +148,9 @@ export function useHStepper() {
         }
 
         // Update the current value and path
-        _currentValue.value = sm.getDataAlongPath()
-        _currentPathStr.value = sm.getCurrentPathStr()
-        _currentPath.value = sm.getCurrentPath()
+        _currentValue.value = sm.pathdata
+        _currentPathStr.value = sm.currentPaths
+        _currentPath.value = sm.currentPath
       }
 
       return table
@@ -178,6 +173,29 @@ export function useHStepper() {
       return sm
     },
 
+    // Get a structure representation of the state machine tree
+    visualizeStateMachine: () => {
+      // Helper function to recursively process each state
+      const processState = (state, level = 0) => {
+        // Create a clean object without currentIndex, depth, and parent
+        const cleanState = {
+          data: state.data,
+          path: state.paths,
+          states: [],
+        }
+
+        // Process each child state
+        state.states.forEach((childState) => {
+          cleanState.states.push(processState(childState, level + 1))
+        })
+
+        return cleanState
+      }
+
+      // Start processing from the root state
+      return processState(sm.stepState)
+    },
+
     // Create new table instance with access to stepper for nested tables
     table: () => {
       const tableId = uuidv4()
@@ -197,7 +215,7 @@ export function useHStepper() {
   }
 
   // Add protected methods to the stepper instance
-  PROTECTED_METHODS.forEach((method) => {
+  PROTECTED_METHODS.filter((method) => method !== 'path' && method !== 'paths').forEach((method) => {
     Object.defineProperty(stepper, method, {
       get() {
         throw new Error(`${method}() must be called after table()`)
