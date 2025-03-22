@@ -17,11 +17,12 @@ const buttonstyle = computed(() => {
 
 <template>
   <div class="field has-addons">
-    <p class="control" v-if="api.hasAutofill()">
+    <p class="control">
       <button
         class="button is-small is-jump-bar has-tooltip-arrow has-tooltip-bottom"
         v-on:click="api.autofill()"
-        data-tooltip="Autofill Form"
+        :data-tooltip="api.hasAutofill() ? 'Autofill Form' : 'No form to autofill'"
+        :disabled="!api.hasAutofill()"
       >
         <span>
           <FAIcon icon="fa-solid fa-pen-to-square" />
@@ -87,10 +88,6 @@ const buttonstyle = computed(() => {
   border-bottom-left-radius: 0;
 }
 
-.counter {
-  font-size: 0.9em;
-  padding-top: 2px;
-}
 .dropdown {
   margin-top: 0;
 }
