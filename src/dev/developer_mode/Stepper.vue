@@ -10,19 +10,6 @@ const altKeyState = useKeyModifier('Alt')
   <div class="field has-addons">
     <p class="control">
       <button
-        v-if="altKeyState"
-        class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
-        v-on:click="api.resetTrial()"
-        data-tooltip="Reset trial to 0"
-        :disabled="api.store.dev.page_provides_trial_stepper == false"
-      >
-        <span>
-          <FAIcon icon="fa-solid fa-circle-chevron-left" />
-        </span>
-      </button>
-
-      <button
-        v-else
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
         v-on:click="api.decrementTrial()"
         data-tooltip="Step trial back"
@@ -64,5 +51,11 @@ const altKeyState = useKeyModifier('Alt')
   font-size: 0.65rem;
   height: 2em;
   margin: 0px;
+}
+.counter {
+  font-size: 0.95em;
+  padding-top: 2px;
+  font-family: monospace;
+  font-weight: 500;
 }
 </style>
