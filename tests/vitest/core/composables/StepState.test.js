@@ -482,6 +482,140 @@ describe('StepState', () => {
     })
   })
 
+  describe('resetTo operations', () => {
+    it('should reset to a leaf node correctly', () => {
+      const child1 = stepper.push('child1')
+      const child2 = stepper.push('child2')
+      const grandchild1 = child1.push('grandchild1')
+      const grandchild2 = child1.push('grandchild2')
+
+      // Reset to a leaf node
+      stepper.resetTo(['child1', 'grandchild1'])
+      expect(stepper.currentPath).toEqual(['child1', 'grandchild1'])
+    })
+
+    it('should reset to a non-leaf node and traverse to leftmost leaf', () => {
+      const child1 = stepper.push('child1')
+      const child2 = stepper.push('child2')
+      const grandchild1 = child1.push('grandchild1')
+      const grandchild2 = child1.push('grandchild2')
+      const grandchild3 = child2.push('grandchild3')
+
+      stepper.next()
+      stepper.next()
+      stepper.next()
+      stepper.next()
+      // Reset to a non-leaf node
+      stepper.resetTo(['child1'])
+      expect(stepper.currentPath).toEqual(['child1', 'grandchild1'])
+    })
+
+    it('should handle numeric path values correctly', () => {
+      const child1 = stepper.push()
+      const child2 = stepper.push()
+      const grandchild1 = child1.push()
+      const grandchild2 = child1.push()
+
+      // Reset using numeric values
+      stepper.resetTo([0, 0])
+      expect(stepper.currentPath).toEqual([0, 0])
+    })
+
+    it('should handle mixed string and numeric path values', () => {
+      const child1 = stepper.push('child1')
+      const child2 = stepper.push()
+      const grandchild1 = child1.push('grandchild1')
+      const grandchild2 = child1.push()
+
+      // Reset using mixed values
+      stepper.resetTo(['child1', 'grandchild1'])
+      expect(stepper.currentPath).toEqual(['child1', 'grandchild1'])
+    })
+
+    it('should handle hyphen-separated string paths', () => {
+      const child1 = stepper.push('child1')
+      const child2 = stepper.push('child2')
+      const grandchild1 = child1.push('grandchild1')
+      const grandchild2 = child1.push('grandchild2')
+
+      // Reset using hyphen-separated string
+      stepper.resetTo('child1-grandchild1')
+      expect(stepper.currentPath).toEqual(['child1', 'grandchild1'])
+    })
+
+    it('should throw error for invalid path', () => {
+      const child1 = stepper.push('child1')
+      const child2 = stepper.push('child2')
+
+      // Try to reset to non-existent path
+      expect(() => stepper.resetTo(['nonexistent'])).toThrow('Invalid path')
+    })
+
+    it('should handle deep nested paths correctly', () => {
+      const child1 = stepper.push('child1')
+      const grandchild1 = child1.push('grandchild1')
+      const greatgrandchild1 = grandchild1.push('greatgrandchild1')
+      const greatgrandchild2 = grandchild1.push('greatgrandchild2')
+
+      // Reset to deepest leaf
+      stepper.resetTo(['child1', 'grandchild1', 'greatgrandchild1'])
+      expect(stepper.currentPath).toEqual(['child1', 'grandchild1', 'greatgrandchild1'])
+    })
+
+    it('should handle root path correctly', () => {
+      const child1 = stepper.push('child1')
+      const child2 = stepper.push('child2')
+
+      // Reset to root
+      stepper.resetTo(['/'])
+      expect(stepper.currentPath).toEqual(['child1'])
+    })
+
+    it('should maintain state after multiple resetTo calls', () => {
+      const child1 = stepper.push('child1')
+      const child2 = stepper.push('child2')
+      const grandchild1 = child1.push('grandchild1')
+      const grandchild2 = child1.push('grandchild2')
+
+      // Reset to different paths
+      stepper.resetTo(['child1', 'grandchild1'])
+      expect(stepper.currentPath).toEqual(['child1', 'grandchild1'])
+
+      stepper.resetTo(['child2'])
+      expect(stepper.currentPath).toEqual(['child2'])
+    })
+
+    it('should correctly update pathdata after resetTo', () => {
+      const child1 = stepper.push('child1')
+      const child2 = stepper.push('child2')
+      const grandchild1 = child1.push('grandchild1')
+      const grandchild2 = child1.push('grandchild2')
+      const grandchild3 = child2.push('grandchild3')
+
+      // Set data on various nodes
+      child1.data = { level: 1 }
+      grandchild1.data = { level: 2 }
+      grandchild2.data = { level: 3 }
+      child2.data = { level: 1 }
+      grandchild3.data = { level: 4 }
+
+      // Initially at first path
+      expect(stepper.pathdata).toEqual([{ level: 1 }, { level: 2 }])
+
+      // Reset to a different path
+      stepper.resetTo(['child2', 'grandchild3'])
+      expect(stepper.pathdata).toEqual([{ level: 1 }, { level: 4 }])
+
+      // Reset to another path
+      stepper.resetTo(['child1', 'grandchild2'])
+      expect(stepper.pathdata).toEqual([{ level: 1 }, { level: 3 }])
+
+      // Reset to a path with no data
+      stepper.resetTo(['child1'])
+      expect(stepper.pathdata).toEqual([{ level: 1 }, { level: 2 }])
+    })
+  })
+
   describe('navigation', () => {
     it('should reset to initial state', () => {
       stepper.push('first')

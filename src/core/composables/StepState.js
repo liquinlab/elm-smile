@@ -294,6 +294,56 @@ export class StepState {
   }
 
   /**
+   * Resets the state machine and navigates to the specified path.
+   * If the path points to a leaf node, stays at that leaf.
+   * If the path points to a non-leaf node, traverses to its leftmost leaf.
+   * @param {Array|string} path - Path to navigate to (array of values or hyphen-separated string)
+   * @throws {Error} If the path doesn't exist
+   */
+  resetTo(path) {
+    // Convert string path to array if needed
+    const pathArray = typeof path === 'string' ? path.split('-') : path
+    console.log('Navigating to path:', pathArray)
+
+    // Reset the state machine
+    this.reset()
+
+    // Start from root
+    let current = this
+    console.log('Starting at root:', current.value)
+
+    // Navigate through the path
+    for (const value of pathArray) {
+      // Skip the root '/' value if it's in the path
+      if (value === '/') continue
+
+      console.log('Looking for child with value:', value, 'in current node:', current.value)
+      console.log(
+        'Available children:',
+        current._states.map((s) => s.value)
+      )
+
+      // Find the child state with matching value, converting to string for comparison
+      const childState = current._states.find((state) => String(state.value) === String(value))
+      if (!childState) {
+        throw new Error(`Invalid path: ${path} (Could not find child with value "${value}" in node "${current.value}")`)
+      }
+
+      // Update current index to point to this child
+      current._currentIndex = current._states.indexOf(childState)
+      current = childState
+      console.log('Moved to node:', current.value)
+    }
+
+    // If we're at a non-leaf node, traverse to its leftmost leaf
+    while (current._states.length > 0) {
+      current._currentIndex = 0
+      current = current._states[0]
+      console.log('Traversing to leftmost leaf:', current.value)
+    }
+  }
+
+  /**
    * Moves to the next state in the sequence.
    * @returns {StepState|null} The next state or null if no next state exists
    */

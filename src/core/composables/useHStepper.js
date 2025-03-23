@@ -71,6 +71,14 @@ export function useHStepper() {
         _currentPath.value = sm.currentPath
       }
     },
+    resetTo: (path) => {
+      console.log('resetTo', path)
+      sm.resetTo(path)
+      // Update reactive refs after reset
+      _currentValue.value = sm.pathdata
+      _currentPathStr.value = sm.currentPaths
+      _currentPath.value = sm.currentPath
+    },
     // Push method for directly pushing a table to the state machine
     push: (table) => {
       // Check if the table is already read-only
