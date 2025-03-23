@@ -238,6 +238,11 @@ export class StepState {
       throw new Error(`State value already exists in this node (value: "${value}")`)
     }
 
+    // Check for hyphen in value
+    if (value !== null && String(value).includes('-')) {
+      throw new Error(`State value cannot contain hyphens (value: "${value}")`)
+    }
+
     const state = new StepState(autoValue, this)
     if (data !== null) {
       state.data = data

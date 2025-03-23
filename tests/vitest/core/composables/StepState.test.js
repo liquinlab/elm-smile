@@ -273,6 +273,28 @@ describe('StepState', () => {
       const inserted2 = root.insert('inserted2', 0)
       expect(root.currentPath).toEqual(['inserted2'])
     })
+
+    it('should not allow values containing hyphens', () => {
+      const root = new StepState()
+      expect(() => root.insert('test-value')).toThrow(/State value cannot contain hyphens/)
+      expect(() => root.insert('value-with-hyphens')).toThrow(/State value cannot contain hyphens/)
+      expect(() => root.insert('value-')).toThrow(/State value cannot contain hyphens/)
+      expect(() => root.insert('-value')).toThrow(/State value cannot contain hyphens/)
+    })
+
+    it('should allow values without hyphens', () => {
+      const root = new StepState()
+      expect(() => root.insert('testvalue')).not.toThrow()
+      expect(() => root.insert('value_with_underscores')).not.toThrow()
+      expect(() => root.insert('value.with.dots')).not.toThrow()
+      expect(() => root.insert('value:with:colons')).not.toThrow()
+    })
+
+    it('should allow auto-generated numeric values', () => {
+      const root = new StepState()
+      expect(() => root.insert(null)).not.toThrow()
+      expect(() => root.insert()).not.toThrow()
+    })
   })
 
   describe('push operations', () => {
