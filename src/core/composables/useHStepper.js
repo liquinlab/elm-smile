@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import useSmileStore from '@/core/stores/smilestore'
 import { useRoute } from 'vue-router'
-import { StepperStateMachine } from '@/core/composables/StepperStateMachine'
+import { StepState } from '@/core/composables/StepState'
 import NestedTable from '@/core/composables/NestedTable'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -14,7 +14,9 @@ export function useHStepper() {
   smilestore.dev.page_provides_trial_stepper = true
 
   // Create instances of our state managers
-  const sm = new StepperStateMachine()
+  const sm = new StepState()
+  sm.push('SOS')
+  sm.push('EOS')
 
   // Internal table management
   const tables = new Map()
@@ -62,7 +64,7 @@ export function useHStepper() {
     },
     reset: () => {
       sm.reset()
-      if (sm.stepState.states.length > 0) {
+      if (sm.states.length > 0) {
         sm.next() // Move to first state after reset
         _currentValue.value = sm.pathdata
         _currentPathStr.value = sm.currentPaths
@@ -112,7 +114,7 @@ export function useHStepper() {
       }
 
       // Process the root table - appends to existing structure
-      processTable(table, sm.stepState)
+      processTable(table, sm)
 
       // Set the table to read-only
       table.setReadOnly()
@@ -121,7 +123,7 @@ export function useHStepper() {
       sm.reset()
 
       // Navigate through the structure - first to top level
-      if (sm.stepState.states.length > 0) {
+      if (sm.states.length > 0) {
         sm.next()
 
         // Then try to navigate to the first child if there are nested elements
@@ -130,15 +132,15 @@ export function useHStepper() {
         let currentIndex = 0
 
         // Check if the current state has child states
-        while (currentSm && currentSm.stepState.currentIndex >= 0 && currentSm.stepState.states.length > 0) {
+        while (currentSm && currentSm.index >= 0 && currentSm.length > 0) {
           // Get the index of the current state
-          currentIndex = currentSm.stepState.currentIndex
+          currentIndex = currentSm.index
 
           // Get the state machine for the current index
           const childSm = currentSm[currentIndex]
 
           // If the child state machine has states, navigate to its first state
-          if (childSm && childSm.stepState.states.length > 0) {
+          if (childSm && childSm.length > 0) {
             childSm.next()
             currentSm = childSm
           } else {
@@ -193,7 +195,7 @@ export function useHStepper() {
       }
 
       // Start processing from the root state
-      return processState(sm.stepState)
+      return processState(sm)
     },
 
     // Create new table instance with access to stepper for nested tables

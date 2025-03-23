@@ -25,13 +25,51 @@ export class StepState {
   constructor(value = null, parent = null) {
     this._value = value === null ? '/' : value
     this._states = []
-    this._currentIndex = -1
+    this._currentIndex = 0
     this._depth = 0
     if (parent !== null) {
       this._depth = parent.depth + 1
     }
     this._parent = parent
-    this._data = null // Rename to _data to avoid naming conflict
+    this._root = parent?._root || this
+    this._data = null
+
+    // If this is the root node, initialize to leftmost leaf
+    if (!parent) {
+      this.initializeToLeftmostLeaf()
+    }
+
+    return new Proxy(this, {
+      get(target, prop) {
+        // Handle array/object access
+        if (typeof prop === 'string' || typeof prop === 'number') {
+          // IMPORTANT: We first try to get a child node by value before checking properties/methods
+          // This ensures that child nodes with values matching getter names (like 'parent')
+          // take precedence over the getter methods
+          const node = target.getNode(prop)
+          if (node) {
+            return node
+          }
+          // If no child node found, then check for properties/methods
+          if (prop in target) {
+            return target[prop]
+          }
+          return undefined
+        }
+        return target[prop]
+      },
+    })
+  }
+
+  /**
+   * Helper method to initialize the tree to point to the leftmost leaf
+   */
+  initializeToLeftmostLeaf() {
+    let current = this
+    while (current._states.length > 0) {
+      current._currentIndex = 0
+      current = current._states[0]
+    }
   }
 
   /**
@@ -191,31 +229,35 @@ export class StepState {
    * Creates and adds a new child state to this node.
    * If no value is provided, automatically assigns the next available index as the value.
    * @param {*} value - Optional value for the new state. If null, uses states.length
+   * @param {*} data - Optional data to associate with the new state
    * @returns {StepState} The newly created child state
    * @throws {Error} If a state with the given value already exists
    */
-  push(value = null) {
-    return this.insert(value, -1)
+  push(value = null, data = null) {
+    return this.insert(value, -1, data)
   }
 
   /**
    * Inserts a new state at the specified position in the list of children.
+   * Maintains the invariant that we're always pointing to a leaf node.
    * @param {*} value - Optional value for the new state. If null, uses states.length
    * @param {number} index - Position to insert at. Can be positive (0-based) or negative (from end).
-   *                         If positive and beyond list length, appends to end.
-   *                         If negative and beyond list length, prepends to start.
+   * @param {*} data - Optional data to associate with the new state
    * @returns {StepState} The newly created child state
    * @throws {Error} If a state with the given value already exists
    */
-  insert(value = null, index = 0) {
+  insert(value = null, index = 0, data = null) {
     const autoValue = value === null ? this._states.length : value
 
     // Check for existing state with same value
     if (value !== null && this._states.some((state) => state.value === value)) {
-      throw new Error(`State with value "${value}" already exists in this node`)
+      throw new Error(`State value already exists in this node (value: "${value}")`)
     }
 
     const state = new StepState(autoValue, this)
+    if (data !== null) {
+      state.data = data
+    }
 
     // Handle negative indices
     if (index < 0) {
@@ -228,16 +270,37 @@ export class StepState {
     }
 
     this._states.splice(index, 0, state)
+
+    // If we're inserting into the current leaf node, update indices to point to the new leaf
+    let current = this._root
+    let targetNode = this
+    let isCurrentPath = true
+
+    // Check if we're on the current path to the leaf
+    while (current._states.length > 0) {
+      current = current._states[current._currentIndex]
+      if (current === targetNode) {
+        // We're inserting to a node on the current path
+        // Need to update indices to point to the new leaf
+        state._currentIndex = 0
+        break
+      }
+      if (current !== targetNode) {
+        isCurrentPath = false
+        break
+      }
+    }
+
     return state
   }
 
   /**
    * Resets the traversal state of this node and all its descendants.
-   * Sets currentIndex back to -1 (no selection) for this node,
+   * Sets currentIndex back to 0 for this node,
    * then recursively resets all child nodes.
    */
   reset() {
-    this._currentIndex = -1
+    this._currentIndex = 0
     this._states.forEach((state) => state.reset())
   }
 
@@ -249,17 +312,10 @@ export class StepState {
     // Empty state has no next value
     if (this._states.length === 0) return null
 
-    // First time navigation - start at index 0 and traverse to leftmost leaf
-    if (this._currentIndex === -1) {
-      this._currentIndex = 0
-      if (this._states[0]._states.length > 0) {
-        return this._states[0].next()
-      }
-      return this._states[0].value
-    }
-
-    // Try to get next value from current state
+    // Get current node
     const current = this._states[this._currentIndex]
+
+    // Try to get next value from current state's children
     const nextInCurrent = current.next()
     if (nextInCurrent !== null) {
       return nextInCurrent
@@ -268,7 +324,13 @@ export class StepState {
     // Move to next sibling state if available
     this._currentIndex++
     if (this._currentIndex < this._states.length) {
-      return this._states[this._currentIndex].next() || this._states[this._currentIndex].value
+      // When moving to a sibling, traverse to its leftmost leaf
+      let leaf = this._states[this._currentIndex]
+      while (leaf._states.length > 0) {
+        leaf._currentIndex = 0
+        leaf = leaf._states[0]
+      }
+      return leaf.value
     }
 
     // End of sequence reached - stay at last state
@@ -281,37 +343,31 @@ export class StepState {
    * @returns {StepState|null} The previous state or null if no previous state exists
    */
   prev() {
-    // Empty state or initial state has no previous value
-    if (this._states.length === 0 || this._currentIndex === -1) {
-      return null
-    }
+    // Empty state has no previous value
+    if (this._states.length === 0) return null
 
-    // Try to get previous value from current state
+    // Get current node
     const current = this._states[this._currentIndex]
+
+    // Try to get previous value from current state's children
     const prevInCurrent = current.prev()
     if (prevInCurrent !== null) {
       return prevInCurrent
     }
 
-    // Reset current state and move to previous sibling
-    current.reset()
-    this._currentIndex--
-
-    // If previous sibling exists, navigate to its rightmost leaf
-    if (this._currentIndex >= 0) {
-      let prevState = this._states[this._currentIndex]
-      // Navigate to the rightmost leaf node
-      while (prevState._states.length > 0) {
-        prevState._currentIndex = prevState._states.length - 1
-        const lastState = prevState._states[prevState._currentIndex]
-        if (lastState._states.length === 0) {
-          return lastState.value
-        }
-        prevState = lastState
+    // Move to previous sibling
+    if (this._currentIndex > 0) {
+      this._currentIndex--
+      // When moving to a previous sibling, traverse to its rightmost leaf
+      let leaf = this._states[this._currentIndex]
+      while (leaf._states.length > 0) {
+        leaf._currentIndex = leaf._states.length - 1
+        leaf = leaf._states[leaf._currentIndex]
       }
-      return prevState.value
+      return leaf.value
     }
 
+    // No more previous states
     return null
   }
 
@@ -396,6 +452,8 @@ export class StepState {
    * Gets the path from root to this node by walking up the parent chain.
    * Returns an array of values representing each node's value along the path,
    * excluding the root node ('/').
+   * This is distinct from the currentPath property which returns the path from the
+   * root to the current selected node by following .index.
    * For example, if we have root -> A -> B -> C, calling getPath() on C returns ['A','B','C']
    * @returns {Array} Array of values representing the path from root to this node
    */
@@ -413,6 +471,8 @@ export class StepState {
    * Gets the path string for this node by walking up the parent chain.
    * Returns a hyphen-separated string of values representing each node's value,
    * excluding the root node ('/').
+   * This is distinct from the currentPath property which returns the path from the
+   * root to the current selected node by following .index.
    * @returns {string} Hyphen-separated string representing the path to this node
    */
   get paths() {
@@ -423,7 +483,7 @@ export class StepState {
    * Gets an array of data objects from all nodes along the current path, from root to leaf.
    * @returns {Array} Array of data objects, where each element is the complete data from a node along the path
    */
-  get datapath() {
+  get pathdata() {
     const dataArray = []
     let current = this
 
@@ -433,10 +493,12 @@ export class StepState {
       ancestors.unshift(current)
       current = current.parent
     }
+
     // Add root node data if it exists and isn't '/'
     if (current.value !== '/' && current.data) {
       dataArray.push(current.data)
     }
+
     // Add ancestor data
     ancestors.forEach((node) => {
       if (node.data) {
@@ -444,9 +506,9 @@ export class StepState {
       }
     })
 
-    // Now traverse down through selected children
+    // Now traverse down through selected children to the leaf
     current = this
-    while (current._currentIndex !== -1 && current._states.length > 0) {
+    while (current._states.length > 0) {
       current = current._states[current._currentIndex]
       if (current.data) {
         dataArray.push(current.data)
@@ -454,6 +516,79 @@ export class StepState {
     }
 
     return dataArray
+  }
+
+  /**
+   * Sets data for a node at the specified path
+   * @param {Array|string} path - Path to the node (array of values or hyphen-separated string)
+   * @param {Object} data - Data to associate with the node
+   * @throws {Error} If the path doesn't exist
+   */
+  setDataAtPath(path, data) {
+    const pathArray = typeof path === 'string' ? path.split('-') : path
+    let current = this
+
+    for (const value of pathArray) {
+      current = current[value]
+      if (!current) {
+        throw new Error(`Invalid path: ${path}`)
+      }
+    }
+
+    current.data = data
+  }
+
+  /**
+   * Returns the current path through the tree as a list of values
+   * @returns {Array} Array of values representing the current path
+   */
+  get currentPath() {
+    const path = []
+    let current = this._root
+
+    // Build path from root to current leaf node
+    while (current._states.length > 0) {
+      current = current._states[current._currentIndex]
+      path.push(current.value)
+    }
+
+    return path
+  }
+
+  /**
+   * Returns the current path through the tree as a hyphen-separated string
+   * @returns {string} String representation of the current path
+   */
+  get currentPaths() {
+    return this.currentPath.join('-')
+  }
+
+  /**
+   * Returns a string representation of the tree structure beneath this node
+   * @returns {string} Tree diagram
+   */
+  get treeDiagram() {
+    const buildDiagram = (node, prefix = '', isLast = true) => {
+      // Create the line for current node
+      const line = prefix + (isLast ? '└── ' : '├── ') + node.value + '\n'
+
+      // Calculate new prefix for children
+      const childPrefix = prefix + (isLast ? '    ' : '│   ')
+
+      // Recursively build diagram for children
+      const childLines = node.states
+        .map((state, index) => buildDiagram(state, childPrefix, index === node.length - 1))
+        .join('')
+
+      return line + childLines
+    }
+
+    // Special case for root node
+    if (this.value === '/') {
+      return '/' + '\n' + this.states.map((state, index) => buildDiagram(state, '', index === this.length - 1)).join('')
+    }
+
+    return buildDiagram(this)
   }
 }
 
