@@ -2,7 +2,7 @@
  * A tree-based state management class for hierarchical navigation.
  *
  * StepState represents a node in a tree structure where each node can have:
- * - A value (string, number, or custom type)
+ * - A id (string, number, or custom type)
  * - Multiple child states
  * - Associated data
  * - Navigation capabilities (next/prev)
@@ -12,18 +12,18 @@
 export class StepState {
   /**
    * Creates a new StepState node in a tree structure.
-   * @param {*} value - The value for this node. If null, defaults to '/'
+   * @param {*} id - The id for this node. If null, defaults to '/'
    * @param {StepState|null} parent - The parent node. If null, this is a root node
    *
    * This constructor initializes:
-   * - value: The node's value
+   * - id: The node's id
    * - states: Array of child nodes
    * - currentIndex: Index tracking current position when traversing children (-1 means no selection)
    * - depth: How deep this node is in the tree (0 for root)
    * - parent: Reference to parent node
    */
-  constructor(value = null, parent = null) {
-    this._value = value === null ? '/' : value
+  constructor(id = null, parent = null) {
+    this._id = id === null ? '/' : id
     this._states = []
     this._currentIndex = 0
     this._depth = 0
@@ -38,8 +38,8 @@ export class StepState {
       get(target, prop) {
         // Handle array/object access
         if (typeof prop === 'string' || typeof prop === 'number') {
-          // IMPORTANT: We first try to get a child node by value before checking properties/methods
-          // This ensures that child nodes with values matching getter names (like 'parent')
+          // IMPORTANT: We first try to get a child node by id before checking properties/methods
+          // This ensures that child nodes with ids matching getter names (like 'parent')
           // take precedence over the getter methods
           const node = target.getNode(prop)
           if (node) {
@@ -73,19 +73,19 @@ export class StepState {
   }
 
   /**
-   * Sets the value of this node
-   * @param {*} value - The new value to set
+   * Sets the id of this node
+   * @param {*} id - The new id to set
    */
-  set value(value) {
-    this._value = value
+  set id(id) {
+    this._id = id
   }
 
   /**
-   * Gets the value of this node
-   * @returns {*} The node's value
+   * Gets the id of this node
+   * @returns {*} The node's id
    */
-  get value() {
-    return this._value
+  get id() {
+    return this._id
   }
 
   /**
@@ -122,10 +122,10 @@ export class StepState {
 
   /**
    * Setter for data property
-   * @param {*} value - The data to store in this node
+   * @param {*} data - The data to store in this node
    */
-  set data(value) {
-    this._data = value
+  set data(data) {
+    this._data = data
   }
 
   /**
@@ -134,6 +134,24 @@ export class StepState {
    */
   get data() {
     return this._data
+  }
+
+  /**
+   * Get all child states of the current state.
+   *
+   * @returns {Array<StepState>} Array of child StepState nodes
+   */
+  get rows() {
+    return this._states
+  }
+
+  /**
+   * Get data from all child states of the current state.
+   *
+   * @returns {Array} Array of data values from all child states
+   */
+  get rowsdata() {
+    return this._states.map((item) => item.data)
   }
 
   /**
@@ -211,39 +229,39 @@ export class StepState {
 
   /**
    * Creates and adds a new child state to this node.
-   * If no value is provided, automatically assigns the next available index as the value.
-   * @param {*} value - Optional value for the new state. If null, uses states.length
+   * If no id is provided, automatically assigns the next available index as the id.
+   * @param {*} id - Optional id for the new state. If null, uses states.length
    * @param {*} data - Optional data to associate with the new state
    * @returns {StepState} The newly created child state
-   * @throws {Error} If a state with the given value already exists
+   * @throws {Error} If a state with the given id already exists
    */
-  push(value = null, data = null) {
-    return this.insert(value, -1, data)
+  push(id = null, data = null) {
+    return this.insert(id, -1, data)
   }
 
   /**
    * Inserts a new state at the specified position in the list of children.
    * Maintains the invariant that we're always pointing to a leaf node.
-   * @param {*} value - Optional value for the new state. If null, uses states.length
+   * @param {*} id - Optional id for the new state. If null, uses states.length
    * @param {number} index - Position to insert at. Can be positive (0-based) or negative (from end).
    * @param {*} data - Optional data to associate with the new state
    * @returns {StepState} The newly created child state
-   * @throws {Error} If a state with the given value already exists
+   * @throws {Error} If a state with the given id already exists
    */
-  insert(value = null, index = 0, data = null) {
-    const autoValue = value === null ? this._states.length : value
+  insert(id = null, index = 0, data = null) {
+    const autoid = id === null ? this._states.length : id
 
-    // Check for existing state with same value
-    if (value !== null && this._states.some((state) => state.value === value)) {
-      throw new Error(`State value already exists in this node (value: "${value}")`)
+    // Check for existing state with same id
+    if (id !== null && this._states.some((state) => state.id === id)) {
+      throw new Error(`State id already exists in this node (id: "${id}")`)
     }
 
-    // Check for hyphen in value
-    if (value !== null && String(value).includes('-')) {
-      throw new Error(`State value cannot contain hyphens (value: "${value}")`)
+    // Check for hyphen in id
+    if (id !== null && String(id).includes('-')) {
+      throw new Error(`State id cannot contain hyphens (id: "${id}")`)
     }
 
-    const state = new StepState(autoValue, this)
+    const state = new StepState(autoid, this)
     if (data !== null) {
       state.data = data
     }
@@ -297,7 +315,7 @@ export class StepState {
    * Resets the state machine and navigates to the specified path.
    * If the path points to a leaf node, stays at that leaf.
    * If the path points to a non-leaf node, traverses to its leftmost leaf.
-   * @param {Array|string} path - Path to navigate to (array of values or hyphen-separated string)
+   * @param {Array|string} path - Path to navigate to (array of ids or hyphen-separated string)
    * @throws {Error} If the path doesn't exist
    */
   resetTo(path) {
@@ -310,36 +328,36 @@ export class StepState {
 
     // Start from root
     let current = this
-    console.log('Starting at root:', current.value)
+    console.log('Starting at root:', current.id)
 
     // Navigate through the path
-    for (const value of pathArray) {
-      // Skip the root '/' value if it's in the path
-      if (value === '/') continue
+    for (const id of pathArray) {
+      // Skip the root '/' id if it's in the path
+      if (id === '/') continue
 
-      console.log('Looking for child with value:', value, 'in current node:', current.value)
+      console.log('Looking for child with id:', id, 'in current node:', current.id)
       console.log(
         'Available children:',
-        current._states.map((s) => s.value)
+        current._states.map((s) => s.id)
       )
 
-      // Find the child state with matching value, converting to string for comparison
-      const childState = current._states.find((state) => String(state.value) === String(value))
+      // Find the child state with matching id, converting to string for comparison
+      const childState = current._states.find((state) => String(state.id) === String(id))
       if (!childState) {
-        throw new Error(`Invalid path: ${path} (Could not find child with value "${value}" in node "${current.value}")`)
+        throw new Error(`Invalid path: ${path} (Could not find child with id "${id}" in node "${current.id}")`)
       }
 
       // Update current index to point to this child
       current._currentIndex = current._states.indexOf(childState)
       current = childState
-      console.log('Moved to node:', current.value)
+      console.log('Moved to node:', current.id)
     }
 
     // If we're at a non-leaf node, traverse to its leftmost leaf
     while (current._states.length > 0) {
       current._currentIndex = 0
       current = current._states[0]
-      console.log('Traversing to leftmost leaf:', current.value)
+      console.log('Traversing to leftmost leaf:', current.id)
     }
   }
 
@@ -369,7 +387,7 @@ export class StepState {
         leaf._currentIndex = 0
         leaf = leaf._states[0]
       }
-      return leaf.value
+      return leaf.id
     }
 
     // End of sequence reached - stay at last state
@@ -403,7 +421,7 @@ export class StepState {
         leaf._currentIndex = leaf._states.length - 1
         leaf = leaf._states[leaf._currentIndex]
       }
-      return leaf.value
+      return leaf.id
     }
 
     // No more previous states
@@ -426,15 +444,15 @@ export class StepState {
   }
 
   /**
-   * Gets a child node by its index or value.
-   * @param {number|*} identifier - Either the index or value of the child node to find
+   * Gets a child node by its index or id.
+   * @param {number|*} identifier - Either the index or id of the child node to find
    * @returns {StepState|null} The found child node, or null if not found
    */
   getNode(identifier) {
     if (typeof identifier === 'number') {
       return this._states[identifier] || null
     }
-    return this._states.find((state) => state.value === identifier) || null
+    return this._states.find((state) => state.id === identifier) || null
   }
 
   /**
@@ -464,7 +482,7 @@ export class StepState {
     }
 
     return {
-      value: this.value,
+      id: this.id,
       currentIndex: this._currentIndex,
       states: this._states.map((state) => state.json), // json doesn't _states
       data: cleanData(this.data),
@@ -476,12 +494,12 @@ export class StepState {
    * @param {string} data - The JSON string to deserialize
    */
   loadFromJSON(data) {
-    this.value = data.value
+    this.id = data.id
     this._currentIndex = data.currentIndex
     this.data = data.data
     // the json doesn't ._states it is just .states
     this._states = data.states.map((stateData) => {
-      const state = new StepState(stateData.value, this)
+      const state = new StepState(stateData.id, this)
       state.loadFromJSON(stateData)
       return state
     })
@@ -489,18 +507,18 @@ export class StepState {
 
   /**
    * Gets the path from root to this node by walking up the parent chain.
-   * Returns an array of values representing each node's value along the path,
+   * Returns an array of ids representing each node's id along the path,
    * excluding the root node ('/').
    * This is distinct from the currentPath property which returns the path from the
    * root to the current selected node by following .index.
    * For example, if we have root -> A -> B -> C, calling getPath() on C returns ['A','B','C']
-   * @returns {Array} Array of values representing the path from root to this node
+   * @returns {Array} Array of ids representing the path from root to this node
    */
   get path() {
     const path = []
     let current = this
-    while (current && current.value !== '/') {
-      path.unshift(current.value)
+    while (current && current.id !== '/') {
+      path.unshift(current.id)
       current = current.parent
     }
     return path
@@ -508,7 +526,7 @@ export class StepState {
 
   /**
    * Gets the path string for this node by walking up the parent chain.
-   * Returns a hyphen-separated string of values representing each node's value,
+   * Returns a hyphen-separated string of ids representing each node's id,
    * excluding the root node ('/').
    * This is distinct from the currentPath property which returns the path from the
    * root to the current selected node by following .index.
@@ -534,7 +552,7 @@ export class StepState {
     }
 
     // Add root node data if it exists and isn't '/'
-    if (current.value !== '/' && current.data) {
+    if (current.id !== '/' && current.data) {
       dataArray.push(current.data)
     }
 
@@ -559,7 +577,7 @@ export class StepState {
 
   /**
    * Sets data for a node at the specified path
-   * @param {Array|string} path - Path to the node (array of values or hyphen-separated string)
+   * @param {Array|string} path - Path to the node (array of ids or hyphen-separated string)
    * @param {Object} data - Data to associate with the node
    * @throws {Error} If the path doesn't exist
    */
@@ -567,8 +585,8 @@ export class StepState {
     const pathArray = typeof path === 'string' ? path.split('-') : path
     let current = this
 
-    for (const value of pathArray) {
-      current = current[value]
+    for (const id of pathArray) {
+      current = current[id]
       if (!current) {
         throw new Error(`Invalid path: ${path}`)
       }
@@ -578,8 +596,8 @@ export class StepState {
   }
 
   /**
-   * Returns the current path through the tree as a list of values
-   * @returns {Array} Array of values representing the current path
+   * Returns the current path through the tree as a list of ids
+   * @returns {Array} Array of ids representing the current path
    */
   get currentPath() {
     const path = []
@@ -588,7 +606,7 @@ export class StepState {
     // Build path from root to current leaf node
     while (current._states.length > 0) {
       current = current._states[current._currentIndex]
-      path.push(current.value)
+      path.push(current.id)
     }
 
     return path
@@ -609,7 +627,7 @@ export class StepState {
   get treeDiagram() {
     const buildDiagram = (node, prefix = '', isLast = true) => {
       // Create the line for current node
-      const line = prefix + (isLast ? '└── ' : '├── ') + node.value + '\n'
+      const line = prefix + (isLast ? '└── ' : '├── ') + node.id + '\n'
 
       // Calculate new prefix for children
       const childPrefix = prefix + (isLast ? '    ' : '│   ')
@@ -623,7 +641,7 @@ export class StepState {
     }
 
     // Special case for root node
-    if (this.value === '/') {
+    if (this.id === '/') {
       return '/' + '\n' + this.states.map((state, index) => buildDiagram(state, '', index === this.length - 1)).join('')
     }
 

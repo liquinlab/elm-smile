@@ -51,7 +51,7 @@ describe('StepState', () => {
 
   describe('basic operations', () => {
     it('should create a root state with correct initial values', () => {
-      expect(stepper.value).toBe('/')
+      expect(stepper.id).toBe('/')
       expect(stepper.states).toEqual([])
       expect(stepper.index).toBe(0)
       expect(stepper.parent).toBeNull()
@@ -61,7 +61,7 @@ describe('StepState', () => {
     it('should push new named states correctly', () => {
       const child = stepper.push('child')
       expect(stepper.states.length).toBe(1)
-      expect(child.value).toBe('child')
+      expect(child.id).toBe('child')
       expect(child.parent).toBe(stepper)
       expect(stepper.depth).toBe(0)
       expect(stepper.treeDepth).toBe(1)
@@ -71,7 +71,7 @@ describe('StepState', () => {
 
     it('should throw an error when pushing duplicate value', () => {
       stepper.push('test')
-      expect(() => stepper.push('test')).toThrow(/State value already exists/)
+      expect(() => stepper.push('test')).toThrow(/State id already exists/)
 
       // Verify auto-generated values still work
       expect(() => stepper.push()).not.toThrow()
@@ -91,9 +91,9 @@ describe('StepState', () => {
       expect(stepper.states.length).toBe(1)
       const child2 = stepper.push()
       expect(stepper.states.length).toBe(2)
-      expect(child.value).toBe(0)
+      expect(child.id).toBe(0)
       expect(child.parent).toBe(stepper)
-      expect(child2.value).toBe(1)
+      expect(child2.id).toBe(1)
       expect(child2.parent).toBe(stepper)
     })
   })
@@ -104,8 +104,8 @@ describe('StepState', () => {
       const first = root.push('first')
       const inserted = root.insert('inserted', 0)
 
-      expect(root.states[0].value).toBe('inserted')
-      expect(root.states[1].value).toBe('first')
+      expect(root.states[0].id).toBe('inserted')
+      expect(root.states[1].id).toBe('first')
       expect(inserted.parent).toBe(root)
     })
 
@@ -114,7 +114,7 @@ describe('StepState', () => {
       const first = root.push('first')
       const inserted = root.insert('inserted', 0, 'data')
 
-      expect(root.states[0].value).toBe('inserted')
+      expect(root.states[0].id).toBe('inserted')
       expect(root.states[0].data).toBe('data')
     })
 
@@ -123,8 +123,8 @@ describe('StepState', () => {
       const first = root.push('first')
       const inserted = root.insert('inserted', -1)
 
-      expect(root.states[0].value).toBe('first')
-      expect(root.states[1].value).toBe('inserted')
+      expect(root.states[0].id).toBe('first')
+      expect(root.states[1].id).toBe('inserted')
       expect(inserted.parent).toBe(root)
     })
 
@@ -134,9 +134,9 @@ describe('StepState', () => {
       const second = root.push('second')
       const inserted = root.insert('inserted', -1)
 
-      expect(root.states[0].value).toBe('first')
-      expect(root.states[1].value).toBe('second')
-      expect(root.states[2].value).toBe('inserted')
+      expect(root.states[0].id).toBe('first')
+      expect(root.states[1].id).toBe('second')
+      expect(root.states[2].id).toBe('inserted')
       expect(inserted.parent).toBe(root)
     })
 
@@ -146,9 +146,9 @@ describe('StepState', () => {
       const second = root.push('second')
       const inserted = root.insert('inserted', -2)
 
-      expect(root.states[0].value).toBe('first')
-      expect(root.states[1].value).toBe('inserted')
-      expect(root.states[2].value).toBe('second')
+      expect(root.states[0].id).toBe('first')
+      expect(root.states[1].id).toBe('inserted')
+      expect(root.states[2].id).toBe('second')
       expect(inserted.parent).toBe(root)
     })
 
@@ -158,9 +158,9 @@ describe('StepState', () => {
       const third = root.push('third')
       const inserted = root.insert('inserted', 1)
 
-      expect(root.states[0].value).toBe('first')
-      expect(root.states[1].value).toBe('inserted')
-      expect(root.states[2].value).toBe('third')
+      expect(root.states[0].id).toBe('first')
+      expect(root.states[1].id).toBe('inserted')
+      expect(root.states[2].id).toBe('third')
       expect(inserted.parent).toBe(root)
     })
 
@@ -170,8 +170,8 @@ describe('StepState', () => {
       // insert at a positive index that is beyond the list length
       const inserted = root.insert('inserted', 5)
 
-      expect(root.states[0].value).toBe('first')
-      expect(root.states[1].value).toBe('inserted')
+      expect(root.states[0].id).toBe('first')
+      expect(root.states[1].id).toBe('inserted')
       expect(inserted.parent).toBe(root)
     })
 
@@ -180,8 +180,8 @@ describe('StepState', () => {
       const first = root.push('first')
       const inserted = root.insert('inserted', -5)
 
-      expect(root.states[0].value).toBe('inserted')
-      expect(root.states[1].value).toBe('first')
+      expect(root.states[0].id).toBe('inserted')
+      expect(root.states[1].id).toBe('first')
       expect(inserted.parent).toBe(root)
     })
 
@@ -189,8 +189,8 @@ describe('StepState', () => {
       const root = new StepState()
       root.push('A')
 
-      expect(() => root.insert('A', 0)).toThrow(/State value already exists/)
-      expect(() => root.insert('A', -1)).toThrow(/State value already exists/)
+      expect(() => root.insert('A', 0)).toThrow(/State id already exists/)
+      expect(() => root.insert('A', -1)).toThrow(/State id already exists/)
     })
 
     it('should auto-generate values when value is null', () => {
@@ -198,7 +198,7 @@ describe('StepState', () => {
       root.push('first')
       const inserted = root.insert(null, 0)
 
-      expect(inserted.value).toBe(1) // Should use states.length as value
+      expect(inserted.id).toBe(1) // Should use states.length as value
     })
 
     it('should maintain currentPath when inserting at current position', () => {
@@ -276,10 +276,10 @@ describe('StepState', () => {
 
     it('should not allow values containing hyphens', () => {
       const root = new StepState()
-      expect(() => root.insert('test-value')).toThrow(/State value cannot contain hyphens/)
-      expect(() => root.insert('value-with-hyphens')).toThrow(/State value cannot contain hyphens/)
-      expect(() => root.insert('value-')).toThrow(/State value cannot contain hyphens/)
-      expect(() => root.insert('-value')).toThrow(/State value cannot contain hyphens/)
+      expect(() => root.insert('test-value')).toThrow(/State id cannot contain hyphens/)
+      expect(() => root.insert('value-with-hyphens')).toThrow(/State id cannot contain hyphens/)
+      expect(() => root.insert('value-')).toThrow(/State id cannot contain hyphens/)
+      expect(() => root.insert('-value')).toThrow(/State id cannot contain hyphens/)
     })
 
     it('should allow values without hyphens', () => {
@@ -304,7 +304,7 @@ describe('StepState', () => {
 
       const root2 = new StepState()
       root2.insert('hi', -1)
-      expect(root.states[0].value).toBe(root2.states[0].value)
+      expect(root.states[0].id).toBe(root2.states[0].id)
     })
 
     it('should call insert when pushing', () => {

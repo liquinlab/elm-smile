@@ -94,7 +94,7 @@ export function useHStepper() {
       // Recursive function to process NestedTable structure
       const processTable = (nestedTable, parentState, level = 0) => {
         // Get the starting index for appending new items (excludes SOS/EOS nodes)
-        const startIndex = parentState.states.filter((state) => state.value !== 'SOS' && state.value !== 'EOS').length
+        const startIndex = parentState.states.filter((state) => state.id !== 'SOS' && state.id !== 'EOS').length
 
         // Get all items at this level
         for (let i = 0; i < nestedTable._items.length; i++) {
