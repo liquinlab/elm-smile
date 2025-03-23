@@ -34,11 +34,6 @@ export class StepState {
     this._root = parent?._root || this
     this._data = null
 
-    // If this is the root node, initialize to leftmost leaf
-    if (!parent) {
-      this.initializeToLeftmostLeaf()
-    }
-
     return new Proxy(this, {
       get(target, prop) {
         // Handle array/object access
@@ -59,17 +54,6 @@ export class StepState {
         return target[prop]
       },
     })
-  }
-
-  /**
-   * Helper method to initialize the tree to point to the leftmost leaf
-   */
-  initializeToLeftmostLeaf() {
-    let current = this
-    while (current._states.length > 0) {
-      current._currentIndex = 0
-      current = current._states[0]
-    }
   }
 
   /**
