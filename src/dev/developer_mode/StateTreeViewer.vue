@@ -3,7 +3,7 @@ import { ref, computed, watch, onMounted, defineComponent, h } from 'vue'
 import TreeNode from './TreeNode.vue'
 
 const props = defineProps({
-  stepper: {
+  stateMachine: {
     type: Object,
     required: true,
   },
@@ -31,14 +31,9 @@ const pathToString = (pathArray) => {
 // Add computed property to check if a node is selected
 const isNodeSelected = (nodePath) => {
   const currentPathStr = pathToString(props.path)
-  console.log('Comparing paths:', { nodePath, currentPath: currentPathStr })
+  //console.log('Comparing paths:', { nodePath, currentPath: currentPathStr })
   return nodePath === currentPathStr
 }
-
-// Replace rootNode computed with stateMachine computed
-const stateMachine = computed(() => {
-  return props.stepper.visualizeStateMachine()
-})
 
 // Function to format object with indentation
 const formatObjectWithIndent = (obj, indent = 0, seen = new WeakSet()) => {
@@ -78,7 +73,7 @@ const formatObjectWithIndent = (obj, indent = 0, seen = new WeakSet()) => {
 
 // You can now use this instead of the current rootNode display
 const formattedRootNode = computed(() => {
-  return formatObjectWithIndent(stateMachine.value)
+  return formatObjectWithIndent(props.stateMachine)
 })
 
 // Function to format data for display

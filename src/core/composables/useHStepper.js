@@ -21,6 +21,7 @@ export function useHStepper() {
   const _path = ref(null)
   const _paths = ref('')
   const _index = ref(null)
+  const _stateMachine = ref(null) // Add reactive ref for state machine visualization
   // Internal table management
   const tables = new Map()
 
@@ -35,12 +36,16 @@ export function useHStepper() {
     sm.loadFromJSON(savedState)
     _data.value = sm.pathdata
     _paths.value = sm.currentPaths
-    _path.value = sm.currentPath
+    _path.value = sm.currentPath || [] // Ensure path is never null
     _index.value = sm.index
     console.log('STEPPER: Loaded state from smilestore with path', sm.currentPaths)
   } else {
     sm.push('SOS')
     sm.push('EOS')
+    _path.value = [] // Initialize path as empty array
+    _paths.value = ''
+    _data.value = null
+    _index.value = null
   }
 
   // Get all protected methods from a temporary table instance
@@ -68,6 +73,7 @@ export function useHStepper() {
         _paths.value = next.currentPaths
         _path.value = next.currentPath
         _index.value = next.index
+        _stateMachine.value = visualizeStateMachine() // Update state machine visualization
         saveStepperState() // Save state after successful navigation
       }
       return next
@@ -80,6 +86,7 @@ export function useHStepper() {
         _paths.value = prev.currentPaths
         _path.value = prev.currentPath
         _index.value = prev.index
+        _stateMachine.value = visualizeStateMachine() // Update state machine visualization
         saveStepperState() // Save state after successful navigation
       }
       return prev
@@ -91,6 +98,7 @@ export function useHStepper() {
         _data.value = sm.pathdata
         _paths.value = sm.currentPaths
         _path.value = sm.currentPath
+        _stateMachine.value = visualizeStateMachine() // Update state machine visualization
         saveStepperState() // Save state after reset
       }
     },
@@ -100,10 +108,16 @@ export function useHStepper() {
       _data.value = sm.pathdata
       _paths.value = sm.currentPaths
       _path.value = sm.currentPath
+      _stateMachine.value = visualizeStateMachine() // Update state machine visualization
       saveStepperState() // Save state after resetTo
     },
-    push: (table) => {
-      if (savedState) {
+    init: () => {
+      //sm.next()
+      _stateMachine.value = visualizeStateMachine() // Update state machine visualization
+      sm.next()
+    },
+    push: (table, force = false) => {
+      if (savedState && !force) {
         console.log('STEPPER: Skipping push as state was loaded from storage')
         return table
       }
@@ -155,41 +169,41 @@ export function useHStepper() {
       table.setReadOnly()
 
       // Reset the state machine to prepare for navigation
-      sm.reset()
+      // sm.reset()
 
-      // Navigate through the structure - first to top level
-      if (sm.states.length > 0) {
-        sm.next()
+      // // Navigate through the structure - first to top level
+      // if (sm.states.length > 0) {
+      //   sm.next()
 
-        // Then try to navigate to the first child if there are nested elements
-        // This simulates navigating through the structure: 0-0, 0-1, etc.
-        let currentSm = sm
-        let currentIndex = 0
+      //   // Then try to navigate to the first child if there are nested elements
+      //   // This simulates navigating through the structure: 0-0, 0-1, etc.
+      //   let currentSm = sm
+      //   let currentIndex = 0
 
-        // Check if the current state has child states
-        while (currentSm && currentSm.index >= 0 && currentSm.length > 0) {
-          // Get the index of the current state
-          currentIndex = currentSm.index
+      //   // Check if the current state has child states
+      //   while (currentSm && currentSm.index >= 0 && currentSm.length > 0) {
+      //     // Get the index of the current state
+      //     currentIndex = currentSm.index
 
-          // Get the state machine for the current index
-          const childSm = currentSm[currentIndex]
+      //     // Get the state machine for the current index
+      //     const childSm = currentSm[currentIndex]
 
-          // If the child state machine has states, navigate to its first state
-          if (childSm && childSm.length > 0) {
-            childSm.next()
-            currentSm = childSm
-          } else {
-            // Break the loop if there are no more child states
-            break
-          }
-        }
+      //     // If the child state machine has states, navigate to its first state
+      //     if (childSm && childSm.length > 0) {
+      //       childSm.next()
+      //       currentSm = childSm
+      //     } else {
+      //       // Break the loop if there are no more child states
+      //       break
+      //     }
+      //   }
 
-        // Update the current value and path
-        _data.value = sm.pathdata
-        _paths.value = sm.currentPaths
-        _path.value = sm.currentPath
-      }
-
+      //   // Update the current value and path
+      //   _data.value = sm.pathdata
+      //   _paths.value = sm.currentPaths
+      //   _path.value = sm.currentPath
+      // }
+      _stateMachine.value = visualizeStateMachine() // Update state machine visualization
       // Add this before the return statement in push
       saveStepperState() // Save state after pushing new items
 
@@ -213,28 +227,9 @@ export function useHStepper() {
       return sm
     },
 
-    // Get a structure representation of the state machine tree
-    visualizeStateMachine: () => {
-      // Helper function to recursively process each state
-      const processState = (state, level = 0) => {
-        // Create a clean object without currentIndex, depth, and parent
-        const cleanState = {
-          data: state.data,
-          path: state.paths,
-          index: state.index,
-          rows: [],
-        }
-
-        // Process each child state
-        state.rows.forEach((childState) => {
-          cleanState.rows.push(processState(childState, level + 1))
-        })
-
-        return cleanState
-      }
-
-      // Start processing from the root state
-      return processState(sm)
+    // Expose reactive state machine visualization
+    get sm() {
+      return _stateMachine.value || visualizeStateMachine()
     },
 
     // Create new table instance with access to stepper for nested tables
@@ -255,6 +250,30 @@ export function useHStepper() {
     },
     // Shorthand for table()
     t: () => stepper.table(),
+  }
+
+  // Helper function to visualize state machine
+  const visualizeStateMachine = () => {
+    // Helper function to recursively process each state
+    const processState = (state, level = 0) => {
+      // Create a clean object without currentIndex, depth, and parent
+      const cleanState = {
+        data: state.data,
+        path: state.paths,
+        index: state.index,
+        rows: [],
+      }
+
+      // Process each child state
+      state.rows.forEach((childState) => {
+        cleanState.rows.push(processState(childState, level + 1))
+      })
+
+      return cleanState
+    }
+
+    // Start processing from the root state
+    return processState(sm)
   }
 
   // Add protected methods to the stepper instance

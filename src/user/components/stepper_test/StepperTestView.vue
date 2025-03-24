@@ -29,6 +29,18 @@ const trials = stepper
   .push()
 
 //stepper.push(trials)
+stepper.reset()
+
+function next() {
+  if (this.stepper.next() == null) {
+    api.goNextView()
+  }
+}
+
+function adddata() {
+  const trials = stepper.t().append([{ type: 'added', id: 100 }])
+  stepper.push(trials, true)
+}
 </script>
 
 <template>
@@ -41,9 +53,10 @@ const trials = stepper
     </div>
     <button @click="stepper.prev()" class="button is-primary m-2">Prev</button>
     <button @click="stepper.reset()" class="button is-danger m-2">Reset</button>
-    <button @click="stepper.next()" class="button is-primary m-2">Next</button>
+    <button @click="next()" class="button is-primary m-2">Next</button>
+    <button @click="adddata()" class="button is-warning m-2">Add Data</button>
     <br />
-    <StateTreeViewer :stepper="stepper" :path="stepper.path" @node-click="stepper.resetTo" />
+    <StateTreeViewer :state-machine="stepper.sm" :path="stepper.path" @node-click="stepper.resetTo" />
   </div>
 </template>
 
