@@ -138,6 +138,8 @@ export class StepState {
 
   /**
    * Get all child states of the current state.
+   * row is just a synonym for child states
+   * row lines a bit more with the table metaphor
    *
    * @returns {Array<StepState>} Array of child StepState nodes
    */
@@ -147,10 +149,21 @@ export class StepState {
 
   /**
    * Get data from all child states of the current state.
+   * row is just a synonym for child states
+   * row lines a bit more with the table metaphor
    *
    * @returns {Array} Array of data values from all child states
    */
   get rowsdata() {
+    return this._states.map((item) => item.data)
+  }
+
+  /**
+   * Get data from all child states of the current state.
+   *
+   * @returns {Array} Array of data values from all child states
+   */
+  get statesdata() {
     return this._states.map((item) => item.data)
   }
 
@@ -377,7 +390,7 @@ export class StepState {
         leaf._currentIndex = 0
         leaf = leaf._states[0]
       }
-      return leaf.id
+      return leaf
     }
 
     // End of sequence reached - stay at last state
@@ -411,7 +424,7 @@ export class StepState {
         leaf._currentIndex = leaf._states.length - 1
         leaf = leaf._states[leaf._currentIndex]
       }
-      return leaf.id
+      return leaf
     }
 
     // No more previous states

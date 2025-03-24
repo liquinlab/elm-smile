@@ -17,9 +17,10 @@ export function useHStepper() {
   const sm = new StepState('/')
 
   // Internal reactive refs
-  const _currentValue = ref(null)
-  const _currentPath = ref(null)
-  const _currentPathStr = ref('')
+  const _data = ref(null)
+  const _path = ref(null)
+  const _paths = ref('')
+  const _index = ref(null)
   // Internal table management
   const tables = new Map()
 
@@ -32,9 +33,10 @@ export function useHStepper() {
   if (savedState) {
     console.log('STEPPER: Loading saved state from smilestore')
     sm.loadFromJSON(savedState)
-    _currentValue.value = sm.pathdata
-    _currentPathStr.value = sm.currentPaths
-    _currentPath.value = sm.currentPath
+    _data.value = sm.pathdata
+    _paths.value = sm.currentPaths
+    _path.value = sm.currentPath
+    _index.value = sm.index
     console.log('STEPPER: Loaded state from smilestore with path', sm.currentPaths)
   } else {
     sm.push('SOS')
@@ -59,43 +61,45 @@ export function useHStepper() {
   const stepper = {
     // Navigation methods
     next: () => {
-      let nextValue = sm.next()
-
-      if (nextValue !== null) {
-        _currentValue.value = sm.pathdata
-        _currentPathStr.value = sm.currentPaths
-        _currentPath.value = sm.currentPath
+      let next = sm.next()
+      console.log('next', next)
+      if (next !== null) {
+        _data.value = next.pathdata
+        _paths.value = next.currentPaths
+        _path.value = next.currentPath
+        _index.value = next.index
         saveStepperState() // Save state after successful navigation
       }
-      return nextValue
+      return next
     },
     prev: () => {
-      let prevValue = sm.prev()
+      let prev = sm.prev()
 
-      if (prevValue !== null) {
-        _currentValue.value = sm.pathdata
-        _currentPathStr.value = sm.currentPaths
-        _currentPath.value = sm.currentPath
+      if (prev !== null) {
+        _data.value = prev.pathdata
+        _paths.value = prev.currentPaths
+        _path.value = prev.currentPath
+        _index.value = prev.index
         saveStepperState() // Save state after successful navigation
       }
-      return prevValue
+      return prev
     },
     reset: () => {
       sm.reset()
       if (sm.states.length > 0) {
         sm.next()
-        _currentValue.value = sm.pathdata
-        _currentPathStr.value = sm.currentPaths
-        _currentPath.value = sm.currentPath
+        _data.value = sm.pathdata
+        _paths.value = sm.currentPaths
+        _path.value = sm.currentPath
         saveStepperState() // Save state after reset
       }
     },
     resetTo: (path) => {
       console.log('resetTo', path)
       sm.resetTo(path)
-      _currentValue.value = sm.pathdata
-      _currentPathStr.value = sm.currentPaths
-      _currentPath.value = sm.currentPath
+      _data.value = sm.pathdata
+      _paths.value = sm.currentPaths
+      _path.value = sm.currentPath
       saveStepperState() // Save state after resetTo
     },
     push: (table) => {
@@ -181,9 +185,9 @@ export function useHStepper() {
         }
 
         // Update the current value and path
-        _currentValue.value = sm.pathdata
-        _currentPathStr.value = sm.currentPaths
-        _currentPath.value = sm.currentPath
+        _data.value = sm.pathdata
+        _paths.value = sm.currentPaths
+        _path.value = sm.currentPath
       }
 
       // Add this before the return statement in push
@@ -193,16 +197,16 @@ export function useHStepper() {
     },
     // Expose current and index as computed properties
     get current() {
-      return _currentValue.value === null ? null : _currentValue.value || []
+      return _data.value === null ? null : _data.value || []
     },
     get index() {
-      return _currentPathStr.value
+      return _paths.value
     },
     get paths() {
-      return _currentPathStr.value
+      return _paths.value
     },
     get path() {
-      return _currentPath.value
+      return _path.value
     },
     // Expose state machine with wrapped getData
     get sm() {

@@ -624,14 +624,14 @@ describe('StepState', () => {
       stepper.next()
       stepper.next()
       stepper.reset()
-      expect(stepper.next()).toBe('second')
+      expect(stepper.next().id).toBe('second')
     })
 
     it('should navigate forward correctly', () => {
       const child1 = stepper.push('child1')
       const child2 = stepper.push('child2')
 
-      expect(stepper.next()).toBe('child2')
+      expect(stepper.next().id).toBe('child2')
       expect(stepper.next()).toBeNull()
     })
 
@@ -642,7 +642,7 @@ describe('StepState', () => {
       stepper.next() // child1
       stepper.next() // child2
 
-      expect(stepper.prev()).toBe('child1')
+      expect(stepper.prev().id).toBe('child1')
       expect(stepper.prev()).toBeNull()
     })
 
@@ -702,35 +702,35 @@ describe('StepState', () => {
       //console.log(stepper.treeDiagram)
 
       // now navigate through the tree
-      expect(stepper.next()).toBe('greatgrandchild2')
-      expect(stepper.next()).toBe('greatgrandchild3')
-      expect(stepper.next()).toBe('greatgrandchild4')
-      expect(stepper.next()).toBe('grandchild4')
-      expect(stepper.next()).toBe('grandchild5')
-      expect(stepper.next()).toBe('grandchild6')
-      expect(stepper.next()).toBe('greatgrandchild6')
-      expect(stepper.next()).toBe('greatgrandchild7')
+      expect(stepper.next().id).toBe('greatgrandchild2')
+      expect(stepper.next().id).toBe('greatgrandchild3')
+      expect(stepper.next().id).toBe('greatgrandchild4')
+      expect(stepper.next().id).toBe('grandchild4')
+      expect(stepper.next().id).toBe('grandchild5')
+      expect(stepper.next().id).toBe('grandchild6')
+      expect(stepper.next().id).toBe('greatgrandchild6')
+      expect(stepper.next().id).toBe('greatgrandchild7')
       expect(stepper.next()).toBeNull()
 
       // now navigate backward
       //expect(stepper.prev()).toBe('greatgrandchild7')  // this is not output because we stop on last node
-      expect(stepper.prev()).toBe('greatgrandchild6')
-      expect(stepper.prev()).toBe('grandchild6')
-      expect(stepper.prev()).toBe('grandchild5')
-      expect(stepper.prev()).toBe('grandchild4')
-      expect(stepper.prev()).toBe('greatgrandchild4')
-      expect(stepper.prev()).toBe('greatgrandchild3')
-      expect(stepper.prev()).toBe('greatgrandchild2')
-      expect(stepper.prev()).toBe('greatgrandchild1')
+      expect(stepper.prev().id).toBe('greatgrandchild6')
+      expect(stepper.prev().id).toBe('grandchild6')
+      expect(stepper.prev().id).toBe('grandchild5')
+      expect(stepper.prev().id).toBe('grandchild4')
+      expect(stepper.prev().id).toBe('greatgrandchild4')
+      expect(stepper.prev().id).toBe('greatgrandchild3')
+      expect(stepper.prev().id).toBe('greatgrandchild2')
+      expect(stepper.prev().id).toBe('greatgrandchild1')
       expect(stepper.prev()).toBeNull()
-      expect(stepper.next()).toBe('greatgrandchild2')
+      expect(stepper.next().id).toBe('greatgrandchild2')
     })
 
     it('should peek next correctly', () => {
       const child1 = stepper.push('child1')
       const child2 = stepper.push('child2')
 
-      expect(stepper.peekNext()).toBe('child2')
+      expect(stepper.peekNext().id).toBe('child2')
       expect(stepper.index).toBe(0) // Should not change position
     })
 
@@ -741,7 +741,7 @@ describe('StepState', () => {
       stepper.next() // child1
       stepper.next() // child2
 
-      expect(stepper.peekPrev()).toBe('child1')
+      expect(stepper.peekPrev().id).toBe('child1')
       expect(stepper.index).toBe(1) // Should not change position
     })
   })
@@ -1016,9 +1016,9 @@ describe('StepState', () => {
       newState.loadFromJSON(serialized)
 
       // Verify navigation works as expected
-      expect(newState.next()).toBe('child4') // Can go backwards
-      expect(newState.prev()).toBe('child3') // Can go backwards
-      expect(newState.next()).toBe('child4') // Can go forwards
+      expect(newState.next().id).toBe('child4') // Can go backwards
+      expect(newState.prev().id).toBe('child3') // Can go backwards
+      expect(newState.next().id).toBe('child4') // Can go forwards
       expect(newState.next()).toBeNull() // Preserves end of sequence
     })
   })
