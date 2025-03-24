@@ -66,13 +66,13 @@ const getChildVerticalLines = (verticalLines, index, total) => {
     </div>
 
     <!-- Recursive tree nodes, but limit depth -->
-    <ul v-if="state.states && state.states.length > 0 && depth < maxDepth" class="children">
+    <ul v-if="state.rows && state.rows.length > 0 && depth < maxDepth" class="children">
       <TreeNode
-        v-for="(childState, childIndex) in state.states"
+        v-for="(childState, childIndex) in state.rows"
         :key="childIndex"
         :state="childState"
         :index="childIndex"
-        :total="state.states.length"
+        :total="state.rows.length"
         :is-node-selected="isNodeSelected"
         :format-data="formatData"
         :depth="depth + 1"

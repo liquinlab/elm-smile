@@ -8,7 +8,7 @@ const api = useAPI()
 const stepper = api.useHStepper()
 
 const trials = stepper
-  .table()
+  .t()
   .append([
     { type: 'trial', id: 1 },
     { type: 'trial', id: 2 },
@@ -26,8 +26,9 @@ const trials = stepper
         }
       })
   })
+  .push()
 
-stepper.push(trials)
+//stepper.push(trials)
 </script>
 
 <template>

@@ -126,13 +126,13 @@ const handleNodeClick = (path) => {
     <div class="tree-container">
       <ul class="tree-root">
         <li v-if="stateMachine" class="tree-node root-node">
-          <ul v-if="stateMachine.states && stateMachine.states.length > 0" class="children">
+          <ul v-if="stateMachine.rows && stateMachine.rows.length > 0" class="children">
             <TreeNode
-              v-for="(state, index) in stateMachine.states"
+              v-for="(state, index) in stateMachine.rows"
               :key="index"
               :state="state"
               :index="index"
-              :total="stateMachine.states.length"
+              :total="stateMachine.rows.length"
               :is-node-selected="isNodeSelected"
               :format-data="formatData"
               :depth="1"

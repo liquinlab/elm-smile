@@ -321,25 +321,17 @@ export class StepState {
   resetTo(path) {
     // Convert string path to array if needed
     const pathArray = typeof path === 'string' ? path.split('-') : path
-    console.log('Navigating to path:', pathArray)
 
     // Reset the state machine
     this.reset()
 
     // Start from root
     let current = this
-    console.log('Starting at root:', current.id)
 
     // Navigate through the path
     for (const id of pathArray) {
       // Skip the root '/' id if it's in the path
       if (id === '/') continue
-
-      console.log('Looking for child with id:', id, 'in current node:', current.id)
-      console.log(
-        'Available children:',
-        current._states.map((s) => s.id)
-      )
 
       // Find the child state with matching id, converting to string for comparison
       const childState = current._states.find((state) => String(state.id) === String(id))
@@ -350,14 +342,12 @@ export class StepState {
       // Update current index to point to this child
       current._currentIndex = current._states.indexOf(childState)
       current = childState
-      console.log('Moved to node:', current.id)
     }
 
     // If we're at a non-leaf node, traverse to its leftmost leaf
     while (current._states.length > 0) {
       current._currentIndex = 0
       current = current._states[0]
-      console.log('Traversing to leftmost leaf:', current.id)
     }
   }
 
@@ -484,8 +474,11 @@ export class StepState {
     return {
       id: this.id,
       currentIndex: this._currentIndex,
-      states: this._states.map((state) => state.json), // json doesn't _states
+      depth: this._depth,
+      states: this._states.map((state) => state.json),
       data: cleanData(this.data),
+      // Note: We don't serialize _parent or _root as they are circular references
+      // and will be re-established during deserialization
     }
   }
 
@@ -494,13 +487,25 @@ export class StepState {
    * @param {string} data - The JSON string to deserialize
    */
   loadFromJSON(data) {
-    this.id = data.id
-    this._currentIndex = data.currentIndex
-    this.data = data.data
-    // the json doesn't ._states it is just .states
+    // Only reset root-level properties if this is the root node
+    if (this._parent === null) {
+      this._id = data.id
+      this._currentIndex = data.currentIndex
+      this._depth = data.depth
+      this._data = data.data
+      this._states = []
+      this._parent = null
+      this._root = this
+    }
+    // Create child states with proper parent references and load their data
     this._states = data.states.map((stateData) => {
-      const state = new StepState(stateData.id, this)
-      state.loadFromJSON(stateData)
+      const state = new StepState(stateData.id, this) // Pass 'this' as parent
+      state.loadFromJSON(stateData) // Load child data while preserving parent reference
+      state._depth = stateData.depth
+      state._currentIndex = stateData.currentIndex
+      state._data = stateData.data
+      state._root = this._root
+      state._parent = this
       return state
     })
   }

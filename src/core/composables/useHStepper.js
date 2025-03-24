@@ -14,10 +14,12 @@ export function useHStepper() {
   smilestore.dev.page_provides_trial_stepper = true
 
   // Create instances of our state managers
-  const sm = new StepState()
-  sm.push('SOS')
-  sm.push('EOS')
+  const sm = new StepState('/')
 
+  // Internal reactive refs
+  const _currentValue = ref(null)
+  const _currentPath = ref(null)
+  const _currentPathStr = ref('')
   // Internal table management
   const tables = new Map()
 
@@ -25,62 +27,83 @@ export function useHStepper() {
   smilestore.registerPageTracker(page)
 
   // // Try to load existing state from smilestore
-  // const savedState = smilestore.getPageTrackerData(page)?.stepperState
-  // if (savedState) {
-  //   log.log('STEPPER: Loading saved state from smilestore')
-  //   sm.loadFromJSON(savedState)
-  // }
+  const savedState = smilestore.getPageTrackerData(page)?.stepperState
+
+  if (savedState) {
+    console.log('STEPPER: Loading saved state from smilestore')
+    sm.loadFromJSON(savedState)
+    _currentValue.value = sm.pathdata
+    _currentPathStr.value = sm.currentPaths
+    _currentPath.value = sm.currentPath
+    console.log('STEPPER: Loaded state from smilestore with path', sm.currentPaths)
+  } else {
+    sm.push('SOS')
+    sm.push('EOS')
+  }
 
   // Get all protected methods from a temporary table instance
   const PROTECTED_METHODS = new NestedTable(sm).getProtectedTableMethods()
 
-  // Internal reactive refs
-  const _currentValue = ref(null)
-  const _currentPath = ref(null)
-  const _currentPathStr = ref('')
+  // Add this helper function after the initial setup and before the stepper object
+  const saveStepperState = () => {
+    if (smilestore.local.pageTracker[page]) {
+      console.log('STEPPER: Saving state to smilestore')
+      smilestore.local.pageTracker[page].data = {
+        ...smilestore.local.pageTracker[page].data,
+        stepperState: sm.json,
+      }
+    }
+  }
 
   // Create the stepper object that will be returned
   const stepper = {
     // Navigation methods
     next: () => {
-      let nextValue = sm.next() // we can trust as StepperStateMachine handles EOS
+      let nextValue = sm.next()
 
       if (nextValue !== null) {
         _currentValue.value = sm.pathdata
         _currentPathStr.value = sm.currentPaths
         _currentPath.value = sm.currentPath
+        saveStepperState() // Save state after successful navigation
       }
       return nextValue
     },
     prev: () => {
-      let prevValue = sm.prev() // we can trust as StepperStateMachine handles SOS
+      let prevValue = sm.prev()
 
       if (prevValue !== null) {
         _currentValue.value = sm.pathdata
         _currentPathStr.value = sm.currentPaths
         _currentPath.value = sm.currentPath
+        saveStepperState() // Save state after successful navigation
       }
       return prevValue
     },
     reset: () => {
       sm.reset()
       if (sm.states.length > 0) {
-        sm.next() // Move to first state after reset
+        sm.next()
         _currentValue.value = sm.pathdata
         _currentPathStr.value = sm.currentPaths
         _currentPath.value = sm.currentPath
+        saveStepperState() // Save state after reset
       }
     },
     resetTo: (path) => {
       console.log('resetTo', path)
       sm.resetTo(path)
-      // Update reactive refs after reset
       _currentValue.value = sm.pathdata
       _currentPathStr.value = sm.currentPaths
       _currentPath.value = sm.currentPath
+      saveStepperState() // Save state after resetTo
     },
-    // Push method for directly pushing a table to the state machine
     push: (table) => {
+      if (savedState) {
+        console.log('STEPPER: Skipping push as state was loaded from storage')
+        return table
+      }
+
       // Check if the table is already read-only
       if (table.isReadOnly) {
         throw new Error('Cannot push a read-only table')
@@ -163,6 +186,9 @@ export function useHStepper() {
         _currentPath.value = sm.currentPath
       }
 
+      // Add this before the return statement in push
+      saveStepperState() // Save state after pushing new items
+
       return table
     },
     // Expose current and index as computed properties
@@ -191,12 +217,13 @@ export function useHStepper() {
         const cleanState = {
           data: state.data,
           path: state.paths,
-          states: [],
+          index: state.index,
+          rows: [],
         }
 
         // Process each child state
-        state.states.forEach((childState) => {
-          cleanState.states.push(processState(childState, level + 1))
+        state.rows.forEach((childState) => {
+          cleanState.rows.push(processState(childState, level + 1))
         })
 
         return cleanState
@@ -222,6 +249,8 @@ export function useHStepper() {
       }
       return table
     },
+    // Shorthand for table()
+    t: () => stepper.table(),
   }
 
   // Add protected methods to the stepper instance
