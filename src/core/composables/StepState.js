@@ -17,7 +17,7 @@ export class StepState {
    *
    * This constructor initializes:
    * - id: The node's id
-   * - states: Array of child nodes
+   * - states: Array of child nodes (also called rows)
    * - currentIndex: Index tracking current position when traversing children (-1 means no selection)
    * - depth: How deep this node is in the tree (0 for root)
    * - parent: Reference to parent node
@@ -265,13 +265,13 @@ export class StepState {
     const autoid = id === null ? this._states.length : id
 
     // Check for existing state with same id
-    if (id !== null && this._states.some((state) => state.id === id)) {
-      throw new Error(`State id already exists in this node (id: "${id}")`)
+    if (this._states.some((state) => state.id === autoid)) {
+      throw new Error(`State id already exists in this node (id: "${autoid}")`)
     }
 
     // Check for hyphen in id
-    if (id !== null && String(id).includes('-')) {
-      throw new Error(`State id cannot contain hyphens (id: "${id}")`)
+    if (String(autoid).includes('-')) {
+      throw new Error(`State id cannot contain hyphens (id: "${autoid}")`)
     }
 
     const state = new StepState(autoid, this)
@@ -290,26 +290,6 @@ export class StepState {
     }
 
     this._states.splice(index, 0, state)
-
-    // If we're inserting into the current leaf node, update indices to point to the new leaf
-    let current = this._root
-    let targetNode = this
-    let isCurrentPath = true
-
-    // Check if we're on the current path to the leaf
-    while (current._states.length > 0) {
-      current = current._states[current._currentIndex]
-      if (current === targetNode) {
-        // We're inserting to a node on the current path
-        // Need to update indices to point to the new leaf
-        state._currentIndex = 0
-        break
-      }
-      if (current !== targetNode) {
-        isCurrentPath = false
-        break
-      }
-    }
 
     return state
   }
