@@ -11,8 +11,6 @@ import useAPI from '@/core/composables/useAPI'
 import Timeline from '@/core/timeline'
 import { useRouter, addGuards } from '@/core/router'
 import appconfig from '@/core/config'
-
-//
 import StatusBar from '@/builtins/navbars/StatusBar.vue'
 
 // Helper function to create a timeline with test routes

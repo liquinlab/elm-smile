@@ -32,13 +32,13 @@ export function useHStepper() {
   const savedState = smilestore.getPageTrackerData(page)?.stepperState
 
   if (savedState) {
-    console.log('STEPPER: Loading saved state from smilestore')
+    //console.log('STEPPER: Loading saved state from smilestore')
     sm.loadFromJSON(savedState)
     _data.value = sm.pathdata
     _paths.value = sm.currentPaths
     _path.value = sm.currentPath || [] // Ensure path is never null
     _index.value = sm.index
-    console.log('STEPPER: Loaded state from smilestore with path', sm.currentPaths)
+    //console.log('STEPPER: Loaded state from smilestore with path', sm.currentPaths)
   } else {
     sm.push('SOS')
     sm.push('EOS')
@@ -54,7 +54,7 @@ export function useHStepper() {
   // Add this helper function after the initial setup and before the stepper object
   const saveStepperState = () => {
     if (smilestore.local.pageTracker[page]) {
-      console.log('STEPPER: Saving state to smilestore')
+      //console.log('STEPPER: Saving state to smilestore')
       smilestore.local.pageTracker[page].data = {
         ...smilestore.local.pageTracker[page].data,
         stepperState: sm.json,
@@ -67,7 +67,7 @@ export function useHStepper() {
     // Navigation methods
     next: () => {
       let next = sm.next()
-      console.log('next', next)
+      //console.log('next', next)
       if (next !== null) {
         _data.value = next.pathdata
         _paths.value = next.currentPaths
@@ -103,7 +103,7 @@ export function useHStepper() {
       }
     },
     resetTo: (path) => {
-      console.log('resetTo', path)
+      //console.log('resetTo', path)
       sm.resetTo(path)
       _data.value = sm.pathdata
       _paths.value = sm.currentPaths
@@ -118,7 +118,7 @@ export function useHStepper() {
     },
     push: (table, force = false) => {
       if (savedState && !force) {
-        console.log('STEPPER: Skipping push as state was loaded from storage')
+        //console.log('STEPPER: Skipping push as state was loaded from storage')
         return table
       }
 
@@ -203,6 +203,10 @@ export function useHStepper() {
       //   _paths.value = sm.currentPaths
       //   _path.value = sm.currentPath
       // }
+      if (!savedState && !force) {
+        stepper.reset()
+      }
+
       _stateMachine.value = visualizeStateMachine() // Update state machine visualization
       // Add this before the return statement in push
       saveStepperState() // Save state after pushing new items
@@ -228,7 +232,7 @@ export function useHStepper() {
     },
 
     // Expose reactive state machine visualization
-    get sm() {
+    get smviz() {
       return _stateMachine.value || visualizeStateMachine()
     },
 

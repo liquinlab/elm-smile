@@ -69,7 +69,7 @@ const routes = [
   },
 ]
 
-describe.skip('useHStepper composable', () => {
+describe('useHStepper composable', () => {
   let api
   let router
   let wrapper
@@ -253,7 +253,7 @@ describe.skip('useHStepper composable', () => {
 
     it('should create a table with the range method', async () => {
       const stepper = getCurrentRouteStepper()
-      const table = stepper.table().range(10)
+      const table = stepper.t().range(10)
       expect(table).toBeInstanceOf(NestedTable)
       expect(table.length).toBe(10) // preferred way to access
       expect(table.rows).toBeInstanceOf(Array)
@@ -266,7 +266,7 @@ describe.skip('useHStepper composable', () => {
     it('should create a nested table', async () => {
       const stepper = getCurrentRouteStepper()
       const table = stepper
-        .table()
+        .t()
         .range(10)
         .forEach((row, i) => {
           // Create range items directly on the row (which is a NestedTable itself)
@@ -314,46 +314,40 @@ describe.skip('useHStepper composable', () => {
         // Verify initial state - should be at first item
         expect(stepper.current).toEqual(tableValues[0])
         expect(stepper.index).toEqual('0')
-        expect(stepper.sm.stepState.currentIndex).toBe(0)
-        expect(stepper.sm.getData()).toEqual(tableValues[0])
+        expect(stepper.sm.index).toBe(1) /// skips SOS to start
 
         // // Step through remaining trials and verify values match
         for (let i = 1; i < 10; i++) {
           const nextValue = stepper.next()
-          expect(nextValue).toBe(i)
+          expect(nextValue.id).toBe(i)
           expect(stepper.current).toEqual(tableValues[i])
           expect(stepper.index).toEqual(i.toString())
-          expect(stepper.sm.stepState.currentIndex).toBe(i)
-          expect(stepper.sm.getData()).toEqual(tableValues[i])
+          expect(stepper.sm.index).toBe(i + 1)
         }
 
         // Verify we're at the end
-        expect(stepper.next()).toBeNull()
+        expect(stepper.next().id).toBe('EOS')
 
         // Step backwards and verify values
         for (let i = 8; i >= 0; i--) {
           const prevValue = stepper.prev()
-          expect(prevValue).toBe(i)
-          expect(stepper.current).toEqual(tableValues[i])
-          expect(stepper.index).toEqual(i.toString())
-          expect(stepper.sm.stepState.currentIndex).toBe(i)
-          expect(stepper.sm.getData()).toEqual(tableValues[i])
+          expect(prevValue.id).toBe(i + 1)
+          expect(stepper.current).toEqual(tableValues[i + 1])
+          expect(stepper.index).toEqual((i + 1).toString())
         }
 
         // Test reset - should go back to first item
         stepper.reset()
         expect(stepper.current).toEqual(tableValues[0])
         expect(stepper.index).toEqual('0')
-        expect(stepper.sm.stepState.currentIndex).toBe(0)
-        expect(stepper.sm.getData()).toEqual(tableValues[0])
+        expect(stepper.sm.index).toBe(1)
 
         // Verify we can step forward again after reset
         const nextValue = stepper.next()
-        expect(nextValue).toBe(1)
+        expect(nextValue.id).toBe(1)
         expect(stepper.current).toEqual(tableValues[1])
         expect(stepper.index).toEqual('1')
-        expect(stepper.sm.stepState.currentIndex).toBe(1)
-        expect(stepper.sm.getData()).toEqual(tableValues[1])
+        expect(stepper.sm.index).toBe(2)
       })
 
       it('should require push() to be the final operation in the chain', async () => {
@@ -369,46 +363,36 @@ describe.skip('useHStepper composable', () => {
         // Verify initial state - should be at first item
         expect(stepper.current).toEqual(tableValues[0])
         expect(stepper.index).toEqual('0')
-        expect(stepper.sm.stepState.currentIndex).toBe(0)
-        expect(stepper.sm.getData()).toEqual(tableValues[0])
 
         // Step through remaining trials and verify values match
         for (let i = 1; i < 10; i++) {
           const nextValue = stepper.next()
-          expect(nextValue).toBe(i)
+          expect(nextValue.id).toBe(i)
           expect(stepper.current).toEqual(tableValues[i])
           expect(stepper.index).toEqual(i.toString())
-          expect(stepper.sm.stepState.currentIndex).toBe(i)
-          expect(stepper.sm.getData()).toEqual(tableValues[i])
         }
 
         // Verify we're at the end
-        expect(stepper.next()).toBeNull()
+        expect(stepper.next().id).toBe('EOS')
 
         // Step backwards and verify values
         for (let i = 8; i >= 0; i--) {
           const prevValue = stepper.prev()
-          expect(prevValue).toBe(i)
-          expect(stepper.current).toEqual(tableValues[i])
-          expect(stepper.index).toEqual(i.toString())
-          expect(stepper.sm.stepState.currentIndex).toBe(i)
-          expect(stepper.sm.getData()).toEqual(tableValues[i])
+          expect(prevValue.id).toBe(i + 1)
+          expect(stepper.current).toEqual(tableValues[i + 1])
+          expect(stepper.index).toEqual((i + 1).toString())
         }
 
         // Test reset - should go back to first item
         stepper.reset()
         expect(stepper.current).toEqual(tableValues[0])
         expect(stepper.index).toEqual('0')
-        expect(stepper.sm.stepState.currentIndex).toBe(0)
-        expect(stepper.sm.getData()).toEqual(tableValues[0])
 
         // Verify we can step forward again after reset
         const nextValue = stepper.next()
-        expect(nextValue).toBe(1)
+        expect(nextValue.id).toBe(1)
         expect(stepper.current).toEqual(tableValues[1])
         expect(stepper.index).toEqual('1')
-        expect(stepper.sm.stepState.currentIndex).toBe(1)
-        expect(stepper.sm.getData()).toEqual(tableValues[1])
       })
 
       it('should handle basic navigation as shown in documentation', async () => {
@@ -508,15 +492,15 @@ describe.skip('useHStepper composable', () => {
         expect(stepper.index).toBe('1-2')
 
         // Verify we're at the end
-        expect(stepper.next()).toBeNull()
+        expect(stepper.next().id).toBe('EOS')
 
         // Test going backwards
         stepper.prev()
         expect(stepper.current).toEqual([
           { range: 1, phase: 'parent', id: 1 },
-          { type: 'feedback', index: 1 },
+          { type: 'rest', index: 2 },
         ])
-        expect(stepper.index).toBe('1-1')
+        expect(stepper.index).toBe('1-2')
 
         // Reset should go back to first parent's first trial
         stepper.reset()
@@ -640,9 +624,13 @@ describe.skip('useHStepper composable', () => {
         expect(stepper.index).toBe('3')
 
         // Verify we're at the end
-        expect(stepper.next()).toBeNull()
+        expect(stepper.next().id).toBe('EOS')
 
         // Test going backwards
+        stepper.prev()
+        expect(stepper.current).toEqual([{ type: 'main', id: 4 }])
+        expect(stepper.index).toBe('3')
+
         stepper.prev()
         expect(stepper.current).toEqual([{ type: 'main', id: 3 }])
         expect(stepper.index).toBe('2')
@@ -656,7 +644,7 @@ describe.skip('useHStepper composable', () => {
         expect(stepper.index).toBe('0')
 
         // Verify we're at the beginning
-        expect(stepper.prev()).toBeNull()
+        expect(stepper.prev().id).toBe('SOS')
 
         // Test reset
         stepper.reset()
@@ -746,11 +734,12 @@ describe.skip('useHStepper composable', () => {
         for (let i = 0; i < 10; i++) {
           stepper.next() // Should eventually reach end without error
         }
+        /// this is past the EOS
         expect(stepper.next()).toBeNull() // Should handle going past end gracefully
 
         // Test navigating backwards beyond start
         stepper.reset()
-        expect(stepper.prev()).toBeNull() // Should handle going before start gracefully
+        expect(stepper.prev().id).toBe('SOS') // Should handle going before start gracefully
 
         // Test resetting at various positions
         stepper.next()
@@ -910,7 +899,7 @@ describe.skip('useHStepper composable', () => {
     })
   })
 
-  describe('stepper state machine integration', () => {
+  describe('stepstate and nestestedtable integration', () => {
     let smilestore
 
     beforeEach(async () => {
@@ -980,7 +969,7 @@ describe.skip('useHStepper composable', () => {
 
       // Verify we've reached the end
       stepper.next()
-      expect(stepper.current).toBeNull()
+      expect(stepper.current).toStrictEqual([])
     })
 
     it('should handle nested trial structures', async () => {
@@ -1103,7 +1092,7 @@ describe.skip('useHStepper composable', () => {
       stepper.next()
       expect(stepper.current).toEqual([{ type: 'trial', id: 2 }])
       stepper.next() // do we want to step to null?
-      expect(stepper.current).toBeNull()
+      expect(stepper.current).toStrictEqual([])
     })
   })
 })
