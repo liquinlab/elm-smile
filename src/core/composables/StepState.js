@@ -187,6 +187,49 @@ export class StepState {
   }
 
   /**
+   * Checks if this node is a leaf node (has no child states).
+   * @returns {boolean} True if this node has no child states, false otherwise
+   */
+  get isLeaf() {
+    return this._states.length === 0
+  }
+
+  /**
+   * Checks if this node is the first non-special leaf node in the tree.
+   *
+   * A leaf node is considered "first" if:
+   * 1. It is a leaf node (has no children)
+   * 2. It is the leftmost leaf node when traversing the tree that is not marked as 'SOS' or 'EOS'
+   *
+   * @returns {boolean} True if this is the first non-special leaf node, false otherwise
+   */
+  get isFirstLeaf() {
+    // If this is not a leaf node, return false
+    if (!this.isLeaf) {
+      return false
+    }
+
+    // Helper function to find leftmost leaf
+    const findLeftmostLeaf = (state) => {
+      if (state.isLeaf) {
+        return state
+      }
+      return findLeftmostLeaf(state._states[0])
+    }
+
+    // Find first non-SOS leaf by checking each branch from left
+    for (let i = 0; i < this._root._states.length; i++) {
+      const leftmostLeaf = findLeftmostLeaf(this._root._states[i])
+      if (leftmostLeaf.id !== 'SOS' && leftmostLeaf.id !== 'EOS') {
+        // Return true if this is that first non-SOS leaf
+        return leftmostLeaf.paths === this.paths
+      }
+    }
+
+    return false
+  }
+
+  /**
    * Checks if there is a next state available.
    * @returns {boolean} True if there is a next state, false otherwise
    */
@@ -412,18 +455,27 @@ export class StepState {
   }
 
   /**
-   * Gets all leaf nodes in the tree beneath this node.
+   * Gets all leaf node paths in the tree beneath this node.
    * A leaf node is defined as a node that has no children.
-   * @returns {Array} An array of all leaf nodes
+   * @returns {string} A hyphen-separated string of leaf node paths
    */
   get leafNodes() {
     if (this._states.length === 0) {
-      return [this.path]
+      return this.paths
     }
 
     return this._states.reduce((leaves, state) => {
       return leaves.concat(state.leafNodes)
     }, [])
+  }
+
+  /**
+   * Gets the total number of leaf nodes in the tree beneath this node.
+   * A leaf node is defined as a node that has no children.
+   * @returns {number} The count of leaf nodes
+   */
+  get countLeafNodes() {
+    return this.leafNodes.length
   }
 
   /**
@@ -448,7 +500,24 @@ export class StepState {
       if (!data) return data
       const cleaned = {}
       for (const [key, value] of Object.entries(data)) {
-        // Handle different non-serializable types differently
+        // Check if it's a Vue component
+        if (value && typeof value === 'object' && value.name && (value.template || value.render)) {
+          cleaned[key] = {
+            __vueComponent: true,
+            componentName: value.name,
+          }
+          continue
+        }
+
+        // Handle data objects that might contain component references
+        if (key === 'type' && value?.name && (value.template || value.render)) {
+          cleaned[key] = {
+            __vueComponent: true,
+            componentName: value.name,
+          }
+          continue
+        }
+
         if (
           typeof value === 'function' ||
           typeof value === 'undefined' ||
@@ -644,6 +713,25 @@ export class StepState {
     }
 
     return buildDiagram(this)
+  }
+
+  /**
+   * Completely clears all states and resets to initial condition
+   * Removes all child states and resets all internal properties
+   */
+  clear() {
+    // Clear all child states recursively
+    this._states.forEach((state) => {
+      state.clear()
+    })
+
+    // Reset all internal properties
+    this._states = []
+    this._currentIndex = 0
+    this._data = null
+
+    // Keep id, depth, parent, and root references intact
+    // as these define the node's position in the tree
   }
 }
 

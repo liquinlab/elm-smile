@@ -860,16 +860,94 @@ describe('StepState', () => {
       const greatgrandchild7 = grandchild7.push('greatgrandchild7')
 
       expect(stepper.leafNodes).toEqual([
-        ['child1', 'grandchild1', 'greatgrandchild1'],
-        ['child1', 'grandchild2', 'greatgrandchild2'],
-        ['child1', 'grandchild3', 'greatgrandchild3'],
-        ['child1', 'grandchild3', 'greatgrandchild4'],
-        ['child2', 'grandchild4'],
-        ['child2', 'grandchild5'],
-        ['child3', 'grandchild6'],
-        ['child4', 'grandchild7', 'greatgrandchild6'],
-        ['child4', 'grandchild7', 'greatgrandchild7'],
+        'child1-grandchild1-greatgrandchild1',
+        'child1-grandchild2-greatgrandchild2',
+        'child1-grandchild3-greatgrandchild3',
+        'child1-grandchild3-greatgrandchild4',
+        'child2-grandchild4',
+        'child2-grandchild5',
+        'child3-grandchild6',
+        'child4-grandchild7-greatgrandchild6',
+        'child4-grandchild7-greatgrandchild7',
       ])
+    })
+  })
+
+  describe('leaf node operations', () => {
+    it('should correctly identify leaf nodes', () => {
+      const child1 = stepper.push('child1')
+      const child2 = stepper.push('child2')
+      const grandchild1 = child1.push('grandchild1')
+      const grandchild2 = child1.push('grandchild2')
+
+      // Root node is not a leaf
+      expect(stepper.isLeaf).toBe(false)
+
+      // Child nodes with children are not leaves
+      expect(child1.isLeaf).toBe(false)
+      expect(child2.isLeaf).toBe(true)
+
+      // Grandchild nodes without children are leaves
+      expect(grandchild1.isLeaf).toBe(true)
+      expect(grandchild2.isLeaf).toBe(true)
+    })
+
+    it('should correctly identify first leaf node', () => {
+      const child1 = stepper.push('child1')
+      const child2 = stepper.push('child2')
+      const grandchild1 = child1.push('grandchild1')
+      const grandchild2 = child1.push('grandchild2')
+      const grandchild3 = child2.push('grandchild3')
+
+      // First leaf should be grandchild1
+      expect(grandchild1.isFirstLeaf).toBe(true)
+      expect(grandchild2.isFirstLeaf).toBe(false)
+      expect(grandchild3.isFirstLeaf).toBe(false)
+    })
+
+    it('should handle SOS and EOS nodes in first leaf check', () => {
+      const sos = stepper.push('SOS')
+      const child1 = stepper.push('child1')
+      const child2 = stepper.push('child2')
+      const eos = stepper.push('EOS')
+      const grandchild1 = child1.push('grandchild1')
+      const grandchild2 = child1.push('grandchild2')
+
+      // SOS and EOS nodes should not be considered first leaves
+      expect(sos.isFirstLeaf).toBe(false)
+      expect(eos.isFirstLeaf).toBe(false)
+
+      // First actual leaf should be grandchild1
+      expect(grandchild1.isFirstLeaf).toBe(true)
+      expect(grandchild2.isFirstLeaf).toBe(false)
+    })
+
+    it('should handle empty tree in first leaf check', () => {
+      // Root node is not a leaf
+      expect(stepper.isLeaf).toBe(true)
+      expect(stepper.isFirstLeaf).toBe(false) // SOS is not a leaf
+    })
+
+    it('should handle single node tree in first leaf check', () => {
+      const child = stepper.push('child')
+      expect(child.isLeaf).toBe(true)
+      expect(child.isFirstLeaf).toBe(true)
+    })
+
+    it('should handle complex tree structure in first leaf check', () => {
+      const child1 = stepper.push('child1')
+      const child2 = stepper.push('child2')
+      const grandchild1 = child1.push('grandchild1')
+      const grandchild2 = child1.push('grandchild2')
+      const grandchild3 = child2.push('grandchild3')
+      const greatgrandchild1 = grandchild1.push('greatgrandchild1')
+      const greatgrandchild2 = grandchild1.push('greatgrandchild2')
+
+      // First leaf should be greatgrandchild1
+      expect(greatgrandchild1.isFirstLeaf).toBe(true)
+      expect(greatgrandchild2.isFirstLeaf).toBe(false)
+      expect(grandchild2.isFirstLeaf).toBe(false)
+      expect(grandchild3.isFirstLeaf).toBe(false)
     })
   })
 
@@ -975,15 +1053,15 @@ describe('StepState', () => {
       const greatgrandchild7 = grandchild7.push('greatgrandchild7')
 
       expect(stepper.leafNodes).toEqual([
-        ['child1', 'grandchild1', 'greatgrandchild1'],
-        ['child1', 'grandchild2', 'greatgrandchild2'],
-        ['child1', 'grandchild3', 'greatgrandchild3'],
-        ['child1', 'grandchild3', 'greatgrandchild4'],
-        ['child2', 'grandchild4'],
-        ['child2', 'grandchild5'],
-        ['child3', 'grandchild6'],
-        ['child4', 'grandchild7', 'greatgrandchild6'],
-        ['child4', 'grandchild7', 'greatgrandchild7'],
+        'child1-grandchild1-greatgrandchild1',
+        'child1-grandchild2-greatgrandchild2',
+        'child1-grandchild3-greatgrandchild3',
+        'child1-grandchild3-greatgrandchild4',
+        'child2-grandchild4',
+        'child2-grandchild5',
+        'child3-grandchild6',
+        'child4-grandchild7-greatgrandchild6',
+        'child4-grandchild7-greatgrandchild7',
       ])
     })
   })
