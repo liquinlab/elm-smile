@@ -161,7 +161,7 @@ describe('useHStepper composable', () => {
       expect(stepper.prev).toBeInstanceOf(Function)
       expect(stepper.reset).toBeInstanceOf(Function)
       expect(stepper.index).toBeDefined()
-      expect(stepper.current).toBeDefined()
+      expect(stepper.datapath).toBeDefined()
       expect(stepper.sm).toBeInstanceOf(StepState)
     })
 
@@ -253,7 +253,7 @@ describe('useHStepper composable', () => {
 
     it('should create a table with the range method', async () => {
       const stepper = getCurrentRouteStepper()
-      const table = stepper.t().range(10)
+      const table = stepper.t.range(10)
       expect(table).toBeInstanceOf(NestedTable)
       expect(table.length).toBe(10) // preferred way to access
       expect(table.rows).toBeInstanceOf(Array)
@@ -265,14 +265,11 @@ describe('useHStepper composable', () => {
 
     it('should create a nested table', async () => {
       const stepper = getCurrentRouteStepper()
-      const table = stepper
-        .t()
-        .range(10)
-        .forEach((row, i) => {
-          // Create range items directly on the row (which is a NestedTable itself)
-          row.range(10)
-          //return row // Return the row to ensure changes are captured
-        })
+      const table = stepper.t.range(10).forEach((row, i) => {
+        // Create range items directly on the row (which is a NestedTable itself)
+        row.range(10)
+        //return row // Return the row to ensure changes are captured
+      })
       //table.print()
       expect(table).toBeInstanceOf(NestedTable)
       expect(table.length).toBe(10) // preferred way to access
@@ -312,16 +309,16 @@ describe('useHStepper composable', () => {
         stepper.reset()
 
         // Verify initial state - should be at first item
-        expect(stepper.current).toEqual(tableValues[0])
-        expect(stepper.index).toEqual('0')
+        expect(stepper.datapath).toEqual(tableValues[0])
+        expect(stepper.index).toEqual(1)
         expect(stepper.sm.index).toBe(1) /// skips SOS to start
 
         // // Step through remaining trials and verify values match
         for (let i = 1; i < 10; i++) {
           const nextValue = stepper.next()
           expect(nextValue.id).toBe(i)
-          expect(stepper.current).toEqual(tableValues[i])
-          expect(stepper.index).toEqual(i.toString())
+          expect(stepper.datapath).toEqual(tableValues[i])
+          expect(stepper.index).toEqual(i + 1) // stepper index start from 0 at the SOS
           expect(stepper.sm.index).toBe(i + 1)
         }
 
@@ -329,24 +326,24 @@ describe('useHStepper composable', () => {
         expect(stepper.next().id).toBe('EOS')
 
         // Step backwards and verify values
-        for (let i = 8; i >= 0; i--) {
+        for (let i = 9; i >= 0; i--) {
           const prevValue = stepper.prev()
-          expect(prevValue.id).toBe(i + 1)
-          expect(stepper.current).toEqual(tableValues[i + 1])
-          expect(stepper.index).toEqual((i + 1).toString())
+          expect(prevValue.id).toBe(i)
+          expect(stepper.datapath).toEqual(tableValues[i])
+          expect(stepper.index).toEqual(i + 1)
         }
 
         // Test reset - should go back to first item
         stepper.reset()
-        expect(stepper.current).toEqual(tableValues[0])
-        expect(stepper.index).toEqual('0')
+        expect(stepper.datapath).toEqual(tableValues[0])
+        expect(stepper.index).toEqual(1)
         expect(stepper.sm.index).toBe(1)
 
         // Verify we can step forward again after reset
         const nextValue = stepper.next()
         expect(nextValue.id).toBe(1)
-        expect(stepper.current).toEqual(tableValues[1])
-        expect(stepper.index).toEqual('1')
+        expect(stepper.datapath).toEqual(tableValues[1])
+        expect(stepper.index).toEqual(2)
         expect(stepper.sm.index).toBe(2)
       })
 
@@ -361,38 +358,38 @@ describe('useHStepper composable', () => {
         table.push()
 
         // Verify initial state - should be at first item
-        expect(stepper.current).toEqual(tableValues[0])
-        expect(stepper.index).toEqual('0')
+        expect(stepper.datapath).toEqual(tableValues[0])
+        expect(stepper.index).toEqual(1)
 
         // Step through remaining trials and verify values match
         for (let i = 1; i < 10; i++) {
           const nextValue = stepper.next()
           expect(nextValue.id).toBe(i)
-          expect(stepper.current).toEqual(tableValues[i])
-          expect(stepper.index).toEqual(i.toString())
+          expect(stepper.datapath).toEqual(tableValues[i])
+          expect(stepper.index).toEqual(i + 1)
         }
 
         // Verify we're at the end
         expect(stepper.next().id).toBe('EOS')
 
         // Step backwards and verify values
-        for (let i = 8; i >= 0; i--) {
+        for (let i = 9; i >= 0; i--) {
           const prevValue = stepper.prev()
-          expect(prevValue.id).toBe(i + 1)
-          expect(stepper.current).toEqual(tableValues[i + 1])
-          expect(stepper.index).toEqual((i + 1).toString())
+          expect(prevValue.id).toBe(i)
+          expect(stepper.datapath).toEqual(tableValues[i])
+          expect(stepper.index).toEqual(i + 1)
         }
 
         // Test reset - should go back to first item
         stepper.reset()
-        expect(stepper.current).toEqual(tableValues[0])
-        expect(stepper.index).toEqual('0')
+        expect(stepper.datapath).toEqual(tableValues[0])
+        expect(stepper.index).toEqual(1)
 
         // Verify we can step forward again after reset
         const nextValue = stepper.next()
         expect(nextValue.id).toBe(1)
-        expect(stepper.current).toEqual(tableValues[1])
-        expect(stepper.index).toEqual('1')
+        expect(stepper.datapath).toEqual(tableValues[1])
+        expect(stepper.index).toEqual(2)
       })
 
       it('should handle basic navigation as shown in documentation', async () => {
@@ -408,23 +405,23 @@ describe('useHStepper composable', () => {
           .push()
 
         // After push(), we're at the first trial
-        expect(stepper.current).toEqual([{ shape: 'circle', color: 'red' }])
-        expect(stepper.index).toBe('0')
+        expect(stepper.datapath).toEqual([{ shape: 'circle', color: 'red' }])
+        expect(stepper.index).toBe(1)
 
         // Move to next trial
         stepper.next()
-        expect(stepper.current).toEqual([{ shape: 'square', color: 'blue' }])
-        expect(stepper.index).toBe('1')
+        expect(stepper.datapath).toEqual([{ shape: 'square', color: 'blue' }])
+        expect(stepper.index).toBe(2)
 
         // Go back
         stepper.prev()
-        expect(stepper.current).toEqual([{ shape: 'circle', color: 'red' }])
-        expect(stepper.index).toBe('0')
+        expect(stepper.datapath).toEqual([{ shape: 'circle', color: 'red' }])
+        expect(stepper.index).toBe(1)
 
         // Reset always goes to the first trial
         stepper.reset()
-        expect(stepper.current).toEqual([{ shape: 'circle', color: 'red' }])
-        expect(stepper.index).toBe('0')
+        expect(stepper.datapath).toEqual([{ shape: 'circle', color: 'red' }])
+        expect(stepper.index).toBe(1)
       })
 
       it('should handle nested tables', async () => {
@@ -445,70 +442,70 @@ describe('useHStepper composable', () => {
         trials.push()
 
         // Verify initial state - should be at first child item
-        expect(stepper.index).toBe('0-0')
-        expect(stepper.current).toEqual([
+        expect(stepper.index).toBe(1)
+        expect(stepper.datapath).toEqual([
           { range: 0, phase: 'parent', id: 0 },
           { type: 'stim', index: 0 },
         ])
 
         // Move to second nested trial of first parent
         stepper.next()
-        expect(stepper.current).toEqual([
+        expect(stepper.datapath).toEqual([
           { range: 0, phase: 'parent', id: 0 },
           { type: 'feedback', index: 1 },
         ])
-        expect(stepper.index).toBe('0-1')
+        expect(stepper.index).toBe(2)
 
         // Move to third nested trial of first parent
         stepper.next()
-        expect(stepper.current).toEqual([
+        expect(stepper.datapath).toEqual([
           { range: 0, phase: 'parent', id: 0 },
           { type: 'rest', index: 2 },
         ])
-        expect(stepper.index).toBe('0-2')
+        expect(stepper.index).toBe(3)
 
         // Move to first nested trial of second parent
         stepper.next()
-        expect(stepper.current).toEqual([
+        expect(stepper.datapath).toEqual([
           { range: 1, phase: 'parent', id: 1 },
           { type: 'stim', index: 0 },
         ])
-        expect(stepper.index).toBe('1-0')
+        expect(stepper.index).toBe(4)
 
         // Move to second nested trial of second parent
         stepper.next()
-        expect(stepper.current).toEqual([
+        expect(stepper.datapath).toEqual([
           { range: 1, phase: 'parent', id: 1 },
           { type: 'feedback', index: 1 },
         ])
-        expect(stepper.index).toBe('1-1')
+        expect(stepper.index).toBe(5)
 
         // Move to third nested trial of second parent
         stepper.next()
-        expect(stepper.current).toEqual([
+        expect(stepper.datapath).toEqual([
           { range: 1, phase: 'parent', id: 1 },
           { type: 'rest', index: 2 },
         ])
-        expect(stepper.index).toBe('1-2')
+        expect(stepper.index).toBe(6)
 
         // Verify we're at the end
         expect(stepper.next().id).toBe('EOS')
 
         // Test going backwards
         stepper.prev()
-        expect(stepper.current).toEqual([
+        expect(stepper.datapath).toEqual([
           { range: 1, phase: 'parent', id: 1 },
           { type: 'rest', index: 2 },
         ])
-        expect(stepper.index).toBe('1-2')
+        expect(stepper.index).toBe(6)
 
         // Reset should go back to first parent's first trial
         stepper.reset()
-        expect(stepper.current).toEqual([
+        expect(stepper.datapath).toEqual([
           { range: 0, phase: 'parent', id: 0 },
           { type: 'stim', index: 0 },
         ])
-        expect(stepper.index).toBe('0-0')
+        expect(stepper.index).toBe(1)
       })
 
       it('should handle nodes with empty data objects', async () => {
@@ -526,21 +523,21 @@ describe('useHStepper composable', () => {
           .push()
 
         // Verify initial state
-        expect(stepper.current).toEqual([{}])
-        expect(stepper.index).toBe('0')
+        expect(stepper.datapath).toEqual([{}])
+        expect(stepper.index).toBe(1)
 
         // Navigate through all states
         stepper.next()
-        expect(stepper.current).toEqual([{ data: null }])
-        expect(stepper.index).toBe('1')
+        expect(stepper.datapath).toEqual([{ data: null }])
+        expect(stepper.index).toBe(2)
 
         stepper.next()
-        expect(stepper.current).toEqual([{ data: undefined }])
-        expect(stepper.index).toBe('2')
+        expect(stepper.datapath).toEqual([{ data: undefined }])
+        expect(stepper.index).toBe(3)
 
         stepper.next()
-        expect(stepper.current).toEqual([{ data: {} }])
-        expect(stepper.index).toBe('3')
+        expect(stepper.datapath).toEqual([{ data: {} }])
+        expect(stepper.index).toBe(4)
       })
 
       it('should handle nodes with missing data in the path', async () => {
@@ -566,19 +563,19 @@ describe('useHStepper composable', () => {
           .push()
 
         // Check first parent (only range data) with first child
-        expect(stepper.current).toEqual([{ range: 0 }, { type: 'stim' }])
-        expect(stepper.index).toBe('0-0')
+        expect(stepper.datapath).toEqual([{ range: 0 }, { type: 'stim' }])
+        expect(stepper.index).toBe(1)
 
         // Move to empty data child
         stepper.next()
-        expect(stepper.current).toEqual([{ range: 0 }, {}])
-        expect(stepper.index).toBe('0-1')
+        expect(stepper.datapath).toEqual([{ range: 0 }, {}])
+        expect(stepper.index).toBe(2)
 
         // Move to second parent (has additional data) with first child
         stepper.next()
         stepper.next()
-        expect(stepper.current).toEqual([{ range: 1, phase: 'parent' }, { type: 'stim' }])
-        expect(stepper.index).toBe('1-0')
+        expect(stepper.datapath).toEqual([{ range: 1, phase: 'parent' }, { type: 'stim' }])
+        expect(stepper.index).toBe(4)
       })
 
       it('should support sequential row addition through multiple pushes', async () => {
@@ -594,8 +591,8 @@ describe('useHStepper composable', () => {
           .push()
 
         // Verify initial state
-        expect(stepper.current).toEqual([{ type: 'practice', id: 1 }])
-        expect(stepper.index).toBe('0')
+        expect(stepper.datapath).toEqual([{ type: 'practice', id: 1 }])
+        expect(stepper.index).toBe(1)
 
         // Second push: Add main trials
         stepper
@@ -608,48 +605,48 @@ describe('useHStepper composable', () => {
 
         stepper.reset()
         // Verify we can navigate through all trials in sequence
-        expect(stepper.index).toBe('0')
-        expect(stepper.current).toEqual([{ type: 'practice', id: 1 }])
+        expect(stepper.index).toBe(1)
+        expect(stepper.datapath).toEqual([{ type: 'practice', id: 1 }])
 
         stepper.next()
-        expect(stepper.current).toEqual([{ type: 'practice', id: 2 }])
-        expect(stepper.index).toBe('1')
+        expect(stepper.datapath).toEqual([{ type: 'practice', id: 2 }])
+        expect(stepper.index).toBe(2)
 
         stepper.next()
-        expect(stepper.current).toEqual([{ type: 'main', id: 3 }])
-        expect(stepper.index).toBe('2')
+        expect(stepper.datapath).toEqual([{ type: 'main', id: 3 }])
+        expect(stepper.index).toBe(3)
 
         stepper.next()
-        expect(stepper.current).toEqual([{ type: 'main', id: 4 }])
-        expect(stepper.index).toBe('3')
+        expect(stepper.datapath).toEqual([{ type: 'main', id: 4 }])
+        expect(stepper.index).toBe(4)
 
         // Verify we're at the end
         expect(stepper.next().id).toBe('EOS')
 
         // Test going backwards
         stepper.prev()
-        expect(stepper.current).toEqual([{ type: 'main', id: 4 }])
-        expect(stepper.index).toBe('3')
+        expect(stepper.datapath).toEqual([{ type: 'main', id: 4 }])
+        expect(stepper.index).toBe(4)
 
         stepper.prev()
-        expect(stepper.current).toEqual([{ type: 'main', id: 3 }])
-        expect(stepper.index).toBe('2')
+        expect(stepper.datapath).toEqual([{ type: 'main', id: 3 }])
+        expect(stepper.index).toBe(3)
 
         stepper.prev()
-        expect(stepper.current).toEqual([{ type: 'practice', id: 2 }])
-        expect(stepper.index).toBe('1')
+        expect(stepper.datapath).toEqual([{ type: 'practice', id: 2 }])
+        expect(stepper.index).toBe(2)
 
         stepper.prev()
-        expect(stepper.current).toEqual([{ type: 'practice', id: 1 }])
-        expect(stepper.index).toBe('0')
+        expect(stepper.datapath).toEqual([{ type: 'practice', id: 1 }])
+        expect(stepper.index).toBe(1)
 
         // Verify we're at the beginning
         expect(stepper.prev().id).toBe('SOS')
 
         // Test reset
         stepper.reset()
-        expect(stepper.current).toEqual([{ type: 'practice', id: 1 }])
-        expect(stepper.index).toBe('0')
+        expect(stepper.datapath).toEqual([{ type: 'practice', id: 1 }])
+        expect(stepper.index).toBe(1)
       })
 
       it('should handle deep nesting (3+ levels)', async () => {
@@ -676,40 +673,40 @@ describe('useHStepper composable', () => {
           .push()
 
         // Verify initial state (first block, first trial, first phase)
-        expect(stepper.current).toEqual([
+        expect(stepper.datapath).toEqual([
           { range: 0, type: 'block', id: 0 },
           { range: 0, type: 'trial', id: 0 },
           { type: 'stimulus', phase: 1 },
         ])
-        expect(stepper.index).toBe('0-0-0')
+        expect(stepper.index).toBe(1)
 
         // Navigate through the structure
         stepper.next()
-        expect(stepper.current).toEqual([
+        expect(stepper.datapath).toEqual([
           { range: 0, type: 'block', id: 0 },
           { range: 0, type: 'trial', id: 0 },
           { type: 'response', phase: 2 },
         ])
-        expect(stepper.index).toBe('0-0-1')
+        expect(stepper.index).toBe(2)
 
         // Move to next trial's first phase
         stepper.next()
-        expect(stepper.current).toEqual([
+        expect(stepper.datapath).toEqual([
           { range: 0, type: 'block', id: 0 },
           { range: 1, type: 'trial', id: 1 },
           { type: 'stimulus', phase: 1 },
         ])
-        expect(stepper.index).toBe('0-1-0')
+        expect(stepper.index).toBe(3)
 
         // Move to next block
         stepper.next()
         stepper.next()
-        expect(stepper.current).toEqual([
+        expect(stepper.datapath).toEqual([
           { range: 1, type: 'block', id: 1 },
           { range: 0, type: 'trial', id: 0 },
           { type: 'stimulus', phase: 1 },
         ])
-        expect(stepper.index).toBe('1-0-0')
+        expect(stepper.index).toBe(5)
       })
 
       it('should handle error cases and invalid paths', async () => {
@@ -745,8 +742,8 @@ describe('useHStepper composable', () => {
         stepper.next()
         stepper.next()
         stepper.reset()
-        expect(stepper.current).toEqual([{ range: 0, phase: 'parent', id: 0 }, { type: 'stim' }])
-        expect(stepper.index).toBe('0-0')
+        expect(stepper.datapath).toEqual([{ range: 0, phase: 'parent', id: 0 }, { type: 'stim' }])
+        expect(stepper.index).toBe(1)
       })
     })
 
@@ -885,16 +882,16 @@ describe('useHStepper composable', () => {
           .push()
 
         // Navigation should work as expected
-        expect(stepper.current).toEqual([{ phase: 'training' }])
+        expect(stepper.datapath).toEqual([{ phase: 'training' }])
 
         stepper.next()
-        expect(stepper.current).toEqual([{ type: 'instruction' }])
+        expect(stepper.datapath).toEqual([{ type: 'instruction' }])
 
         stepper.next()
-        expect(stepper.current).toEqual([{ type: 'practice', id: 1 }])
+        expect(stepper.datapath).toEqual([{ type: 'practice', id: 1 }])
 
         stepper.next()
-        expect(stepper.current).toEqual([{ type: 'practice', id: 2 }])
+        expect(stepper.datapath).toEqual([{ type: 'practice', id: 2 }])
       })
     })
   })
@@ -956,20 +953,20 @@ describe('useHStepper composable', () => {
 
       // Verify initial state
       expect(stepper.sm).toBeDefined()
-      expect(stepper.index).toBe('0')
+      expect(stepper.index).toBe(1)
 
       // Verify state machine contains correct trials
-      expect(stepper.current).toEqual([{ type: 'instruction' }])
+      expect(stepper.datapath).toEqual([{ type: 'instruction' }])
 
       stepper.next()
-      expect(stepper.current).toEqual([{ type: 'trial', id: 1 }])
+      expect(stepper.datapath).toEqual([{ type: 'trial', id: 1 }])
 
       stepper.next()
-      expect(stepper.current).toEqual([{ type: 'trial', id: 2 }])
+      expect(stepper.datapath).toEqual([{ type: 'trial', id: 2 }])
 
       // Verify we've reached the end
       stepper.next()
-      expect(stepper.current).toStrictEqual([])
+      expect(stepper.datapath).toStrictEqual([])
     })
 
     it('should handle nested trial structures', async () => {
@@ -989,20 +986,20 @@ describe('useHStepper composable', () => {
       stepper.push(moretrials)
 
       // Verify navigation through nested structure
-      expect(stepper.current).toEqual([{ phase: 'training' }])
+      expect(stepper.datapath).toEqual([{ phase: 'training' }])
 
       // Push nested trials
       //stepper.push(nestedTrials)
 
       // Verify nested trials
       stepper.next()
-      expect(stepper.current).toEqual([{ type: 'instruction' }])
+      expect(stepper.datapath).toEqual([{ type: 'instruction' }])
 
       stepper.next()
-      expect(stepper.current).toEqual([{ type: 'practice', id: 1 }])
+      expect(stepper.datapath).toEqual([{ type: 'practice', id: 1 }])
 
       stepper.next()
-      expect(stepper.current).toEqual([{ type: 'practice', id: 2 }])
+      expect(stepper.datapath).toEqual([{ type: 'practice', id: 2 }])
     })
 
     it.skip('should persist state in smilestore', async () => {
@@ -1047,7 +1044,7 @@ describe('useHStepper composable', () => {
       stepper.reset()
 
       // Verify state machine is reset
-      expect(stepper.index).toBe('0')
+      expect(stepper.index).toBe(1)
 
       // Verify state is cleared from smilestore
       const currentRoute = router.currentRoute.value
@@ -1056,9 +1053,9 @@ describe('useHStepper composable', () => {
       //expect(pageData.stepperState).toBeNull()
 
       // Verify we can navigate from beginning again
-      expect(stepper.current).toEqual([{ type: 'trial', id: 1 }])
+      expect(stepper.datapath).toEqual([{ type: 'trial', id: 1 }])
       stepper.next()
-      expect(stepper.current).toEqual([{ type: 'trial', id: 2 }])
+      expect(stepper.datapath).toEqual([{ type: 'trial', id: 2 }])
     })
 
     // Add test for array input
@@ -1088,11 +1085,14 @@ describe('useHStepper composable', () => {
     it('should navigate to the next trial', async () => {
       const stepper = getCurrentRouteStepper()
       stepper.table().append({ type: 'trial', id: 1 }).append({ type: 'trial', id: 2 }).push()
-      expect(stepper.current).toEqual([{ type: 'trial', id: 1 }])
+      expect(stepper.datapath).toEqual([{ type: 'trial', id: 1 }])
       stepper.next()
-      expect(stepper.current).toEqual([{ type: 'trial', id: 2 }])
+      expect(stepper.datapath).toEqual([{ type: 'trial', id: 2 }])
       stepper.next() // do we want to step to null?
-      expect(stepper.current).toStrictEqual([])
+      expect(stepper.datapath).toStrictEqual([])
+    })
+  })
+
     })
   })
 })

@@ -214,11 +214,27 @@ export function useHStepper() {
       return table
     },
     // Expose current and index as computed properties
-    get current() {
-      return _data.value === null ? null : _data.value || []
+    get datapath() {
+      if (_data.value === null) return null
+
+      return _data.value.map((item) => {
+        if (item?.type?.__vueComponent) {
+          return {
+            ...item,
+            type: componentRegistry.get(item.type.componentName) || {
+              template: `<div>Component ${item.type.componentName} not found</div>`,
+            },
+          }
+        }
+        return item
+      })
     },
     get index() {
-      return _paths.value
+      // Get all leaf nodes from the state machine
+      const leafNodes = sm.leafNodes
+      //console.log('leafNodes', leafNodes)
+      // Find the index of our current path in the leaf nodes array
+      return leafNodes.indexOf(_paths.value)
     },
     get paths() {
       return _paths.value
@@ -253,7 +269,43 @@ export function useHStepper() {
       return table
     },
     // Shorthand for table()
-    t: () => stepper.table(),
+    get t() {
+      return stepper.table()
+    },
+    // Add transactionHistory getter to the stepper object
+    get transactionHistory() {
+      return _transactionHistory.value
+    },
+    get nrows() {
+      return sm.countLeafNodes
+    },
+
+    // Add new clearState method
+    clearState: () => {
+      if (smilestore.local.pageTracker[page]) {
+        // Remove the stepperState from the page tracker data
+        const pageData = smilestore.local.pageTracker[page].data || {}
+        delete pageData.stepperState
+        smilestore.local.pageTracker[page].data = pageData
+
+        // Clear all states and reset the state machine
+        sm.clear()
+        sm.push('SOS')
+        sm.push('EOS')
+
+        // Reset all internal refs
+        _path.value = []
+        _paths.value = ''
+        _data.value = null
+        _index.value = null
+        _transactionHistory.value = []
+        _stateMachine.value = visualizeStateMachine()
+
+        // Clear component registry and tables
+        componentRegistry.clear()
+        tables.clear()
+      }
+    },
   }
 
   // Helper function to visualize state machine
