@@ -1238,4 +1238,295 @@ describe('useHStepper composable', () => {
       expect(stepper.transactionHistory).toHaveLength(0)
     })
   })
+
+  describe('Vue component serialization and rehydration', () => {
+    // Define test components
+    const TestComponent = defineComponent({
+      name: 'TestComponent',
+      props: {
+        message: {
+          type: String,
+          required: true,
+        },
+      },
+      template: '<div>{{ message }}</div>',
+    })
+
+    const NestedComponent = defineComponent({
+      name: 'NestedComponent',
+      props: {
+        items: {
+          type: Array,
+          required: true,
+        },
+      },
+      template: '<div><div v-for="item in items">{{ item }}</div></div>',
+    })
+
+    beforeEach(async () => {
+      // Reset mock state
+      vi.clearAllMocks()
+
+      // Create a fresh router for each test
+      router = createRouter({
+        history: createWebHashHistory(),
+        routes,
+      })
+
+      // Create pinia instance
+      const pinia = createTestingPinia({
+        stubActions: false,
+        createSpy: vi.fn,
+      })
+
+      // Create a test component that uses the composable
+      const TestWrapper = defineComponent({
+        template: `
+          <div>
+            <router-view></router-view>
+          </div>
+        `,
+      })
+
+      // Create a mock component for routes that uses the composable
+      const MockComponent = defineComponent({
+        name: 'MockComponent',
+        setup() {
+          const api = useAPI()
+          const stepper = api.useHStepper()
+          return { api, stepper }
+        },
+        template: `<div>Mock Component</div>`,
+      })
+
+      // Mount the test wrapper component
+      wrapper = mount(TestWrapper, {
+        global: {
+          plugins: [pinia, router],
+          stubs: {
+            RouterLink: true,
+          },
+        },
+      })
+
+      // Navigate to the first route and wait for it to be ready
+      await router.push('/')
+      await router.isReady()
+      await flushPromises()
+
+      api = getCurrentRouteAPI()
+    })
+
+    it('should serialize and rehydrate a simple component', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create a table with a component
+      const table = stepper
+        .table()
+        .append({
+          type: TestComponent,
+          props: { message: 'Hello World' },
+        })
+        .push()
+
+      // Verify initial state
+      expect(stepper.datapath[0].type).toEqual(TestComponent)
+      expect(stepper.datapath[0].props.message).toBe('Hello World')
+
+      // Simulate state serialization by creating a new stepper
+      const newStepper = getCurrentRouteStepper()
+
+      // Verify component was rehydrated
+      expect(newStepper.datapath[0].type).toEqual(TestComponent)
+      expect(newStepper.datapath[0].props.message).toBe('Hello World')
+    })
+
+    it('should handle components in nested structures', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create a nested table with components at different levels
+      const table = stepper
+        .table()
+        .append({
+          type: TestComponent,
+          props: { message: 'Parent' },
+        })
+        .forEach((row) => {
+          row.append({
+            type: NestedComponent,
+            props: { items: ['Child 1', 'Child 2'] },
+          })
+        })
+        .push()
+
+      // Verify initial state
+      expect(stepper.datapath[0].type).toEqual(TestComponent)
+      expect(stepper.datapath[0].props.message).toBe('Parent')
+      expect(stepper.datapath[1].type).toEqual(NestedComponent)
+      expect(stepper.datapath[1].props.items).toEqual(['Child 1', 'Child 2'])
+
+      // Simulate state serialization by creating a new stepper
+      const newStepper = getCurrentRouteStepper()
+
+      // Verify nested structure was rehydrated
+      expect(newStepper.datapath[0].type).toEqual(TestComponent)
+      expect(newStepper.datapath[0].props.message).toBe('Parent')
+      expect(newStepper.datapath[1].type).toEqual(NestedComponent)
+      expect(newStepper.datapath[1].props.items).toEqual(['Child 1', 'Child 2'])
+    })
+
+    it('should handle multiple components in the same structure', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create a table with multiple components
+      const table = stepper
+        .table()
+        .append({
+          type: TestComponent,
+          props: { message: 'First' },
+        })
+        .push()
+
+      // Push additional components separately since they need to be in sequence
+      const table2 = stepper
+        .table()
+        .append({
+          type: TestComponent,
+          props: { message: 'Second' },
+        })
+        .append({
+          type: NestedComponent,
+          props: { items: ['Item 1', 'Item 2'] },
+        })
+        .push()
+
+      // Verify initial state
+      expect(stepper.datapath[0].type).toEqual(TestComponent)
+      expect(stepper.datapath[0].props.message).toBe('First')
+
+      // Navigate to next component
+      stepper.next()
+      expect(stepper.datapath[0].type).toEqual(TestComponent)
+      expect(stepper.datapath[0].props.message).toBe('Second')
+
+      // Navigate to final component
+      stepper.next()
+      expect(stepper.datapath[0].type).toEqual(NestedComponent)
+      expect(stepper.datapath[0].props.items).toEqual(['Item 1', 'Item 2'])
+    })
+
+    it('should handle components with complex props', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create a component with complex props
+      const ComplexComponent = defineComponent({
+        name: 'ComplexComponent',
+        props: {
+          data: {
+            type: Object,
+            required: true,
+          },
+          items: {
+            type: Array,
+            required: true,
+          },
+        },
+        template: '<div>{{ data.name }} <div v-for="item in items">{{ item }}</div></div>',
+      })
+
+      // Create a table with a component having complex props
+      const table = stepper
+        .table()
+        .append({
+          type: ComplexComponent,
+          props: {
+            data: { name: 'Complex', value: 42 },
+            items: [
+              { id: 1, text: 'One' },
+              { id: 2, text: 'Two' },
+            ],
+          },
+        })
+        .push()
+
+      // Verify initial state
+      expect(stepper.datapath[0].type).toEqual(ComplexComponent)
+      expect(stepper.datapath[0].props.data).toEqual({ name: 'Complex', value: 42 })
+      expect(stepper.datapath[0].props.items).toEqual([
+        { id: 1, text: 'One' },
+        { id: 2, text: 'Two' },
+      ])
+
+      // Simulate state serialization by creating a new stepper
+      const newStepper = getCurrentRouteStepper()
+
+      // Verify complex props were rehydrated
+      expect(newStepper.datapath[0].type).toEqual(ComplexComponent)
+      expect(newStepper.datapath[0].props.data).toEqual({ name: 'Complex', value: 42 })
+      expect(newStepper.datapath[0].props.items).toEqual([
+        { id: 1, text: 'One' },
+        { id: 2, text: 'Two' },
+      ])
+    })
+
+    it('should handle missing components gracefully', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create a table with a non-existent component
+      const table = stepper
+        .table()
+        .append({
+          type: { componentName: 'NonExistentComponent' },
+          props: { message: 'Test' },
+        })
+        .push()
+
+      // Verify initial state
+      expect(stepper.datapath[0].type.componentName).toBe('NonExistentComponent')
+      expect(stepper.datapath[0].props.message).toBe('Test')
+
+      // Simulate state serialization by creating a new stepper
+      const newStepper = getCurrentRouteStepper()
+
+      // Verify the non-existent component data is preserved
+      expect(newStepper.datapath[0].type.componentName).toBe('NonExistentComponent')
+      expect(newStepper.datapath[0].props.message).toBe('Test')
+    })
+
+    it('should maintain component state through navigation', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create a table with multiple components
+      const table = stepper
+        .table()
+        .append([
+          {
+            type: TestComponent,
+            props: { message: 'First' },
+          },
+          {
+            type: TestComponent,
+            props: { message: 'Second' },
+          },
+        ])
+        .push()
+
+      // Navigate through components
+      expect(stepper.datapath[0].props.message).toBe('First')
+      stepper.next()
+      expect(stepper.datapath[0].props.message).toBe('Second')
+
+      // Go back
+      stepper.prev()
+      expect(stepper.datapath[0].props.message).toBe('First')
+
+      // Simulate state serialization by creating a new stepper
+      const newStepper = getCurrentRouteStepper()
+
+      // Verify navigation state was preserved
+      expect(newStepper.datapath[0].props.message).toBe('First')
+      newStepper.next()
+      expect(newStepper.datapath[0].props.message).toBe('Second')
+    })
+  })
 })

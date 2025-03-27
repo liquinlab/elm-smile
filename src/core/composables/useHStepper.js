@@ -75,6 +75,38 @@ export function useHStepper() {
     }
   }
 
+  // Create internal component registry
+  const componentRegistry = new Map()
+
+  // Helper to register component
+  const registerComponent = (component) => {
+    if (component?.name && (component.template || component.render)) {
+      componentRegistry.set(component.name, component)
+    }
+  }
+
+  // Helper to scan data for components
+  const scanForComponents = (data) => {
+    if (!data) return
+
+    // Check if the item itself is a component
+    if (data?.name && (data.template || data.render)) {
+      registerComponent(data)
+    }
+
+    // Check type property for component
+    if (data?.type?.name && (data.type.template || data.type.render)) {
+      registerComponent(data.type)
+    }
+
+    // Recursively scan arrays and objects
+    if (Array.isArray(data)) {
+      data.forEach(scanForComponents)
+    } else if (typeof data === 'object') {
+      Object.values(data).forEach(scanForComponents)
+    }
+  }
+
   // Create the stepper object that will be returned
   const stepper = {
     // Navigation methods
@@ -134,6 +166,12 @@ export function useHStepper() {
       const tnxID = transactionId()
       const fullTransactionId = `${table.tableID}-${tnxID}`
       console.log('push', fullTransactionId)
+
+      // Always scan table items for components, regardless of saved state
+      table._items.forEach((item) => {
+        scanForComponents(item.data)
+      })
+
       // Skip the actual push if we're loading from saved state or if table was already pushed
       if (savedState && _transactionHistory.value.includes(fullTransactionId)) {
         return table
@@ -332,6 +370,16 @@ export function useHStepper() {
       },
     })
   })
+
+  // When loading from savedState, we should also scan the existing state
+  if (savedState) {
+    // Scan the entire state machine for components
+    const scanStateMachine = (state) => {
+      scanForComponents(state.data)
+      state.states.forEach(scanStateMachine)
+    }
+    scanStateMachine(sm)
+  }
 
   return stepper
 }
