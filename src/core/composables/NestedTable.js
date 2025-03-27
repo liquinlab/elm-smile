@@ -1075,8 +1075,9 @@ class NestedTable {
       'getSubtreeData',
 
       // Getters
-      //'path',
-      //'paths',
+      'id',
+      'path',
+      'paths',
       'length',
       'rows',
       'rowsdata',
@@ -1110,6 +1111,62 @@ class NestedTable {
 
   get readOnly() {
     return this._readOnly
+  }
+
+  /**
+   * Get the unique identifier for this table node.
+   *
+   * @returns {string} UUID v4 string that uniquely identifies this node
+   */
+  get id() {
+    return this._id
+  }
+
+  /**
+   * Generates a deterministic signature/hash of the entire table structure including all nodes.
+   * This can be used to compare tables or track changes.
+   *
+   * @returns {string} A unique hash representing the entire table structure and data
+   */
+  get tableID() {
+    // Helper function to create a deterministic string representation of any value
+    const stringifyValue = (value) => {
+      if (value === undefined) return 'undefined'
+      if (value === null) return 'null'
+      if (typeof value === 'object') {
+        // Sort object keys to ensure consistent ordering
+        const sortedKeys = Object.keys(value).sort()
+        return '{' + sortedKeys.map((key) => `${key}:${stringifyValue(value[key])}`).join(',') + '}'
+      }
+      return String(value)
+    }
+
+    // Helper function to recursively process the table structure
+    const processNode = (node) => {
+      const nodeSignature = [
+        `path:${node._path.join('-')}`,
+        `data:${stringifyValue(node.data)}`,
+        'items:[' + node._items.map((item) => processNode(item)).join(',') + ']',
+      ].join(';')
+
+      return nodeSignature
+    }
+
+    // Get the full table signature
+    const fullSignature = processNode(this)
+
+    // Create a hash of the signature using a simple but fast hashing function
+    const hash = (str) => {
+      let hash = 5381
+      for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) + hash + str.charCodeAt(i)
+        hash = hash & hash // Convert to 32-bit integer
+      }
+      return hash >>> 0 // Convert to unsigned
+    }
+
+    // Return the final hash in hex format
+    return hash(fullSignature).toString(16).padStart(8, '0')
   }
 
   /**

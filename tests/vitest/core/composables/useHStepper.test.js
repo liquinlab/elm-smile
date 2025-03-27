@@ -1093,6 +1093,149 @@ describe('useHStepper composable', () => {
     })
   })
 
+  describe('transaction history', () => {
+    it('should generate deterministic transaction IDs', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // First push
+      const table1 = stepper.table().append({ type: 'trial', id: 1 })
+      const firstHash = table1.tableID
+      stepper.push(table1)
+
+      // Second push
+      const table2 = stepper.table().append({ type: 'trial', id: 2 })
+      const secondHash = table2.tableID
+      stepper.push(table2)
+
+      // Verify transaction history format - using base36 format (8 chars)
+      expect(stepper.transactionHistory).toHaveLength(2)
+      expect(stepper.transactionHistory[0]).toMatch(new RegExp(`${firstHash}-[a-z0-9]{8}`))
+      expect(stepper.transactionHistory[1]).toMatch(new RegExp(`${secondHash}-[a-z0-9]{8}`))
+
+      // Verify IDs are different
+      const [, firstId] = stepper.transactionHistory[0].split('-')
+      const [, secondId] = stepper.transactionHistory[1].split('-')
+      expect(firstId).not.toBe(secondId)
+    })
+
+    it('should prevent duplicate pushes of same table/transaction', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create and push a table
+      const table1 = stepper.table().append({ type: 'trial', id: 1 })
+      stepper.push(table1)
+      const initialLength = stepper.nrows
+
+      // Try to push identical data in a new table (since original is read-only)
+      const table2 = stepper.table().append({ type: 'trial', id: 1 })
+      stepper.push(table2)
+
+      // Verify no new rows were added
+      expect(stepper.nrows).toBe(initialLength)
+      expect(stepper.transactionHistory).toHaveLength(1)
+    })
+
+    it('should handle complex nested table structures in transaction history', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create a complex nested table
+      const table1 = stepper.table().range(2)
+      table1.forEach((row) => {
+        row.append([
+          { type: 'stim', phase: 1 },
+          { type: 'feedback', phase: 2 },
+        ])
+      })
+
+      // Push and store hash
+      const hash1 = table1.tableID
+      stepper.push(table1)
+
+      // Create identical structure in a new table
+      const table2 = stepper.table().range(2)
+      table2.forEach((row) => {
+        row.append([
+          { type: 'stim', phase: 1 },
+          { type: 'feedback', phase: 2 },
+        ])
+      })
+
+      // Verify identical structure generates same hash
+      expect(table2.tableID).toBe(hash1)
+
+      // Push should be skipped due to duplicate hash
+      stepper.push(table2)
+      expect(stepper.transactionHistory).toHaveLength(1)
+      expect(stepper.nrows).toBe(6) // 2 parent rows * (2 child rows + 1 parent data) = 6
+    })
+
+    it('should generate consistent table hashes for identical data', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create two identical tables
+      const table1 = stepper.table().append({ type: 'trial', id: 1 })
+      const table2 = stepper.table().append({ type: 'trial', id: 1 })
+
+      // Verify they generate the same hash
+      expect(table1.tableID).toBe(table2.tableID)
+    })
+
+    it('should allow pushing different data even with same structure', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Push first table
+      const table1 = stepper.table().append({ type: 'trial', id: 1 })
+      stepper.push(table1)
+      const initialLength = stepper.nrows
+
+      // Push second table with different data
+      const table2 = stepper.table().append({ type: 'trial', id: 2 })
+      stepper.push(table2)
+
+      // Verify new rows were added
+      expect(stepper.nrows).toBe(initialLength + 1)
+      expect(stepper.transactionHistory).toHaveLength(2)
+    })
+
+    it('should maintain transaction history across resets', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Push some tables
+      const table1 = stepper.table().append({ type: 'trial', id: 1 })
+      stepper.push(table1)
+
+      const table2 = stepper.table().append({ type: 'trial', id: 2 })
+      stepper.push(table2)
+
+      // Store transaction history
+      const history = [...stepper.transactionHistory]
+
+      // Reset stepper
+      stepper.reset()
+
+      // Verify history is maintained
+      expect(stepper.transactionHistory).toEqual(history)
+      expect(stepper.transactionHistory).toHaveLength(2)
+    })
+
+    it('should clear transaction history with clearState', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Push some tables
+      const table1 = stepper.table().append({ type: 'trial', id: 1 })
+      stepper.push(table1)
+
+      const table2 = stepper.table().append({ type: 'trial', id: 2 })
+      stepper.push(table2)
+
+      // Verify history exists
+      expect(stepper.transactionHistory).toHaveLength(2)
+
+      // Clear state
+      stepper.clearState()
+
+      // Verify history is cleared
+      expect(stepper.transactionHistory).toHaveLength(0)
     })
   })
 })

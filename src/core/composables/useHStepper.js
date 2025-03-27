@@ -22,8 +22,16 @@ export function useHStepper() {
   const _paths = ref('')
   const _index = ref(null)
   const _stateMachine = ref(null) // Add reactive ref for state machine visualization
+  const _transactionHistory = ref([]) // Add new ref for transaction history
   // Internal table management
   const tables = new Map()
+
+  // Modify the RNG implementation to return 8-character string
+  let _seed = 12345 // Fixed seed for deterministic behavior
+  const transactionId = () => {
+    _seed = (_seed * 1664525 + 1013904223) >>> 0 // LCG parameters from Numerical Recipes
+    return (_seed & 0xffffffff).toString(36).padStart(8, '0').slice(-8) // Convert to base36 string, padded to 8 chars
+  }
 
   // Register page tracker if not already registered
   smilestore.registerPageTracker(page)
@@ -33,11 +41,12 @@ export function useHStepper() {
 
   if (savedState) {
     //console.log('STEPPER: Loading saved state from smilestore')
-    sm.loadFromJSON(savedState)
+    sm.loadFromJSON(savedState.stepperState)
     _data.value = sm.pathdata
     _paths.value = sm.currentPaths
     _path.value = sm.currentPath || [] // Ensure path is never null
     _index.value = sm.index
+    _transactionHistory.value = savedState.transactionHistory || [] // Load transaction history
     //console.log('STEPPER: Loaded state from smilestore with path', sm.currentPaths)
   } else {
     sm.push('SOS')
@@ -46,6 +55,7 @@ export function useHStepper() {
     _paths.value = ''
     _data.value = null
     _index.value = null
+    _transactionHistory.value = [] // Initialize empty transaction history
   }
 
   // Get all protected methods from a temporary table instance
@@ -57,7 +67,10 @@ export function useHStepper() {
       //console.log('STEPPER: Saving state to smilestore')
       smilestore.local.pageTracker[page].data = {
         ...smilestore.local.pageTracker[page].data,
-        stepperState: sm.json,
+        stepperState: {
+          stepperState: sm.json,
+          transactionHistory: _transactionHistory.value,
+        },
       }
     }
   }
@@ -116,11 +129,24 @@ export function useHStepper() {
       _stateMachine.value = visualizeStateMachine() // Update state machine visualization
       sm.next()
     },
-    push: (table, force = false) => {
-      if (savedState && !force) {
-        //console.log('STEPPER: Skipping push as state was loaded from storage')
+    push: (table) => {
+      // Generate a new random number at the start of each push
+      const tnxID = transactionId()
+      const fullTransactionId = `${table.tableID}-${tnxID}`
+      console.log('push', fullTransactionId)
+      // Skip the actual push if we're loading from saved state or if table was already pushed
+      if (savedState && _transactionHistory.value.includes(fullTransactionId)) {
         return table
       }
+
+      // Check if we've already pushed a table with this hash
+      const existingTransaction = _transactionHistory.value.find((tx) => tx.startsWith(table.tableID + '-'))
+      if (existingTransaction) {
+        return table
+      }
+
+      // Add combined transaction ID to transaction history
+      _transactionHistory.value.push(fullTransactionId)
 
       // Check if the table is already read-only
       if (table.isReadOnly) {
@@ -167,43 +193,9 @@ export function useHStepper() {
 
       // Set the table to read-only
       table.setReadOnly()
-
-      // Reset the state machine to prepare for navigation
-      // sm.reset()
-
-      // // Navigate through the structure - first to top level
-      // if (sm.states.length > 0) {
-      //   sm.next()
-
-      //   // Then try to navigate to the first child if there are nested elements
-      //   // This simulates navigating through the structure: 0-0, 0-1, etc.
-      //   let currentSm = sm
-      //   let currentIndex = 0
-
-      //   // Check if the current state has child states
-      //   while (currentSm && currentSm.index >= 0 && currentSm.length > 0) {
-      //     // Get the index of the current state
-      //     currentIndex = currentSm.index
-
-      //     // Get the state machine for the current index
-      //     const childSm = currentSm[currentIndex]
-
-      //     // If the child state machine has states, navigate to its first state
-      //     if (childSm && childSm.length > 0) {
-      //       childSm.next()
-      //       currentSm = childSm
-      //     } else {
-      //       // Break the loop if there are no more child states
-      //       break
-      //     }
-      //   }
-
-      //   // Update the current value and path
-      //   _data.value = sm.pathdata
-      //   _paths.value = sm.currentPaths
-      //   _path.value = sm.currentPath
-      // }
-      if (!savedState && !force) {
+      console.log('index', sm.index)
+      if (sm.index == 0) {
+        console.log('resetting', sm.index)
         stepper.reset()
       }
 
