@@ -3,6 +3,10 @@ import { ref, computed, watch, onMounted, defineComponent, h } from 'vue'
 import TreeNode from './TreeNode.vue'
 
 const props = defineProps({
+  stepper: {
+    type: Object,
+    required: true,
+  },
   stateMachine: {
     type: Object,
     required: true,
@@ -114,10 +118,66 @@ const formatData = (data) => {
 const handleNodeClick = (path) => {
   emit('node-click', path)
 }
+
+// Add this function to handle reload
+const handleReload = () => {
+  window.location.reload()
+}
+
+const isEndState = computed(() => {
+  return props.stepper.paths === 'SOS' || props.stepper.paths === 'EOS'
+})
 </script>
 
 <template>
   <div class="tree-viewer-container">
+    <div class="columns w-full topbar">
+      <div class="column is-7 smaller">
+        <span class="index-display">{{ stepper.index }}</span>
+        <span class="path-display">{{ stepper.paths }}</span>
+        &nbsp;<FAIcon icon="fa-solid fa-ban" v-if="isEndState" />
+      </div>
+      <div class="column is-5 smaller">
+        <div class="field has-addons">
+          <p class="control">
+            <button @click="stepper.prev()" class="button is-small nav-button">
+              <span>
+                <FAIcon icon="fa-solid fa-angle-left" />
+              </span>
+            </button>
+          </p>
+          <p class="control">
+            <button @click="stepper.reset()" class="button is-small nav-button">
+              <span>
+                <FAIcon icon="fa-solid fa-house-flag" />
+              </span>
+            </button>
+          </p>
+          <p class="control">
+            <button @click="stepper.next()" class="button is-small nav-button">
+              <span>
+                <FAIcon icon="fa-solid fa-angle-right" />
+              </span>
+            </button>
+          </p>
+          <p class="control">
+            <button @click="stepper.clearState()" class="button is-small nav-button">
+              <span>
+                <FAIcon icon="fa-solid fa-trash" />
+              </span>
+            </button>
+          </p>
+          <p class="control">
+            <button @click="handleReload" class="button is-small nav-button">
+              <span>
+                <FAIcon icon="fa-solid fa-arrow-rotate-left" />
+              </span>
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+
     <div class="tree-container">
       <ul class="tree-root">
         <li v-if="stateMachine" class="tree-node root-node">
@@ -143,6 +203,51 @@ const handleNodeClick = (path) => {
 </template>
 
 <style>
+.nav-button {
+  font-size: 0.6rem;
+  border-left: 1px solid #e4e4e4;
+}
+.path-display {
+  margin-left: 5px;
+  margin-top: 8px;
+  font-size: 1.2rem;
+  font-family: monospace;
+  font-weight: 800;
+  color: #323232;
+}
+.field {
+  padding-top: 4px;
+}
+.smaller {
+  padding-bottom: 11px;
+  padding-top: 10px;
+}
+.topbar {
+  background-color: #f8f8f8;
+}
+.topbar-border {
+  border-top: 1px solid #e4e4e4;
+  padding-top: 4px;
+}
+.data-display {
+  font-size: 0.7rem;
+  font-family: monospace;
+  color: #6a6a6a;
+}
+.index-display {
+  font-size: 0.8rem;
+  font-family: monospace;
+  font-weight: 800;
+  color: #6a6a6a;
+}
+.content-display {
+  font-size: 0.7rem;
+  line-height: 1.4;
+  font-family: monospace;
+  font-weight: 800;
+  color: #6a6a6a;
+  white-space: pre-wrap;
+}
 .tree-viewer-container {
   text-align: left;
   width: 400px;

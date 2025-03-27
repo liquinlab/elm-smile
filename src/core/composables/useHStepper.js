@@ -345,8 +345,11 @@ export function useHStepper() {
       // Create a clean object without currentIndex, depth, and parent
       const cleanState = {
         data: state.data,
+        pathdata: state.pathdata,
         path: state.paths,
         index: state.index,
+        isLeaf: state.isLeaf,
+        isFirstLeaf: state.isFirstLeaf,
         rows: [],
       }
 

@@ -1,4 +1,6 @@
 <script setup>
+import { computed } from 'vue'
+
 const props = defineProps({
   state: Object,
   index: Number,
@@ -28,11 +30,11 @@ const handleClick = () => {
 const getBranchType = (index, total, depth) => {
   // Only show ┌── for the first item at depth 1
   if (index === 0 && depth === 1) {
-    return '┌── '
+    return '┌─ '
   } else if (index === total - 1) {
-    return '└── '
+    return '└─ '
   } else {
-    return '├── '
+    return '├─ '
   }
 }
 
@@ -40,7 +42,7 @@ const getBranchType = (index, total, depth) => {
 const getVerticalPrefix = (verticalLines) => {
   if (!verticalLines || !verticalLines.length) return ''
 
-  return verticalLines.map((hasLine) => (hasLine ? '│   ' : '    ')).join('')
+  return verticalLines.map((hasLine) => (hasLine ? '│ ' : '  ')).join('')
 }
 
 // Create new vertical lines for children based on current node
@@ -52,17 +54,28 @@ const getChildVerticalLines = (verticalLines, index, total) => {
 
   return newLines
 }
+
+const isEndState = computed(() => {
+  return props.state.path === 'SOS' || props.state.path === 'EOS'
+})
 </script>
 
 <template>
   <li class="tree-node">
-    <div class="tree-line" :class="{ 'node-selected': isNodeSelected(state.path) }" @click="handleClick">
+    <div
+      class="tree-line"
+      :class="{
+        'node-selected': isNodeSelected(state.path),
+      }"
+      @click="handleClick"
+    >
       <span class="vertical-lines">{{ getVerticalPrefix(verticalLines) }}</span>
-      <span class="tree-branch">{{ getBranchType(index, total, depth) }}</span>
-      <span class="node-path">{{ state.path }}</span>
-      <span v-if="state.data !== null && state.data !== undefined" class="node-data">
-        {{ formatData(state.data) }}
-      </span>
+      <span class="tree-branch" :class="{ 'end-state': isEndState }">{{ getBranchType(index, total, depth) }}</span>
+      <span class="node-path" :class="{ 'end-state': isEndState, 'leaf-state': !state.isLeaf }"
+        >{{ state.path }} <FAIcon icon="fa-solid fa-house-flag" class="home-icon" v-if="state.isFirstLeaf" />
+        <FAIcon icon="fa-solid fa-leaf" class="leaf-icon" v-else-if="state.isLeaf && !isEndState" />
+        <FAIcon icon="fa-solid fa-ban" v-if="isEndState"
+      /></span>
     </div>
 
     <!-- Recursive tree nodes, but limit depth -->
@@ -97,16 +110,19 @@ const getChildVerticalLines = (verticalLines, index, total) => {
   padding: 2px 0;
   white-space: pre;
   cursor: pointer;
+  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .tree-line:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
 }
 
 .node-selected {
-  background-color: rgb(250, 250, 214);
+  background-color: rgb(146, 249, 224);
   color: black;
-  border-radius: 5px;
+  border-radius: 10px;
 }
 
 .vertical-lines {
@@ -132,5 +148,24 @@ const getChildVerticalLines = (verticalLines, index, total) => {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.end-state {
+  opacity: 0.4;
+  color: #f10e0e;
+}
+
+.leaf-state {
+  opacity: 0.5;
+}
+
+.leaf-icon {
+  color: #04a004;
+  opacity: 0.35;
+}
+
+.home-icon {
+  color: #0eb6e0;
+  opacity: 0.65;
 }
 </style>

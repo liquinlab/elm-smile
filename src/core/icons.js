@@ -13,6 +13,9 @@ import { faQrcode } from '@fortawesome/free-solid-svg-icons'
 import { faDownload } from '@fortawesome/free-solid-svg-icons'
 import { faGear } from '@fortawesome/free-solid-svg-icons'
 import { faBook } from '@fortawesome/free-solid-svg-icons'
+import { faBan } from '@fortawesome/free-solid-svg-icons'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faHouseFlag } from '@fortawesome/free-solid-svg-icons'
 import { faClock } from '@fortawesome/free-solid-svg-icons'
 import { faCloudArrowUp } from '@fortawesome/free-solid-svg-icons'
 import { faArrowsTurnToDots } from '@fortawesome/free-solid-svg-icons'
@@ -71,12 +74,17 @@ import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons'
 import { faClock as farClock } from '@fortawesome/free-regular-svg-icons'
 import { faDiamond as faDiamond } from '@fortawesome/free-solid-svg-icons'
 import { faPerson } from '@fortawesome/free-solid-svg-icons'
+import { faLeaf } from '@fortawesome/free-solid-svg-icons'
 /* add icons to the library */
 library.add(
   faRobot,
   faSwatchbook,
   faDesktop,
   farCircle,
+  faTrash,
+  faHouseFlag,
+  faLeaf,
+  faBan,
   faCircleChevronLeft,
   faQrcode,
   faDownload,

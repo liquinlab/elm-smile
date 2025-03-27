@@ -2,13 +2,35 @@
 import useAPI from '@/core/composables/useAPI'
 import StateTreeViewer from '@/dev/developer_mode/StateTreeViewer.vue'
 import { computed } from 'vue'
+import { defineComponent, h } from 'vue'
 
 const api = useAPI()
 
-const stepper = api.useHStepper()
+const Stimulus = defineComponent({
+  name: 'Stimulus',
+  template: `
+    <div>
+      Stim
+    </div>
+  `,
+})
 
-const trials = stepper
-  .t()
+const Feedback = defineComponent({
+  name: 'Feedback',
+  template: `
+    <div>
+      Feedback
+    </div>
+  `,
+})
+
+const stepper = api.useHStepper()
+const trials = stepper.t
+  .append([{ type: Stimulus }, { type: Feedback }])
+  .repeat(3)
+  .push()
+
+const trials2 = stepper.t
   .append([
     { type: 'trial', id: 1 },
     { type: 'trial', id: 2 },
@@ -21,15 +43,12 @@ const trials = stepper
         { type: 'step', id: index++ },
       ])
       .forEach((step) => {
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 25; i++) {
           step.append([{ type: 'step', id: i }])
         }
       })
   })
   .push()
-
-//stepper.push(trials)
-stepper.reset()
 
 function next() {
   if (this.stepper.next() == null) {
@@ -38,8 +57,8 @@ function next() {
 }
 
 function adddata() {
-  const trials = stepper.t().append([{ type: 'added', id: 100 }])
-  stepper.push(trials, true)
+  const trials = stepper.t.append([{ type: 'added', id: stepper.nrows - 2 }])
+  stepper.push(trials)
 }
 </script>
 
@@ -47,16 +66,20 @@ function adddata() {
   <div>
     <h1 class="title">Stepper Test</h1>
     <div class="tree-diagram-text">
-      <b>Path String</b>: {{ stepper.paths }}<br />
-      <b>Path</b>: {{ stepper.path }}<br />
-      <b>Current</b>: {{ stepper.current }}<br />
+      <b>Path</b>: {{ stepper.paths }}<br />
+      <b>Index</b>: {{ stepper.index }}<br />
+      <b>Data on Path</b>: {{ stepper.datapath }}<br />
     </div>
-    <button @click="stepper.prev()" class="button is-primary m-2">Prev</button>
-    <button @click="stepper.reset()" class="button is-danger m-2">Reset</button>
-    <button @click="next()" class="button is-primary m-2">Next</button>
-    <button @click="adddata()" class="button is-warning m-2">Add Data</button>
+    <component :is="stepper.current?.[0]?.type" />
+
     <br />
-    <StateTreeViewer :state-machine="stepper.sm" :path="stepper.path" @node-click="stepper.resetTo" />
+    <StateTreeViewer
+      :stepper="stepper"
+      :state-machine="stepper.smviz"
+      :path="stepper.path"
+      @node-click="stepper.resetTo"
+    />
+    <button @click="adddata()" class="button is-small is-warning m-2">Add Data</button>
   </div>
 </template>
 
