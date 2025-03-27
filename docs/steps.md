@@ -73,8 +73,7 @@ For example:
 const stepper = api.useHStepper()
 
 // Create and push some trials
-const trials = stepper
-  .table()
+const trials = stepper.t
   .append([
     { shape: 'circle', color: 'red' },
     { shape: 'square', color: 'blue' },
@@ -105,10 +104,10 @@ With nested trials, the `index` property shows the full path:
 
 ```js
 const stepper = api.useHStepper()
-const trials = stepper.table().range(2) // Create parent trials
+const trials = stepper.t.range(2) // Create parent trials
 
 // Add nested trials to first parent
-trials[0].table().append([{ type: 'stim' }, { type: 'feedback' }])
+trials[0].t.append([{ type: 'stim' }, { type: 'feedback' }])
 
 trials.push()
 
@@ -141,14 +140,14 @@ The `stepper` also provides methods for building trial sequences through its
 ### Building Trial Tables
 
 The stepper provides a powerful API for creating and manipulating trial
-sequences. You start by calling `table()` to create a fresh table, then use
-various chainable methods to build up your sequence:
+sequences. You start by calling `table()` or `t()` to create a fresh table, then
+use various chainable methods to build up your sequence:
 
 ```js
 const stepper = api.useHStepper()
 
 // Create a new table and append some trials
-const trials = stepper.table().append([
+const trials = stepper.t.append([
   { shape: 'circle', color: 'red' },
   { shape: 'square', color: 'green' },
 ])
@@ -170,8 +169,7 @@ sequence into the stepper's state:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper
-  .table()
+const trials = stepper.t
   .append({ shape: 'circle', color: 'red' })
   .append({ shape: 'square', color: 'green' })
   .push() // Save the trials to the state machine
@@ -203,8 +201,8 @@ The `length` property behaves differently for tables and entries:
 For example:
 
 ```js
-const trials = stepper.table().range(2)
-trials[0].table().append([{ type: 'stim' }, { type: 'feedback' }])
+const trials = stepper.t.range(2)
+trials[0].t.append([{ type: 'stim' }, { type: 'feedback' }])
 
 console.log(trials.length) // 2 (number of rows in parent table)
 console.log(trials[0].length) // 2 (number of rows in nested table)
@@ -243,19 +241,18 @@ array-like indexing:
 const stepper = api.useHStepper()
 
 // Create a parent table with 3 trials
-const trials = stepper.table().range(3)
+const trials = stepper.t.range(3)
 
 // Create nested tables for specific trials
-trials[0].table().range(3) // First trial gets 3 sub-trials
-trials[1].table().range(5) // Second trial gets 5 sub-trials
+trials[0].t.range(3) // First trial gets 3 sub-trials
+trials[1].t.range(5) // Second trial gets 5 sub-trials
 
 // Access nested table rows using array indexing
 console.log(trials[0][0]) // First row of first trial's nested table
 console.log(trials[1][2]) // Third row of second trial's nested table
 
 // You can chain operations on nested tables
-trials[0]
-  .table()
+trials[0].t
   .range(3)
   .forEach((row) => ({ ...row, type: 'test' }))
   .append([{ index: 3, type: 'extra' }])
@@ -270,9 +267,9 @@ will overwrite any existing one:
 const stepper = api.useHStepper()
 
 // Create two nested tables for the first trial
-const trials = stepper.table().range(2)
-trials[0].table().range(2) // First nested table
-trials[0].table().range(3) // Second nested table overwrites the first
+const trials = stepper.t.range(2)
+trials[0].t.range(2) // First nested table
+trials[0].t.range(3) // Second nested table overwrites the first
 
 // The second table (with 3 rows) is now accessible
 console.log(trials[0][0]) // First row of the nested table
@@ -313,7 +310,7 @@ Tables provide array-like access to their rows:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper.table().append([
+const trials = stepper.t.append([
   { shape: 'circle', color: 'red' },
   { shape: 'square', color: 'green' },
 ])
@@ -342,7 +339,7 @@ pairing values by their position:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper.table().zip({
+const trials = stepper.t.zip({
   shape: ['circle', 'square', 'triangle'],
   color: ['red', 'green', 'blue'],
 })
@@ -366,7 +363,7 @@ option:
 const stepper = api.useHStepper()
 
 // Loop shorter arrays
-const trials1 = stepper.table().zip(
+const trials1 = stepper.t.zip(
   {
     shape: ['circle', 'square'],
     color: ['red', 'green', 'blue'],
@@ -381,7 +378,7 @@ const trials1 = stepper.table().zip(
 // ]
 
 // Pad with a specific value
-const trials2 = stepper.table().zip(
+const trials2 = stepper.t.zip(
   {
     shape: ['circle', 'square'],
     color: ['red', 'green', 'blue'],
@@ -396,7 +393,7 @@ const trials2 = stepper.table().zip(
 // ]
 
 // Repeat the last value
-const trials3 = stepper.table().zip(
+const trials3 = stepper.t.zip(
   {
     shape: ['circle', 'square'],
     color: ['red', 'green', 'blue'],
@@ -431,7 +428,7 @@ single-element arrays:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper.table().zip(
+const trials = stepper.t.zip(
   {
     shape: 'circle', // Treated as ['circle']
     color: ['red', 'green', 'blue'],
@@ -459,7 +456,7 @@ The `outer()` method creates all possible combinations of values:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper.table().outer({
+const trials = stepper.t.outer({
   shape: ['circle', 'square'],
   color: ['red', 'green'],
 })
@@ -492,7 +489,7 @@ as single-element arrays:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper.table().outer({
+const trials = stepper.t.outer({
   shape: 'circle', // Treated as ['circle']
   color: ['red', 'green'],
 })
@@ -517,8 +514,7 @@ times, in order:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper
-  .table()
+const trials = stepper.t
   .append([
     { shape: 'circle', color: 'red' },
     { shape: 'square', color: 'green' },
@@ -546,7 +542,7 @@ numbered trials or when you want to build a sequence that you'll modify later:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper.table().range(3)
+const trials = stepper.t.range(3)
 
 // Results in:
 // [
@@ -565,13 +561,10 @@ complex sequences:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper
-  .table()
-  .range(2)
-  .forEach((row) => ({
-    ...row,
-    condition: row.range % 2 === 0 ? 'A' : 'B',
-  }))
+const trials = stepper.t.range(2).forEach((row) => ({
+  ...row,
+  condition: row.range % 2 === 0 ? 'A' : 'B',
+}))
 
 // Results in:
 // [
@@ -599,7 +592,7 @@ development and debugging:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper.table().append([
+const trials = stepper.t.append([
   { shape: 'circle', color: 'red' },
   { shape: 'square', color: 'blue' },
 ])
@@ -619,12 +612,12 @@ The `print()` method also handles nested tables with proper indentation:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper.table().range(2)
-trials[0].table().append([
+const trials = stepper.t.range(2)
+trials[0].t.append([
   { type: 'stim', value: 1 },
   { type: 'feedback', value: 2 },
 ])
-trials[1].table().append([{ type: 'stim', value: 3 }])
+trials[1].t.append([{ type: 'stim', value: 3 }])
 
 trials.print()
 // Output:
@@ -649,8 +642,7 @@ other methods:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper
-  .table()
+const trials = stepper.t
   .append({ shape: 'circle' })
   .print() // Print current state
   .append({ shape: 'square' })
@@ -671,12 +663,12 @@ different trial types:
 ```js
 const stepper = api.useHStepper()
 
-const trials1 = stepper.table().append([
+const trials1 = stepper.t.append([
   { type: 'stim', id: 1 },
   { type: 'stim', id: 2 },
 ])
 
-const trials2 = stepper.table().append([
+const trials2 = stepper.t.append([
   { type: 'feedback', id: 3 },
   { type: 'feedback', id: 4 },
 ])
@@ -700,13 +692,13 @@ The method can handle tables of different lengths, arrays, or single objects:
 const stepper = api.useHStepper()
 
 // Different length tables
-const trials1 = stepper.table().append([
+const trials1 = stepper.t.append([
   { type: 'stim', id: 1 },
   { type: 'stim', id: 2 },
   { type: 'stim', id: 3 },
 ])
 
-const trials2 = stepper.table().append([
+const trials2 = stepper.t.append([
   { type: 'feedback', id: 4 },
   { type: 'feedback', id: 5 },
 ])
@@ -750,8 +742,7 @@ with other methods:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper
-  .table()
+const trials = stepper.t
   .append([
     { type: 'stim', id: 1 },
     { type: 'stim', id: 2 },
@@ -777,7 +768,7 @@ beginning or end of your trial table:
 const stepper = api.useHStepper()
 
 // Take the first 3 trials
-const trials1 = stepper.table().range(5).head(3)
+const trials1 = stepper.t.range(5).head(3)
 
 // Results in:
 // [
@@ -790,7 +781,7 @@ const trials1 = stepper.table().range(5).head(3)
 trials1.push()
 
 // Take the last 3 trials
-const trials2 = stepper.table().range(5).tail(3)
+const trials2 = stepper.t.range(5).tail(3)
 
 // Results in:
 // [
@@ -811,8 +802,7 @@ You can combine these methods with other operations:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper
-  .table()
+const trials = stepper.t
   .range(5)
   .tail(3)
   .forEach((row) => ({ ...row, condition: 'test' }))
@@ -853,8 +843,7 @@ The `forEach()` method allows you to modify each trial:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper
-  .table()
+const trials = stepper.t
   .append([
     { shape: 'circle', color: 'red' },
     { shape: 'square', color: 'green' },
@@ -886,8 +875,7 @@ shuffle operation respects the seeded random number generation system (see
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper
-  .table()
+const trials = stepper.t
   .append([
     { shape: 'circle', color: 'red' },
     { shape: 'square', color: 'green' },
@@ -908,8 +896,7 @@ randomization:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper
-  .table()
+const trials = stepper.t
   .append([
     { shape: 'circle', color: 'red' },
     { shape: 'square', color: 'green' },
@@ -945,7 +932,7 @@ sampling types:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper.table().append([
+const trials = stepper.t.append([
   { id: 1, shape: 'circle', color: 'red' },
   { id: 2, shape: 'square', color: 'green' },
   { id: 3, shape: 'triangle', color: 'blue' },
@@ -955,3 +942,30 @@ const trials = stepper.table().append([
 // Push the trials
 trials.push()
 ```
+
+# Steps to steps
+
+## Persistence
+
+- [x] 100% confidence in StepState component and tests
+- [x] serialize non serializable data
+- [x] the current .t() hiding method will not work for .partition() and .map()
+      etc... maybe scrap it
+- [] autofill functionality
+
+## Testing
+
+- [] test where the step data includes component references
+- [x] useHstepper test
+
+## Transparent State Management
+
+- [x] the "force" option in push is bullshit
+- [x] transactions to allow declarative state changes
+- [] testing for stepper component integration
+- [] can move table modifications and transctions inside stepstate?
+
+## Integration
+
+- [] useHstepper dev bar
+- [] useHstepper in builtin/user components
