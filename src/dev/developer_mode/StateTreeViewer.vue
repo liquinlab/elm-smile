@@ -131,6 +131,7 @@ const handleNodeClick = (path) => {
   console.log('Node clicked with path:', path)
   if (stepper.value) {
     stepper.value.resetTo(path)
+    // Scroll will happen via the watcher
   } else {
     console.warn('Stepper not available for path reset')
   }
@@ -145,6 +146,47 @@ const isEndState = computed(() => {
   if (!stepper.value) return false
   return stepper.value.paths === 'SOS' || stepper.value.paths === 'EOS'
 })
+
+// Add refs for container and selected node tracking
+const treeContainer = ref(null)
+
+const scrollToSelectedNode = () => {
+  if (!stepper.value?.path) return
+
+  setTimeout(() => {
+    // Use the component's scope to find the selected node
+    if (!treeContainer.value) return
+
+    const selectedNode = treeContainer.value.querySelector('.node-selected')
+    if (!selectedNode) return
+
+    try {
+      // First try the new ScrollIntoViewOptions
+      selectedNode.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest',
+      })
+    } catch (e) {
+      // Fallback for older browsers or if the above fails
+      const containerRect = treeContainer.value.getBoundingClientRect()
+      const nodeRect = selectedNode.getBoundingClientRect()
+      const scrollOffset = nodeRect.top - containerRect.top - containerRect.height / 2 + nodeRect.height / 2
+
+      treeContainer.value.scrollTop += scrollOffset
+    }
+  }, 100)
+}
+
+// Add watcher for path changes to trigger scroll
+watch(
+  () => stepper.value?.path,
+  (newPath) => {
+    if (newPath) {
+      scrollToSelectedNode()
+    }
+  }
+)
 </script>
 
 <template>
@@ -176,7 +218,7 @@ const isEndState = computed(() => {
       </div>
     </div>
 
-    <div class="tree-container">
+    <div class="tree-container" ref="treeContainer">
       <ul class="tree-root">
         <li v-if="stateMachine" class="tree-node root-node">
           <ul v-if="stateMachine.rows && stateMachine.rows.length > 0" class="children">
@@ -298,8 +340,13 @@ const isEndState = computed(() => {
   height: 500px;
   overflow: auto;
   font-family: monospace;
-  flex-shrink: 0; /* Prevent shrinking */
+  flex-shrink: 0;
   border-top: 1px solid #cacaca;
+  position: relative;
+  scroll-behavior: smooth;
+  height: auto;
+  max-height: 500px;
+  flex: 1;
 }
 
 .tree-root {
