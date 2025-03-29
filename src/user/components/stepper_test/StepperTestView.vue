@@ -24,7 +24,8 @@ const Feedback = defineComponent({
   `,
 })
 
-const stepper = api.useHStepper()
+const stepper = api.useStepper()
+
 const trials = stepper.t
   .append([{ type: Stimulus }, { type: Feedback }])
   .repeat(3)

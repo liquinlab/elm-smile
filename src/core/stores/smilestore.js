@@ -127,6 +127,7 @@ const init_global = {
   // ephemeral state, resets on browser refresh
   progress: 0,
   forceNavigate: false,
+  steppers: {}, // Store for useHStepper instances
   db_connected: false,
   db_changes: true,
   urls: {
@@ -199,6 +200,7 @@ export default defineStore('smilestore', {
     getConditions: (state) => state.local.conditions,
     getRandomizedRoutes: (state) => state.local.randomizedRoutes,
     verifiedVisibility: (state) => state.data.verified_visibility,
+    getStepper: (state) => (page) => state.global.steppers[page],
     getShortId: (state) => {
       if (!state.local.docRef || typeof state.local.docRef !== 'string') return 'N/A'
       //const lastDashIndex = state.local.docRef.lastIndexOf('-')

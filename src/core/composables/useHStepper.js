@@ -165,7 +165,6 @@ export function useHStepper() {
       // Generate a new random number at the start of each push
       const tnxID = transactionId()
       const fullTransactionId = `${table.tableID}-${tnxID}`
-      console.log('push', fullTransactionId)
 
       // Always scan table items for components, regardless of saved state
       table._items.forEach((item) => {
@@ -231,9 +230,7 @@ export function useHStepper() {
 
       // Set the table to read-only
       table.setReadOnly()
-      console.log('index', sm.index)
       if (sm.index == 0) {
-        console.log('resetting', sm.index)
         stepper.reset()
       }
 

@@ -1,54 +1,25 @@
-import { shuffle } from '@/core/randomization'
-import { ref, computed } from 'vue'
+import { useHStepper } from './useHStepper'
 import useSmileStore from '@/core/stores/smilestore'
-import useLog from '@/core/stores/log'
 import { useRoute } from 'vue-router'
 
-export function useStepper(trials) {
+export function useStepper() {
   const smilestore = useSmileStore()
-  const log = useLog()
   const route = useRoute()
   const page = route.name
+
+  // Set page_provides_trial_stepper to true for the dev bar
   smilestore.dev.page_provides_trial_stepper = true
 
-  const n_trials = trials.length
-
-  function nextStep() {
-    log.log('STEPPER: Advancing to next step')
-    if (smilestore.getPageTrackerIndex(page) < n_trials - 1) {
-      smilestore.incrementPageTracker(page)
-    } else {
-      smilestore.incrementPageTracker(page)
+  // Initialize the stepper in global smilestore if it doesn't exist
+  if (!smilestore.global.steppers?.[page]) {
+    if (!smilestore.global.steppers) {
+      smilestore.global.steppers = {}
     }
+    smilestore.global.steppers[page] = useHStepper()
   }
 
-  function prevStep() {
-    log.warn('TRIAL STEPPER: Rewinding to prev trial')
-    if (smilestore.getPageTrackerIndex(page) > 0) {
-      smilestore.decrementPageTracker(page)
-    }
-  }
-
-  function resetStep() {
-    smilestore.resetPageTracker(page)
-  }
-
-  const step_index = computed(() => {
-    return smilestore.getPageTrackerIndex(page)
-  })
-
-  const step = computed(() => {
-    return trials[step_index.value]
-  })
-
-  return {
-    next: nextStep,
-    prev: prevStep,
-    reset: resetStep,
-    // Simple getters for reactive versions
-    index: () => step_index.value,
-    current: () => step.value,
-  }
+  // Return the existing stepper instance
+  return smilestore.global.steppers[page]
 }
 
 export default useStepper
