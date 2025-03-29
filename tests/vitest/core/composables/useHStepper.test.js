@@ -1529,4 +1529,118 @@ describe('useHStepper composable', () => {
       expect(newStepper.datapath[0].props.message).toBe('Second')
     })
   })
+
+  describe('path field functionality', () => {
+    it('should use path field for node identifiers in simple tables', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create a table with explicit paths
+      const table = stepper
+        .table()
+        .append([
+          { path: 'intro', type: 'instruction' },
+          { path: 'practice', type: 'trial' },
+          { path: 'main', type: 'trial' },
+        ])
+        .push()
+
+      // Verify initial state uses the specified path
+      expect(stepper.path).toEqual(['intro'])
+      expect(stepper.paths).toBe('intro')
+      expect(stepper.datapath).toEqual([{ path: 'intro', type: 'instruction' }])
+
+      // Navigate and verify paths
+      stepper.next()
+      expect(stepper.path).toEqual(['practice'])
+      expect(stepper.paths).toBe('practice')
+      expect(stepper.datapath).toEqual([{ path: 'practice', type: 'trial' }])
+
+      stepper.next()
+      expect(stepper.path).toEqual(['main'])
+      expect(stepper.paths).toBe('main')
+      expect(stepper.datapath).toEqual([{ path: 'main', type: 'trial' }])
+    })
+
+    it('should use path field for node identifiers in nested tables', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create a nested table structure with explicit paths
+      const table = stepper
+        .table()
+        .append([
+          { path: 'block1', type: 'block' },
+          { path: 'block2', type: 'block' },
+        ])
+        .forEach((block) => {
+          block.append([
+            { path: 'stim', type: 'stimulus' },
+            { path: 'feedback', type: 'response' },
+          ])
+        })
+        .push()
+
+      // Verify initial state
+      expect(stepper.path).toEqual(['block1', 'stim'])
+      expect(stepper.paths).toBe('block1-stim')
+      expect(stepper.datapath).toEqual([
+        { path: 'block1', type: 'block' },
+        { path: 'stim', type: 'stimulus' },
+      ])
+
+      // Navigate through the structure and verify paths
+      stepper.next()
+      expect(stepper.path).toEqual(['block1', 'feedback'])
+      expect(stepper.paths).toBe('block1-feedback')
+      expect(stepper.datapath).toEqual([
+        { path: 'block1', type: 'block' },
+        { path: 'feedback', type: 'response' },
+      ])
+
+      stepper.next()
+      expect(stepper.path).toEqual(['block2', 'stim'])
+      expect(stepper.paths).toBe('block2-stim')
+      expect(stepper.datapath).toEqual([
+        { path: 'block2', type: 'block' },
+        { path: 'stim', type: 'stimulus' },
+      ])
+
+      stepper.next()
+      expect(stepper.path).toEqual(['block2', 'feedback'])
+      expect(stepper.paths).toBe('block2-feedback')
+      expect(stepper.datapath).toEqual([
+        { path: 'block2', type: 'block' },
+        { path: 'feedback', type: 'response' },
+      ])
+    })
+
+    it('should mix explicit paths with default sequential numbering', async () => {
+      const stepper = getCurrentRouteStepper()
+
+      // Create a table with mixed path specification
+      const table = stepper
+        .table()
+        .append([
+          { path: 'intro', type: 'instruction' },
+          { type: 'trial' }, // No path specified
+          { path: 'final', type: 'trial' },
+        ])
+        .push()
+
+      // Verify initial state
+      expect(stepper.path).toEqual(['intro'])
+      expect(stepper.paths).toBe('intro')
+      expect(stepper.datapath).toEqual([{ path: 'intro', type: 'instruction' }])
+
+      // Navigate and verify default numbering is used when path is not specified
+      stepper.next()
+      expect(stepper.path).toEqual([1]) // Default sequential numbering
+      expect(stepper.paths).toBe('1')
+      expect(stepper.datapath).toEqual([{ type: 'trial' }])
+
+      stepper.next()
+      expect(stepper.path).toEqual(['final'])
+      expect(stepper.paths).toBe('final')
+      expect(stepper.datapath).toEqual([{ path: 'final', type: 'trial' }])
+    })
+  })
 })

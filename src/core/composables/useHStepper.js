@@ -204,12 +204,20 @@ export function useHStepper() {
         for (let i = 0; i < nestedTable._items.length; i++) {
           const item = nestedTable._items[i]
 
-          // Create a new state in the state machine, using startIndex + i to ensure unique indices
+          // Use path from data if available, otherwise use index-based approach
           let state
-          if (level == 0) {
-            state = parentState.insert(startIndex + i, -2)
+          if (item.data && item.data.path !== undefined) {
+            if (level == 0) {
+              state = parentState.insert(item.data.path, -2)
+            } else {
+              state = parentState.push(item.data.path)
+            }
           } else {
-            state = parentState.push(startIndex + i)
+            if (level == 0) {
+              state = parentState.insert(startIndex + i, -2)
+            } else {
+              state = parentState.push(startIndex + i)
+            }
           }
 
           // Set data for this item
@@ -217,8 +225,7 @@ export function useHStepper() {
             state.data = item.data
           }
 
-          // Process child items if they exist - need to handle all nested elements
-          // NestedTable items are stored directly in the _items array
+          // Process child items if they exist
           if (item._items && item._items.length > 0) {
             processTable(item, state, level + 1)
           }
