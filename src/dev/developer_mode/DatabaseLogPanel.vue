@@ -6,7 +6,7 @@ const api = SmileAPI()
 import useLog from '@/core/stores/log'
 const log = useLog()
 
-const height_pct = computed(() => `${api.store.dev.data_bar_height - 70}px`)
+const height_pct = computed(() => `${api.store.dev.console_bar_height - 70}px`)
 
 function filter_log(msg) {
   const search_match = msg.message.toLowerCase().includes(api.store.dev.search_params.toLowerCase())

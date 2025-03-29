@@ -64,7 +64,7 @@ function adddata() {
 </script>
 
 <template>
-  <div>
+  <div class="page">
     <h1 class="title">Stepper Test</h1>
     <div class="tree-diagram-text">
       <b>Path</b>: {{ stepper.paths }}<br />
@@ -74,17 +74,18 @@ function adddata() {
     <component :is="stepper.current?.[0]?.type" />
 
     <br />
-    <StateTreeViewer
-      :stepper="stepper"
-      :state-machine="stepper.smviz"
-      :path="stepper.path"
-      @node-click="stepper.resetTo"
-    />
+    <div class="viewer-container">
+      <StateTreeViewer />
+    </div>
     <button @click="adddata()" class="button is-small is-warning m-2">Add Data</button>
   </div>
 </template>
 
 <style scoped>
+.viewer-container {
+  width: 400px;
+  margin: 0 auto;
+}
 .tree-diagram-text {
   text-align: left;
   width: 400px;

@@ -82,8 +82,9 @@ const init_dev = {
   // syncs with local storage
   page_provides_autofill: null, // does current page offer autofil (transient)
   page_provides_trial_stepper: false, // does current page provide a trial stepper (transient)
-  show_data_bar: false, // show/hide the data base bottom (transient)
-  data_bar_height: 370, // height of the data bar (transient)
+  show_console_bar: false, // show/hide the data base bottom (transient)
+  show_side_bar: false,
+  console_bar_height: 460, // height of the data bar (transient)
   data_bar_tab: 'database', // which tab to show in the data bar (transient)
   search_params: '', // search parameters (transient)
   log_filter: 'All', // what level of log messages to show (transient)
@@ -183,7 +184,7 @@ export default defineStore('smilestore', {
   }),
 
   getters: {
-    isDataBarVisible: (state) => state.dev.show_data_bar,
+    isDataBarVisible: (state) => state.dev.show_console_bar,
     isKnownUser: (state) => state.local.knownUser,
     isConsented: (state) => state.local.consented,
     isWithdrawn: (state) => state.local.withdrawn,

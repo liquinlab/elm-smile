@@ -57,7 +57,7 @@ const alt_tooltip = computed(() => {
     <button
       class="button devbar-button has-tooltip-arrow has-tooltip-bottom"
       :data-tooltip="database_tooltip"
-      @click="api.store.dev.show_data_bar = !api.store.dev.show_data_bar"
+      @click="api.store.dev.show_console_bar = !api.store.dev.show_console_bar"
     >
       <FAIcon
         icon="fa-solid fa-database"

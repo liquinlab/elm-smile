@@ -37,7 +37,7 @@ const stopTimer = () => {
 
 const startTimer = () => {
   timer.value = setInterval(() => {
-    //api.debug("updating timer", api.store.dev.show_data_bar)
+    //api.debug("updating timer", api.store.dev.show_console_bar)
     if (!api.store.global.db_connected) {
       last_write_time_string.value = `Never happened`
     } else {

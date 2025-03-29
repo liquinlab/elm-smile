@@ -135,7 +135,6 @@ function submitWithdraw() {
   flex-flow: row nowrap;
   align-items: stretch;
   position: relative;
-  z-index: 10;
 }
 
 .infobar-brand {

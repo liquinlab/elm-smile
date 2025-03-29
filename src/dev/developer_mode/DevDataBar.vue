@@ -11,8 +11,6 @@ const mousedown = ref(false)
 
 const { x, y } = useMouse()
 
-const height_pct = computed(() => `${api.store.dev.data_bar_height}px`)
-
 function down() {
   mousedown.value = true
   window.addEventListener('mousemove', move)
@@ -23,13 +21,13 @@ function up() {
 }
 function move() {
   if (mousedown.value == true) {
-    api.store.dev.data_bar_height = Math.min(window.innerHeight - y.value + 20, window.innerHeight) // small adjustment to where you probably click
+    api.store.dev.console_bar_height = Math.min(window.innerHeight - y.value + 20, window.innerHeight) // small adjustment to where you probably click
   }
 }
 </script>
 
 <template>
-  <nav class="databar devdatabar is-fixed-bottom">
+  <nav class="databar">
     <aside class="menu datamenu">
       <ul class="menu-list">
         <li :class="{ active: api.store.dev.data_bar_tab == 'database' }">
@@ -79,7 +77,10 @@ function move() {
 
           <div class="databar-panel-header-end">
             <div class="databar-panel-header-item closebutton">
-              <a class="databar-panel-header-item" @click="api.store.dev.show_data_bar = !api.store.dev.show_data_bar">
+              <a
+                class="databar-panel-header-item"
+                @click="api.store.dev.show_console_bar = !api.store.dev.show_console_bar"
+              >
                 <FAIcon icon="fa-solid fa-circle-xmark icon" />
               </a>
             </div>
@@ -95,7 +96,7 @@ function move() {
   </nav>
 </template>
 
-<style>
+<style scoped>
 .databar-panel-header {
   display: flex;
   flex-flow: row nowrap;
@@ -136,11 +137,15 @@ function move() {
   display: flex;
   flex-flow: row nowrap;
   align-items: stretch;
-  position: relative;
-}
-
-.databar.is-fixed-bottom {
-  bottom: 0;
+  width: 100%;
+  border-top: var(--dev-bar-lines);
+  background: #fff;
+  color: #000;
+  height: 100%;
+  padding: 0px;
+  margin: 0px;
+  margin-bottom: 0px;
+  overflow-y: hidden;
 }
 
 .databar.is-fixed-bottom,
@@ -151,23 +156,13 @@ function move() {
   z-index: 500;
 }
 
-.devdatabar {
-  border-top: var(--dev-bar-lines);
-  background: #fff;
-  color: #000;
-  height: v-bind(height_pct);
-  padding: 0px;
-  margin: 0px;
-  margin-bottom: 0px;
-}
-
 .datamenu {
   background: var(--dev-bar-mild-grey);
   min-width: 20px;
   padding-left: 2px;
   padding-top: 0px;
   border-right: var(--dev-bar-lines);
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
 .menu-list {
@@ -197,20 +192,20 @@ function move() {
 .closebutton {
   padding-right: 10px;
 }
-</style>
-
-<style scoped>
-.menu-label {
-  background: #eff2f3;
-  color: #fff;
-}
 .secpanel {
   width: 100%;
   padding: 0;
   margin: 0;
   text-align: left;
   height: 100%;
+  flex: 1 1 auto;
 }
+
+.menu-label {
+  background: #eff2f3;
+  color: #fff;
+}
+
 .logpanel {
   width: 100%;
   font-size: 12px;
