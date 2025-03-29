@@ -1,30 +1,42 @@
 <script setup>
 import { ref, computed, watch, onMounted, defineComponent, h } from 'vue'
 import TreeNode from './TreeNode.vue'
+import DataPathViewer from '@/dev/developer_mode/DataPathViewer.vue'
+import useSmileStore from '@/core/stores/smilestore'
+import { useRoute } from 'vue-router'
 
-const props = defineProps({
-  stepper: {
-    type: Object,
-    required: true,
-  },
-  stateMachine: {
-    type: Object,
-    required: true,
-  },
-  path: {
-    type: Array,
-    required: true,
-  },
+const route = useRoute()
+const store = useSmileStore()
+
+// Reactively get the stepper for the current page
+const stepper = computed(() => {
+  return store.global.steppers?.[route.name]
 })
 
-const emit = defineEmits(['node-click'])
-
-// Add a watch to debug path changes
+// Add a watcher to handle stepper initialization
 watch(
-  () => props.path,
+  () => store.global.steppers?.[route.name],
+  (newStepper) => {
+    if (newStepper) {
+      // Force a component update when stepper becomes available
+      console.log('Stepper initialized:', route.name)
+    }
+  },
+  { immediate: true } // This will run the watcher immediately on component mount
+)
+
+const stateMachine = computed(() => stepper.value?.smviz)
+
+// Update the path watcher to use stepper.value
+watch(
+  () => stepper.value?.path,
   (newPath) => {
-    console.log('Path changed:', newPath)
-  }
+    console.log('Path watcher triggered:', {
+      newPath,
+      stepper: stepper.value,
+    })
+  },
+  { immediate: true }
 )
 
 // Convert array path to string format (e.g., [1, 1] -> "1-1")
@@ -34,8 +46,8 @@ const pathToString = (pathArray) => {
 
 // Add computed property to check if a node is selected
 const isNodeSelected = (nodePath) => {
-  const currentPathStr = pathToString(props.path)
-  //console.log('Comparing paths:', { nodePath, currentPath: currentPathStr })
+  if (!stepper.value?.path) return false
+  const currentPathStr = pathToString(stepper.value.path)
   return nodePath === currentPathStr
 }
 
@@ -77,7 +89,7 @@ const formatObjectWithIndent = (obj, indent = 0, seen = new WeakSet()) => {
 
 // You can now use this instead of the current rootNode display
 const formattedRootNode = computed(() => {
-  return formatObjectWithIndent(props.stateMachine)
+  return formatObjectWithIndent(stateMachine.value)
 })
 
 // Function to format data for display
@@ -116,7 +128,12 @@ const formatData = (data) => {
 }
 
 const handleNodeClick = (path) => {
-  emit('node-click', path)
+  console.log('Node clicked with path:', path)
+  if (stepper.value) {
+    stepper.value.resetTo(path)
+  } else {
+    console.warn('Stepper not available for path reset')
+  }
 }
 
 // Add this function to handle reload
@@ -125,56 +142,37 @@ const handleReload = () => {
 }
 
 const isEndState = computed(() => {
-  return props.stepper.paths === 'SOS' || props.stepper.paths === 'EOS'
+  if (!stepper.value) return false
+  return stepper.value.paths === 'SOS' || stepper.value.paths === 'EOS'
 })
 </script>
 
 <template>
-  <div class="tree-viewer-container">
-    <div class="columns w-full topbar">
-      <div class="column is-7 smaller">
+  <div v-if="!stepper">No stepper found</div>
+  <div class="tree-viewer-container" v-else>
+    <div class="path-display-container">
+      <div class="path-info">
         <span class="index-display">{{ stepper.index }}</span>
         <span class="path-display">{{ stepper.paths }}</span>
         &nbsp;<FAIcon icon="fa-solid fa-ban" v-if="isEndState" />
       </div>
-      <div class="column is-5 smaller">
-        <div class="field has-addons">
-          <p class="control">
-            <button @click="stepper.prev()" class="button is-small nav-button">
-              <span>
-                <FAIcon icon="fa-solid fa-angle-left" />
-              </span>
-            </button>
-          </p>
-          <p class="control">
-            <button @click="stepper.reset()" class="button is-small nav-button">
-              <span>
-                <FAIcon icon="fa-solid fa-house-flag" />
-              </span>
-            </button>
-          </p>
-          <p class="control">
-            <button @click="stepper.next()" class="button is-small nav-button">
-              <span>
-                <FAIcon icon="fa-solid fa-angle-right" />
-              </span>
-            </button>
-          </p>
-          <p class="control">
-            <button @click="stepper.clearState()" class="button is-small nav-button">
-              <span>
-                <FAIcon icon="fa-solid fa-trash" />
-              </span>
-            </button>
-          </p>
-          <p class="control">
-            <button @click="handleReload" class="button is-small nav-button">
-              <span>
-                <FAIcon icon="fa-solid fa-arrow-rotate-left" />
-              </span>
-            </button>
-          </p>
-        </div>
+
+      <div class="field has-addons">
+        <p class="control">
+          <button @click="stepper.reset()" class="button is-small nav-button">
+            <span><FAIcon icon="fa-solid fa-house-flag" /></span>
+          </button>
+        </p>
+        <p class="control">
+          <button @click="stepper.clearState()" class="button is-small nav-button">
+            <span><FAIcon icon="fa-solid fa-trash" /></span>
+          </button>
+        </p>
+        <p class="control">
+          <button @click="handleReload" class="button is-small nav-button">
+            <span><FAIcon icon="fa-solid fa-arrow-rotate-left" /></span>
+          </button>
+        </p>
       </div>
     </div>
 
@@ -199,24 +197,68 @@ const isEndState = computed(() => {
         </li>
       </ul>
     </div>
+
+    <div class="data-container">
+      <div class="data-display">
+        Node Data
+        <DataPathViewer :data="stepper.datapath" />
+      </div>
+    </div>
   </div>
 </template>
 
-<style>
-.nav-button {
-  font-size: 0.6rem;
-  border-left: 1px solid #e4e4e4;
+<style scoped>
+.tree-viewer-container {
+  text-align: left;
+  width: 100%;
+  height: 100%;
+  margin: 0 0;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 0px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Important for nested flex containers */
 }
+
+.path-display-container {
+  background-color: #f1f3f3;
+  padding: 20px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 32px;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.path-info {
+  display: flex;
+  align-items: baseline; /* Change from center to baseline */
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 800;
+  color: #389e95;
+  font-size: 0.9rem;
+  line-height: 1; /* Add line-height to control vertical spacing */
+}
+
 .path-display {
   margin-left: 5px;
-  margin-top: 8px;
   font-size: 1.2rem;
   font-family: monospace;
   font-weight: 800;
-  color: #323232;
+  color: #246761;
+  line-height: 1; /* Add line-height to match */
 }
-.field {
-  padding-top: 4px;
+
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-button {
+  font-size: 0.6rem;
+  border-left: 1px solid #e4e4e4;
 }
 .smaller {
   padding-bottom: 11px;
@@ -224,21 +266,19 @@ const isEndState = computed(() => {
 }
 .topbar {
   background-color: #f8f8f8;
+  padding-left: 10px;
 }
 .topbar-border {
   border-top: 1px solid #e4e4e4;
   padding-top: 4px;
 }
-.data-display {
-  font-size: 0.7rem;
-  font-family: monospace;
-  color: #6a6a6a;
-}
+
 .index-display {
   font-size: 0.8rem;
   font-family: monospace;
   font-weight: 800;
-  color: #6a6a6a;
+  color: #3e7974;
+  line-height: 1; /* Add line-height to match */
 }
 .content-display {
   font-size: 0.7rem;
@@ -248,15 +288,6 @@ const isEndState = computed(() => {
   color: #6a6a6a;
   white-space: pre-wrap;
 }
-.tree-viewer-container {
-  text-align: left;
-  width: 400px;
-  margin: 0 auto;
-  border: 1px solid #eee;
-  border-radius: 4px;
-  padding: 10px;
-  margin-top: 10px;
-}
 
 .state-tree-viewer {
   font-family: monospace;
@@ -264,9 +295,11 @@ const isEndState = computed(() => {
 }
 
 .tree-container {
-  max-height: 500px;
+  height: 500px;
   overflow: auto;
   font-family: monospace;
+  flex-shrink: 0; /* Prevent shrinking */
+  border-top: 1px solid #cacaca;
 }
 
 .tree-root {
@@ -285,5 +318,26 @@ const isEndState = computed(() => {
 /* First tree node has no padding */
 .tree-root > li.tree-node {
   padding-left: 0;
+}
+
+.data-container {
+  flex: 1 1 auto; /* grow, shrink, auto basis */
+  overflow: auto;
+  padding-left: 0px;
+  margin-left: 0px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Important for nested flex containers */
+  background-color: #f1f3f3;
+  border-top: 1px solid #cacaca;
+}
+
+.data-display {
+  flex: 1;
+  overflow: auto;
+  padding: 10px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  font-family: monospace;
 }
 </style>
