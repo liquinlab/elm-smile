@@ -943,6 +943,59 @@ const trials = stepper.t.append([
 trials.push()
 ```
 
+#### Special Data Fields
+
+##### The `path` Field
+
+When building trial tables, you can use a special `path` field in your trial
+data to explicitly control the node identifiers in the state machine. This is
+useful when you need specific path values rather than the default sequential
+numbering:
+
+```js
+const stepper = api.useHStepper()
+
+const trials = stepper.t.append([
+  { path: 'intro', type: 'instruction' },
+  { path: 'practice', type: 'trial' },
+  { path: 'main', type: 'trial' },
+])
+
+// Results in nodes with paths:
+// - "intro"
+// - "practice"
+// - "main"
+// Instead of the default:
+// - "0"
+// - "1"
+// - "2"
+
+// Push the trials
+trials.push()
+```
+
+This also works with nested tables:
+
+```js
+const stepper = api.useHStepper()
+
+const trials = stepper.t.append({ path: 'block1' })
+trials[0].t.append([
+  { path: 'stim', type: 'stimulus' },
+  { path: 'feedback', type: 'feedback' },
+])
+
+// Results in paths:
+// - "block1/stim"
+// - "block1/feedback"
+
+// Push the trials
+trials.push()
+```
+
+If no `path` field is provided, the stepper will use default sequential
+numbering for node identifiers.
+
 # Steps to steps
 
 ## Persistence
@@ -951,21 +1004,28 @@ trials.push()
 - [x] serialize non serializable data
 - [x] the current .t() hiding method will not work for .partition() and .map()
       etc... maybe scrap it
-- [] autofill functionality
 
 ## Testing
 
-- [] test where the step data includes component references
+- [x] test where the step data includes component references
 - [x] useHstepper test
 
 ## Transparent State Management
 
 - [x] the "force" option in push is bullshit
 - [x] transactions to allow declarative state changes
-- [] testing for stepper component integration
-- [] can move table modifications and transctions inside stepstate?
 
 ## Integration
 
-- [] useHstepper dev bar
-- [] useHstepper in builtin/user components
+- [x] useHstepper dev bar
+- [x] sidebar view
+
+## Todod
+
+- [] useStepper in builtin/user components
+- [] autofill functionality
+- [] data saving
+- [] testing for stepper component integration
+- [] can move table modifications and transctions inside stepstate?
+- [] useHstepper shouldn't be a composable?
+- [] code review
