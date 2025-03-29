@@ -28,22 +28,45 @@ const formatValue = (value) => {
 const isExpandable = (value) => {
   return value !== null && (typeof value === 'object' || Array.isArray(value))
 }
+
+const isSinglePrimitive = (value) => {
+  if (typeof value === 'string' || typeof value === 'number') {
+    return true
+  }
+  if (isExpandable(value) && Object.keys(value).length === 1) {
+    const singleValue = Object.values(value)[0]
+    return typeof singleValue === 'string' || typeof singleValue === 'number'
+  }
+  return false
+}
+
+const getSingleValue = (value) => {
+  return typeof value === 'string' || typeof value === 'number' ? value : Object.values(value)[0]
+}
 </script>
 
 <template>
   <div class="data-path-viewer">
     <template v-if="isExpandable(data)">
       <div v-for="(value, key) in data" :key="key" class="data-node">
-        <div class="node-content" @click="toggleNode(key)">
-          <span class="expand-icon">{{ expandedNodes.has(key) ? '▼' : '▶' }}</span>
-          <span class="key">{{ key }}:</span>
-          <span v-if="!expandedNodes.has(key)" class="preview">
-            {{ Array.isArray(value) ? `[${value.length} items]` : '{...}' }}
-          </span>
-        </div>
-        <div v-if="expandedNodes.has(key)" class="nested-content">
-          <DataPathViewer :data="value" />
-        </div>
+        <template v-if="isSinglePrimitive(value)">
+          <div class="node-content">
+            <span class="key">{{ key }}:</span>
+            <span class="primitive-value">{{ formatValue(getSingleValue(value)) }}</span>
+          </div>
+        </template>
+        <template v-else>
+          <div class="node-content" @click="toggleNode(key)">
+            <span class="expand-icon">{{ expandedNodes.has(key) ? '▼' : '▶' }}</span>
+            <span class="key">{{ key }}:</span>
+            <span v-if="!expandedNodes.has(key)" class="preview">
+              {{ Array.isArray(value) ? `[${value.length} items]` : '{...}' }}
+            </span>
+          </div>
+          <div v-if="expandedNodes.has(key)" class="nested-content">
+            <DataPathViewer :data="value" />
+          </div>
+        </template>
       </div>
     </template>
     <template v-else>
@@ -80,7 +103,7 @@ const isExpandable = (value) => {
 }
 
 .key {
-  color: #881391;
+  color: #0baac3;
   margin-right: 4px;
 }
 
@@ -90,7 +113,7 @@ const isExpandable = (value) => {
 }
 
 .primitive-value {
-  color: #1a1aa6;
+  color: #dda814;
 }
 
 .nested-content {
