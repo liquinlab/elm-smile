@@ -5,6 +5,9 @@ import { reactive, computed } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
+const stepper = api.useStepper()
+const pages = stepper.t.append([{ path: 'device_page1' }, { path: 'device_page2' }]).push()
+
 const forminfo = reactive({
   device_type: '', // type of device (e.g., desktop, laptop, tablet, phone)
   connection: '', // type of internet connection (e.g., wifi, ethernet, cellular)
@@ -39,9 +42,6 @@ function autofill() {
 
 api.setPageAutofill(autofill)
 
-const pages = ['page1', 'page2']
-const step = api.useStepper(pages)
-
 function finish() {
   api.saveForm('device', forminfo)
   api.goNextView()
@@ -57,7 +57,7 @@ function finish() {
         to improve the quality of our experiments in the future.
       </p>
 
-      <div class="formstep" v-if="step.index() === 0">
+      <div class="formstep" v-if="stepper.paths === 'device_page1'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -151,7 +151,7 @@ function finish() {
               <div class="columns">
                 <div class="column">
                   <div class="has-text-right">
-                    <button class="button is-warning" id="finish" v-if="page_one_complete" @click="step.next()">
+                    <button class="button is-warning" id="finish" v-if="page_one_complete" @click="stepper.next()">
                       Continue &nbsp;
                       <FAIcon icon="fa-solid fa-arrow-right" />
                     </button>
@@ -163,7 +163,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-else-if="step.index() === 1">
+      <div class="formstep" v-else-if="stepper.paths === 'device_page2'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -219,7 +219,7 @@ function finish() {
               <div class="columns">
                 <div class="column">
                   <div class="has-text-left">
-                    <button class="button is-warning" id="finish" @click="step.prev()">
+                    <button class="button is-warning" id="finish" @click="stepper.prev()">
                       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous
                     </button>
                   </div>
