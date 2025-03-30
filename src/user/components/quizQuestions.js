@@ -1,6 +1,6 @@
 export const QUIZ_QUESTIONS = [
   {
-    page: 1,
+    path: 'quiz_page1',
     questions: [
       {
         id: 'example1',
@@ -19,7 +19,7 @@ export const QUIZ_QUESTIONS = [
     ],
   },
   {
-    page: 2,
+    path: 'quiz_page2',
     questions: [
       {
         id: 'example3',
@@ -34,6 +34,13 @@ export const QUIZ_QUESTIONS = [
         multiSelect: false,
         answers: ['63', '59', '49', '14'],
         correctAnswer: ['49'],
+      },
+      {
+        id: 'example4',
+        question: "Who is in Todd's lab?",
+        multiSelect: true,
+        answers: ['Pat', 'Ellen', 'Jimbo', 'Roger'],
+        correctAnswer: ['Pat', 'Ellen'],
       },
     ],
   },
