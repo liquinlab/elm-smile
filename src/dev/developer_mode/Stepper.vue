@@ -36,7 +36,7 @@ const altKeyState = useKeyModifier('Alt')
       <button
         class="button is-small is-jump-bar has-tooltip-arrow has-tooltip-bottom"
         data-tooltip="Current stepper path"
-        @click="api.store.dev.show_side_bar = !api.store.dev.show_side_bar"
+        :disabled="!stepper || api.store.dev.page_provides_trial_stepper == false"
       >
         <span class="counter" v-if="stepper?.paths">{{ stepper?.paths }}</span>
         <FAIcon icon="fa-solid fa-circle-minus" v-else />
