@@ -18,6 +18,8 @@ const api = useAPI()
 import useSmileStore from '@/core/stores/smilestore'
 const smilestore = useSmileStore() // load the global store
 
+const toosmall = ref(api.isBrowserTooSmall())
+
 var snapshot = { ...smilestore.$state.data }
 smilestore.$subscribe((mutation, newstate) => {
   Object.keys(newstate.data).forEach((key) => {
