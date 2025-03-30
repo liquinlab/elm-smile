@@ -354,7 +354,7 @@ export class StepState {
    * @param {Array|string} path - Path to navigate to (array of ids or hyphen-separated string)
    * @throws {Error} If the path doesn't exist
    */
-  resetTo(path) {
+  goTo(path) {
     // Convert string path to array if needed
     const pathArray = typeof path === 'string' ? path.split('-') : path
 

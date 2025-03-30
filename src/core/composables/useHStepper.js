@@ -147,14 +147,14 @@ export function useHStepper() {
         saveStepperState() // Save state after reset
       }
     },
-    resetTo: (path) => {
-      //console.log('resetTo', path)
-      sm.resetTo(path)
+    goTo: (path) => {
+      //console.log('goTo', path)
+      sm.goTo(path)
       _data.value = sm.pathdata
       _paths.value = sm.currentPaths
       _path.value = sm.currentPath
       _stateMachine.value = visualizeStateMachine() // Update state machine visualization
-      saveStepperState() // Save state after resetTo
+      saveStepperState() // Save state after goTo
     },
     init: () => {
       //sm.next()
@@ -163,6 +163,7 @@ export function useHStepper() {
     },
     push: (table) => {
       // Generate a new random number at the start of each push
+
       const tnxID = transactionId()
       const fullTransactionId = `${table.tableID}-${tnxID}`
 

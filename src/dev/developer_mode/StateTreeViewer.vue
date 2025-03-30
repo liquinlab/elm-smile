@@ -130,7 +130,7 @@ const formatData = (data) => {
 const handleNodeClick = (path) => {
   console.log('Node clicked with path:', path)
   if (stepper.value) {
-    stepper.value.resetTo(path)
+    stepper.value.goTo(path)
     // Scroll will happen via the watcher
   } else {
     console.warn('Stepper not available for path reset')
