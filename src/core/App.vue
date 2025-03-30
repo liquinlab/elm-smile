@@ -42,18 +42,30 @@ smilestore.$subscribe((mutation, newstate) => {
 onMounted(() => {
   api.log.log('App.vue initialized')
 
-  window.addEventListener('resize', (event) => {
-    api.recordWindowEvent('resize', { width: window.innerWidth, height: window.innerHeight })
-    toosmall.value = api.isBrowserTooSmall()
-  })
+  window.addEventListener(
+    'resize',
+    (event) => {
+      api.recordWindowEvent('resize', { width: window.innerWidth, height: window.innerHeight })
+      toosmall.value = api.isBrowserTooSmall()
+    },
+    { passive: true }
+  )
 
-  window.addEventListener('focus', (event) => {
-    api.recordWindowEvent('focus')
-  })
+  window.addEventListener(
+    'focus',
+    (event) => {
+      api.recordWindowEvent('focus')
+    },
+    { passive: true }
+  )
 
-  window.addEventListener('blur', (event) => {
-    api.recordWindowEvent('blur')
-  })
+  window.addEventListener(
+    'blur',
+    (event) => {
+      api.recordWindowEvent('blur')
+    },
+    { passive: true }
+  )
 })
 </script>
 
