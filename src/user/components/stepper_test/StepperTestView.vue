@@ -85,6 +85,8 @@ function adddata() {
 .viewer-container {
   width: 400px;
   margin: 0 auto;
+  border: 1px solid #c5c5c5;
+  border-top: none;
 }
 .tree-diagram-text {
   text-align: left;
