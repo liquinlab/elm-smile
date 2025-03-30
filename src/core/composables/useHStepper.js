@@ -207,11 +207,12 @@ export function useHStepper() {
 
           // Use path from data if available, otherwise use index-based approach
           let state
-          if (item.data && item.data.path !== undefined) {
+          if (item.data && (item.data.path !== undefined || item.data.page !== undefined)) {
+            const nodeName = item.data.path !== undefined ? item.data.path : item.data.page
             if (level == 0) {
-              state = parentState.insert(item.data.path, -2)
+              state = parentState.insert(nodeName, -2)
             } else {
-              state = parentState.push(item.data.path)
+              state = parentState.push(nodeName)
             }
           } else {
             if (level == 0) {
