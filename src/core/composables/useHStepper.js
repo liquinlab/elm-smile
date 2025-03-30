@@ -316,7 +316,7 @@ export function useHStepper() {
     },
 
     // Add new clearState method
-    clearState: () => {
+    clear: () => {
       if (smilestore.local.pageTracker[page]) {
         // Remove the stepperState from the page tracker data
         const pageData = smilestore.local.pageTracker[page].data || {}

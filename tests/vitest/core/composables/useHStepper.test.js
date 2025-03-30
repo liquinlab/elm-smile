@@ -1218,7 +1218,7 @@ describe('useHStepper composable', () => {
       expect(stepper.transactionHistory).toHaveLength(2)
     })
 
-    it('should clear transaction history with clearState', async () => {
+    it('should clear transaction history with clear', async () => {
       const stepper = getCurrentRouteStepper()
 
       // Push some tables
@@ -1232,7 +1232,7 @@ describe('useHStepper composable', () => {
       expect(stepper.transactionHistory).toHaveLength(2)
 
       // Clear state
-      stepper.clearState()
+      stepper.clear()
 
       // Verify history is cleared
       expect(stepper.transactionHistory).toHaveLength(0)
