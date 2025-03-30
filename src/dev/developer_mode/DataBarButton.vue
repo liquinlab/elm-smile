@@ -33,11 +33,7 @@ const alt_tooltip = computed(() => {
 </script>
 
 <template>
-  <button
-    class="button devbar-button has-tooltip-arrow has-tooltip-bottom"
-    :data-tooltip="database_tooltip"
-    @click="api.store.dev.show_console_bar = !api.store.dev.show_console_bar"
-  >
+  <button class="button devbar-button has-tooltip-arrow has-tooltip-bottom" :data-tooltip="database_tooltip">
     <FAIcon
       icon="fa-solid fa-database"
       class="disconnected"

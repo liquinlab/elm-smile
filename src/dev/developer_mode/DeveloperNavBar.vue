@@ -4,11 +4,9 @@ import { useRouter, useRoute } from 'vue-router'
 
 import DocsDropDown from '@/dev/developer_mode/DocsDropDown.vue'
 import RandomizationDropDown from '@/dev/developer_mode/RandomizationDropDown.vue'
-import ConfigDropDown from '@/dev/developer_mode/ConfigDropDown.vue'
 import Stepper from '@/dev/developer_mode/Stepper.vue'
 import RouteInfoDropDrop from '@/dev/developer_mode/RouteInfoDropDown.vue'
 import ResetButton from '@/dev/developer_mode/ResetButton.vue'
-
 import DataBarButton from '@/dev/developer_mode/DataBarButton.vue'
 import ViewButton from '@/dev/developer_mode/ViewButton.vue'
 
@@ -35,11 +33,6 @@ const api = useAPI()
       <div class="devbar-end">
         <div class="devbar-item devbar-buttonpanel">
           <div class="buttons">
-            <!-- config button -->
-            <div class="devbar-configdropdown">
-              <ConfigDropDown></ConfigDropDown>
-            </div>
-
             <!-- randomization button -->
             <div class="devbar-randomizationdropdown">
               <RandomizationDropDown></RandomizationDropDown>

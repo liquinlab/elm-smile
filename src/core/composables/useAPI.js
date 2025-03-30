@@ -47,6 +47,7 @@ export default function useAPI() {
     data: store.data,
     private: store.private,
     all_data: { private: store.private, data: store.data },
+    all_config: { local: store.local, data: store.dev, code: store.config.github, config: store.config },
     // local: store.local,
     // global: store.global,
     // dev: store.dev,

@@ -4,7 +4,7 @@ import { onKeyDown } from '@vueuse/core'
 
 // load sub-components used in this compomnents
 import DeveloperNavBar from '@/dev/developer_mode/DeveloperNavBar.vue'
-import DevDataBar from '@/dev/developer_mode/DevDataBar.vue'
+import DevConsoleBar from '@/dev/developer_mode/DevConsoleBar.vue'
 import DevSideBar from '@/dev/developer_mode/DevSideBar.vue'
 import PresentationNavBar from '@/dev/presentation_mode/PresentationNavBar.vue'
 
@@ -53,6 +53,28 @@ onKeyDown(['Alt', '3'], (e) => {
     }
   }
 })
+
+// Add shortcuts for switching console tabs
+onKeyDown(['Alt', '4'], (e) => {
+  if (api.config.mode === 'development' && api.store.dev.show_console_bar) {
+    e.preventDefault()
+    api.store.dev.console_bar_tab = 'browse'
+  }
+})
+
+onKeyDown(['Alt', '5'], (e) => {
+  if (api.config.mode === 'development' && api.store.dev.show_console_bar) {
+    e.preventDefault()
+    api.store.dev.console_bar_tab = 'log'
+  }
+})
+
+onKeyDown(['Alt', '6'], (e) => {
+  if (api.config.mode === 'development' && api.store.dev.show_console_bar) {
+    e.preventDefault()
+    api.store.dev.console_bar_tab = 'config'
+  }
+})
 </script>
 <template>
   <div class="app-container">
@@ -84,7 +106,7 @@ onKeyDown(['Alt', '3'], (e) => {
     <!-- Bottom console - can be toggled, 200px tall when visible -->
     <Transition name="console-slide">
       <div v-if="api.config.mode == 'development' && api.store.dev.show_console_bar" class="console">
-        <DevDataBar />
+        <DevConsoleBar />
       </div>
     </Transition>
   </div>

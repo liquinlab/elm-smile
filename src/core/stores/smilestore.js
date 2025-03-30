@@ -85,15 +85,15 @@ const init_dev = {
   show_console_bar: false, // show/hide the data base bottom (transient)
   show_side_bar: false,
   console_bar_height: 460, // height of the data bar (transient)
-  data_bar_tab: 'browse', // which tab to show in the data bar (transient)
+  console_bar_tab: 'browse', // which tab to show in the data bar (transient)
   search_params: '', // search parameters (transient)
   log_filter: 'All', // what level of log messages to show (transient)
   notification_filter: 'Errors only', // what level of notifications to show (transient)
   last_page_limit: false, // limits logs to the last page (transient)
   data_path: null, // path to the data (transient)
+  config_path: null, // path to the config (transient)
   // panel locations (transient)
   config_panel: { type: 'local', visible: false, x: -280, y: 0 },
-  state_var_panel: { visible: false, x: -150, y: 0 },
   randomization_panel: { visible: false, x: -130, y: 0 },
   route_panel: { visible: false, x: -0, y: -3 },
 }
