@@ -311,6 +311,9 @@ export function useHStepper() {
     get transactionHistory() {
       return _transactionHistory.value
     },
+    get length() {
+      return sm.countLeafNodes - 2
+    },
     get nrows() {
       return sm.countLeafNodes
     },
@@ -371,13 +374,15 @@ export function useHStepper() {
   }
 
   // Add protected methods to the stepper instance
-  PROTECTED_METHODS.filter((method) => method !== 'path' && method !== 'paths').forEach((method) => {
-    Object.defineProperty(stepper, method, {
-      get() {
-        throw new Error(`${method}() must be called after table()`)
-      },
-    })
-  })
+  PROTECTED_METHODS.filter((method) => method !== 'path' && method !== 'paths' && method !== 'length').forEach(
+    (method) => {
+      Object.defineProperty(stepper, method, {
+        get() {
+          throw new Error(`${method}() must be called after table()`)
+        },
+      })
+    }
+  )
 
   // When loading from savedState, we should also scan the existing state
   if (savedState) {
