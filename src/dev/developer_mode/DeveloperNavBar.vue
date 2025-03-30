@@ -10,6 +10,7 @@ import RouteInfoDropDrop from '@/dev/developer_mode/RouteInfoDropDown.vue'
 import ResetButton from '@/dev/developer_mode/ResetButton.vue'
 
 import DataBarButton from '@/dev/developer_mode/DataBarButton.vue'
+import ViewButton from '@/dev/developer_mode/ViewButton.vue'
 
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
@@ -59,6 +60,9 @@ const api = useAPI()
             <div class="devbar-routeinfodropdown">
               <RouteInfoDropDrop></RouteInfoDropDrop>
             </div>
+
+            <!-- view button -->
+            <ViewButton></ViewButton>
           </div>
         </div>
       </div>

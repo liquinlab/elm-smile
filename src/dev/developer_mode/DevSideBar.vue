@@ -7,6 +7,7 @@ import DatabaseInfoSidebarPanel from '@/dev/developer_mode/DatabaseInfoSidebarPa
   <div class="sidebar-container">
     <DatabaseInfoSidebarPanel />
     <StateTreeViewer />
+    <div class="sidebar-footer"></div>
   </div>
 </template>
 
@@ -19,6 +20,9 @@ import DatabaseInfoSidebarPanel from '@/dev/developer_mode/DatabaseInfoSidebarPa
   background-color: #f1f3f3;
 }
 
+.sidebar-footer {
+  border-top: 1px solid #e4e4e4;
+}
 /* DatabaseInfoSidebarPanel will take its natural height */
 :deep(.tree-viewer-container),
 :deep(.tree-viewer-container-empty) {
