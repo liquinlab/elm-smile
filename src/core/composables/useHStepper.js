@@ -250,6 +250,14 @@ export function useHStepper() {
       return table
     },
     // Expose current and index as computed properties
+    get data() {
+      if (!this.datapath) return null
+
+      // Merge all objects in datapath array into a single object
+      return this.datapath.reduce((merged, item) => {
+        return { ...merged, ...item }
+      }, {})
+    },
     get datapath() {
       if (_data.value === null) return null
 
