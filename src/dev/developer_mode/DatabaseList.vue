@@ -100,13 +100,16 @@ function option_selected(option) {
   overflow-x: hidden;
 }
 .menu-list li {
-  font-size: 0.8em;
+  font-size: 0.73em;
   font-family: monospace;
+  margin-top: 2px;
+  margin-right: 4px;
+  margin-left: 4px;
 }
 
 .menu-list li a {
   color: #717a80;
-  padding-top: 2px;
+  padding-top: 5px;
 }
 
 .menu-list li b {
@@ -121,5 +124,6 @@ function option_selected(option) {
   vertical-align: middle;
   padding: 0px;
   font-size: 0.9em;
+  margin-top: 3px;
 }
 </style>

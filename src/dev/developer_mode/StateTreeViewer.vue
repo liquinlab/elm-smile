@@ -193,8 +193,7 @@ watch(
 </script>
 
 <template>
-  <div class="tree-viewer-container-empty" v-if="!stepper"></div>
-  <div class="tree-viewer-container" v-else>
+  <div class="tree-viewer-container" v-if="stepper">
     <div class="path-display-container">
       <div class="path-info">
         <div class="path-display">{{ stepper.paths }}</div>
@@ -232,6 +231,8 @@ watch(
     </div>
 
     <div class="tree-container" ref="treeContainer">
+      <div class="index-display">{{ stepper.index }}/{{ stepper.length }}</div>
+
       <ul class="tree-root">
         <li v-if="stateMachine" class="tree-node root-node">
           <ul v-if="stateMachine.rows && stateMachine.rows.length > 0" class="children">
@@ -253,8 +254,6 @@ watch(
       </ul>
     </div>
     <div class="data-container">
-      <div class="index-display">{{ stepper.index }}/{{ stepper.length }}</div>
-
       <div class="data-display">
         Data
         <DataPathViewer :data="stepper.data" />
@@ -265,15 +264,13 @@ watch(
 
 <style scoped>
 .tree-viewer-container {
-  width: 100%;
-  height: 100%;
-  margin: 0 0;
-  padding: 0px;
   display: flex;
   flex-direction: column;
-  text-align: left;
-  border-top: 1px solid #cacaca;
+  height: 100%;
   min-height: 0; /* Important for nested flex containers */
+  overflow: hidden;
+  background-color: #f1f3f3;
+  border-top: 1px solid #cacaca;
 }
 
 .tree-viewer-container-empty {
@@ -356,6 +353,9 @@ watch(
   color: #e49310;
   line-height: 1; /* Add line-height to match */
   text-align: right;
+  position: absolute;
+  right: 0;
+  top: 4px;
 }
 .content-display {
   font-size: 0.7rem;
@@ -372,16 +372,26 @@ watch(
 }
 
 .tree-container {
+  flex: 0 1 auto; /* don't grow, can shrink, auto basis */
   overflow: auto;
   font-family: monospace;
-  flex-shrink: 0;
   border-top: 1px solid #cacaca;
   position: relative;
   scroll-behavior: smooth;
-  height: auto;
-  max-height: 250px;
+  max-height: 300px;
+  min-height: 50px;
+  background-color: #fff;
+}
+
+.data-container {
+  flex: 1 1 0; /* grow, can shrink, 0 basis */
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
   min-height: 100px;
-  flex: 1;
+  background-color: #f1f3f3;
+  border-top: 1px solid #cacaca;
+  text-align: left;
 }
 
 .tree-root {
@@ -401,18 +411,6 @@ watch(
 /* First tree node has no padding */
 .tree-root > li.tree-node {
   padding-left: 0;
-}
-
-.data-container {
-  flex: 1 1 auto; /* grow, shrink, auto basis */
-  overflow: auto;
-  padding-left: 0px;
-  margin-left: 0px;
-  display: flex;
-  flex-direction: column;
-  min-height: 0; /* Important for nested flex containers */
-  background-color: #f1f3f3;
-  border-top: 1px solid #cacaca;
 }
 
 .data-display {

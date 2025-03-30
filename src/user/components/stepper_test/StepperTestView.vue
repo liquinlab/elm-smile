@@ -44,7 +44,7 @@ const trials2 = stepper.t
         { type: 'step', id: index++ },
       ])
       .forEach((step) => {
-        for (let i = 0; i < 25; i++) {
+        for (let i = 0; i < 5; i++) {
           step.append([{ type: 'step', id: i }])
         }
       })
@@ -52,7 +52,7 @@ const trials2 = stepper.t
   .push()
 
 function next() {
-  if (this.stepper.next() == null) {
+  if (stepper.index >= stepper.length) {
     api.goNextView()
   }
 }

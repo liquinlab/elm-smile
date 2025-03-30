@@ -127,7 +127,10 @@ function panel_jump(index) {
   border-bottom: 1px solid #ccc;
   border-top: 1px solid #ccc;
   font-size: 0.8em;
-  color: #656565;
+  color: #434343;
+}
+.breadcrumb li + li::before {
+  color: var(--darker-grey);
 }
 .contentpanel {
   padding-left: 0px;

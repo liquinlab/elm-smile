@@ -5,7 +5,6 @@ import { useRouter, useRoute } from 'vue-router'
 import DocsDropDown from '@/dev/developer_mode/DocsDropDown.vue'
 import RandomizationDropDown from '@/dev/developer_mode/RandomizationDropDown.vue'
 import ConfigDropDown from '@/dev/developer_mode/ConfigDropDown.vue'
-import StateVarsDropDown from '@/dev/developer_mode/StateVarsDropDown.vue'
 import Stepper from '@/dev/developer_mode/Stepper.vue'
 import RouteInfoDropDrop from '@/dev/developer_mode/RouteInfoDropDown.vue'
 import ResetButton from '@/dev/developer_mode/ResetButton.vue'
@@ -43,11 +42,6 @@ const api = useAPI()
             <!-- randomization button -->
             <div class="devbar-randomizationdropdown">
               <RandomizationDropDown></RandomizationDropDown>
-            </div>
-
-            <!-- state variable buttons -->
-            <div class="devbar-statevarsdropdown">
-              <StateVarsDropDown></StateVarsDropDown>
             </div>
 
             <!-- reset button -->
@@ -171,12 +165,6 @@ const api = useAPI()
     display: inline;
   }
   .devbar-stepper {
-    display: none;
-  }
-}
-
-@media screen and (max-width: 560px) {
-  .devbar-statevarsdropdown {
     display: none;
   }
 }

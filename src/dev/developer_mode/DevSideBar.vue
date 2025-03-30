@@ -4,16 +4,25 @@ import DatabaseInfoSidebarPanel from '@/dev/developer_mode/DatabaseInfoSidebarPa
 </script>
 
 <template>
-  <div class="sidebar">
+  <div class="sidebar-container">
     <DatabaseInfoSidebarPanel />
     <StateTreeViewer />
   </div>
 </template>
 
 <style scoped>
-.sidebar {
-  border-left: var(--dev-bar-lines);
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  background-color: var(--dev-bar-background);
+  overflow: hidden;
+  background-color: #f1f3f3;
+}
+
+/* DatabaseInfoSidebarPanel will take its natural height */
+:deep(.tree-viewer-container),
+:deep(.tree-viewer-container-empty) {
+  flex: 1;
+  min-height: 0; /* Important for flex child to shrink properly */
 }
 </style>

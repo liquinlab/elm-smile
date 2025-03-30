@@ -176,8 +176,9 @@ function move() {
 }
 
 .closebutton {
-  padding-right: 10px;
+  padding-right: 0px;
   padding-left: 10px;
+  width: 40px;
 }
 .secpanel {
   width: 100%;

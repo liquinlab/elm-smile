@@ -132,6 +132,8 @@ onKeyDown(['Alt', '3'], (e) => {
   flex: 0 0 280px;
   height: 100%; /* Subtract toolbar height (33px) and console height if visible */
   overflow: hidden; /* Changed from auto to hidden to prevent scrolling */
+  border-left: var(--dev-bar-lines);
+  background-color: var(--dev-bar-background);
 }
 
 .console {

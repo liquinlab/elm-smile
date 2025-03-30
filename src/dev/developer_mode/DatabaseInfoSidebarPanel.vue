@@ -125,7 +125,83 @@ function connectDB() {
         </div>
       </div>
     </div>
+    <table class="table is-hoverable is-striped is-fullwidth">
+      <tbody>
+        <tr>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+        <tr>
+          <td class="has-text-center">
+            <b>Consent:</b><br />
+            <div class="field">
+              <input
+                id="switchRoundedDefault1"
+                type="checkbox"
+                name="switchRoundedDefault1"
+                class="switch is-rounded is-rtl is-small"
+                v-model="smilestore.local.consented"
+              />
+              <label for="switchRoundedDefault1"></label>
+            </div>
+          </td>
+          <td class="has-text-center">
+            <b>Known:</b><br />
+            <div class="field">
+              <input
+                id="switchRoundedDefault2"
+                type="checkbox"
+                name="switchRoundedDefault2"
+                class="switch is-rounded is-rtl is-small"
+                v-model="smilestore.local.knownUser"
+              />
+              <label for="switchRoundedDefault2"></label>
+            </div>
+          </td>
+          <td class="has-text-center">
+            <b>Done:</b><br />
+            <div class="field">
+              <input
+                id="switchRoundedDefault3"
+                type="checkbox"
+                name="switchRoundedDefault3"
+                class="switch is-rounded is-rtl is-small"
+                v-model="smilestore.local.done"
+              />
+              <label for="switchRoundedDefault3"></label>
+            </div>
+          </td>
+          <td class="has-text-center">
+            <b>Withdrew:</b><br />
+            <div class="field">
+              <input
+                id="switchRoundedDefault4"
+                type="checkbox"
+                name="switchRoundedDefault4"
+                class="switch is-rounded is-rtl is-small"
+                v-model="smilestore.local.withdrawn"
+              />
+              <label for="switchRoundedDefault4"></label>
+            </div>
+          </td>
+        </tr>
 
+        <tr>
+          <td class="has-text-left" colspan="1"><b>Service:</b></td>
+          <td class="has-text-left is-family-code" colspan="3">
+            <div class="control select is-small">
+              <select id="recruitment" v-model="smilestore.data.recruitment_service" class="select is-small">
+                <option v-for="(cond, key) in smilestore.global.urls" :key="cond">
+                  {{ key }}
+                </option>
+              </select>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
     <table class="table is-hoverable is-striped is-fullwidth">
       <tbody>
         <tr>
@@ -137,18 +213,6 @@ function connectDB() {
           <td class="has-text-left is-family-code">{{ '/' + api.store.local.lastRoute }}</td>
         </tr>
         <tr>
-          <td class="has-text-left"><b>Consented:</b></td>
-          <td class="has-text-left is-family-code">{{ api.store.local.consented }}</td>
-        </tr>
-        <tr>
-          <td class="has-text-left"><b>Is done:</b></td>
-          <td class="has-text-left is-family-code">{{ api.store.local.done }}</td>
-        </tr>
-        <tr>
-          <td class="has-text-left"><b>Repeat:</b></td>
-          <td class="has-text-left is-family-code">{{ api.config.allow_repeats }}</td>
-        </tr>
-        <tr>
           <td class="has-text-left"><b>Mode:</b></td>
           <td class="has-text-left is-family-code">
             {{ api.config.mode == 'development' ? 'testing' : 'live' }}
@@ -156,7 +220,9 @@ function connectDB() {
         </tr>
         <tr>
           <td class="has-text-left"><b>Project:</b></td>
-          <td class="has-text-left is-family-code">{{ api.config.firebaseConfig.projectId }}</td>
+          <td class="has-text-left is-family-code">
+            {{ api.config.firebaseConfig.projectId }}
+          </td>
         </tr>
         <tr>
           <td class="has-text-left"><b>DocRef:</b></td>
@@ -182,7 +248,9 @@ function connectDB() {
         </tr>
         <tr>
           <td class="has-text-left"><b>Auto save:</b></td>
-          <td class="has-text-left is-family-code">{{ api.config.auto_save }}</td>
+          <td class="has-text-left is-family-code">
+            {{ api.config.auto_save }}
+          </td>
         </tr>
         <tr>
           <td class="has-text-left"><b>Size:</b></td>
@@ -207,12 +275,19 @@ function connectDB() {
   margin: 0;
 }
 
+.table {
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+  border-top: none;
+}
 .database-info-sidebar-panel {
   height: fit-content;
   padding-top: 10px;
-  padding-bottom: 5px;
+  padding-bottom: 0px;
   padding-right: 0px;
   padding-left: 0px;
+  margin: 0px;
+  background-color: #fff;
 }
 .step-title {
   font-size: 0.8em;
