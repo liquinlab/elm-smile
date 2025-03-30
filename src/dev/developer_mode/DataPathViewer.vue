@@ -30,18 +30,11 @@ const isExpandable = (value) => {
 }
 
 const isSinglePrimitive = (value) => {
-  if (typeof value === 'string' || typeof value === 'number') {
-    return true
-  }
-  if (isExpandable(value) && Object.keys(value).length === 1) {
-    const singleValue = Object.values(value)[0]
-    return typeof singleValue === 'string' || typeof singleValue === 'number'
-  }
-  return false
+  return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
 }
 
 const getSingleValue = (value) => {
-  return typeof value === 'string' || typeof value === 'number' ? value : Object.values(value)[0]
+  return value
 }
 </script>
 
@@ -52,7 +45,7 @@ const getSingleValue = (value) => {
         <template v-if="isSinglePrimitive(value)">
           <div class="node-content">
             <span class="key">{{ key }}:</span>
-            <span class="primitive-value">{{ formatValue(getSingleValue(value)) }}</span>
+            <span class="primitive-value">{{ formatValue(value) }}</span>
           </div>
         </template>
         <template v-else>

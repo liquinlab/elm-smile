@@ -161,19 +161,22 @@ const scrollToSelectedNode = () => {
     if (!selectedNode) return
 
     try {
-      // First try the new ScrollIntoViewOptions
-      selectedNode.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'nearest',
-      })
-    } catch (e) {
-      // Fallback for older browsers or if the above fails
-      const containerRect = treeContainer.value.getBoundingClientRect()
+      // Get the container's scroll position and dimensions
+      const container = treeContainer.value
+      const containerRect = container.getBoundingClientRect()
       const nodeRect = selectedNode.getBoundingClientRect()
-      const scrollOffset = nodeRect.top - containerRect.top - containerRect.height / 2 + nodeRect.height / 2
 
-      treeContainer.value.scrollTop += scrollOffset
+      // Calculate the relative position of the node within the container
+      const relativeTop = nodeRect.top - containerRect.top
+      const relativeBottom = nodeRect.bottom - containerRect.top
+
+      // Calculate the center position we want
+      const targetPosition = relativeTop - containerRect.height / 2 + nodeRect.height / 2
+
+      // Smoothly scroll to the target position
+      container.scrollTop += targetPosition
+    } catch (e) {
+      console.error('Error scrolling to selected node:', e)
     }
   }, 100)
 }
@@ -190,23 +193,33 @@ watch(
 </script>
 
 <template>
-  <div v-if="!stepper">No stepper found</div>
+  <div class="tree-viewer-container-empty" v-if="!stepper"></div>
   <div class="tree-viewer-container" v-else>
     <div class="path-display-container">
       <div class="path-info">
-        <span class="index-display">{{ stepper.index }}</span>
-        <span class="path-display">{{ stepper.paths }}</span>
+        <div class="path-display">{{ stepper.paths }}</div>
+
         &nbsp;<FAIcon icon="fa-solid fa-ban" v-if="isEndState" />
       </div>
 
       <div class="field has-addons">
+        <p class="control">
+          <button @click="stepper.prev()" class="button is-small nav-button">
+            <span><FAIcon icon="fa-solid fa-angle-left" /></span>
+          </button>
+        </p>
+        <p class="control">
+          <button @click="stepper.next()" class="button is-small nav-button">
+            <span><FAIcon icon="fa-solid fa-angle-right" /></span>
+          </button>
+        </p>
         <p class="control">
           <button @click="stepper.reset()" class="button is-small nav-button">
             <span><FAIcon icon="fa-solid fa-house-flag" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="stepper.clearState()" class="button is-small nav-button">
+          <button @click="stepper.clear()" class="button is-small nav-button">
             <span><FAIcon icon="fa-solid fa-trash" /></span>
           </button>
         </p>
@@ -239,11 +252,12 @@ watch(
         </li>
       </ul>
     </div>
-
     <div class="data-container">
+      <div class="index-display">{{ stepper.index }}/{{ stepper.length }}</div>
+
       <div class="data-display">
-        Node Data
-        <DataPathViewer :data="stepper.datapath" />
+        Data
+        <DataPathViewer :data="stepper.data" />
       </div>
     </div>
   </div>
@@ -251,21 +265,36 @@ watch(
 
 <style scoped>
 .tree-viewer-container {
-  text-align: left;
   width: 100%;
   height: 100%;
   margin: 0 0;
-  border: 1px solid #eee;
-  border-radius: 4px;
   padding: 0px;
   display: flex;
   flex-direction: column;
+  text-align: left;
+  border-top: 1px solid #cacaca;
   min-height: 0; /* Important for nested flex containers */
+}
+
+.tree-viewer-container-empty {
+  flex: 1;
+  height: 100%;
+  padding-top: 15px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 15px;
+  font-size: 0.8rem;
+  font-family: monospace;
+  font-weight: 800;
+  color: #3e7974;
+  border-top: 1px solid #cacaca;
+  background-color: #f1f3f3;
+  text-align: left;
 }
 
 .path-display-container {
   background-color: #f1f3f3;
-  padding: 20px 15px;
+  padding: 0px 5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -285,11 +314,14 @@ watch(
 
 .path-display {
   margin-left: 5px;
-  font-size: 1.2rem;
+  font-size: clamp(0.5rem, 0.8rem, 0.8rem); /* Shrink font size if needed but not larger than 0.9rem */
   font-family: monospace;
   font-weight: 800;
   color: #246761;
-  line-height: 1; /* Add line-height to match */
+  line-height: 1;
+  white-space: nowrap; /* Prevent wrapping */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Show ellipsis for overflow */
 }
 
 .nav-buttons {
@@ -316,11 +348,14 @@ watch(
 }
 
 .index-display {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
+  padding-right: 4px;
+  padding-top: 3px;
   font-family: monospace;
   font-weight: 800;
-  color: #3e7974;
+  color: #e49310;
   line-height: 1; /* Add line-height to match */
+  text-align: right;
 }
 .content-display {
   font-size: 0.7rem;
@@ -337,7 +372,6 @@ watch(
 }
 
 .tree-container {
-  height: 500px;
   overflow: auto;
   font-family: monospace;
   flex-shrink: 0;
@@ -345,7 +379,8 @@ watch(
   position: relative;
   scroll-behavior: smooth;
   height: auto;
-  max-height: 500px;
+  max-height: 250px;
+  min-height: 100px;
   flex: 1;
 }
 
@@ -360,6 +395,7 @@ watch(
   margin: 3px 0;
   position: relative;
   font-family: monospace;
+  font-size: 0.75rem;
 }
 
 /* First tree node has no padding */
