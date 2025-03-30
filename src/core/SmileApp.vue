@@ -88,11 +88,20 @@ onKeyDown(['Alt', '6'], (e) => {
     <div class="router" v-if="toosmall">
       <WindowSizerView triggered="true"></WindowSizerView>
     </div>
-    <div v-else class="content-area">
-      <!-- Main content - scrollable, expands when sidebar is hidden -->
-      <div class="main-content">
-        <StatusBar v-if="showStatusBar" />
-        <router-view />
+    <div v-else class="content-wrapper">
+      <div class="content-and-console">
+        <!-- Main content - scrollable -->
+        <div class="main-content">
+          <StatusBar v-if="showStatusBar" />
+          <router-view />
+        </div>
+
+        <!-- Bottom console - can be toggled -->
+        <Transition name="console-slide">
+          <div v-if="api.config.mode == 'development' && api.store.dev.show_console_bar" class="console">
+            <DevConsoleBar />
+          </div>
+        </Transition>
       </div>
 
       <!-- Sidebar - can be toggled, transitions in/out -->
@@ -102,13 +111,6 @@ onKeyDown(['Alt', '6'], (e) => {
         </div>
       </Transition>
     </div>
-
-    <!-- Bottom console - can be toggled, 200px tall when visible -->
-    <Transition name="console-slide">
-      <div v-if="api.config.mode == 'development' && api.store.dev.show_console_bar" class="console">
-        <DevConsoleBar />
-      </div>
-    </Transition>
   </div>
 </template>
 
@@ -132,13 +134,18 @@ onKeyDown(['Alt', '6'], (e) => {
   background-color: var(--dev-bar-light-grey);
 }
 
-.content-area {
+.content-wrapper {
   display: flex;
+  flex: 1;
   overflow: hidden;
-  position: relative;
+  width: calc(100% - 14px);
+}
+
+.content-and-console {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   min-height: 0;
-  width: calc(100% - 14px); /* Changed from 100vw to account for scrollbar */
-  height: 100%;
 }
 
 .main-content {
@@ -147,20 +154,20 @@ onKeyDown(['Alt', '6'], (e) => {
   flex-direction: column;
   overflow-y: auto;
   overflow-x: auto;
+  min-height: 0;
 }
 
 .sidebar {
-  flex-direction: column;
   flex: 0 0 280px;
-  height: 100%; /* Subtract toolbar height (33px) and console height if visible */
-  overflow: hidden; /* Changed from auto to hidden to prevent scrolling */
+  height: 100%;
+  overflow: hidden;
   border-left: var(--dev-bar-lines);
   background-color: var(--dev-bar-background);
 }
 
 .console {
   height: v-bind(height_pct);
-  width: calc(100% - 14px); /* Account for typical scrollbar width */
+  width: 100%;
   background-color: #6798c8;
   overflow: hidden;
   overflow-x: hidden;

@@ -84,7 +84,7 @@ const init_dev = {
   page_provides_trial_stepper: false, // does current page provide a trial stepper (transient)
   show_console_bar: false, // show/hide the data base bottom (transient)
   show_side_bar: false,
-  console_bar_height: 460, // height of the data bar (transient)
+  console_bar_height: 300, // height of the data bar (transient)
   console_bar_tab: 'browse', // which tab to show in the data bar (transient)
   search_params: '', // search parameters (transient)
   log_filter: 'All', // what level of log messages to show (transient)
