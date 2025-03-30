@@ -1,12 +1,11 @@
 <script setup>
-import { computed } from 'vue'
-import useAPI from '@/core/composables/useAPI'
 import StateTreeViewer from '@/dev/developer_mode/StateTreeViewer.vue'
-const api = useAPI()
+import DatabaseInfoSidebarPanel from '@/dev/developer_mode/DatabaseInfoSidebarPanel.vue'
 </script>
 
 <template>
   <div class="sidebar">
+    <DatabaseInfoSidebarPanel />
     <StateTreeViewer />
   </div>
 </template>
@@ -15,5 +14,6 @@ const api = useAPI()
 .sidebar {
   border-left: var(--dev-bar-lines);
   height: 100%;
+  background-color: var(--dev-bar-background);
 }
 </style>

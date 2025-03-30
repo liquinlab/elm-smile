@@ -85,7 +85,7 @@ const init_dev = {
   show_console_bar: false, // show/hide the data base bottom (transient)
   show_side_bar: false,
   console_bar_height: 460, // height of the data bar (transient)
-  data_bar_tab: 'database', // which tab to show in the data bar (transient)
+  data_bar_tab: 'browse', // which tab to show in the data bar (transient)
   search_params: '', // search parameters (transient)
   log_filter: 'All', // what level of log messages to show (transient)
   notification_filter: 'Errors only', // what level of notifications to show (transient)

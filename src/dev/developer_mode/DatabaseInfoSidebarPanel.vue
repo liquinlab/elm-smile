@@ -65,43 +65,28 @@ onMounted(() => {
 onBeforeUnmount(() => {
   stopTimer()
 })
+
+function connectDB() {
+  if (!api.store.local.knownUser) {
+    api.setKnown()
+    api.setConsented()
+  }
+}
 </script>
 <template>
   <!-- content of panel here -->
-  <div class="contentpanel info">
+  <div class="database-info-sidebar-panel">
     <div class="steps">
       <div class="step-item" :class="{ 'is-success is-completed': api.store.local.knownUser }">
         <div class="step-marker" v-if="!api.store.local.knownUser">1</div>
         <div class="step-marker" v-else><FAIcon icon="fa-solid fa-check" /></div>
         <div class="step-details" :class="{ 'is-success is-completed': api.store.local.knownUser }">
-          <p class="step-title is-size-6">
+          <p class="step-title is-size-7">
             <FAIcon icon="fa-solid fa-user-plus" v-if="api.store.local.knownUser" />
             <FAIcon icon="fa-solid fa-user-minus" v-else />
-            &nbsp;&nbsp;User status
           </p>
-          <p v-if="!api.store.local.knownUser">User has <b>not been seen before</b>.</p>
-          <p v-else>User <b>has</b> been seen before.</p>
-          <br />
-          <table class="table is-hoverable is-striped is-fullwidth">
-            <tbody>
-              <tr>
-                <th width="55%"></th>
-                <th></th>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Last route:</b></td>
-                <td class="has-text-left is-family-code is-size-7">{{ '/' + api.store.local.lastRoute }}</td>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Is done:</b></td>
-                <td class="has-text-left is-family-code is-size-7">{{ api.store.local.done }}</td>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Allow repeat:</b></td>
-                <td class="has-text-left is-family-code is-size-7">{{ api.config.allow_repeats }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <p v-if="!api.store.local.knownUser">Unknown user.</p>
+          <p v-else>Known user.</p>
 
           <!--
             <p class="pl-10 pr-10 mb-10 is-size-7">
@@ -114,45 +99,16 @@ onBeforeUnmount(() => {
         </div>
       </div>
 
-      <div class="step-item" :class="{ 'is-success is-completed': api.store.global.db_connected }">
+      <div class="step-item" :class="{ 'is-success is-completed': api.store.global.db_connected }" @click="connectDB()">
         <div class="step-marker" v-if="!api.store.global.db_connected">2</div>
         <div class="step-marker" v-else><FAIcon icon="fa-solid fa-check" /></div>
-
         <div class="step-details" :class="{ 'is-success is-completed': api.store.global.db_connected }">
-          <p class="step-title is-size-6">
-            <img src="/src/assets/dev/logo_lockup_firebase_vertical.svg" width="15" />&nbsp;&nbsp;Firestore
+          <p class="step-title is-size-7">
+            <img src="/src/assets/dev/logo_lockup_firebase_vertical.svg" width="15" />
           </p>
-          <p v-if="!api.store.global.db_connected">Database is <b>not</b> connected.</p>
-          <p v-else>Database is connected.</p>
+          <p v-if="!api.store.global.db_connected">Not connected.</p>
+          <p v-else>Connected.</p>
           <br />
-          <table class="table is-hoverable is-striped is-fullwidth">
-            <tbody>
-              <tr>
-                <th width="40%"></th>
-                <th></th>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Mode:</b></td>
-                <td class="has-text-left is-family-code is-size-7">
-                  {{ api.config.mode == 'development' ? 'testing' : 'live' }}
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Project:</b></td>
-                <td class="has-text-left is-family-code is-size-7">{{ api.config.firebaseConfig.projectId }}</td>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>DocRef:</b></td>
-                <td class="has-text-left is-family-code is-size-7">
-                  {{ api.store.local.docRef }}&nbsp;&nbsp;<a
-                    v-if="api.store.local.docRef"
-                    @click.prevent="open_firebase_console(firebase_url)"
-                    ><FAIcon icon="fa-solid fa-square-up-right"
-                  /></a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       </div>
       <div class="step-item" :class="sync_state">
@@ -162,58 +118,110 @@ onBeforeUnmount(() => {
         </div>
         <div class="step-marker" v-else><FAIcon icon="fa-solid fa-check" /></div>
         <div class="step-details">
-          <p class="step-title is-size-6" :class="sync_state"><FAIcon icon="fa-solid fa-rotate" />&nbsp;&nbsp;Sync</p>
+          <p class="step-title is-size-7" :class="sync_state"><FAIcon icon="fa-solid fa-rotate" /></p>
           <p v-if="!api.store.global.db_connected">Data never synced.</p>
           <p v-else-if="api.store.global.db_changes">Data out of sync.</p>
           <p v-else>Database is synced.</p>
-
-          <br />
-          <table class="table is-hoverable is-striped is-fullwidth">
-            <tbody>
-              <tr>
-                <th width="40%"></th>
-                <th></th>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Writes:</b></td>
-                <td class="has-text-left is-family-code is-size-7">
-                  {{ api.store.local.totalWrites }} out of {{ api.config.max_writes }} max
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Last write:</b></td>
-                <td class="has-text-left is-family-code is-size-7">
-                  {{ last_write_time_string }}
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Auto save:</b></td>
-                <td class="has-text-left is-family-code is-size-7">{{ api.config.auto_save }}</td>
-              </tr>
-              <tr>
-                <td class="has-text-left"><b>Approx size:</b></td>
-                <td class="has-text-left is-family-code is-size-7">
-                  {{ api.store.local.approx_data_size }} / 1,048,576 max<br />
-                  ({{ Math.round((api.store.local.approx_data_size / 1048576) * 1000) / 1000 }}%)
-                </td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       </div>
     </div>
+
+    <table class="table is-hoverable is-striped is-fullwidth">
+      <tbody>
+        <tr>
+          <th width="30%"></th>
+          <th></th>
+        </tr>
+        <tr>
+          <td class="has-text-left"><b>Last route:</b></td>
+          <td class="has-text-left is-family-code">{{ '/' + api.store.local.lastRoute }}</td>
+        </tr>
+        <tr>
+          <td class="has-text-left"><b>Consented:</b></td>
+          <td class="has-text-left is-family-code">{{ api.store.local.consented }}</td>
+        </tr>
+        <tr>
+          <td class="has-text-left"><b>Is done:</b></td>
+          <td class="has-text-left is-family-code">{{ api.store.local.done }}</td>
+        </tr>
+        <tr>
+          <td class="has-text-left"><b>Repeat:</b></td>
+          <td class="has-text-left is-family-code">{{ api.config.allow_repeats }}</td>
+        </tr>
+        <tr>
+          <td class="has-text-left"><b>Mode:</b></td>
+          <td class="has-text-left is-family-code">
+            {{ api.config.mode == 'development' ? 'testing' : 'live' }}
+          </td>
+        </tr>
+        <tr>
+          <td class="has-text-left"><b>Project:</b></td>
+          <td class="has-text-left is-family-code">{{ api.config.firebaseConfig.projectId }}</td>
+        </tr>
+        <tr>
+          <td class="has-text-left"><b>DocRef:</b></td>
+          <td class="has-text-left is-family-code">
+            {{ api.store.local.docRef }}&nbsp;&nbsp;<a
+              v-if="api.store.local.docRef"
+              @click.prevent="open_firebase_console(firebase_url)"
+              ><FAIcon icon="fa-solid fa-square-up-right"
+            /></a>
+          </td>
+        </tr>
+        <tr>
+          <td class="has-text-left"><b>Writes:</b></td>
+          <td class="has-text-left is-family-code">
+            {{ api.store.local.totalWrites }} out of {{ api.config.max_writes }} max
+          </td>
+        </tr>
+        <tr>
+          <td class="has-text-left"><b>Last write:</b></td>
+          <td class="has-text-left is-family-code">
+            {{ last_write_time_string }}
+          </td>
+        </tr>
+        <tr>
+          <td class="has-text-left"><b>Auto save:</b></td>
+          <td class="has-text-left is-family-code">{{ api.config.auto_save }}</td>
+        </tr>
+        <tr>
+          <td class="has-text-left"><b>Size:</b></td>
+          <td class="has-text-left is-family-code">
+            {{ api.store.local.approx_data_size }} / 1,048,576 max ({{
+              Math.round((api.store.local.approx_data_size / 1048576) * 1000) / 1000
+            }}%)
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <style scoped>
+.table td {
+  padding: 1 0 1 1;
+  font-size: 0.6em;
+}
+.table th {
+  padding: 0;
+  margin: 0;
+}
+
+.database-info-sidebar-panel {
+  height: fit-content;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  padding-right: 0px;
+  padding-left: 0px;
+}
 .step-title {
-  font-size: 0.9em;
+  font-size: 0.8em;
   font-weight: bold;
 }
 
 .step-details {
-  font-size: 0.85em;
-  padding: 25px;
+  font-size: 0.65em;
+  padding: 0px;
 }
 
 @media screen and (max-width: 1024px) {
@@ -295,9 +303,9 @@ onBeforeUnmount(() => {
   }
   .step-details {
     width: 100%;
-    padding: 25px;
-    padding-left: 50px;
-    padding-right: 50px;
+    padding: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
     margin-left: auto;
     margin-right: auto;
   }

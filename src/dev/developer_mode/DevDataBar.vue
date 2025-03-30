@@ -1,7 +1,6 @@
 <script setup>
 import { useMouse } from '@vueuse/core'
 import { ref, computed } from 'vue'
-import DatabaseInfoPanel from '@/dev/developer_mode/DatabaseInfoPanel.vue'
 import DatabaseLogPanel from '@/dev/developer_mode/DatabaseLogPanel.vue'
 import DatabaseBrowsePanel from '@/dev/developer_mode/DatabaseBrowsePanel.vue'
 
@@ -30,14 +29,6 @@ function move() {
   <nav class="databar">
     <aside class="menu datamenu">
       <ul class="menu-list">
-        <li :class="{ active: api.store.dev.data_bar_tab == 'database' }">
-          <a
-            @click="api.store.dev.data_bar_tab = 'database'"
-            class="has-tooltip-arrow has-tooltip-right"
-            data-tooltip="Database Info"
-            ><FAIcon icon="fa-solid fa-database icon" />
-          </a>
-        </li>
         <li :class="{ active: api.store.dev.data_bar_tab == 'browse' }">
           <a
             @click="api.store.dev.data_bar_tab = 'browse'"
@@ -63,10 +54,6 @@ function move() {
       <nav class="databar-panel-header logpanel" role="navigation" aria-label="data navigation">
         <div id="navbardatabase" class="databar-panel-header-menu" @mousedown="down()">
           <div class="databar-panel-header-start">
-            <div class="databar-panel-header-item info" v-if="api.store.dev.data_bar_tab == 'database'">
-              <FAIcon icon="fa-solid fa-database icon" />&nbsp;&nbsp;<b>Database Info</b>
-            </div>
-
             <div class="databar-panel-header-item info" v-if="api.store.dev.data_bar_tab == 'browse'">
               <FAIcon icon="fa-solid fa-magnifying-glass icon" />&nbsp;&nbsp;<b>Data Explorer</b>
             </div>
@@ -76,11 +63,11 @@ function move() {
           </div>
 
           <div class="databar-panel-header-end">
-            <div class="databar-panel-header-item closebutton">
-              <a
-                class="databar-panel-header-item"
-                @click="api.store.dev.show_console_bar = !api.store.dev.show_console_bar"
-              >
+            <div
+              class="databar-panel-header-item closebutton"
+              @click="api.store.dev.show_console_bar = !api.store.dev.show_console_bar"
+            >
+              <a class="databar-panel-header-item">
                 <FAIcon icon="fa-solid fa-circle-xmark icon" />
               </a>
             </div>
@@ -89,7 +76,6 @@ function move() {
       </nav>
 
       <!-- content of panel here -->
-      <DatabaseInfoPanel v-if="api.store.dev.data_bar_tab == 'database'"></DatabaseInfoPanel>
       <DatabaseBrowsePanel v-if="api.store.dev.data_bar_tab == 'browse'"></DatabaseBrowsePanel>
       <DatabaseLogPanel v-if="api.store.dev.data_bar_tab == 'log'"></DatabaseLogPanel>
     </section>
@@ -191,6 +177,7 @@ function move() {
 
 .closebutton {
   padding-right: 10px;
+  padding-left: 10px;
 }
 .secpanel {
   width: 100%;
