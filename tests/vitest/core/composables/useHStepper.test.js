@@ -235,7 +235,7 @@ describe('useHStepper composable', () => {
       const stepper = getCurrentRouteStepper()
 
       // Test getters that should be protected
-      const getters = ['length', 'rows', 'rowsdata']
+      const getters = ['rows', 'rowsdata']
       // path/paths is excluded because there is a equivalent function on the state machien
 
       getters.forEach((getter) => {
@@ -1122,12 +1122,12 @@ describe('useHStepper composable', () => {
       const stepper = getCurrentRouteStepper()
 
       // Create and push a table
-      const table1 = stepper.table().append({ type: 'trial', id: 1 })
+      const table1 = stepper.t.append({ type: 'trial', id: 1 })
       stepper.push(table1)
       const initialLength = stepper.nrows
 
       // Try to push identical data in a new table (since original is read-only)
-      const table2 = stepper.table().append({ type: 'trial', id: 1 })
+      const table2 = stepper.t.append({ type: 'trial', id: 1 })
       stepper.push(table2)
 
       // Verify no new rows were added
