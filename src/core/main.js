@@ -12,7 +12,7 @@ import { pinia } from '@/core/createpinia'
 import '@/core/icons' // configure fontawesome
 
 // drag components
-import VueDraggableResizable from 'vue-draggable-resizable'
+//import VueDraggableResizable from 'vue-draggable-resizable'
 import { createNotivue } from 'notivue'
 
 // Create the app and the data store
@@ -50,7 +50,7 @@ app.use(
 app.component('FAIcon', FontAwesomeIcon)
 
 // add the ability to drag and resize elements
-app.component('vue-draggable-resizable', VueDraggableResizable)
+//app.component('vue-draggable-resizable', VueDraggableResizable)
 
 // you "mount the app starting at the #app element"
 app.mount('#app') // start the app!

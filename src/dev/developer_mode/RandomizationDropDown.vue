@@ -63,110 +63,102 @@ watch(
     </div>
 
     <div class="dropdown-menu pt-0 mt-0" id="dropdown-menu" role="menu">
-      <vue-draggable-resizable
-        :x="api.store.dev.randomization_panel.x"
-        :y="api.store.dev.randomization_panel.y"
-        :draggable="api.store.dev.randomization_panel.visible"
-        :resizable="false"
-        :onDrag="onDragCallback"
-      >
-        <div class="dropdown-content">
-          <div class="pin" :class="{ 'pin-selected': api.store.dev.randomization_panel.visible }">
-            <a @click="toggle_and_reset()">
-              <FAIcon icon=" fa-solid fa-thumbtack" />
-            </a>
-          </div>
-          <div class="randomization is-right">
-            <h1 class="title is-6">Seeded Randomization</h1>
-            <p class="is-left">
-              You have the option of manually setting the seed id, which is used to seed random number generators
-              throughout the experiment. To do so, replace the value in the textbox with the desired seed id and click
-              the green reset button before proceeding. Read more about randomization
-              <a href="https://smile.gureckislab.org/randomization.html">in the docs</a>.
-            </p>
-            <br />
-            <table class="table is-fullwidth">
-              <tbody>
-                <tr>
-                  <th width="30%"></th>
-                  <th></th>
-                </tr>
-                <tr>
-                  <td class="has-text-left"><b>Fixed Seed</b>:</td>
-                  <td class="has-text-left is-family-code is-size-7">
-                    <div class="field">
-                      <input
-                        id="switchRoundedDefault"
-                        type="checkbox"
-                        name="switchRoundedDefault"
-                        class="switch is-rounded is-rtl is-small"
-                        v-model="smilestore.local.useSeed"
-                      />
-                      <label for="switchRoundedDefault"></label>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="has-text-left"><b>Seed</b>:</td>
-                  <td class="has-text-left is-family-code is-size-7">
-                    <div class="textinput">
-                      <input
-                        class="input is-small"
-                        type="text"
-                        placeholder="Current seed"
-                        size="15"
-                        width="10"
-                        v-model="seed"
-                      />
-                      <button
-                        class="button is-small is-light removeedge has-tooltip-arrow has-tooltip-top"
-                        data-tooltip="Set new seed"
-                        @click="randomize_seed()"
-                      >
-                        <FAIcon icon="fa-solid fa-arrow-right" />
-                      </button>
-                    </div>
-                    <!-- <TextInputWithButton :v-model="seed"
+      <div class="dropdown-content">
+        <div class="pin" :class="{ 'pin-selected': api.store.dev.randomization_panel.visible }">
+          <a @click="toggle_and_reset()">
+            <FAIcon icon=" fa-solid fa-thumbtack" />
+          </a>
+        </div>
+        <div class="randomization is-right">
+          <h1 class="title is-6">Seeded Randomization</h1>
+          <p class="is-left">
+            You have the option of manually setting the seed id, which is used to seed random number generators
+            throughout the experiment. To do so, replace the value in the textbox with the desired seed id and click the
+            green reset button before proceeding. Read more about randomization
+            <a href="https://smile.gureckislab.org/randomization.html">in the docs</a>.
+          </p>
+          <br />
+          <table class="table is-fullwidth">
+            <tbody>
+              <tr>
+                <th width="30%"></th>
+                <th></th>
+              </tr>
+              <tr>
+                <td class="has-text-left"><b>Fixed Seed</b>:</td>
+                <td class="has-text-left is-family-code is-size-7">
+                  <div class="field">
+                    <input
+                      id="switchRoundedDefault"
+                      type="checkbox"
+                      name="switchRoundedDefault"
+                      class="switch is-rounded is-rtl is-small"
+                      v-model="smilestore.local.useSeed"
+                    />
+                    <label for="switchRoundedDefault"></label>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="has-text-left"><b>Seed</b>:</td>
+                <td class="has-text-left is-family-code is-size-7">
+                  <div class="textinput">
+                    <input
+                      class="input is-small"
+                      type="text"
+                      placeholder="Current seed"
+                      size="15"
+                      width="10"
+                      v-model="seed"
+                    />
+                    <button
+                      class="button is-small is-light removeedge has-tooltip-arrow has-tooltip-top"
+                      data-tooltip="Set new seed"
+                      @click="randomize_seed()"
+                    >
+                      <FAIcon icon="fa-solid fa-arrow-right" />
+                    </button>
+                  </div>
+                  <!-- <TextInputWithButton :v-model="seed"
                       :seed="seed"
                       tooltip="Set new seed"
                       @action="randomize_seed()"
                     ></TextInputWithButton> -->
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="field"></div>
+
+          <h1 class="title is-6">Random variables</h1>
+          <p class="is-left">
+            Read more about randomization
+            <a href="https://smile.gureckislab.org/randomization.html"> in the docs </a>.
+          </p>
+          <br />
+          <table class="table is-fullwidth">
+            <tbody>
+              <template v-for="(value, key) in smilestore.local.possibleConditions" :key="key">
+                <tr>
+                  <td width="30%">
+                    <b>{{ key }}:</b>
+                  </td>
+                  <td>
+                    <div class="select is-small">
+                      <select v-model="selected[key]" @change="changeCond(key, $event)">
+                        <option disabled value="">[not selected]</option>
+                        <option v-for="cond in value" :key="cond">
+                          {{ cond }}
+                        </option>
+                      </select>
+                    </div>
                   </td>
                 </tr>
-              </tbody>
-            </table>
-            <div class="field"></div>
-
-            <h1 class="title is-6">Random variables</h1>
-            <p class="is-left">
-              Read more about randomization
-              <a href="https://smile.gureckislab.org/randomization.html"> in the docs </a>.
-            </p>
-            <br />
-            <table class="table is-fullwidth">
-              <tbody>
-                <template v-for="(value, key) in smilestore.local.possibleConditions" :key="key">
-                  <tr>
-                    <td width="30%">
-                      <b>{{ key }}:</b>
-                    </td>
-                    <td>
-                      <div class="select is-small">
-                        <select v-model="selected[key]" @change="changeCond(key, $event)">
-                          <option disabled value="">[not selected]</option>
-                          <option v-for="cond in value" :key="cond">
-                            {{ cond }}
-                          </option>
-                        </select>
-                      </div>
-                    </td>
-                  </tr>
-                </template>
-              </tbody>
-            </table>
-          </div>
+              </template>
+            </tbody>
+          </table>
         </div>
-      </vue-draggable-resizable>
+      </div>
     </div>
   </div>
 </template>
