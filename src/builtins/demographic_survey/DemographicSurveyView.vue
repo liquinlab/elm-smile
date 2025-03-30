@@ -6,7 +6,7 @@ import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
 const stepper = api.useStepper()
-const pages = stepper.t.append([{ path: 'page1' }, { path: 'page2' }, { path: 'page3' }]).push()
+const pages = stepper.t.append([{ path: 'survey_page1' }, { path: 'survey_page2' }, { path: 'survey_page3' }]).push()
 
 const forminfo = reactive({
   dob: '',
@@ -79,7 +79,7 @@ function finish() {
         We request some information about you which we can use to understand aggregate differences between individuals.
         Your privacy will be maintained and the data will not be linked to your online identity (e.g., email).
       </p>
-      <div class="formstep" v-if="stepper.paths === 'page1'">
+      <div class="formstep" v-if="stepper.paths === 'survey_page1'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -161,7 +161,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-else-if="stepper.paths === 'page2'">
+      <div class="formstep" v-else-if="stepper.paths === 'survey_page2'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -225,7 +225,7 @@ function finish() {
               <div class="columns">
                 <div class="column">
                   <div class="has-text-left">
-                    <button class="button is-warning" id="finish" @click="step.prev()">
+                    <button class="button is-warning" id="finish" @click="stepper.prev()">
                       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous
                     </button>
                   </div>
@@ -244,7 +244,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-else-if="stepper.paths === 'page3'">
+      <div class="formstep" v-else-if="stepper.paths === 'survey_page3'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
