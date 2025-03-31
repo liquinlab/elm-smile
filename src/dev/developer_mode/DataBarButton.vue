@@ -9,7 +9,7 @@ import CircleProgress from '@/dev/developer_mode/CircleProgress.vue'
 // if not a known user
 
 const database_tooltip = computed(() => {
-  var msg = 'Toggle data panel | '
+  var msg = ''
   if (api.store.global.db_connected == true) {
     msg += 'Database connected | '
   } else {
@@ -25,10 +25,6 @@ const database_tooltip = computed(() => {
     msg += Math.round((api.store.local.approx_data_size / 1048576) * 1000) / 1000 + '% data used'
   }
   return msg
-})
-
-const alt_tooltip = computed(() => {
-  return 'Create connection to Firestore database'
 })
 </script>
 

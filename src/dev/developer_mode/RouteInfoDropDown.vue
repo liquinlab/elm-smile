@@ -7,8 +7,10 @@ const api = useAPI()
 
 const buttonstyle = computed(() => {
   let base = 'button is-small is-route is-jump-bar has-tooltip-arrow has-tooltip-bottom'
-  if (api.store.dev.route_panel.visible || api.store.dev.pinned_route !== null) {
+  if (api.store.dev.route_panel.visible) {
     return base + ' is-selected'
+  } else if (api.store.dev.pinned_route !== null) {
+    return base + ' pinned'
   } else {
     return base
   }
@@ -110,7 +112,7 @@ const buttonstyle = computed(() => {
   margin-top: 0;
 }
 .is-selected {
-  background-color: rgb(211, 251, 222);
+  background-color: rgb(219, 219, 219);
 }
 .is-jump-bar {
   font-size: 0.65rem;
