@@ -6,7 +6,7 @@ import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 const emit = defineEmits(['selected'])
 
-const height_pct = computed(() => `${api.store.dev.console_bar_height - 100}px`)
+const height_pct = computed(() => `${api.store.dev.console_bar_height - 90}px`)
 
 const header = computed(() => {
   if (props.data === undefined || props.data === null) {
@@ -31,6 +31,13 @@ const data_field = computed(() => {
     return null
   }
 })
+
+function truncateText(text, maxLength = 30) {
+  if (!text) return text
+  if (text.length <= maxLength) return text
+  return text.substring(0, maxLength) + '...'
+}
+
 function option_selected(option) {
   emit('selected', option)
 }
@@ -56,13 +63,13 @@ function option_selected(option) {
       <li v-for="(option, key) in data_field" :class="{ active: key === props.selected }">
         <div v-if="option === null || (typeof option != 'object' && !Array.isArray(option))">
           <a>
-            <b>{{ key }}</b
-            >: {{ option === null ? 'null' : option }}
+            <b>{{ truncateText(key) }}</b
+            >: {{ option === null ? 'null' : truncateText(String(option)) }}
           </a>
         </div>
         <div v-else @click="option_selected(key)">
           <a>
-            <b>{{ key }}</b>
+            <b>{{ truncateText(key) }}</b>
             <div class="arrow">
               <FAIcon icon=" fa-solid fa-angle-right" />
             </div>
@@ -91,9 +98,10 @@ function option_selected(option) {
   color: #858484;
   padding: 5px;
   font-size: 0.8em;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
   padding-left: 10px;
 }
+
 .menu-list {
   height: v-bind(height_pct);
   overflow-y: scroll;

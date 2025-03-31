@@ -6,7 +6,7 @@ const api = SmileAPI()
 import useLog from '@/core/stores/log'
 const log = useLog()
 
-const height_pct = computed(() => `${api.store.dev.console_bar_height - 70}px`)
+const height_pct = computed(() => `${api.store.dev.console_bar_height - 67}px`)
 
 function filter_log(msg) {
   const search_match = msg.message.toLowerCase().includes(api.store.dev.search_params.toLowerCase())
@@ -176,12 +176,23 @@ function getBgClass(msg) {
 }
 .scrollablelog {
   height: v-bind(height_pct);
+  max-height: 100%;
   width: 100%;
+  max-width: 100%;
   margin: 0px;
   margin-top: 0px;
+  overflow: hidden;
   overflow-y: scroll;
   display: flex;
   flex-direction: column-reverse;
+  box-sizing: border-box;
+}
+.menu-list {
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 .menu-list li {
   font-size: 0.7em;
@@ -189,6 +200,11 @@ function getBgClass(msg) {
   padding: 7px;
   padding-right: 0px;
   border-bottom: 1px solid #f2f2f2;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 .bg-white {
   background-color: #ffffff;

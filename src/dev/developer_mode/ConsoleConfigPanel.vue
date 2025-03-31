@@ -131,7 +131,7 @@ function resetDevState() {
           @selected="panel2_select"
         ></ConfigList>
       </div>
-      <div class="column colcontent is-5 edge isdark">
+      <div class="column colcontent is-4 edge isdark">
         <!-- zero from end -->
         <ConfigList :data="panel_path(0)" @selected="panel3_select"></ConfigList>
       </div>
