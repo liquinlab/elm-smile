@@ -14,6 +14,7 @@ import WindowSizerView from '@/builtins/window_sizer/WindowSizerView.vue'
 
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
+import KeyCommandNotification from '@/dev/developer_mode/KeyCommandNotification.vue'
 const api = useAPI()
 
 const toosmall = ref(api.isBrowserTooSmall())
@@ -24,55 +25,91 @@ const showStatusBar = computed(() => {
   return api.currentRouteName() !== 'data' && api.currentRouteName() !== 'recruit' && api.config.mode != 'presentation'
 })
 
-// Add keyboard shortcuts for dev mode
+// Add notification state
+const showNotification = ref(false)
+const notificationCommand = ref('')
+const notificationAction = ref('')
+
+const showTemporaryNotification = (command, action) => {
+  notificationCommand.value = command
+  notificationAction.value = action
+  showNotification.value = true
+  setTimeout(() => {
+    showNotification.value = false
+  }, 1500) // Hide after 1.5 seconds
+}
+
+// Modify Alt+1 handler
 onKeyDown(['Alt', '1'], (e) => {
   if (api.config.mode === 'development') {
     e.preventDefault()
-    api.store.dev.show_side_bar = !api.store.dev.show_side_bar
-  }
-})
 
-onKeyDown(['Alt', '2'], (e) => {
-  if (api.config.mode === 'development') {
-    e.preventDefault()
-    api.store.dev.show_console_bar = !api.store.dev.show_console_bar
-  }
-})
+    const sideBar = api.store.dev.show_side_bar
+    const consoleBar = api.store.dev.show_console_bar
 
-onKeyDown(['Alt', '3'], (e) => {
-  if (api.config.mode === 'development') {
-    e.preventDefault()
-    // If both are visible or only one is visible, hide both
-    if (api.store.dev.show_side_bar || api.store.dev.show_console_bar) {
-      api.store.dev.show_side_bar = false
+    if (!sideBar && !consoleBar) {
+      api.store.dev.show_side_bar = true
       api.store.dev.show_console_bar = false
-    } else {
-      // If neither is visible, show both
+      showTemporaryNotification('Alt + 1', 'Showing Sidebar')
+    } else if (sideBar && !consoleBar) {
+      api.store.dev.show_side_bar = false
+      api.store.dev.show_console_bar = true
+      showTemporaryNotification('Alt + 1', 'Showing Console')
+    } else if (!sideBar && consoleBar) {
       api.store.dev.show_side_bar = true
       api.store.dev.show_console_bar = true
+      showTemporaryNotification('Alt + 1', 'Showing Both Panels')
+    } else {
+      api.store.dev.show_side_bar = false
+      api.store.dev.show_console_bar = false
+      showTemporaryNotification('Alt + 1', 'Hiding All Panels')
     }
   }
 })
 
-// Add shortcuts for switching console tabs
+// Modify Alt+2 handler
+onKeyDown(['Alt', '2'], (e) => {
+  if (api.config.mode === 'development') {
+    e.preventDefault()
+
+    const currentTab = api.store.dev.console_bar_tab
+
+    if (currentTab === 'browse') {
+      api.store.dev.console_bar_tab = 'log'
+      if (api.store.dev.show_console_bar) {
+        showTemporaryNotification('Alt + 2', 'Switched to Log Tab')
+      }
+    } else if (currentTab === 'log') {
+      api.store.dev.console_bar_tab = 'config'
+      if (api.store.dev.show_console_bar) {
+        showTemporaryNotification('Alt + 2', 'Switched to Config Tab')
+      }
+    } else {
+      api.store.dev.console_bar_tab = 'browse'
+      if (api.store.dev.show_console_bar) {
+        showTemporaryNotification('Alt + 2', 'Switched to Browse Tab')
+      }
+    }
+  }
+})
+
+// Add shortcut for resetting local state
+onKeyDown(['Alt', '3'], (e) => {
+  if (api.config.mode === 'development') {
+    e.preventDefault()
+    api.resetLocalState()
+  }
+})
+
+// Add shortcut for connecting to database
 onKeyDown(['Alt', '4'], (e) => {
-  if (api.config.mode === 'development' && api.store.dev.show_console_bar) {
+  if (api.config.mode === 'development') {
     e.preventDefault()
-    api.store.dev.console_bar_tab = 'browse'
-  }
-})
-
-onKeyDown(['Alt', '5'], (e) => {
-  if (api.config.mode === 'development' && api.store.dev.show_console_bar) {
-    e.preventDefault()
-    api.store.dev.console_bar_tab = 'log'
-  }
-})
-
-onKeyDown(['Alt', '6'], (e) => {
-  if (api.config.mode === 'development' && api.store.dev.show_console_bar) {
-    e.preventDefault()
-    api.store.dev.console_bar_tab = 'config'
+    if (!api.store.local.knownUser) {
+      api.setKnown()
+      api.setConsented()
+      showTemporaryNotification('Alt + 4', 'Connected to Database')
+    }
   }
 })
 </script>
@@ -111,6 +148,8 @@ onKeyDown(['Alt', '6'], (e) => {
         </div>
       </Transition>
     </div>
+
+    <KeyCommandNotification :show="showNotification" :command="notificationCommand" :action="notificationAction" />
   </div>
 </template>
 
