@@ -7,7 +7,7 @@ const api = useAPI()
 
 const buttonstyle = computed(() => {
   let base = 'button is-small is-route is-jump-bar has-tooltip-arrow has-tooltip-bottom'
-  if (api.store.dev.route_panel.visible) {
+  if (api.store.dev.route_panel.visible || api.store.dev.pinned_route !== null) {
     return base + ' is-selected'
   } else {
     return base
@@ -67,7 +67,7 @@ const buttonstyle = computed(() => {
         </span>
       </button>
     </p>
-    <p class="control">
+    <p class="control" v-if="api.store.config.mode === 'development'">
       <button
         class="button is-small is-jump-bar has-tooltip-arrow has-tooltip-bottom"
         :class="{ pinned: api.store.dev.pinned_route !== null }"
@@ -90,7 +90,7 @@ const buttonstyle = computed(() => {
           </button>
         </p>
       </div>
-      <div class="dropdown-menu pt-0 mt-0" id="dropdown-menu" role="menu">
+      <div class="dropdown-menu pt-0 mt-0" id="dropdown-menu" role="menu" v-if="api.store.dev.pinned_route === null">
         <RouteJumper :routeName="api.currentRouteName()"></RouteJumper>
       </div>
     </div>
