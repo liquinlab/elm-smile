@@ -1,9 +1,5 @@
 <script setup>
-//import RouteGraph from '@/dev/developer_mode/RouteGraph.vue'
 import { watch, ref } from 'vue'
-
-import { useKeyModifier } from '@vueuse/core'
-const altKeyState = useKeyModifier('Alt')
 
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
@@ -31,8 +27,6 @@ const filteredRoutes = routes.filter((r) => {
 // now append seqtimeline and filteredRoutes
 const allRoutes = seqtimeline.concat(filteredRoutes)
 
-const forceMode = ref(true)
-
 // watch route -- if route changes, update value of current query. This will get carried forward when you jump routes
 const currentQuery = ref(route.query)
 watch(route, async (newRoute, oldRoute) => {
@@ -43,20 +37,9 @@ function setHover(route) {
   hoverRoute.value = route
 }
 
-watch(altKeyState, (value) => {
-  forceMode.value = !value
-})
-
 function navigate(route) {
-  if (forceMode.value) {
-    log.warn(`DEV MODE: user requested to FORCE navigate to ${route}`)
-    api.gotoView(route, true)
-  } else {
-    log.warn(`DEV MODE: user requested to navigate to ${route}`)
-    api.gotoView(route, false)
-  }
-  // dismiss hover if open but not if panel is set to remain visible.
-  //api.store.dev.route_panel.visible = false
+  log.warn(`DEV MODE: user requested to FORCE navigate to ${route}`)
+  api.gotoView(route, true)
 }
 </script>
 <template>
@@ -78,14 +61,9 @@ function navigate(route) {
             <FAIcon v-else icon="fa-solid fa-diamond" />
             /{{ r.name }}
           </div>
-          <div class="forcebutton forcemode" v-if="altKeyState && hoverRoute === r.name">
-            <FAIcon icon="fa-solid fa-square-caret-right" />
-          </div>
         </span>
       </div>
     </template>
-    <hr />
-    <div class="note">Use ⌥ + click to navigate as the user in real experiment would.</div>
   </div>
 </template>
 
