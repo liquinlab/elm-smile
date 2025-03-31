@@ -1,12 +1,15 @@
 <script setup>
 import StateTreeViewer from '@/dev/developer_mode/StateTreeViewer.vue'
 import DatabaseInfoSidebarPanel from '@/dev/developer_mode/DatabaseInfoSidebarPanel.vue'
+import RandomizationSidebarPanel from '@/dev/developer_mode/RandomizationSidebarPanel.vue'
 </script>
 
 <template>
   <div class="sidebar-container">
     <DatabaseInfoSidebarPanel />
+    <RandomizationSidebarPanel />
     <StateTreeViewer />
+
     <div class="sidebar-footer"></div>
   </div>
 </template>
