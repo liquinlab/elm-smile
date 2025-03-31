@@ -1,6 +1,4 @@
 <script setup>
-import { useMouse } from '@vueuse/core'
-import { ref, computed } from 'vue'
 import ConsoleLogPanel from '@/dev/developer_mode/ConsoleLogPanel.vue'
 import ConsoleDatabaseBrowsePanel from '@/dev/developer_mode/ConsoleDatabaseBrowsePanel.vue'
 import ConsoleConfigPanel from '@/dev/developer_mode/ConsoleConfigPanel.vue'
@@ -47,7 +45,7 @@ const api = useAPI()
 
     <section class="section secpanel">
       <nav class="databar-panel-header logpanel" role="navigation" aria-label="data navigation">
-        <div id="navbardatabase" class="databar-panel-header-menu" @mousedown="down()">
+        <div id="navbardatabase" class="databar-panel-header-menu">
           <div class="databar-panel-header-start">
             <div class="databar-panel-header-item info" v-if="api.store.dev.console_bar_tab == 'browse'">
               <FAIcon icon="fa-solid fa-magnifying-glass icon" />&nbsp;&nbsp;<b>Data Explorer</b>

@@ -10,9 +10,6 @@ export function useHStepper() {
   const route = useRoute()
   const page = route.name
 
-  // this activates the stepper for the page in the dev tools
-  smilestore.dev.page_provides_trial_stepper = true
-
   // Create instances of our state managers
   const sm = new StepState('/')
 
@@ -304,7 +301,6 @@ export function useHStepper() {
       // Store the table in our internal map
       tables.set(tableId, table)
 
-      // Add cleanup on push to remove the table from our map
       //const originalPush = table.push
       table.push = () => {
         // Forward to the stepper's push method
@@ -339,7 +335,6 @@ export function useHStepper() {
         sm.clear()
         sm.push('SOS')
         sm.push('EOS')
-
         // Reset all internal refs
         _path.value = []
         _paths.value = ''
