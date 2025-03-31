@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+const VERBOSE = false
 // Mock Firebase modules
 vi.mock('firebase/app', () => ({
   initializeApp: vi.fn(() => ({
@@ -45,8 +46,14 @@ vi.mock('@/core/config', () => ({
 
 vi.mock('@/core/stores/log', () => ({
   default: () => ({
-    log: vi.fn(),
-    error: vi.fn(),
+    log: (...args) => {
+      if (VERBOSE) console.log('LOG:', ...args)
+      return vi.fn()
+    },
+    error: (...args) => {
+      if (VERBOSE) console.error('ERROR:', ...args)
+      return vi.fn()
+    },
   }),
 }))
 
