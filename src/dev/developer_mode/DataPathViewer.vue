@@ -3,7 +3,7 @@ import { ref } from 'vue'
 
 const props = defineProps({
   data: {
-    type: [Object, Array, String, Number, Boolean],
+    type: [Object, Array, String, Number, Boolean, null],
     required: true,
   },
 })
