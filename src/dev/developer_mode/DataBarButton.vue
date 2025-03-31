@@ -51,24 +51,27 @@ const alt_tooltip = computed(() => {
     </template>
     <template v-if="!api.store.global.db_connected">
       &nbsp;&nbsp;|&nbsp;&nbsp;
-      <CircleProgress
-        :percentage="Math.round(api.store.local.approx_data_size / 1048576) * 100"
-        :size="12"
-        :strokeWidth="40"
-        slicecolor="#aaa"
-        basecolor="#aaa"
-      />
+      <div class="mt-1">
+        <CircleProgress
+          :percentage="Math.round(api.store.local.approx_data_size / 1048576) * 100"
+          :size="12"
+          :strokeWidth="40"
+          slicecolor="#aaa"
+          basecolor="#aaa"
+        />
+      </div>
     </template>
     <template v-else>
       &nbsp;&nbsp;|&nbsp;&nbsp;
-
-      <CircleProgress
-        :percentage="Math.round(api.store.local.approx_data_size / 1048576) * 100"
-        :size="12"
-        :strokeWidth="40"
-        slicecolor="hsl(var(--bulma-button-h), var(--bulma-button-s), calc(var(--bulma-button-background-l) + var(--bulma-button-background-l-delta)))"
-        basecolor="var(--status-green)"
-      />
+      <div class="mt-1">
+        <CircleProgress
+          :percentage="Math.round(api.store.local.approx_data_size / 1048576) * 100"
+          :size="12"
+          :strokeWidth="40"
+          slicecolor="hsl(var(--bulma-button-h), var(--bulma-button-s), calc(var(--bulma-button-background-l) + var(--bulma-button-background-l-delta)))"
+          basecolor="var(--status-green)"
+        />
+      </div>
     </template>
   </button>
 </template>
