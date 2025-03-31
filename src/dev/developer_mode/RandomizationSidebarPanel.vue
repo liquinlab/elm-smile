@@ -101,7 +101,7 @@ const getBranchType = (index, total) => {
             </li>
           </template>
         </ul>
-        <div class="randomization-note">(see design.js)</div>
+        <div class="randomization-note">see design.js</div>
       </div>
     </div>
   </div>
@@ -110,7 +110,7 @@ const getBranchType = (index, total) => {
 <style scoped>
 .randomization-info-sidebar-panel {
   height: fit-content;
-  padding: 10px 0 0 0;
+  padding: 0px 0 0 0;
   margin: 0;
   background-color: #fff;
 }
@@ -139,7 +139,7 @@ const getBranchType = (index, total) => {
   color: #484e4e;
   background-color: #f0f0f0;
   padding: 0.4rem 0.5rem;
-  margin: 0.5rem 0rem 0px 0;
+  margin: 0rem 0rem 0px 0;
   border-top: 1px solid #d2d2d2;
   border-bottom: 1px solid #d2d2d2;
 }
