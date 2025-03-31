@@ -84,6 +84,7 @@ const init_dev = {
   page_provides_trial_stepper: false, // does current page provide a trial stepper (transient)
   show_console_bar: false, // show/hide the data base bottom (transient)
   show_side_bar: false,
+  pinned_route: null,
   console_bar_height: 300, // height of the data bar (transient)
   console_bar_tab: 'browse', // which tab to show in the data bar (transient)
   search_params: '', // search parameters (transient)
@@ -473,6 +474,7 @@ export default defineStore('smilestore', {
           // console.error(Date.now() - this.local.lastWrite)
           return
         }
+
         await updateSubjectDataRecord(this.data, this.local.docRef)
         await updatePrivateSubjectDataRecord(this.private, this.local.docRef)
         //console.log('data size = ', sizeof(data))
