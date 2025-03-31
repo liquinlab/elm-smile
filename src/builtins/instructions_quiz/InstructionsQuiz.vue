@@ -133,6 +133,13 @@ function returnInstructions() {
 function finish() {
   api.goNextView()
 }
+
+// randomize questions and add to stepper
+randomizeQuestions()
+stepper.t
+  .append(randomizedQuestions.value)
+  .append([{ path: 'start_task' }, { path: 'retry' }]) // add to additional pages
+  .push()
 </script>
 
 <template>
