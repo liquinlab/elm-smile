@@ -8,8 +8,8 @@ import useAPI from '@/core/composables/useAPI'
 //    and if they are, they redirect to last route
 
 export function addGuards(r, providedApi = null) {
-  const api = providedApi || useAPI()
   r.beforeEach(async (to, from) => {
+    const api = providedApi || useAPI()
     if (api.isResetApp()) {
       api.log.warn('ROUTER GUARD: Resetting app')
       api.resetLocalState()
