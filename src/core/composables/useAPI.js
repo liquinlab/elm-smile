@@ -47,7 +47,7 @@ export default function useAPI() {
     data: store.data,
     private: store.private,
     all_data: { private: store.private, data: store.data },
-    all_config: { local: store.local, data: store.dev, code: store.config.github, config: store.config },
+    all_config: { local: store.local, dev: store.dev, code: store.config.github, config: store.config },
     // local: store.local,
     // global: store.global,
     // dev: store.dev,
@@ -130,6 +130,12 @@ export default function useAPI() {
     setKnown: async () => await store.setKnown(),
     setDone: () => store.setDone(),
     setConsented: () => store.setConsented(),
+    connectDB: async () => {
+      if (!api.store.local.knownUser) {
+        await store.setKnown()
+        store.setConsented()
+      }
+    },
     setWithdrawn: (forminfo) => store.setWithdrawn(forminfo),
     verifyVisibility: (value) => {
       store.data.verified_visibility = value
