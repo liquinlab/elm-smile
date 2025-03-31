@@ -97,7 +97,7 @@ function resetDevState() {
     </nav>
 
     <div class="columns colcontent is-mobile">
-      <div class="column colcontent is-1 edge">
+      <div class="column colcontent is-2 edge">
         <div class="actionsbar">
           <p class="is-left is-size-7 p-2">
             Read more about configuration options

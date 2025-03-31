@@ -72,6 +72,8 @@ function connectDB() {
     api.setConsented()
   }
 }
+
+const showServiceSelect = ref(false)
 </script>
 <template>
   <!-- content of panel here -->
@@ -187,19 +189,6 @@ function connectDB() {
             </div>
           </td>
         </tr>
-
-        <tr>
-          <td class="has-text-left" colspan="1"><b>Service:</b></td>
-          <td class="has-text-left is-family-code" colspan="3">
-            <div class="control select is-small">
-              <select id="recruitment" v-model="smilestore.data.recruitment_service" class="select is-small">
-                <option v-for="(cond, key) in smilestore.global.urls" :key="cond">
-                  {{ key }}
-                </option>
-              </select>
-            </div>
-          </td>
-        </tr>
       </tbody>
     </table>
     <table class="table is-hoverable is-striped is-fullwidth">
@@ -207,6 +196,31 @@ function connectDB() {
         <tr>
           <th width="30%"></th>
           <th></th>
+        </tr>
+        <tr>
+          <td class="has-text-left" colspan="1"><b>Service:</b></td>
+          <td class="has-text-left is-family-code" colspan="3">
+            <div class="is-flex is-align-items-center">
+              <template v-if="!showServiceSelect">
+                <span class="mr-2">{{ smilestore.data.recruitment_service }}</span>
+
+                <FAIcon icon="fa-solid fa-pen-to-square" @click="showServiceSelect = true" />
+              </template>
+              <div v-else class="control select is-small">
+                <select
+                  id="recruitment"
+                  v-model="smilestore.data.recruitment_service"
+                  class="select is-small"
+                  @change="showServiceSelect = false"
+                  @blur="showServiceSelect = false"
+                >
+                  <option v-for="(cond, key) in smilestore.global.urls" :key="cond">
+                    {{ key }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </td>
         </tr>
         <tr>
           <td class="has-text-left"><b>Last route:</b></td>
