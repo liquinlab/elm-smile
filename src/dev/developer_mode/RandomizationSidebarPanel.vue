@@ -54,6 +54,32 @@ const getBranchType = (index, total) => {
 </script>
 <template>
   <div class="randomization-info-sidebar-panel">
+    <div
+      class="subsection"
+      v-if="smilestore.local.possibleConditions && Object.keys(smilestore.local.possibleConditions).length > 0"
+    >
+      <div class="sectitle">Random Variables</div>
+
+      <!-- -->
+
+      <div class="randomization-conditions-list-container">
+        <ul class="conditions-list">
+          <template v-for="(value, key, index) in smilestore.local.possibleConditions" :key="key">
+            <li>
+              <span class="tree-branch">{{
+                getBranchType(index, Object.keys(smilestore.local.possibleConditions).length)
+              }}</span>
+              <div class="select is-small mb-1">
+                <select v-model="selected[key]" @change="changeCond(key, $event)">
+                  <option v-for="cond in value" :key="cond" :value="cond">{{ key }}: {{ cond }}</option>
+                </select>
+              </div>
+            </li>
+          </template>
+        </ul>
+        <div class="randomization-note">see design.js</div>
+      </div>
+    </div>
     <div class="sectitle">Set seed</div>
     <div class="randomization-seed-container">
       <div class="columns is-mobile m-0 p-0">
@@ -81,27 +107,6 @@ const getBranchType = (index, total) => {
             </button>
           </div>
         </div>
-      </div>
-
-      <div class="sectitle">Random Variables</div>
-      <!-- -->
-
-      <div class="randomization-conditions-list-container">
-        <ul class="conditions-list">
-          <template v-for="(value, key, index) in smilestore.local.possibleConditions" :key="key">
-            <li>
-              <span class="tree-branch">{{
-                getBranchType(index, Object.keys(smilestore.local.possibleConditions).length)
-              }}</span>
-              <div class="select is-small mb-1">
-                <select v-model="selected[key]" @change="changeCond(key, $event)">
-                  <option v-for="cond in value" :key="cond" :value="cond">{{ key }}: {{ cond }}</option>
-                </select>
-              </div>
-            </li>
-          </template>
-        </ul>
-        <div class="randomization-note">see design.js</div>
       </div>
     </div>
   </div>
