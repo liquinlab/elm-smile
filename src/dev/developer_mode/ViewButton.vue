@@ -38,7 +38,7 @@ const cycleState = () => {
 
 <template>
   <button
-    class="button devbar-button has-tooltip-arrow has-tooltip-bottom"
+    class="button devbar-button has-tooltip-arrow has-tooltip-left"
     :data-tooltip="
       currentState === 'both'
         ? 'Both panels visible'

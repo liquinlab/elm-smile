@@ -6,6 +6,7 @@ import useAPI from '@/core/composables/useAPI'
 // 3. add navigation guards
 //    currently these check if user is known
 //    and if they are, they redirect to last route
+
 export function addGuards(r, providedApi = null) {
   const api = providedApi || useAPI()
   r.beforeEach(async (to, from) => {
@@ -26,6 +27,24 @@ export function addGuards(r, providedApi = null) {
       api.resetApp() // set reset app on next load
     }
 
+    if (api.store.config.mode === 'development' && api.store.dev.pinned_route) {
+      // if pinned route doesn't exist, clear it
+
+      if (!r.hasRoute(api.store.dev.pinned_route)) {
+        api.store.dev.pinned_route = null
+      }
+
+      await api.connectDB()
+      api.log.warn('ROUTER GUARD: Pinned route, redirecting to ' + api.store.dev.pinned_route)
+      if (to.name === api.store.dev.pinned_route) {
+        return true
+      } else {
+        return {
+          name: api.store.dev.pinned_route,
+          replace: true,
+        }
+      }
+    }
     // Set queries to be combination of from queries and to queries
     // (TO overwrites FROM if there is one with the same key)
     // Also add queries that come before the URL -- this later

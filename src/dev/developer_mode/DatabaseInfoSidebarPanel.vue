@@ -66,13 +66,6 @@ onBeforeUnmount(() => {
   stopTimer()
 })
 
-function connectDB() {
-  if (!api.store.local.knownUser) {
-    api.setKnown()
-    api.setConsented()
-  }
-}
-
 const showServiceSelect = ref(false)
 </script>
 <template>
@@ -101,7 +94,11 @@ const showServiceSelect = ref(false)
         </div>
       </div>
 
-      <div class="step-item" :class="{ 'is-success is-completed': api.store.global.db_connected }" @click="connectDB()">
+      <div
+        class="step-item"
+        :class="{ 'is-success is-completed': api.store.global.db_connected }"
+        @click="api.connectDB()"
+      >
         <div class="step-marker" v-if="!api.store.global.db_connected">2</div>
         <div class="step-marker" v-else><FAIcon icon="fa-solid fa-check" /></div>
         <div class="step-details" :class="{ 'is-success is-completed': api.store.global.db_connected }">

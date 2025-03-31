@@ -29,6 +29,7 @@ const buttonstyle = computed(() => {
         </span>
       </button>
     </p>
+
     <p class="control" v-if="api.hasPrevView()">
       <button
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
@@ -66,7 +67,21 @@ const buttonstyle = computed(() => {
         </span>
       </button>
     </p>
-
+    <p class="control">
+      <button
+        class="button is-small is-jump-bar has-tooltip-arrow has-tooltip-bottom"
+        :class="{ pinned: api.store.dev.pinned_route !== null }"
+        v-on:click="
+          api.store.dev.pinned_route =
+            api.store.dev.pinned_route === api.currentRouteName() ? null : api.currentRouteName()
+        "
+        data-tooltip="Pin current route"
+      >
+        <span>
+          <FAIcon icon="fa-solid fa-thumbtack" />
+        </span>
+      </button>
+    </p>
     <div class="dropdown is-hoverable is-right" :class="{ 'is-active': api.store.dev.route_panel.visible }">
       <div class="dropdown-trigger">
         <p class="control is-route">
@@ -83,6 +98,9 @@ const buttonstyle = computed(() => {
 </template>
 
 <style scoped>
+.pinned {
+  background-color: rgb(211, 251, 222);
+}
 .is-route {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
