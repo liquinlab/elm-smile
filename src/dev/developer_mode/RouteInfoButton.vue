@@ -15,6 +15,12 @@ const buttonstyle = computed(() => {
     return base
   }
 })
+
+const toggleRoutePanel = () => {
+  if (api.store.dev.pinned_route == null) {
+    api.store.dev.route_panel.visible = !api.store.dev.route_panel.visible
+  }
+}
 </script>
 
 <template>
@@ -87,7 +93,7 @@ const buttonstyle = computed(() => {
     <div class="dropdown is-hoverable is-right" :class="{ 'is-active': api.store.dev.route_panel.visible }">
       <div class="dropdown-trigger">
         <p class="control is-route">
-          <button :class="buttonstyle" @click="api.store.dev.route_panel.visible = !api.store.dev.route_panel.visible">
+          <button :class="buttonstyle" @click="toggleRoutePanel()">
             <div class="routelabel">/{{ api.currentRouteName() }}</div>
           </button>
         </p>

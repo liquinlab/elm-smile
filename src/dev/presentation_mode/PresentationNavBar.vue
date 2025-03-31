@@ -2,7 +2,7 @@
 import { onMounted, watch, ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
-import RouteInfoDropDrop from '@/dev/developer_mode/RouteInfoDropDown.vue'
+import RouteInfoButton from '@/dev/developer_mode/RouteInfoButton.vue'
 import ResetButton from '@/dev/presentation_mode/PresentationModeResetButton.vue'
 import QRCodeButton from '@/dev/presentation_mode/QRCodeButton.vue'
 </script>
@@ -31,7 +31,7 @@ import QRCodeButton from '@/dev/presentation_mode/QRCodeButton.vue'
 
             <!-- route info buttons -->
             <div class="devbar-routeinfodropdown">
-              <RouteInfoDropDrop></RouteInfoDropDrop>
+              <RouteInfoButton></RouteInfoButton>
             </div>
           </div>
         </div>

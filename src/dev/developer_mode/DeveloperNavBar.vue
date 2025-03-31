@@ -4,7 +4,7 @@ import { useRouter, useRoute } from 'vue-router'
 
 import DocsDropDown from '@/dev/developer_mode/DocsDropDown.vue'
 import Stepper from '@/dev/developer_mode/Stepper.vue'
-import RouteInfoDropDrop from '@/dev/developer_mode/RouteInfoDropDown.vue'
+import RouteInfoButton from '@/dev/developer_mode/RouteInfoButton.vue'
 import ResetButton from '@/dev/developer_mode/ResetButton.vue'
 import DataBarButton from '@/dev/developer_mode/DataBarButton.vue'
 import ViewButton from '@/dev/developer_mode/ViewButton.vue'
@@ -45,7 +45,7 @@ const api = useAPI()
             </div>
             <!-- route info buttons -->
             <div class="devbar-routeinfodropdown">
-              <RouteInfoDropDrop></RouteInfoDropDrop>
+              <RouteInfoButton></RouteInfoButton>
             </div>
 
             <!-- view button -->
