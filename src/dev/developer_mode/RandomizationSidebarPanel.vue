@@ -86,20 +86,23 @@ const getBranchType = (index, total) => {
       <div class="sectitle">Random Variables</div>
       <!-- -->
 
-      <ul class="conditions-list">
-        <template v-for="(value, key, index) in smilestore.local.possibleConditions" :key="key">
-          <li>
-            <span class="tree-branch">{{
-              getBranchType(index, Object.keys(smilestore.local.possibleConditions).length)
-            }}</span>
-            <div class="select is-small mb-1">
-              <select v-model="selected[key]" @change="changeCond(key, $event)">
-                <option v-for="cond in value" :key="cond" :value="cond">{{ key }}: {{ cond }}</option>
-              </select>
-            </div>
-          </li>
-        </template>
-      </ul>
+      <div class="randomization-conditions-list-container">
+        <ul class="conditions-list">
+          <template v-for="(value, key, index) in smilestore.local.possibleConditions" :key="key">
+            <li>
+              <span class="tree-branch">{{
+                getBranchType(index, Object.keys(smilestore.local.possibleConditions).length)
+              }}</span>
+              <div class="select is-small mb-1">
+                <select v-model="selected[key]" @change="changeCond(key, $event)">
+                  <option v-for="cond in value" :key="cond" :value="cond">{{ key }}: {{ cond }}</option>
+                </select>
+              </div>
+            </li>
+          </template>
+        </ul>
+        <div class="randomization-note">(see design.js)</div>
+      </div>
     </div>
   </div>
 </template>
@@ -110,6 +113,19 @@ const getBranchType = (index, total) => {
   padding: 10px 0 0 0;
   margin: 0;
   background-color: #fff;
+}
+.randomization-conditions-list-container {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  padding-top: 6px;
+}
+.randomization-note {
+  font-size: 0.4em;
+  color: #666;
+  position: absolute;
+  top: 0;
+  right: 0.3rem;
 }
 .randomization-seed-container {
   margin-top: 0px;
@@ -123,7 +139,7 @@ const getBranchType = (index, total) => {
   color: #484e4e;
   background-color: #f0f0f0;
   padding: 0.4rem 0.5rem;
-  margin: 0.5rem 0rem 0.5rem 0;
+  margin: 0.5rem 0rem 0px 0;
   border-top: 1px solid #d2d2d2;
   border-bottom: 1px solid #d2d2d2;
 }
@@ -135,46 +151,6 @@ const getBranchType = (index, total) => {
 }
 .collabel {
   font-size: 0.7em;
-}
-.table td {
-  padding: 1 0 1 1;
-  font-size: 0.6em;
-}
-.table th {
-  padding: 0;
-  margin: 0;
-}
-
-.dropdown-content {
-  padding: 0;
-  padding-top: 8px;
-  margin: 0;
-  width: 350px;
-  text-align: left;
-}
-.pin {
-  float: right;
-  margin: 0;
-  padding-right: 15px;
-  color: #fff;
-}
-
-.pin a {
-  color: #ccc;
-}
-
-.pin-selected a {
-  color: #42b983;
-}
-
-.randomization {
-  width: 350px;
-  padding: 15px;
-  text-align: left;
-}
-
-.randomization a {
-  color: #0b8a9b;
 }
 
 .textinput {
@@ -223,8 +199,8 @@ const getBranchType = (index, total) => {
 .conditions-list li {
   display: flex;
   align-items: center;
-  margin-bottom: 0.25rem;
-  margin-left: 0.5rem;
+  margin-bottom: 0rem;
+  margin-left: 0.2rem;
 }
 
 .tree-branch {
@@ -232,6 +208,6 @@ const getBranchType = (index, total) => {
   font-size: 0.9em;
   color: #666;
   white-space: pre;
-  margin-right: 0.25rem;
+  margin-right: 0rem;
 }
 </style>
