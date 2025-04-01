@@ -17,7 +17,8 @@ export function addGuards(r, providedApi = null) {
 
     // check if status change on previous
     if (from.meta !== undefined && from.meta.setConsented !== undefined && from.meta.setConsented) {
-      api.completeConsent()
+      api.setConsented()
+      api.createDBRecord()
     }
     if (from.meta !== undefined && from.meta.setDone !== undefined && from.meta.setDone) {
       api.setDone()
@@ -128,7 +129,7 @@ export function addGuards(r, providedApi = null) {
         'ROUTER GUARD: Allowing direct, out-of-order navigation to /' +
           to.name +
           //to.meta.allowAlways +,
-          '.  This is being forced by api.gotoView().'
+          '.  This is being forced by api.goToView().'
       )
       api.store.setLastRoute(to.name)
       api.store.recordRoute(to.name)

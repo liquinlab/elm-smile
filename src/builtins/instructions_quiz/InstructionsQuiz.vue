@@ -127,7 +127,7 @@ function submitQuiz() {
 function returnInstructions() {
   stepper.reset() // reset the quiz
   randomizeQuestions() // re-randomize questions
-  api.gotoView(props.returnTo)
+  api.goToView(props.returnTo)
 }
 
 function finish() {

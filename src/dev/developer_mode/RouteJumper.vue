@@ -39,7 +39,7 @@ function setHover(route) {
 
 function navigate(route) {
   log.warn(`DEV MODE: user requested to FORCE navigate to ${route}`)
-  api.gotoView(route, true)
+  api.goToView(route, true)
 }
 </script>
 <template>

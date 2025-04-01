@@ -23,11 +23,53 @@ import { useStepper } from '@/core/composables/useStepper'
 import useLog from '@/core/stores/log'
 
 export default function useAPI() {
-  const { goNextView, goPrevView, gotoView } = useTimeline()
+  const { goNextView, goPrevView, goToView } = useTimeline()
   const route = useRoute()
   const router = useRouter()
+<<<<<<< HEAD
   const store = useSmileStore()
   const logStore = useLog()
+=======
+  const smilestore = useSmileStore()
+  const log = useLog()
+  const api = reactive({
+    config: smilestore.config,
+    data: smilestore.data,
+    private: smilestore.private,
+    all_data: { private: smilestore.private, data: smilestore.data },
+    local: smilestore.local,
+    global: smilestore.global,
+    dev: smilestore.dev,
+    route: route,
+    router: router,
+    goNextView: goNextView,
+    goPrevView: goPrevView,
+    goToView: goToView,
+    faker: faker_distributions,
+    hasNextView: () => route.meta.next && route.meta.sequential,
+    hasPrevView: () => route.meta.prev && route.meta.sequential,
+    randomInt: randomInt,
+    shuffle: shuffle,
+    sampleWithReplacement: sampleWithReplacement,
+    sampleWithoutReplacement: sampleWithoutReplacement,
+    useStepper: useStepper,
+    // isKnownUser: smilestore.local.knownUser,
+    // isDone: smilestore.local.done,
+    // isConsented: smilestore.local.consented,
+    // isWithdrawn: smilestore.local.withdrawn,
+    urls: smilestore.global.urls,
+    resetApp: () => {
+      smilestore.resetApp()
+    },
+    isResetApp: () => {
+      return smilestore.local.reset
+    },
+    resetLocalState() {
+      localStorage.removeItem(api.config.local_storage_key) // delete the local store
+      // localStorage.removeItem(`${appconfig.local_storage_key}-seed_id`)
+      // localStorage.removeItem(`${appconfig.local_storage_key}-seed_set`)
+      smilestore.resetLocal() // reset all the data even
+>>>>>>> main
 
   const api = reactive({
     // Store and logging
@@ -259,10 +301,16 @@ export default function useAPI() {
         })
       }, 1)
     },
+<<<<<<< HEAD
     completeConsent: async () => {
       api.setConsented()
       if (!api.store.local.knownUser) {
         await api.setKnown()
+=======
+    createDBRecord: async () => {
+      if (!api.local.knownUser) {
+        await api.setKnown() // set new user and add document, then assign conditions
+>>>>>>> main
       }
     },
   })
