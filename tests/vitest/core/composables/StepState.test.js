@@ -839,7 +839,7 @@ describe('StepState', () => {
       // Verify all properties are reset
       expect(root.states).toEqual([])
       expect(root.index).toBe(0)
-      expect(root.data).toBeNull()
+      expect(root.data).toEqual({})
       expect(root._root).toStrictEqual(root)
     })
 
@@ -856,7 +856,7 @@ describe('StepState', () => {
       // Verify the cleared state and its children are reset
       expect(root['A'].states).toEqual([])
       expect(root['A'].index).toBe(0)
-      expect(root['A'].data).toBeNull()
+      expect(root['A'].data).toEqual({})
       expect(root['A']._root).toStrictEqual(root)
     })
 
@@ -1209,8 +1209,78 @@ describe('StepState', () => {
   })
 
   describe('data management', () => {
-    it('should initialize with null data', () => {
-      expect(stepper.data).toBeNull()
+    it('should initialize with empty object data', () => {
+      expect(stepper.data).toEqual({})
+    })
+
+    it('should set and get key-value pairs using data getter/setter', () => {
+      // Set a single key-value pair
+      stepper.data.test = 'value'
+      expect(stepper.data.test).toBe('value')
+      expect(stepper.data).toEqual({ test: 'value' })
+
+      // Set multiple key-value pairs
+      stepper.data.key1 = 42
+      stepper.data.key2 = true
+      expect(stepper.data).toEqual({
+        test: 'value',
+        key1: 42,
+        key2: true,
+      })
+
+      // Update existing key
+      stepper.data.test = 'new value'
+      expect(stepper.data.test).toBe('new value')
+      expect(stepper.data).toEqual({
+        test: 'new value',
+        key1: 42,
+        key2: true,
+      })
+
+      // Set nested object
+      stepper.data.nested = { foo: 'bar' }
+      expect(stepper.data.nested.foo).toBe('bar')
+      expect(stepper.data).toEqual({
+        test: 'new value',
+        key1: 42,
+        key2: true,
+        nested: { foo: 'bar' },
+      })
+    })
+
+    it('should maintain data when setting multiple key-value pairs', () => {
+      // Set initial data
+      stepper.data = { initial: 'value' }
+
+      // Add new key-value pair
+      stepper.data.newKey = 'new value'
+      expect(stepper.data).toEqual({
+        initial: 'value',
+        newKey: 'new value',
+      })
+
+      // Update existing key
+      stepper.data.initial = 'updated'
+      expect(stepper.data).toEqual({
+        initial: 'updated',
+        newKey: 'new value',
+      })
+    })
+
+    it('should handle nested data updates', () => {
+      // Set initial nested data
+      stepper.data = { nested: { foo: 'bar' } }
+
+      // Update nested value
+      stepper.data.nested.foo = 'baz'
+      expect(stepper.data.nested.foo).toBe('baz')
+
+      // Add new nested key
+      stepper.data.nested.newKey = 42
+      expect(stepper.data.nested).toEqual({
+        foo: 'baz',
+        newKey: 42,
+      })
     })
 
     it('should store and retrieve data', () => {
@@ -1252,15 +1322,32 @@ describe('StepState', () => {
       expect(() => stepper.setDataAtPath('nonexistent', {})).toThrow('Invalid path')
     })
 
+    it('should require object data in setDataAtPath', () => {
+      stepper.push('first')
+      stepper['first'].push('second')
+
+      // Should accept objects
+      expect(() => stepper.setDataAtPath(['first', 'second'], {})).not.toThrow()
+      expect(() => stepper.setDataAtPath(['first', 'second'], { test: 'value' })).not.toThrow()
+
+      // Should reject non-objects
+      expect(() => stepper.setDataAtPath(['first', 'second'], null)).toThrow('Data must be an object')
+      expect(() => stepper.setDataAtPath(['first', 'second'], undefined)).toThrow('Data must be an object')
+      expect(() => stepper.setDataAtPath(['first', 'second'], 42)).toThrow('Data must be an object')
+      expect(() => stepper.setDataAtPath(['first', 'second'], 'string')).toThrow('Data must be an object')
+      expect(() => stepper.setDataAtPath(['first', 'second'], true)).toThrow('Data must be an object')
+      expect(() => stepper.setDataAtPath(['first', 'second'], [])).toThrow('Data must be an object')
+    })
+
     it('should allow null data', () => {
       stepper.data = { test: 'value' }
       stepper.data = null
       expect(stepper.data).toBeNull()
     })
 
-    it('should return null for nodes without data', () => {
+    it('should return empty object for nodes without data', () => {
       stepper.push('first')
-      expect(stepper['first'].data).toEqual(null)
+      expect(stepper['first'].data).toEqual({})
     })
 
     describe('datapath', () => {
@@ -1285,10 +1372,9 @@ describe('StepState', () => {
         stepper['first'].push('second')
         stepper['first']['second'].push('third')
 
-        // Navigate to the deepest node
-        stepper.next()
-        stepper['first'].next()
-        stepper['first']['second'].next()
+        //stepper.next() // move to grandchild
+        //stepper['first'].next()
+        //stepper['first']['second'].next()
 
         const pathData = stepper['first']['second']['third'].pathdata
         expect(pathData).toEqual([])
@@ -1302,7 +1388,6 @@ describe('StepState', () => {
         // Only set data on grandchild
         grandchild.data = { data: 'test' }
 
-        // Navigate to grandchild
         //stepper.next() // moves to grandchild
 
         // Should only get grandchild data

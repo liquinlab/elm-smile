@@ -32,7 +32,7 @@ export class StepState {
     }
     this._parent = parent
     this._root = parent?._root || this
-    this._data = null
+    this._data = {}
 
     return new Proxy(this, {
       get(target, prop) {
@@ -625,14 +625,14 @@ export class StepState {
       current = current.parent
     }
 
-    // Add root node data if it exists and isn't '/'
-    if (current.id !== '/' && current.data) {
+    // Add root node data if it exists and isn't '/' and isn't empty
+    if (current.id !== '/' && current.data && Object.keys(current.data).length > 0) {
       dataArray.push(current.data)
     }
 
     // Add ancestor data
     ancestors.forEach((node) => {
-      if (node.data) {
+      if (node.data && Object.keys(node.data).length > 0) {
         dataArray.push(node.data)
       }
     })
@@ -641,7 +641,7 @@ export class StepState {
     current = this
     while (current._states.length > 0) {
       current = current._states[current._currentIndex]
-      if (current.data) {
+      if (current.data && Object.keys(current.data).length > 0) {
         dataArray.push(current.data)
       }
     }
@@ -656,6 +656,11 @@ export class StepState {
    * @throws {Error} If the path doesn't exist
    */
   setDataAtPath(path, data) {
+    // Ensure data is an object (not null, undefined, or an array)
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      throw new Error('Data must be an object')
+    }
+
     const pathArray = typeof path === 'string' ? path.split('-') : path
     let current = this
 
@@ -735,7 +740,7 @@ export class StepState {
     // Reset all internal properties
     this._states = []
     this._currentIndex = 0
-    this._data = null
+    this._data = {}
   }
 
   /**
