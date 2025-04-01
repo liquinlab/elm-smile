@@ -219,9 +219,9 @@ export function useHStepper() {
             }
           }
 
-          // Set data for this item
+          // Set data for this item - create a deep copy
           if (item.data !== undefined) {
-            state.data = item.data
+            state.data = JSON.parse(JSON.stringify(item.data))
           }
 
           // Process child items if they exist
