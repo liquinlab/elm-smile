@@ -21,6 +21,11 @@ const toggleRoutePanel = () => {
     api.store.dev.route_panel.visible = !api.store.dev.route_panel.visible
   }
 }
+
+const togglePin = () => {
+  api.store.dev.pinned_route = api.store.dev.pinned_route === null ? api.currentRouteName() : null
+  api.store.dev.route_panel.visible = false
+}
 </script>
 
 <template>
@@ -79,10 +84,7 @@ const toggleRoutePanel = () => {
       <button
         class="button is-small is-jump-bar has-tooltip-arrow has-tooltip-bottom"
         :class="{ pinned: api.store.dev.pinned_route !== null }"
-        v-on:click="
-          api.store.dev.pinned_route =
-            api.store.dev.pinned_route === api.currentRouteName() ? null : api.currentRouteName()
-        "
+        v-on:click="togglePin()"
         data-tooltip="Pin current route"
       >
         <span>
