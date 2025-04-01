@@ -385,10 +385,10 @@ export default defineStore('smilestore', {
       }
     },
     recordTrialData(data) {
-      this.data.study_data.push(data)
+      this.data.study_data.push(JSON.parse(JSON.stringify(data)))
     },
     saveForm(name, data) {
-      this.data[name + '_form'] = data
+      this.data[name + '_form'] = JSON.parse(JSON.stringify(data))
     },
     verifyVisibility(value) {
       this.data.verified_visibility = value
