@@ -109,7 +109,7 @@ const togglePin = () => {
 
 <style scoped>
 .pinned {
-  background-color: rgb(211, 251, 222);
+  background-color: #ffdd57;
 }
 .is-route {
   border-top-left-radius: 0;

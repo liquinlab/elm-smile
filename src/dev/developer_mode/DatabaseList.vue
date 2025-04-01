@@ -6,7 +6,7 @@ import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 const emit = defineEmits(['selected'])
 
-const height_pct = computed(() => `${api.store.dev.console_bar_height - 100}px`)
+const height_pct = computed(() => `${api.store.dev.console_bar_height - 90}px`)
 
 const header = computed(() => {
   if (props.data === undefined || props.data === null) {
@@ -91,7 +91,7 @@ function option_selected(option) {
   color: #858484;
   padding: 5px;
   font-size: 0.8em;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
   padding-left: 10px;
 }
 .menu-list {
