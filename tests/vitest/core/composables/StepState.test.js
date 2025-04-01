@@ -810,6 +810,113 @@ describe('StepState', () => {
 
       expect(nestedDiagram).toBe(rootDiagram)
     })
+
+    it('should get root node correctly using root getter', () => {
+      const root = new StepState()
+      root.push('level1')
+      root['level1'].push('level2')
+      root['level1']['level2'].push('level3')
+
+      // Test root getter at different levels
+      expect(root.root).toStrictEqual(root)
+      expect(root['level1'].root).toStrictEqual(root)
+      expect(root['level1']['level2'].root).toStrictEqual(root)
+      expect(root['level1']['level2']['level3'].root).toStrictEqual(root)
+    })
+  })
+
+  describe('clear operations', () => {
+    it('should clear all states and reset properties', () => {
+      const root = new StepState()
+      root.push('A')
+      root['A'].push('B')
+      root['A']['B'].push('C')
+      root.data = { test: 'data' }
+
+      // Clear the state
+      root.clear()
+
+      // Verify all properties are reset
+      expect(root.states).toEqual([])
+      expect(root.index).toBe(0)
+      expect(root.data).toBeNull()
+      expect(root._root).toStrictEqual(root)
+    })
+
+    it('should clear nested states recursively', () => {
+      const root = new StepState()
+      root.push('A')
+      root['A'].push('B')
+      root['A']['B'].push('C')
+      root['A'].data = { test: 'data' }
+
+      // Clear a nested state
+      root['A'].clear()
+
+      // Verify the cleared state and its children are reset
+      expect(root['A'].states).toEqual([])
+      expect(root['A'].index).toBe(0)
+      expect(root['A'].data).toBeNull()
+      expect(root['A']._root).toStrictEqual(root)
+    })
+
+    it('should maintain root reference after clearing', () => {
+      const root = new StepState()
+      root.push('A')
+      root['A'].push('B')
+
+      // Clear a nested state
+      root['A'].clear()
+
+      // Verify root reference is maintained
+      expect(root['A']._root).toStrictEqual(root)
+    })
+  })
+
+  describe('cleartree operations', () => {
+    it('should clear all states but preserve data', () => {
+      const root = new StepState()
+      root.push('A')
+      root['A'].push('B')
+      root['A']['B'].push('C')
+      root.data = { test: 'data' }
+
+      // Clear the tree
+      root.cleartree()
+
+      // Verify states are cleared but data is preserved
+      expect(root.states).toEqual([])
+      expect(root.index).toBe(0)
+      expect(root.data).toEqual({ test: 'data' })
+    })
+
+    it('should clear nested states recursively but preserve data', () => {
+      const root = new StepState()
+      root.push('A')
+      root['A'].push('B')
+      root['A']['B'].push('C')
+      root['A'].data = { test: 'data' }
+
+      // Clear a nested state
+      root['A'].cleartree()
+
+      // Verify the cleared state and its children are reset but data is preserved
+      expect(root['A'].states).toEqual([])
+      expect(root['A'].index).toBe(0)
+      expect(root['A'].data).toEqual({ test: 'data' })
+    })
+
+    it('should maintain root reference after clearing tree', () => {
+      const root = new StepState()
+      root.push('A')
+      root['A'].push('B')
+
+      // Clear a nested state
+      root['A'].cleartree()
+
+      // Verify root reference is maintained
+      expect(root['A']._root).toStrictEqual(root)
+    })
   })
 
   describe('node access', () => {

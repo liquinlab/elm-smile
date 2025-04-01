@@ -137,6 +137,13 @@ export class StepState {
   }
 
   /**
+   * Gets the root node of the state tree
+   * @returns {StepState} The root StepState node
+   */
+  get root() {
+    return this._root
+  }
+  /**
    * Get all child states of the current state.
    * row is just a synonym for child states
    * row lines a bit more with the table metaphor
@@ -729,9 +736,21 @@ export class StepState {
     this._states = []
     this._currentIndex = 0
     this._data = null
+  }
 
-    // Keep id, depth, parent, and root references intact
-    // as these define the node's position in the tree
+  /**
+   * Completely clears all states and resets to initial condition
+   * Removes all child states and resets all internal properties
+   */
+  cleartree() {
+    // Clear all child states recursively
+    this._states.forEach((state) => {
+      state.clear()
+    })
+
+    // Reset all internal properties
+    this._states = []
+    this._currentIndex = 0
   }
 }
 
