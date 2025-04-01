@@ -23,8 +23,14 @@ export function useHStepper() {
   // Internal table management
   const tables = new Map()
 
-  // Modify the RNG implementation to return 8-character string
+  // RNG implementation
   let _seed = 12345 // Fixed seed for deterministic behavior
+
+  // New method to handle RNG seed functionality
+  const resetSeed = () => {
+    _seed = 12345 // Reset to initial seed value
+  }
+
   const transactionId = () => {
     _seed = (_seed * 1664525 + 1013904223) >>> 0 // LCG parameters from Numerical Recipes
     return (_seed & 0xffffffff).toString(36).padStart(8, '0').slice(-8) // Convert to base36 string, padded to 8 chars
@@ -342,6 +348,9 @@ export function useHStepper() {
         _index.value = null
         _transactionHistory.value = []
         _stateMachine.value = visualizeStateMachine()
+
+        // Reset the RNG seed
+        resetSeed()
 
         // Clear component registry and tables
         componentRegistry.clear()
