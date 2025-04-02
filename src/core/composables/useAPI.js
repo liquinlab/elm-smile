@@ -170,8 +170,6 @@ export default function useAPI() {
 
     // Page tracking
     getPageTracker: (routeName = null) => store.getPageTracker(routeName || route.name),
-    getPageTrackerData: (routeName = null) => store.getPageTrackerData(routeName || route.name),
-    getPageTrackerIndex: (routeName = null) => store.getPageTrackerIndex(routeName || route.name),
     hasAutofill: () => store.hasAutofill,
     autofill: () => store.autofill(),
     currentRouteName: () => route.name,
@@ -180,9 +178,6 @@ export default function useAPI() {
 
     // Event and trial management
     recordWindowEvent: (type, event_data = null) => store.recordWindowEvent(type, event_data),
-    incrementTrial: () => store.incrementPageTracker(route.name),
-    decrementTrial: () => store.decrementPageTracker(route.name),
-    resetTrial: () => store.resetPageTracker(route.name),
     saveData: (force) => store.saveData(force),
     recordTrialData: (data) => {
       store.data.trial_num += 1
