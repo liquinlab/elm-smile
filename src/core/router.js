@@ -17,8 +17,7 @@ export function addGuards(r, providedApi = null) {
 
     // check if status change on previous
     if (from.meta !== undefined && from.meta.setConsented !== undefined && from.meta.setConsented) {
-      api.setConsented()
-      api.createDBRecord()
+      api.completeConsent()
     }
     if (from.meta !== undefined && from.meta.setDone !== undefined && from.meta.setDone) {
       api.setDone()
