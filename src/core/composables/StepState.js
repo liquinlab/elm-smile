@@ -762,7 +762,7 @@ export class StepState {
    * Completely clears all states and resets to initial condition
    * Removes all child states and resets all internal properties
    */
-  cleartree() {
+  clearTree() {
     // Clear all child states recursively
     this._states.forEach((state) => {
       state.clear()

@@ -882,7 +882,7 @@ describe('StepState', () => {
       root.data = { test: 'data' }
 
       // Clear the tree
-      root.cleartree()
+      root.clearTree()
 
       // Verify states are cleared but data is preserved
       expect(root.states).toEqual([])
@@ -898,7 +898,7 @@ describe('StepState', () => {
       root['A'].data = { test: 'data' }
 
       // Clear a nested state
-      root['A'].cleartree()
+      root['A'].clearTree()
 
       // Verify the cleared state and its children are reset but data is preserved
       expect(root['A'].states).toEqual([])
@@ -912,7 +912,7 @@ describe('StepState', () => {
       root['A'].push('B')
 
       // Clear a nested state
-      root['A'].cleartree()
+      root['A'].clearTree()
 
       // Verify root reference is maintained
       expect(root['A']._root).toStrictEqual(root)

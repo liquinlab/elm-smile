@@ -373,7 +373,7 @@ export function useHStepper() {
         smilestore.local.pageTracker[page].data = pageData
 
         // Clear all states and reset the state machine
-        sm.cleartree() /// this only clear the tree and not the data at the top level
+        sm.clearTree() /// this only clear the tree and not the data at the top level
         //sm.clear()
         sm.push('SOS')
         sm.push('EOS')
