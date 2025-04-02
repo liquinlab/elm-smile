@@ -256,11 +256,35 @@ export function useHStepper() {
     get data() {
       if (!this.datapath) return null
 
-      // Merge all objects in datapath array into a single object
-      return this.datapath.reduce((merged, item) => {
-        return { ...merged, ...item }
-      }, {})
+      // Create a computed property that merges the datapath
+      const mergedData = computed(() => {
+        // By default, later items override earlier ones (last-wins)
+        // To preserve first occurrence, reverse the array before reducing
+        return this.datapath.reduce((merged, item) => {
+          return { ...merged, ...item }
+        }, {})
+      })
+
+      // Create a writable object that updates currentData
+      return new Proxy(mergedData.value, {
+        get: (target, prop) => {
+          return target[prop]
+        },
+        set: (target, prop, value) => {
+          if (sm.currentData) {
+            sm.currentData[prop] = value
+            saveStepperState()
+            return true
+          }
+          return false
+        },
+      })
     },
+
+    get d() {
+      return this.data
+    },
+
     get datapath() {
       if (_data.value === null) return null
 

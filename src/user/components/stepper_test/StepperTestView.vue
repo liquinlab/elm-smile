@@ -69,9 +69,9 @@ function adddata() {
     <div class="tree-diagram-text">
       <b>Path</b>: {{ stepper.paths }}<br />
       <b>Index</b>: {{ stepper.index }}<br />
-      <b>Data on Path</b>: {{ stepper.datapath }}<br />
+      <b>Data on Path</b>: {{ stepper.data }}<br />
     </div>
-    <component :is="stepper.current?.[0]?.type" />
+    <component :is="stepper.data?.type" />
 
     <br />
     <div class="viewer-container">

@@ -692,6 +692,21 @@ export class StepState {
   }
 
   /**
+   * Returns the data from the current leaf node in the tree
+   * @returns {*} The data from the current leaf node
+   */
+  get currentData() {
+    let current = this._root
+
+    // Traverse to current leaf node
+    while (current._states.length > 0) {
+      current = current._states[current._currentIndex]
+    }
+
+    return current.data
+  }
+
+  /**
    * Returns the current path through the tree as a hyphen-separated string
    * @returns {string} String representation of the current path
    */

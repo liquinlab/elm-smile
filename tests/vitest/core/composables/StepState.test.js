@@ -1433,6 +1433,68 @@ describe('StepState', () => {
       })
     })
 
+    describe('currentData', () => {
+      it('should return data from current leaf node', () => {
+        const child1 = stepper.push('child1')
+        const child2 = stepper.push('child2')
+        const grandchild = child1.push('grandchild')
+
+        // Set data on various nodes
+        child1.data = { level: 1 }
+        grandchild.data = { level: 2 }
+        child2.data = { level: 3 }
+
+        // Initially at grandchild
+        expect(stepper.currentData).toEqual({ level: 2 })
+
+        // Navigate to child2
+        stepper.next()
+        expect(stepper.currentData).toEqual({ level: 3 })
+      })
+
+      it('should return empty object for leaf node without data', () => {
+        const child = stepper.push('child')
+        const grandchild = child.push('grandchild')
+
+        // No data set on any nodes
+        expect(stepper.currentData).toEqual({})
+      })
+
+      it('should update when navigating through the tree', () => {
+        const child1 = stepper.push('child1')
+        const child2 = stepper.push('child2')
+        const grandchild1 = child1.push('grandchild1')
+        const grandchild2 = child1.push('grandchild2')
+
+        // Set data on nodes
+        grandchild1.data = { data: 'first' }
+        grandchild2.data = { data: 'second' }
+        child2.data = { data: 'third' }
+
+        // Initially at grandchild1
+        expect(stepper.currentData).toEqual({ data: 'first' })
+
+        // Navigate to grandchild2
+        stepper.next()
+        expect(stepper.currentData).toEqual({ data: 'second' })
+
+        // Navigate to child2
+        stepper.next()
+        expect(stepper.currentData).toEqual({ data: 'third' })
+      })
+
+      it('should handle null data in leaf node', () => {
+        const child = stepper.push('child')
+        child.data = null
+        expect(stepper.currentData).toBeNull()
+      })
+
+      it('should return root data when at root level', () => {
+        stepper.data = { root: 'data' }
+        expect(stepper.currentData).toEqual({ root: 'data' })
+      })
+    })
+
     describe('setDataAtPath', () => {
       it('should set data at a specific path', () => {
         stepper.push('parent')
