@@ -20,6 +20,7 @@ export function useHStepper() {
   const _index = ref(null)
   const _stateMachine = ref(null) // Add reactive ref for state machine visualization
   const _transactionHistory = ref([]) // Add new ref for transaction history
+  const _gvars = ref({}) // Add new reactive ref for global variables
   // Internal table management
   const tables = new Map()
 
@@ -49,6 +50,7 @@ export function useHStepper() {
     _paths.value = sm.currentPaths
     _path.value = sm.currentPath || [] // Ensure path is never null
     _index.value = sm.index
+    _gvars.value = sm.data.gvars || {}
     _transactionHistory.value = savedState.transactionHistory || [] // Load transaction history
     //console.log('STEPPER: Loaded state from smilestore with path', sm.currentPaths)
   } else {
@@ -59,6 +61,13 @@ export function useHStepper() {
     _data.value = null
     _index.value = null
     _transactionHistory.value = [] // Initialize empty transaction history
+  }
+
+  // Initialize root node data with empty gvars object if not already present
+  if (!sm.root.data) {
+    sm.root.data = { gvars: {} }
+  } else if (!sm.root.data.gvars) {
+    sm.root.data.gvars = {}
   }
 
   // Get all protected methods from a temporary table instance
@@ -353,7 +362,6 @@ export function useHStepper() {
       return sm.countLeafNodes
     },
 
-    // Add new clearState method
     clear: () => {
       if (smilestore.local.pageTracker[page]) {
         // Remove the stepperState from the page tracker data
@@ -362,7 +370,8 @@ export function useHStepper() {
         smilestore.local.pageTracker[page].data = pageData
 
         // Clear all states and reset the state machine
-        sm.clear()
+        sm.cleartree() /// this only clear the tree and not the data at the top level
+        //sm.clear()
         sm.push('SOS')
         sm.push('EOS')
         // Reset all internal refs
@@ -380,6 +389,13 @@ export function useHStepper() {
         componentRegistry.clear()
         tables.clear()
       }
+    },
+    clearGlobals: () => {
+      sm.root.data.gvars = {}
+      saveStepperState() // Save state when global variables are modified
+    },
+    get globals() {
+      return sm.root.data.gvars
     },
   }
 

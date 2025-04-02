@@ -253,9 +253,29 @@ watch(
         </li>
       </ul>
     </div>
+    <div class="data-container-global">
+      <div class="global-data-display">
+        Global Variables
+        <button
+          @click="stepper.clearGvars()"
+          class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
+          data-tooltip="Delete Global Variables"
+        >
+          <span><FAIcon icon="fa-solid fa-trash" /></span>
+        </button>
+        <DataPathViewer :data="stepper.globals" />
+      </div>
+    </div>
     <div class="data-container">
       <div class="data-display">
-        Data
+        Node Data
+        <button
+          @click="stepper.clear()"
+          class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
+          data-tooltip="Delete Nodes"
+        >
+          <span><FAIcon icon="fa-solid fa-trash" /></span>
+        </button>
         <DataPathViewer :data="stepper.data" />
       </div>
     </div>
@@ -331,6 +351,10 @@ watch(
   font-size: 0.6rem;
   border-left: 1px solid #e4e4e4;
 }
+.nav-button-small {
+  font-size: 0.5rem;
+  border-left: 1px solid #e4e4e4;
+}
 .smaller {
   padding-bottom: 11px;
   padding-top: 10px;
@@ -383,12 +407,22 @@ watch(
   background-color: #fff;
 }
 
+.data-container-global {
+  flex: 1 1 0; /* grow, can shrink, 0 basis */
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  max-height: 120px;
+  background-color: #f1f3f3;
+  border-top: 1px solid #cacaca;
+  text-align: left;
+}
+
 .data-container {
   flex: 1 1 0; /* grow, can shrink, 0 basis */
   overflow: auto;
   display: flex;
   flex-direction: column;
-  min-height: 100px;
   background-color: #f1f3f3;
   border-top: 1px solid #cacaca;
   text-align: left;
@@ -411,6 +445,16 @@ watch(
 /* First tree node has no padding */
 .tree-root > li.tree-node {
   padding-left: 0;
+}
+.global-data-display {
+  flex: 1;
+  overflow: auto;
+  padding: 10px;
+  max-height: 120px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  font-family: monospace;
+  z-index: 2000;
 }
 
 .data-display {
