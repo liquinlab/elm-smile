@@ -2,9 +2,10 @@ import { useRoute, useRouter } from 'vue-router'
 import _ from 'lodash'
 import useSmileStore from '@/core/stores/smilestore'
 import useLog from '@/core/stores/log'
+import { pinia } from '@/core/createpinia'
 
 export default function useTimeline() {
-  const smilestore = useSmileStore()
+  const smilestore = useSmileStore(pinia)
   const route = useRoute()
   const router = useRouter()
   const log = useLog()

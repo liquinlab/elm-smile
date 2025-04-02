@@ -26,9 +26,9 @@ function computeCompletionCode() {
     completed: 'oo',
   }
   let end_code = ''
-  if (api.local.withdrawn) {
+  if (api.store.local.withdrawn) {
     end_code = codes['withdrew']
-  } else if (api.local.done) {
+  } else if (api.store.local.done) {
     end_code = codes['completed']
   }
   return hashDigest.slice(0, 20) + end_code // only use first 20 characters, may need to update to shortest possible code

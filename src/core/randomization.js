@@ -107,12 +107,11 @@ export const faker_distributions = {
     }
   },
   render: (trial) => {
-    let rendered = { ...trial }
     for (let [key, value] of Object.entries(trial)) {
       if (typeof value === 'function') {
-        rendered[key] = value()
+        trial[key] = value()
       }
     }
-    return rendered
+    return trial
   },
 }

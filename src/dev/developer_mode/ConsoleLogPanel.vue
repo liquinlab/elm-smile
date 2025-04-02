@@ -6,12 +6,12 @@ const api = SmileAPI()
 import useLog from '@/core/stores/log'
 const log = useLog()
 
-const height_pct = computed(() => `${api.dev.data_bar_height - 70}px`)
+const height_pct = computed(() => `${api.store.dev.console_bar_height - 67}px`)
 
 function filter_log(msg) {
-  const search_match = msg.message.toLowerCase().includes(api.dev.search_params.toLowerCase())
+  const search_match = msg.message.toLowerCase().includes(api.store.dev.search_params.toLowerCase())
   let type_match = true
-  switch (api.dev.log_filter) {
+  switch (api.store.dev.log_filter) {
     case 'All':
       break
     case 'Debug only':
@@ -55,17 +55,22 @@ function getBgClass(msg) {
         <li>
           <label class="checkbox">
             <b>Since last page change:</b>&nbsp;
-            <input type="checkbox" v-model="api.dev.last_page_limit" />
+            <input type="checkbox" v-model="api.store.dev.last_page_limit" />
           </label>
         </li>
         <li>
           <b>Search:</b>&nbsp;
-          <input class="input is-small search" placeholder="Search..." type="text" v-model="api.dev.search_params" />
+          <input
+            class="input is-small search"
+            placeholder="Search..."
+            type="text"
+            v-model="api.store.dev.search_params"
+          />
         </li>
         <li>
           <b>Filter:</b>&nbsp;
           <div class="select is-small">
-            <select v-model="api.dev.log_filter">
+            <select v-model="api.store.dev.log_filter">
               <option>All</option>
               <option>Current page only</option>
               <option>Debug only</option>
@@ -78,7 +83,7 @@ function getBgClass(msg) {
         <li>
           <b>Notifications:</b>&nbsp;
           <div class="select is-small">
-            <select v-model="api.dev.notification_filter">
+            <select v-model="api.store.dev.notification_filter">
               <option>All</option>
               <option>None</option>
               <option>Warnings and Errors</option>
@@ -93,7 +98,7 @@ function getBgClass(msg) {
 
     <div class="scrollablelog">
       <aside class="menu">
-        <ul class="menu-list" v-if="api.dev.last_page_limit">
+        <ul class="menu-list" v-if="api.store.dev.last_page_limit">
           <template v-for="msg in log.page_history">
             <li :class="getBgClass(msg)" v-if="filter_log(msg)">
               <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
@@ -171,12 +176,23 @@ function getBgClass(msg) {
 }
 .scrollablelog {
   height: v-bind(height_pct);
+  max-height: 100%;
   width: 100%;
+  max-width: 100%;
   margin: 0px;
   margin-top: 0px;
+  overflow: hidden;
   overflow-y: scroll;
   display: flex;
   flex-direction: column-reverse;
+  box-sizing: border-box;
+}
+.menu-list {
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 .menu-list li {
   font-size: 0.7em;
@@ -184,6 +200,11 @@ function getBgClass(msg) {
   padding: 7px;
   padding-right: 0px;
   border-bottom: 1px solid #f2f2f2;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 .bg-white {
   background-color: #ffffff;

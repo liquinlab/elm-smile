@@ -23,6 +23,7 @@ import useLog from '@/core/stores/log'
 // so it's doing what we want apparently
 
 // get local storage
+
 const existingLocalStorage = JSON.parse(localStorage.getItem(appconfig.local_storage_key))
 
 let seed
@@ -79,18 +80,21 @@ function removeFirestore(config) {
 
 const init_dev = {
   // syncs with local storage
-  page_provides_autofill: null,
-  page_provides_trial_stepper: false,
-  show_data_bar: false,
-  data_bar_height: 370,
-  data_bar_tab: 'database',
-  search_params: '',
-  log_filter: 'All',
-  notification_filter: 'Errors only',
-  last_page_limit: false,
-  data_path: null,
+  page_provides_autofill: null, // does current page offer autofil (transient)
+  page_provides_trial_stepper: false, // does current page provide a trial stepper (transient)
+  show_console_bar: false, // show/hide the data base bottom (transient)
+  show_side_bar: false,
+  pinned_route: null,
+  console_bar_height: 300, // height of the data bar (transient)
+  console_bar_tab: 'browse', // which tab to show in the data bar (transient)
+  search_params: '', // search parameters (transient)
+  log_filter: 'All', // what level of log messages to show (transient)
+  notification_filter: 'Errors only', // what level of notifications to show (transient)
+  last_page_limit: false, // limits logs to the last page (transient)
+  data_path: null, // path to the data (transient)
+  config_path: null, // path to the config (transient)
+  // panel locations (transient)
   config_panel: { type: 'local', visible: false, x: -280, y: 0 },
-  state_var_panel: { visible: false, x: -150, y: 0 },
   randomization_panel: { visible: false, x: -130, y: 0 },
   route_panel: { visible: false, x: -0, y: -3 },
 }
@@ -125,6 +129,7 @@ const init_global = {
   // ephemeral state, resets on browser refresh
   progress: 0,
   forceNavigate: false,
+  steppers: {}, // Store for useHStepper instances
   db_connected: false,
   db_changes: true,
   urls: {
@@ -180,7 +185,7 @@ export default defineStore('smilestore', {
   }),
 
   getters: {
-    isDataBarVisible: (state) => state.dev.show_data_bar,
+    isDataBarVisible: (state) => state.dev.show_console_bar,
     isKnownUser: (state) => state.local.knownUser,
     isConsented: (state) => state.local.consented,
     isWithdrawn: (state) => state.local.withdrawn,
@@ -197,9 +202,10 @@ export default defineStore('smilestore', {
     getConditions: (state) => state.local.conditions,
     getRandomizedRoutes: (state) => state.local.randomizedRoutes,
     verifiedVisibility: (state) => state.data.verified_visibility,
+    getStepper: (state) => (page) => state.global.steppers[page],
     getShortId: (state) => {
-      if (state.local.docRef == null) return 'N/A'
-      const lastDashIndex = state.local.docRef.lastIndexOf('-')
+      if (!state.local.docRef || typeof state.local.docRef !== 'string') return 'N/A'
+      //const lastDashIndex = state.local.docRef.lastIndexOf('-')
       return `${state.local.docRef.substring(0, 10)}`
     },
   },
@@ -264,47 +270,16 @@ export default defineStore('smilestore', {
       this.data.randomized_routes = {}
     },
     registerPageTracker(page) {
-      const log = useLog()
       if (this.local.pageTracker[page] === undefined) {
-        this.local.pageTracker[page] = {
-          index: 0,
-          data: {},
-        }
+        this.local.pageTracker[page] = {}
       }
     },
     getPageTracker(page) {
       return this.local.pageTracker[page]
     },
-    getPageTrackerIndex(page) {
-      return this.local.pageTracker[page]?.index
-    },
-    getPageTrackerData(page) {
-      return this.local.pageTracker[page]?.data
-    },
-    incrementPageTracker(page) {
-      const log = useLog()
-      if (this.local.pageTracker[page] !== undefined) {
-        this.local.pageTracker[page].index += 1
-        return this.local.pageTracker[page].index
-      } else {
-        log.error('SMILESTORE: page tracker not initialized for page', page)
-      }
-    },
-    decrementPageTracker(page) {
-      const log = useLog()
-      if (this.local.pageTracker[page] !== undefined) {
-        this.local.pageTracker[page].index -= 1
-        if (this.local.pageTracker[page].index < 0) {
-          this.local.pageTracker[page].index = 0
-        }
-        return this.local.pageTracker[page].index
-      } else {
-        log.error('SMILESTORE: page tracker not initialized for page', page)
-      }
-    },
     resetPageTracker(page) {
       if (this.local.pageTracker[page]) {
-        this.local.pageTracker[page].index = 0
+        this.local.pageTracker[page] = {}
       }
     },
     recordWindowEvent(type, event_data = null) {
@@ -379,10 +354,10 @@ export default defineStore('smilestore', {
       }
     },
     recordTrialData(data) {
-      this.data.study_data.push(data)
+      this.data.study_data.push(JSON.parse(JSON.stringify(data)))
     },
     saveForm(name, data) {
-      this.data[name + '_form'] = data
+      this.data[name + '_form'] = JSON.parse(JSON.stringify(data))
     },
     verifyVisibility(value) {
       this.data.verified_visibility = value
@@ -468,6 +443,7 @@ export default defineStore('smilestore', {
           // console.error(Date.now() - this.local.lastWrite)
           return
         }
+
         await updateSubjectDataRecord(this.data, this.local.docRef)
         await updatePrivateSubjectDataRecord(this.private, this.local.docRef)
         //console.log('data size = ', sizeof(data))

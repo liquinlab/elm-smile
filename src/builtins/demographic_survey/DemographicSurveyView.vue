@@ -5,6 +5,10 @@ import { reactive, computed } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
+const stepper = api.useStepper()
+const pages = stepper.t.append([{ path: 'survey_page1' }, { path: 'survey_page2' }, { path: 'survey_page3' }])
+stepper.push(pages)
+
 const forminfo = reactive({
   dob: '',
   gender: '',
@@ -62,9 +66,6 @@ function autofill() {
 
 api.setPageAutofill(autofill)
 
-const pages = ['page1', 'page2', 'page3']
-const step = api.useStepper(pages)
-
 function finish() {
   api.saveForm('demographic', forminfo)
   api.goNextView()
@@ -79,7 +80,7 @@ function finish() {
         We request some information about you which we can use to understand aggregate differences between individuals.
         Your privacy will be maintained and the data will not be linked to your online identity (e.g., email).
       </p>
-      <div class="formstep" v-if="step.index() === 0">
+      <div class="formstep" v-if="stepper.paths === 'survey_page1'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -149,7 +150,7 @@ function finish() {
               <div class="columns">
                 <div class="column">
                   <div class="has-text-right">
-                    <button class="button is-warning" id="finish" v-if="page_one_complete" @click="step.next()">
+                    <button class="button is-warning" id="finish" v-if="page_one_complete" @click="stepper.next()">
                       Continue &nbsp;
                       <FAIcon icon="fa-solid fa-arrow-right" />
                     </button>
@@ -161,7 +162,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-else-if="step.index() === 1">
+      <div class="formstep" v-else-if="stepper.paths === 'survey_page2'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -225,14 +226,14 @@ function finish() {
               <div class="columns">
                 <div class="column">
                   <div class="has-text-left">
-                    <button class="button is-warning" id="finish" @click="step.prev()">
+                    <button class="button is-warning" id="finish" @click="stepper.prev()">
                       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous
                     </button>
                   </div>
                 </div>
                 <div class="column">
                   <div class="has-text-right">
-                    <button class="button is-warning" id="finish" v-if="page_two_complete" @click="step.next()">
+                    <button class="button is-warning" id="finish" v-if="page_two_complete" @click="stepper.next()">
                       Continue &nbsp;
                       <FAIcon icon="fa-solid fa-arrow-right" />
                     </button>
@@ -244,7 +245,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-else-if="step.index() === 2">
+      <div class="formstep" v-else-if="stepper.paths === 'survey_page3'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -516,7 +517,7 @@ function finish() {
               <div class="columns">
                 <div class="column">
                   <div class="has-text-left">
-                    <button class="button is-warning" id="finish" @click="step.prev()">
+                    <button class="button is-warning" id="finish" @click="stepper.prev()">
                       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous
                     </button>
                   </div>

@@ -95,7 +95,10 @@ export default defineConfig({
       },
       {
         text: 'APIs and Advanced Documentation',
-        items: [{ text: '📚 API', link: '/api' }],
+        items: [
+          { text: '📚 API', link: '/api' },
+          { text: '🍽️ NestedTable API', link: '/tableapi' },
+        ],
       },
 
       {

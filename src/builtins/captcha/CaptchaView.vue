@@ -34,27 +34,21 @@ const api = useAPI()
 // for the image categorization and rotate image task need a bunch of images
 // possibly altered so that there is lots of substructure to it
 
-const pages = [
-  { component: CaptchaInstructionsText_01, props: { adjective: '' }, data: [] },
-  { component: CaptchaTrialRotateImage, props: { timed_task: true, max_time: 50000 }, data: [] },
-  { component: CaptchaTrialMaze, props: { timed_task: false }, data: [] },
-
-  // { component: CaptchaTrialTextComprehension, props: { timed_task: false }, data: [] },
-  // { component: CaptchaShyDot, props: { timed_task: false }, data: [] },
-  // { component: CaptchaInstructionsText_02, props: {}, data: [] },
-  // //{ component: CaptchaTrialImageCategorization, props: {}, data: [] },
-  // { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
-  //
-  // { component: CaptchaButtonPress, props: {}, data: [] },
-  // { component: CaptchaRotateImage, props: {}, data: [] },
-  // { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
-  // { component: CaptchaRotateImage, props: {}, data: [] },
-  // { component: CaptchaButtonPress, props: {}, data: [] },
-  // { component: CaptchaRotateImage, props: {}, data: [] },
-  // { component: CaptchaTrialTextComprehension, props: { timed_task: false }, data: [] },
-  // { component: CaptchaRotateImage, props: {}, data: [] },
-  // { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
-]
+// { component: CaptchaTrialTextComprehension, props: { timed_task: false }, data: [] },
+// { component: CaptchaShyDot, props: { timed_task: false }, data: [] },
+// { component: CaptchaInstructionsText_02, props: {}, data: [] },
+// //{ component: CaptchaTrialImageCategorization, props: {}, data: [] },
+// { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
+//
+// { component: CaptchaButtonPress, props: {}, data: [] },
+// { component: CaptchaRotateImage, props: {}, data: [] },
+// { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
+// { component: CaptchaRotateImage, props: {}, data: [] },
+// { component: CaptchaButtonPress, props: {}, data: [] },
+// { component: CaptchaRotateImage, props: {}, data: [] },
+// { component: CaptchaTrialTextComprehension, props: { timed_task: false }, data: [] },
+// { component: CaptchaRotateImage, props: {}, data: [] },
+// { component: CaptchaTrialMaze, props: { timed_task: true }, data: [] },
 
 // a dynamic loader for different trial types which is randomized?
 // each trial type is a simple game that just stores the data from the subject
@@ -67,37 +61,42 @@ const pages = [
 // 5 - human brain should show stroop interference
 // 6 -
 
-const step = api.useStepper(pages)
+const stepper = api.useStepper()
 
-const currentTab = computed(() => {
-  return pages[step.index()]
-})
+const trials = stepper.t.append([
+  { path: 'instructions_01', component: CaptchaInstructionsText_01, props: { adjective: '' } },
+  {
+    path: 'rotate_image',
+    component: CaptchaTrialRotateImage,
+    props: { timed_task: true, max_time: 50000 },
+  },
+  { path: 'maze', component: CaptchaTrialMaze, props: { timed_task: false } },
+])
+stepper.push(trials)
+
+// const currentTab = computed(() => {
+//   return stepppages[step.index()]
+// })
 // captcha steps
 
 function next_trial() {
-  if (step.index() >= pages.length - 1) {
-    //api.resetPageTracker() // you coudl reset when you leavr but why?
-    finish()
+  if (stepper.index >= stepper.length) {
+    api.goNextView()
   } else {
-    ///api.incrementTrial()
     api.saveData() // force a save
-    step.next()
+    stepper.next()
   }
-}
-
-function finish() {
-  // smilestore.saveData()
-  api.goNextView()
 }
 </script>
 
 <template>
   <div class="page">
-    <div class="instructions" v-if="step.index() >= pages.length">
+    <div class="instructions" v-if="stepper.paths == 'EOS'">
       <div class="formstep">
         <article class="message is-danger">
           <div class="message-header">
             <p>Error</p>
+            {{ stepper.index }}
             <button class="delete" aria-label="delete"></button>
           </div>
           <div class="message-body">
@@ -109,12 +108,11 @@ function finish() {
       </div>
     </div>
 
-    <!-- Component changes when currentTab changes -->
     <component
-      :is="currentTab.component"
-      v-bind="currentTab.props"
+      :is="stepper.data.component"
+      v-bind="stepper.data.props"
       @next-page-captcha="next_trial()"
-      :key="step.index()"
+      :key="stepper.index"
       v-else
     >
     </component>

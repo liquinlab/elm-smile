@@ -50,17 +50,72 @@ export const anonymousAuth = async () => {
   }
 }
 
+// Add validation function as an internal helper
+const validateFirestoreData = (data, path = '') => {
+  // Check if value is null or undefined
+  if (data === null || data === undefined) {
+    return true
+  }
+
+  // Check data type
+  if (
+    typeof data === 'string' ||
+    typeof data === 'number' ||
+    typeof data === 'boolean' ||
+    data instanceof Date ||
+    (typeof data === 'object' && 'seconds' in data && 'nanoseconds' in data) // Check for Timestamp-like object
+  ) {
+    return true
+  }
+
+  // Check arrays
+  if (Array.isArray(data)) {
+    // Empty arrays are valid
+    if (data.length === 0) {
+      return true
+    }
+    for (let i = 0; i < data.length; i++) {
+      if (Array.isArray(data[i])) {
+        throw new Error(`Nested arrays are not allowed in Firestore at path: ${path}[${i}]`)
+      }
+      validateFirestoreData(data[i], `${path}[${i}]`)
+    }
+    return true
+  }
+
+  // Check objects
+  if (typeof data === 'object') {
+    // Empty objects are valid
+    if (Object.keys(data).length === 0) {
+      return true
+    }
+    for (const [key, value] of Object.entries(data)) {
+      if (/[\.\/\[\]\*]/.test(key)) {
+        throw new Error(`Invalid key name "${key}" at path: ${path}. Keys cannot contain ".", "/", "[", "]", or "*"`)
+      }
+
+      if (value instanceof Function || value instanceof Symbol) {
+        throw new Error(`Unsupported data type for key "${key}" at path: ${path}. Value type: ${typeof value}`)
+      }
+
+      validateFirestoreData(value, path ? `${path}.${key}` : key)
+    }
+    return true
+  }
+
+  throw new Error(`Unsupported data type at path: ${path}. Value type: ${typeof data}`)
+}
+
 // create a collection
 export const updateSubjectDataRecord = async (data, docid) => {
   const log = useLog()
-  // is it weird to have a aync method that doesn't return anything?
   try {
+    validateFirestoreData(data)
     const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/`, docid)
-    setDoc(docRef, data, {
-      merge: true,
-    })
+    await setDoc(docRef, data, { merge: true })
   } catch (e) {
-    log.error('FIRESTORE-DB: Error updating document', e)
+    log.error('FIRESTORE-DB: Error updating document:', e.message)
+    throw e // Re-throw to allow caller to handle the error
   }
 }
 
@@ -73,7 +128,8 @@ export const updatePrivateSubjectDataRecord = async (data, docid) => {
       merge: true,
     })
   } catch (e) {
-    log.error('FIRESTORE-DB: Error updating document', e)
+    log.error('FIRESTORE-DB: Error updating private document', e)
+    throw e
   }
 }
 
@@ -102,17 +158,15 @@ export const loadDoc = async (docid) => {
     log.error('FIRESTORE-DB: Error updating document', e)
     return undefined
   }
-  // doc.data() will be undefined in this case
-  log.error('FIRESTORE-DB: No such document!')
-  return undefined
 }
 
 export const createDoc = async (data) => {
   const log = useLog()
-  log.log(`FIRESTORE-DB: trying to create a main document.`)
   try {
     const user = await anonymousAuth()
     if (!user) throw new Error('Authentication failed')
+
+    validateFirestoreData(data)
 
     log.log(`FIRESTORE-DB: trying to create a main document.`, appconfig.project_ref)
 
@@ -126,7 +180,7 @@ export const createDoc = async (data) => {
         code_name: appconfig.code_name,
         code_name_url: appconfig.code_name_url,
       })
-      console.log('FIRESTORE-DB: New experiment registered with ID: ', `${mode}/${appconfig.project_ref}`)
+      log.log('FIRESTORE-DB: New experiment registered with ID: ', `${mode}/${appconfig.project_ref}`)
     }
 
     log.log(`FIRESTORE-DB: trying to create a main document.`, appconfig.project_ref)
@@ -146,7 +200,7 @@ export const createDoc = async (data) => {
     log.log(`FIRESTORE-DB: New document written with ID: ${docRef.id} for user ${user.uid})`)
     return docRef.id
   } catch (e) {
-    log.error('FIRESTORE-DB: Error adding document: ', e)
+    log.error('FIRESTORE-DB: Error creating document:', e.message)
     return null
   }
 }
@@ -158,6 +212,7 @@ export const createPrivateDoc = async (data, docId) => {
     const user = await anonymousAuth()
     if (!user) throw new Error('Authentication failed')
 
+    validateFirestoreData(data)
     // Add a new document with a generated id.
     const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/${docId}/private/`, 'private_data')
     await setDoc(docRef, {
@@ -182,9 +237,9 @@ export default db
 // if not create one with the name of the experiment
 // add code name to the document as well
 
-// setDoc - write if document doesn’t exist, or replace if there is one at that name
-// updateDoc - only overwrite fields you specify but error if doesn’t exist
-// setDoc(,,{merge: true}) - create document if doesn’t exist, or update if it does
+// setDoc - write if document doesn't exist, or replace if there is one at that name
+// updateDoc - only overwrite fields you specify but error if doesn't exist
+// setDoc(,,{merge: true}) - create document if doesn't exist, or update if it does
 // each as async away or .then()
 // addDoc gives you a random reference
 // getDoc to read in with document snamshop

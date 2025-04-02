@@ -71,12 +71,12 @@ function submitWithdraw() {
       <div class="infobar-end">
         <div class="infobar-item" v-if="!appconfig.anonymous_mode">
           <div class="buttons">
-            <button class="button is-info is-small is-light" v-if="api.local.consented" @click="toggleConsent()">
+            <button class="button is-info is-small is-light" v-if="api.store.local.consented" @click="toggleConsent()">
               <FAIcon icon="magnifying-glass" />&nbsp;&nbsp;View consent
             </button>
             <button
               class="button is-danger is-small is-light"
-              v-if="api.local.consented && !api.local.withdrawn"
+              v-if="api.store.local.consented && !api.store.local.withdrawn"
               @click="toggleWithdraw()"
             >
               <FAIcon icon="circle-xmark" />&nbsp;&nbsp;Withdraw
@@ -135,7 +135,6 @@ function submitWithdraw() {
   flex-flow: row nowrap;
   align-items: stretch;
   position: relative;
-  z-index: 10;
 }
 
 .infobar-brand {

@@ -69,9 +69,9 @@ const handleMouseMove = (event) => {
     svg.circle.move(newXreal - svg.radius, newYreal - svg.radius)
 
     svg.pathString += ` L ${newXreal} ${newYreal}`
-    //api.debug(flagLocation)
+    //api.log.debug(flagLocation)
     // if newXreal and newYreal are withing the flag location
-    api.debug(`${newXreal}, ${newYreal}, ${flagLocation.row * rectWidth}, ${flagLocation.col * rectHeight}`)
+    api.log.debug(`${newXreal}, ${newYreal}, ${flagLocation.row * rectWidth}, ${flagLocation.col * rectHeight}`)
     if (
       newXreal > flagLocation.col * rectWidth &&
       newXreal < (flagLocation.col + 1) * rectWidth &&
@@ -82,8 +82,8 @@ const handleMouseMove = (event) => {
       //emit('nextPageCaptcha')
     }
 
-    api.debug(`in cell  ${Math.floor(newXreal / rectWidth)}, ${Math.floor(newYreal / rectHeight)}`)
-    //api.debug('color', )
+    api.log.debug(`in cell  ${Math.floor(newXreal / rectWidth)}, ${Math.floor(newYreal / rectHeight)}`)
+    //api.log.debug('color', )
     if (grid.value[Math.floor(newYreal / rectHeight)][Math.floor(newXreal / rectWidth)] == 'black') {
       touched_black.value = true
       bordercolor.value = red
@@ -104,7 +104,7 @@ onMounted(() => {
   svg.draw.on('mousemove', handleMouseMove)
   start_time = Date.now()
   timeout.value = ((MAX_TIME - (Date.now(0) - start_time)) / MAX_TIME) * 100
-  api.debug(`${timeout}`)
+  api.log.debug(`${timeout}`)
 
   // Add pulsing animation to the circle
   const circle = document.querySelector('#circle')
@@ -193,19 +193,19 @@ function getRandomColor() {
 }
 
 const startDragging = () => {
-  // api.debug('start dragging')
+  // api.log.debug('start dragging')
   svg.isDragging = true
 }
 const stopDragging = () => {
-  //api.debug('stop dragging')
+  //api.log.debug('stop dragging')
   svg.isDragging = false
 }
 
 const flag_touch = () => {
   if (svg.isDragging) {
-    api.debug('flag touched')
+    api.log.debug('flag touched')
   } else {
-    api.debug('nice try')
+    api.log.debug('nice try')
   }
 }
 

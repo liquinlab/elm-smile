@@ -59,9 +59,6 @@ function finish() {
 </template>
 
 <style scoped>
-.page {
-  width: 100vw;
-}
 .info {
   width: 65%;
   padding-top: 30px;

@@ -31,13 +31,14 @@ import Exp from '@/builtins/tasks/ExpView.vue'
 import Task1 from '@/builtins/tasks/Task1View.vue'
 import Task2 from '@/builtins/tasks/Task2View.vue'
 import StroopExp from '@/user/components/stroop_exp/StroopView.vue'
+import StepperTest from '@/user/components/stepper_test/StepperTestView.vue'
 
 // #3. Import smile API and timeline
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
 import Timeline from '@/core/timeline'
-const timeline = new Timeline()
+const timeline = new Timeline(api)
 
 import useSmileStore from '@/core/stores/smilestore'
 import { onBeforeRouteLeave } from 'vue-router'
@@ -166,6 +167,12 @@ timeline.pushSeqView({
   },
 })
 
+// stepper test
+timeline.pushSeqView({
+  name: 'stepper',
+  component: StepperTest,
+})
+
 // demographic survey
 timeline.pushSeqView({
   name: 'demograph',
@@ -197,11 +204,12 @@ timeline.pushSeqView({
   name: 'quiz',
   component: InstructionsQuiz,
   props: {
-    quizQuestions: QUIZ_QUESTIONS,
+    questions: QUIZ_QUESTIONS,
     returnTo: 'instructions',
-    randomizeQuestionsAndAnswers: true,
+    randomizeQandA: true,
   },
 })
+
 // main experiment
 // note: by default, the path will be set to the name of the view
 // however, you can override this by setting the path explicitly

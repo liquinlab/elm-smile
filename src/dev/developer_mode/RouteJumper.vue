@@ -1,9 +1,5 @@
 <script setup>
-//import RouteGraph from '@/dev/developer_mode/RouteGraph.vue'
 import { watch, ref } from 'vue'
-
-import { useKeyModifier } from '@vueuse/core'
-const altKeyState = useKeyModifier('Alt')
 
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
@@ -20,8 +16,8 @@ const route = useRoute()
 // construct routes in order we want to display them
 const routerRoutes = router.getRoutes()
 // get seqtimeline and routes from local storage
-const seqtimeline = api.local.seqtimeline
-const routes = api.local.routes
+const seqtimeline = api.store.local.seqtimeline
+const routes = api.store.local.routes
 
 // filter routes - only those that aren't in seqtimeline
 const filteredRoutes = routes.filter((r) => {
@@ -30,8 +26,6 @@ const filteredRoutes = routes.filter((r) => {
 
 // now append seqtimeline and filteredRoutes
 const allRoutes = seqtimeline.concat(filteredRoutes)
-
-const forceMode = ref(true)
 
 // watch route -- if route changes, update value of current query. This will get carried forward when you jump routes
 const currentQuery = ref(route.query)
@@ -43,20 +37,9 @@ function setHover(route) {
   hoverRoute.value = route
 }
 
-watch(altKeyState, (value) => {
-  forceMode.value = !value
-})
-
 function navigate(route) {
-  if (forceMode.value) {
-    log.warn(`DEV MODE: user requested to FORCE navigate to ${route}`)
-    api.goToView(route, true)
-  } else {
-    log.warn(`DEV MODE: user requested to navigate to ${route}`)
-    api.goToView(route, false)
-  }
-  // dismiss hover if open but not if panel is set to remain visible.
-  //api.dev.route_panel.visible = false
+  log.warn(`DEV MODE: user requested to FORCE navigate to ${route}`)
+  api.goToView(route, true)
 }
 </script>
 <template>
@@ -78,14 +61,9 @@ function navigate(route) {
             <FAIcon v-else icon="fa-solid fa-diamond" />
             /{{ r.name }}
           </div>
-          <div class="forcebutton forcemode" v-if="altKeyState && hoverRoute === r.name">
-            <FAIcon icon="fa-solid fa-square-caret-right" />
-          </div>
         </span>
       </div>
     </template>
-    <hr />
-    <div class="note">Use ⌥ + click to navigate as the user in real experiment would.</div>
   </div>
 </template>
 

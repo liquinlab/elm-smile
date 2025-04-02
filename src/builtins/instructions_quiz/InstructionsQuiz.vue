@@ -2,10 +2,11 @@
 import { reactive, computed, ref, onMounted } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
+const step = api.useStepper()
 
 // read in props
 const props = defineProps({
-  quizQuestions: {
+  questions: {
     type: Object,
     required: true,
   },
@@ -14,20 +15,40 @@ const props = defineProps({
     required: false,
     default: 'instructions',
   },
-  randomizeQuestionsAndAnswers: {
+  randomizeQandA: {
     type: Boolean,
     required: false,
     default: true,
   },
 })
+let qs = props.questions
 
-if (props.randomizeQuestionsAndAnswers) {
-  // randomize seed
-  api.randomSeed()
+function init() {
+  // randomize questions and add to stepper
+  qs = props.randomizeQandA ? getRandomizedQuestions() : props.questions
+
+  console.log('qs', props.questions)
+  //const pages = step.t.append({ path: 'pages' })[0].append(qs)
+  const pages = step.t.append({ path: 'pages' }).forEach((row) => {
+    row.append(qs)
+  })
+  step.push(pages, true)
+
+  //const feedback = step.t.append({ path: 'feedback' })[].append([{ path: 'success' }, { path: 'retry' }])
+  const feedback = step.t.append({ path: 'feedback' }).forEach((row) => {
+    row.append([{ path: 'success' }, { path: 'retry' }]) // add to additional pages
+  })
+  step.push(feedback, true)
+  // step.push(feedback, true)
+
+  if (!step.globals.attempts) {
+    step.globals.attempts = 1
+  }
 }
 
-const randomizedQuestions = ref(
-  props.quizQuestions.map((page) => ({
+function getRandomizedQuestions() {
+  api.randomSeed() // randomize seed
+  return props.questions.map((page) => ({
     ...page,
     questions: api.shuffle(
       page.questions.map((q) => ({
@@ -36,87 +57,94 @@ const randomizedQuestions = ref(
       }))
     ),
   }))
-)
-
-function randomizeQuestions() {
-  console.log('randomizing questions')
-  randomizedQuestions.value = props.quizQuestions.map((page) => ({
-    ...page,
-    questions: api.shuffle(
-      page.questions.map((q) => ({
-        ...q,
-        answers: api.shuffle(q.answers),
-      }))
-    ),
-  }))
 }
-
-// Call randomization when component mounts
-onMounted(() => {
-  randomizeQuestions()
-})
 
 function autofill() {
-  quizState.answers = randomizedQuestions.value.map((page) =>
-    page.questions.map((question) => question.correctAnswer[0])
-  )
+  // Helper function to recursively find and update questions in states
+  function updateQuestionsInState(state) {
+    // Check if this state has questions
+    if (state.data?.questions) {
+      state.data.questions = state.data.questions.map((question) => ({
+        ...question,
+        answer: question.multiSelect ? question.correctAnswer : question.correctAnswer[0],
+      }))
+    }
+
+    // Recursively check all child states
+    state._states.forEach(updateQuestionsInState)
+  }
+
+  // Start from root state and traverse all states
+  updateQuestionsInState(step.sm)
 }
+
 api.setPageAutofill(autofill)
 
-// Update the pages array to use randomizedQuestions length
-const pages = randomizedQuestions.value.map((_, index) => `page${index + 1}`)
-const step = api.useStepper(pages)
-
-// Update quizState to use randomizedQuestions length
-const quizState = reactive({
-  page: 'quiz',
-  answers: randomizedQuestions.value.map((page) => Array(page.questions.length).fill(null)),
-})
-
-// Update quizCorrect to use randomizedQuestions
+// Update quizCorrect to handle multiple answers
 const quizCorrect = computed(() =>
-  randomizedQuestions.value.every((page, pageIndex) =>
-    page.questions.every(
-      (question, questionIndex) => quizState.answers[pageIndex][questionIndex] === question.correctAnswer[0]
-    )
-  )
+  step.data?.questions?.every((question) => {
+    if (Array.isArray(question.correctAnswer)) {
+      // For multiselect, check if arrays have same values regardless of order
+      const selectedAnswers = Array.isArray(question.answer) ? question.answer : [question.answer]
+      return (
+        question.correctAnswer.length === selectedAnswers.length &&
+        question.correctAnswer.every((answer) => selectedAnswers.includes(answer))
+      )
+    }
+    // For single select, keep existing behavior
+    return question.answer === question.correctAnswer[0]
+  })
 )
+
 const currentPageComplete = computed(() => {
-  if (!quizState.answers || !quizState.answers[step.index()]) {
+  if (!step.data?.questions) {
     return false
   }
-  return quizState.answers[step.index()].every((answer) => answer !== null)
+  return step.data.questions.every((question) => {
+    if ('answer' in question) {
+      // For multiselect, ensure at least one option is selected
+      if (question.multiselect) {
+        return Array.isArray(question.answer) && question.answer.length > 0
+      }
+      return true
+    }
+    return false
+  })
 })
 
 function submitQuiz() {
   api.recordTrialData({
     phase: 'INSTRUCTIONS_QUIZ',
-    questions: randomizedQuestions.value, // Update to use randomized questions
-    answers: quizState.answers,
+    questions: step.alldata('pages*'), // Update to use randomized questions
+    globals: step.globals,
   })
   if (quizCorrect.value) {
-    quizState.page = 'start'
+    step.goTo('feedback-success')
   } else {
-    quizState.page = 'retry'
+    step.goTo('feedback-retry')
   }
 }
 
 function returnInstructions() {
   step.reset() // reset the quiz
-  randomizeQuestions() // re-randomize questions
-  api.goToView(props.returnTo)
+  step.clear() // don't remember across reloads
+  init()
+  step.globals.attempts = step.globals.attempts + 1 // increment attempts
+  api.gotoView(props.returnTo) // go back to instructions
 }
 
 function finish() {
   api.goNextView()
 }
+
+init()
 </script>
 
 <template>
   <div class="page prevent-select">
     <div class="formcontent">
       <!-- Replace the two quiz page sections with this single dynamic one -->
-      <div class="formstep" v-if="quizState.page === 'quiz' && step.index() < randomizedQuestions.length">
+      <div class="formstep" v-if="step.index <= qs.length && /^pages-pg\d+$/.test(step.paths)">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
@@ -135,24 +163,23 @@ function finish() {
           </div>
           <div class="column">
             <div class="box is-shadowless formbox">
-              <div v-for="question in randomizedQuestions[step.index()].questions" :key="question.id" class="mb-5">
+              <div v-for="question in step.data.questions" :key="question.id" class="mb-5">
                 <FormKit
-                  type="select"
+                  :type="question.multiSelect ? 'checkbox' : 'select'"
                   :label="question.question"
                   :name="question.id"
-                  placeholder="Select an option"
-                  v-model="
-                    quizState.answers[step.index()][randomizedQuestions[step.index()].questions.indexOf(question)]
-                  "
-                  :options="question.answers"
+                  :placeholder="question.multiSelect ? 'Select options' : 'Select option'"
+                  v-model="step.data.questions[step.data.questions.indexOf(question)].answer"
+                  :options="question.multiSelect ? question.answers : question.answers"
                   validation="required"
+                  :multiple="question.multiSelect"
                 />
               </div>
               <hr />
               <div class="columns">
                 <div class="column">
                   <div class="has-text-left">
-                    <button v-if="step.index() > 0" class="button is-warning" @click="step.prev">
+                    <button v-if="step.index > 1" class="button is-warning" @click="step.prev()">
                       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous page
                     </button>
                   </div>
@@ -161,11 +188,11 @@ function finish() {
                   <div class="has-text-right">
                     <button
                       v-if="currentPageComplete"
-                      :class="['button', step.index() === randomizedQuestions.length - 1 ? 'is-success' : 'is-warning']"
-                      @click="step.index() === randomizedQuestions.length - 1 ? submitQuiz() : step.next()"
+                      :class="['button', step.index === qs.length ? 'is-success' : 'is-warning']"
+                      @click="step.index === qs.length ? submitQuiz() : step.next()"
                     >
-                      {{ step.index() === randomizedQuestions.length - 1 ? 'Submit' : 'Next page' }}
-                      <template v-if="step.index() !== randomizedQuestions.length - 1">
+                      {{ step.index === qs.length ? 'Submit' : 'Next page' }}
+                      <template v-if="step.index !== qs.length">
                         &nbsp;<FAIcon icon="fa-solid fa-arrow-right" />
                       </template>
                     </button>
@@ -177,7 +204,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-else-if="quizState.page === 'start'">
+      <div class="formstep" v-else-if="step.paths === 'feedback-success'">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold has-text-centered">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Congrats! You passed.
@@ -189,7 +216,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-else-if="quizState.page === 'retry'">
+      <div class="formstep" v-else-if="step.paths === 'feedback-retry'">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold has-text-centered">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Sorry! You did not get all the answers correct.
@@ -230,10 +257,22 @@ function finish() {
 }
 
 .formcontent {
-  width: 80%;
+  width: 95%; /* Default for mobile */
   margin: auto;
   margin-bottom: 10px;
   padding-bottom: 10px;
   text-align: left;
+}
+
+@media screen and (min-width: 569px) {
+  .formcontent {
+    width: 85%; /* Tablet */
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .formcontent {
+    width: 98%; /* Desktop */
+  }
 }
 </style>

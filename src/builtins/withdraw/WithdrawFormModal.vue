@@ -13,21 +13,11 @@ const forminfo = reactive({
   email: '',
 })
 
-// function testme() {
-//     api.debug('testme')
-// }
-
 function withdraw() {
   api.setWithdrawn(forminfo) // set withdraw data fields
   api.saveData(true) // force a data save
   emit('submit-withdraw')
 }
-
-// function prefill_form() {
-//     api.debug('caught prefill')
-//     forminfo.email = prefill_email()
-//     api.debug(forminfo.email)
-// }
 </script>
 
 <template>

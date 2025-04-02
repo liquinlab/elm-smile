@@ -3,14 +3,11 @@ import { onMounted, watch, ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import DocsDropDown from '@/dev/developer_mode/DocsDropDown.vue'
-import RandomizationDropDown from '@/dev/developer_mode/RandomizationDropDown.vue'
-import ConfigDropDown from '@/dev/developer_mode/ConfigDropDown.vue'
-import StateVarsDropDown from '@/dev/developer_mode/StateVarsDropDown.vue'
 import Stepper from '@/dev/developer_mode/Stepper.vue'
-import RouteInfoDropDrop from '@/dev/developer_mode/RouteInfoDropDown.vue'
+import RouteInfoButton from '@/dev/developer_mode/RouteInfoButton.vue'
 import ResetButton from '@/dev/developer_mode/ResetButton.vue'
-
 import DataBarButton from '@/dev/developer_mode/DataBarButton.vue'
+import ViewButton from '@/dev/developer_mode/ViewButton.vue'
 
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
@@ -35,21 +32,6 @@ const api = useAPI()
       <div class="devbar-end">
         <div class="devbar-item devbar-buttonpanel">
           <div class="buttons">
-            <!-- config button -->
-            <div class="devbar-configdropdown">
-              <ConfigDropDown></ConfigDropDown>
-            </div>
-
-            <!-- randomization button -->
-            <div class="devbar-randomizationdropdown">
-              <RandomizationDropDown></RandomizationDropDown>
-            </div>
-
-            <!-- state variable buttons -->
-            <div class="devbar-statevarsdropdown">
-              <StateVarsDropDown></StateVarsDropDown>
-            </div>
-
             <!-- reset button -->
             <div class="devbar-resetbutton">
               <ResetButton></ResetButton>
@@ -63,8 +45,11 @@ const api = useAPI()
             </div>
             <!-- route info buttons -->
             <div class="devbar-routeinfodropdown">
-              <RouteInfoDropDrop></RouteInfoDropDrop>
+              <RouteInfoButton></RouteInfoButton>
             </div>
+
+            <!-- view button -->
+            <ViewButton></ViewButton>
           </div>
         </div>
       </div>
@@ -171,12 +156,6 @@ const api = useAPI()
     display: inline;
   }
   .devbar-stepper {
-    display: none;
-  }
-}
-
-@media screen and (max-width: 560px) {
-  .devbar-statevarsdropdown {
     display: none;
   }
 }

@@ -6,17 +6,20 @@ import VueGtag from 'vue-gtag' // google analytics
 // import with an @ symbol are resolved by vite to ./src directory
 
 import App from '@/core/App.vue' // import the main app component
-import { router } from '@/core/router' // import the router
+import timeline from '@/user/design'
+import { useRouter, addGuards } from '@/core/router' // import the router
 import { pinia } from '@/core/createpinia'
 import '@/core/icons' // configure fontawesome
 
 // drag components
-import VueDraggableResizable from 'vue-draggable-resizable'
+//import VueDraggableResizable from 'vue-draggable-resizable'
 import { createNotivue } from 'notivue'
 
 // Create the app and the data store
 // const pinia = createPinia() // create the data store
 const app = createApp(App) // create the app
+const router = useRouter(timeline)
+addGuards(router)
 const notivue = createNotivue({
   position: 'top-left',
   limit: 4,
@@ -47,7 +50,7 @@ app.use(
 app.component('FAIcon', FontAwesomeIcon)
 
 // add the ability to drag and resize elements
-app.component('vue-draggable-resizable', VueDraggableResizable)
+//app.component('vue-draggable-resizable', VueDraggableResizable)
 
 // you "mount the app starting at the #app element"
 app.mount('#app') // start the app!

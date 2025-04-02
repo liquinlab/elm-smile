@@ -45,8 +45,7 @@ files provided in the repository.
 ::: danger Warning!
 
 This will only work if you have signed and encrypted your lab's configurations.
-See instructions
-[here](/adduser).
+See instructions [here](/adduser).
 
 :::
 
@@ -209,6 +208,9 @@ VITE_AUTO_SAVE_DATA              = true
 VITE_MAX_WRITES                  = 1000
 VITE_MIN_WRITE_INTERVAL          = 2000
 
+# stepper configuration
+VITE_MAX_STEPPER_ROWS            = 5000
+
 ```
 
 Notice that the configuration options in this file begin with `VITE_`. This
@@ -244,6 +246,9 @@ means they are made available to the web application/experiment.
 - `VITE_MIN_WRITE_INTERVAL` configured the minimum time in milliseconds that
   should pass between writes to the Firestore. This respects Firestore's limit
   of 1 write per document per second. It defaults to 2000ms.
+- `VITE_MAX_STEPPER_ROWS` configures the maximum number of rows that can be
+  displayed in the TimelineStepper component. This helps manage performance and
+  UI complexity when dealing with large numbers of steps in your experiment.
 
 #### Web Services Options (`.env.local`)
 
@@ -485,8 +490,8 @@ experiment.
 
 ## Adding new configuration options
 
-Adding new configuration options can also happen in `.env.local`. You
-simply make up a new `VITE_SOMETHING` variable. Then add it to the object in
+Adding new configuration options can also happen in `.env.local`. You simply
+make up a new `VITE_SOMETHING` variable. Then add it to the object in
 `src/core/config.js` to expose it to your web application! The configuration is
 available as `smileconfig` anywhere in your Vue app. It's pretty easy.
 

@@ -19,7 +19,6 @@ const props = defineProps({
 <style scoped>
 .pie-chart {
   display: inline-block;
-  margin-top: 3px;
 }
 
 svg {

@@ -1,61 +1,43 @@
 <script setup>
-import { useMouse } from '@vueuse/core'
-import { ref, computed } from 'vue'
-import DatabaseInfoPanel from '@/dev/developer_mode/DatabaseInfoPanel.vue'
-import DatabaseLogPanel from '@/dev/developer_mode/DatabaseLogPanel.vue'
-import DatabaseBrowsePanel from '@/dev/developer_mode/DatabaseBrowsePanel.vue'
+import ConsoleLogPanel from '@/dev/developer_mode/ConsoleLogPanel.vue'
+import ConsoleDatabaseBrowsePanel from '@/dev/developer_mode/ConsoleDatabaseBrowsePanel.vue'
+import ConsoleConfigPanel from '@/dev/developer_mode/ConsoleConfigPanel.vue'
 
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
-const mousedown = ref(false)
-
-const { x, y } = useMouse()
-
-const height_pct = computed(() => `${api.dev.data_bar_height}px`)
-
-function down() {
-  mousedown.value = true
-  window.addEventListener('mousemove', move)
-  window.addEventListener('mouseup', up)
-}
-function up() {
-  mousedown.value = false
-}
-function move() {
-  if (mousedown.value == true) {
-    api.dev.data_bar_height = Math.min(window.innerHeight - y.value + 20, window.innerHeight) // small adjustment to where you probably click
-  }
-}
 </script>
 
 <template>
-  <nav class="databar devdatabar is-fixed-bottom">
+  <nav class="databar">
     <aside class="menu datamenu">
       <ul class="menu-list">
-        <li :class="{ active: api.dev.data_bar_tab == 'database' }">
+        <li :class="{ active: api.store.dev.console_bar_tab == 'browse' }">
           <a
-            @click="api.dev.data_bar_tab = 'database'"
-            class="has-tooltip-arrow has-tooltip-right"
-            data-tooltip="Database Info"
-            ><FAIcon icon="fa-solid fa-database icon" />
-          </a>
-        </li>
-        <li :class="{ active: api.dev.data_bar_tab == 'browse' }">
-          <a
-            @click="api.dev.data_bar_tab = 'browse'"
+            @click="api.store.dev.console_bar_tab = 'browse'"
             class="has-tooltip-arrow has-tooltip-right"
             data-tooltip="Data Explorer"
           >
             <FAIcon icon="fa-solid fa-magnifying-glass icon" />
           </a>
         </li>
-        <li :class="{ active: api.dev.data_bar_tab == 'log' }">
+
+        <li :class="{ active: api.store.dev.console_bar_tab == 'log' }">
           <a
-            @click="api.dev.data_bar_tab = 'log'"
+            @click="api.store.dev.console_bar_tab = 'log'"
             class="has-tooltip-arrow has-tooltip-right"
             data-tooltip="Narrative Log"
           >
             <FAIcon icon="fa-solid fa-book icon" />
+          </a>
+        </li>
+
+        <li :class="{ active: api.store.dev.console_bar_tab == 'config' }">
+          <a
+            @click="api.store.dev.console_bar_tab = 'config'"
+            class="has-tooltip-arrow has-tooltip-right"
+            data-tooltip="Configuration"
+          >
+            <FAIcon icon="fa-solid fa-gear icon" />
           </a>
         </li>
       </ul>
@@ -63,39 +45,32 @@ function move() {
 
     <section class="section secpanel">
       <nav class="databar-panel-header logpanel" role="navigation" aria-label="data navigation">
-        <div id="navbardatabase" class="databar-panel-header-menu" @mousedown="down()">
+        <div id="navbardatabase" class="databar-panel-header-menu">
           <div class="databar-panel-header-start">
-            <div class="databar-panel-header-item info" v-if="api.dev.data_bar_tab == 'database'">
-              <FAIcon icon="fa-solid fa-database icon" />&nbsp;&nbsp;<b>Database Info</b>
-            </div>
-
-            <div class="databar-panel-header-item info" v-if="api.dev.data_bar_tab == 'browse'">
+            <div class="databar-panel-header-item info" v-if="api.store.dev.console_bar_tab == 'browse'">
               <FAIcon icon="fa-solid fa-magnifying-glass icon" />&nbsp;&nbsp;<b>Data Explorer</b>
             </div>
-            <div class="databar-panel-header-item info" v-if="api.dev.data_bar_tab == 'log'">
+            <div class="databar-panel-header-item info" v-if="api.store.dev.console_bar_tab == 'log'">
               <FAIcon icon="fa-solid fa-book icon" />&nbsp;&nbsp;<b>Narrative Log</b>
+            </div>
+            <div class="databar-panel-header-item info" v-if="api.store.dev.console_bar_tab == 'config'">
+              <FAIcon icon="fa-solid fa-gear icon" />&nbsp;&nbsp;<b>Configuration</b>
             </div>
           </div>
 
-          <div class="databar-panel-header-end">
-            <div class="databar-panel-header-item closebutton">
-              <a class="databar-panel-header-item" @click="api.dev.show_data_bar = !api.dev.show_data_bar">
-                <FAIcon icon="fa-solid fa-circle-xmark icon" />
-              </a>
-            </div>
-          </div>
+          <div class="databar-panel-header-end"></div>
         </div>
       </nav>
 
       <!-- content of panel here -->
-      <DatabaseInfoPanel v-if="api.dev.data_bar_tab == 'database'"></DatabaseInfoPanel>
-      <DatabaseBrowsePanel v-if="api.dev.data_bar_tab == 'browse'"></DatabaseBrowsePanel>
-      <DatabaseLogPanel v-if="api.dev.data_bar_tab == 'log'"></DatabaseLogPanel>
+      <ConsoleDatabaseBrowsePanel v-if="api.store.dev.console_bar_tab == 'browse'"></ConsoleDatabaseBrowsePanel>
+      <ConsoleLogPanel v-if="api.store.dev.console_bar_tab == 'log'"></ConsoleLogPanel>
+      <ConsoleConfigPanel v-if="api.store.dev.console_bar_tab == 'config'"></ConsoleConfigPanel>
     </section>
   </nav>
 </template>
 
-<style>
+<style scoped>
 .databar-panel-header {
   display: flex;
   flex-flow: row nowrap;
@@ -136,11 +111,15 @@ function move() {
   display: flex;
   flex-flow: row nowrap;
   align-items: stretch;
-  position: relative;
-}
-
-.databar.is-fixed-bottom {
-  bottom: 0;
+  width: 100%;
+  border-top: var(--dev-bar-lines);
+  background: #fff;
+  color: #000;
+  height: 100%;
+  padding: 0px;
+  margin: 0px;
+  margin-bottom: 0px;
+  overflow-y: hidden;
 }
 
 .databar.is-fixed-bottom,
@@ -151,23 +130,13 @@ function move() {
   z-index: 500;
 }
 
-.devdatabar {
-  border-top: var(--dev-bar-lines);
-  background: #fff;
-  color: #000;
-  height: v-bind(height_pct);
-  padding: 0px;
-  margin: 0px;
-  margin-bottom: 0px;
-}
-
 .datamenu {
   background: var(--dev-bar-mild-grey);
   min-width: 20px;
   padding-left: 2px;
   padding-top: 0px;
   border-right: var(--dev-bar-lines);
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
 .menu-list {
@@ -195,14 +164,9 @@ function move() {
 }
 
 .closebutton {
-  padding-right: 10px;
-}
-</style>
-
-<style scoped>
-.menu-label {
-  background: #eff2f3;
-  color: #fff;
+  padding-right: 0px;
+  padding-left: 10px;
+  width: 40px;
 }
 .secpanel {
   width: 100%;
@@ -210,7 +174,14 @@ function move() {
   margin: 0;
   text-align: left;
   height: 100%;
+  flex: 1 1 auto;
 }
+
+.menu-label {
+  background: #eff2f3;
+  color: #fff;
+}
+
 .logpanel {
   width: 100%;
   font-size: 12px;
