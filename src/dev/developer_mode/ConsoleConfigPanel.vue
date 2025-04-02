@@ -103,13 +103,21 @@ function resetDevState() {
             Read more about configuration options
             <a href="https://smile.gureckislab.org/configuration.html">in the docs</a>.
           </p>
-          <div class="resetbutton has-tooltip-arrow has-tooltip-bottom ml-2 mb-2 mt-2" data-tooltip="Reset local state">
-            <a class="button is-small" @click="api.resetLocalState()">
+          <div class="resetbutton ml-2 mb-2 mt-2">
+            <a
+              class="button is-small has-tooltip-arrow has-tooltip-right"
+              @click="api.resetLocalState()"
+              data-tooltip="Reset local state"
+            >
               <b>Local:</b> <FAIcon icon=" fa-solid fa-arrow-rotate-left" />
             </a>
           </div>
-          <div class="resetbutton has-tooltip-arrow has-tooltip-bottom ml-2" data-tooltip="Reset developer interface">
-            <a class="button is-small" @click="resetDevState()">
+          <div class="resetbutton ml-2">
+            <a
+              class="button is-small has-tooltip-arrow has-tooltip-right"
+              @click="resetDevState()"
+              data-tooltip="Reset developer interface"
+            >
               <b>Dev:</b> <FAIcon icon=" fa-solid fa-arrow-rotate-left" />
             </a>
           </div>

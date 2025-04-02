@@ -226,7 +226,7 @@ const showServiceSelect = ref(false)
         <tr>
           <td class="has-text-left"><b>Mode:</b></td>
           <td class="has-text-left is-family-code">
-            {{ api.config.mode == 'development' ? 'testing' : 'live' }}
+            {{ api.config.mode }}
           </td>
         </tr>
         <tr>

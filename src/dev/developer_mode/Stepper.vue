@@ -19,27 +19,6 @@ const altKeyState = useKeyModifier('Alt')
 
 <template>
   <div class="field has-addons">
-<<<<<<< HEAD
-=======
-    <p class="control" v-if="api.hasPrevView()">
-      <button
-        class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
-        v-on:click="api.goToView(route?.meta?.prev)"
-        data-tooltip="Previous page"
-      >
-        <span>
-          <FAIcon icon="fa-solid fa-angles-left" />
-        </span>
-      </button>
-    </p>
-    <p class="control" v-else>
-      <button class="button is-small devbar-button" disabled>
-        <span>
-          <FAIcon icon="fa-solid fa-angles-left" />
-        </span>
-      </button>
-    </p>
->>>>>>> main
     <p class="control">
       <button
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
