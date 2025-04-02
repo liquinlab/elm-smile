@@ -204,7 +204,7 @@ onKeyDown(['Alt', '4'], (e) => {
   background-color: var(--dev-bar-background);
 }
 
-@media screen and (max-height: 920px) {
+@media screen and (max-height: 1020px) {
   .sidebar {
     overflow-y: auto;
   }

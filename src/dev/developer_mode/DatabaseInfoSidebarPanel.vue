@@ -71,7 +71,7 @@ const showServiceSelect = ref(false)
 <template>
   <!-- content of panel here -->
   <div class="database-info-sidebar-panel">
-    <div class="steps">
+    <div class="steps is-hidden-small">
       <div class="step-item" :class="{ 'is-success is-completed': api.store.local.knownUser }">
         <div class="step-marker" v-if="!api.store.local.knownUser">1</div>
         <div class="step-marker" v-else><FAIcon icon="fa-solid fa-check" /></div>
@@ -219,17 +219,17 @@ const showServiceSelect = ref(false)
             </div>
           </td>
         </tr>
-        <tr>
+        <tr class="is-hidden-small">
           <td class="has-text-left"><b>Last route:</b></td>
           <td class="has-text-left is-family-code">{{ '/' + api.store.local.lastRoute }}</td>
         </tr>
-        <tr>
+        <tr class="is-hidden-small">
           <td class="has-text-left"><b>Mode:</b></td>
           <td class="has-text-left is-family-code">
             {{ api.config.mode }}
           </td>
         </tr>
-        <tr>
+        <tr class="is-hidden-small">
           <td class="has-text-left"><b>Project:</b></td>
           <td class="has-text-left is-family-code">
             {{ api.config.firebaseConfig.projectId }}
@@ -245,25 +245,25 @@ const showServiceSelect = ref(false)
             /></a>
           </td>
         </tr>
-        <tr>
+        <tr class="is-hidden-small">
           <td class="has-text-left"><b>Writes:</b></td>
           <td class="has-text-left is-family-code">
             {{ api.store.local.totalWrites }} out of {{ api.config.max_writes }} max
           </td>
         </tr>
-        <tr>
+        <tr class="is-hidden-small">
           <td class="has-text-left"><b>Last write:</b></td>
           <td class="has-text-left is-family-code">
             {{ last_write_time_string }}
           </td>
         </tr>
-        <tr>
+        <tr class="is-hidden-small">
           <td class="has-text-left"><b>Auto save:</b></td>
           <td class="has-text-left is-family-code">
             {{ api.config.auto_save }}
           </td>
         </tr>
-        <tr>
+        <tr class="is-hidden-small">
           <td class="has-text-left"><b>Size:</b></td>
           <td class="has-text-left is-family-code">
             {{ api.store.local.approx_data_size }} / 1,048,576 max ({{
@@ -286,14 +286,21 @@ const showServiceSelect = ref(false)
   margin: 0;
 }
 
+.is-hidden-small {
+  @media screen and (max-height: 900px) {
+    display: none !important;
+  }
+}
+
 .table {
   margin-bottom: 0px;
   padding-bottom: 0px;
   border-top: none;
+  padding-top: 0px;
 }
 .database-info-sidebar-panel {
   height: fit-content;
-  padding-top: 10px;
+  padding-top: 0px;
   padding-bottom: 0px;
   padding-right: 0px;
   padding-left: 0px;
@@ -305,6 +312,9 @@ const showServiceSelect = ref(false)
   font-weight: bold;
 }
 
+.steps {
+  padding-top: 10px;
+}
 .step-details {
   font-size: 0.65em;
   padding: 0px;
