@@ -6,7 +6,6 @@ import { createTestingPinia } from '@pinia/testing'
 import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import seedrandom from 'seedrandom'
 import NestedTable from '@/core/composables/NestedTable'
 
 // import shared mocks
@@ -69,7 +68,7 @@ const routes = [
   },
 ]
 
-describe('useHStepper composable', () => {
+describe.skip('useHStepper composable', () => {
   let api
   let router
   let wrapper

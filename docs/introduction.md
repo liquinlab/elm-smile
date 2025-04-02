@@ -9,7 +9,7 @@ fun to develop rich and interactive online experiments. Unlike tools that cater
 to non-programmers, Smile is designed to help reasonably competent programmers
 accomplish more in less time.
 
-### Key features:
+### Highlighted features:
 
 - Fast and fun front-end interface development with [Vue.js](https://vuejs.org)
   and [Bulma CSS](https://bulma.io). Make complex games, animations, and surveys
@@ -20,7 +20,7 @@ accomplish more in less time.
   experiment logic and start collecting data.
 - Participant-friendly features include the ability to withdraw from the
   experiment (while providing feedback), incremental data saving, optimized load
-  times, and graceful error handling
+  times, and graceful error handling.
   <!-- and a responsive design that works on most/all
   devices.-->
 - Developer [mode](/developing) which makes it easier to debug and design
@@ -35,8 +35,6 @@ accomplish more in less time.
   [Cursor](https://www.cursor.com/) because LLMs are trained on extensive
   codebases covering VueJS, Bulma, and other popular web standards used by the
   project.
-- Presentation [mode](/presentation) which provides a beautiful and interactive
-  demo website you can share with reviewers and collaborators.
 - Built-in support for multiple [recruitment services](/recruitment) including
   Prolific, MTurk, CloudResearch, and more.
 - Secure data storage and retrieval using a flexible, but easy-to-use
@@ -53,6 +51,8 @@ accomplish more in less time.
   [recruitment posters](/deploying#notifying-the-slack-bot) (or for
   [presentations](/presentation#qr-code-download)),
   [anonymized links](/deploying#what-url-do-you-send-participants-to), and more.
+- Presentation [mode](/presentation) which provides a beautiful and interactive
+  demo website you can share with reviewers and collaborators.
 - [Data provenance features](/analysis#data-provenance) include an audit trail
   of which version of the code was used to create each data file.
 - Great looking and detailed docs, if we do say so ourselves!
