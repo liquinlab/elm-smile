@@ -44,8 +44,9 @@ export function useHStepper() {
   const savedState = smilestore.getPageTracker(page)?.data
 
   if (savedState) {
-    //console.log('STEPPER: Loading saved state from smilestore')
+    console.log('STEPPER: Loading saved state from smilestore')
     sm.loadFromJSON(savedState.stepperState)
+    console.log('sm', sm)
     _data.value = sm.pathdata
     _paths.value = sm.currentPaths
     _path.value = sm.currentPath || [] // Ensure path is never null
@@ -63,6 +64,7 @@ export function useHStepper() {
     _transactionHistory.value = [] // Initialize empty transaction history
   }
 
+  console.log('sm.root', sm.root)
   // Initialize root node data with empty gvars object if not already present
   if (!sm.root.data) {
     sm.root.data = { gvars: {} }
@@ -173,11 +175,11 @@ export function useHStepper() {
       _stateMachine.value = visualizeStateMachine() // Update state machine visualization
       sm.next()
     },
-    push: (table) => {
+    push: (table, ignoreContent = false) => {
       // Generate a new random number at the start of each push
 
       const tnxID = transactionId()
-      const fullTransactionId = `${table.tableID}-${tnxID}`
+      const fullTransactionId = ignoreContent ? `${tnxID}` : `${table.tableID}-${tnxID}`
 
       // Always scan table items for components, regardless of saved state
       table._items.forEach((item) => {
@@ -190,7 +192,7 @@ export function useHStepper() {
       }
 
       // Check if we've already pushed a table with this hash
-      const existingTransaction = _transactionHistory.value.find((tx) => tx.startsWith(table.tableID + '-'))
+      const existingTransaction = _transactionHistory.value.find((tx) => tx === fullTransactionId)
       if (existingTransaction) {
         return table
       }
@@ -236,6 +238,7 @@ export function useHStepper() {
 
           // Set data for this item - create a deep copy
           if (item.data !== undefined) {
+            //state.data = item.data
             state.data = JSON.parse(JSON.stringify(item.data))
           }
 
