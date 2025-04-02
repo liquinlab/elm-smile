@@ -204,9 +204,9 @@ timeline.pushSeqView({
   name: 'quiz',
   component: InstructionsQuiz,
   props: {
-    quizQuestions: QUIZ_QUESTIONS,
+    questions: QUIZ_QUESTIONS,
     returnTo: 'instructions',
-    randomizeQuestionsAndAnswers: true,
+    randomizeQandA: true,
   },
 })
 

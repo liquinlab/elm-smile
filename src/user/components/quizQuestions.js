@@ -1,6 +1,6 @@
 export const QUIZ_QUESTIONS = [
   {
-    path: 'quiz_page1',
+    path: 'pg1',
     questions: [
       {
         id: 'example1',
@@ -19,7 +19,7 @@ export const QUIZ_QUESTIONS = [
     ],
   },
   {
-    path: 'quiz_page2',
+    path: 'pg2',
     questions: [
       {
         id: 'example3',
