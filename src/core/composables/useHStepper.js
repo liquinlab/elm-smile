@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, markRaw } from 'vue'
 import useSmileStore from '@/core/stores/smilestore'
 import { useRoute } from 'vue-router'
 import { StepState } from '@/core/composables/StepState'
@@ -23,6 +23,37 @@ export function useHStepper() {
   const _gvars = ref({}) // Add new reactive ref for global variables
   // Internal table management
   const tables = new Map()
+
+  // Custom deep copy function that handles special types
+  const deepCopy = (obj) => {
+    if (obj === null || typeof obj !== 'object') {
+      return obj
+    }
+
+    // Handle Vue components
+    if (obj?.__vueComponent || obj?.template || obj?.render) {
+      return markRaw(obj)
+    }
+
+    // Handle functions
+    if (typeof obj === 'function') {
+      return obj
+    }
+
+    // Handle arrays
+    if (Array.isArray(obj)) {
+      return obj.map((item) => deepCopy(item))
+    }
+
+    // Handle objects
+    const copy = {}
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        copy[key] = deepCopy(obj[key])
+      }
+    }
+    return copy
+  }
 
   // RNG implementation
   let _seed = 12345 // Fixed seed for deterministic behavior
@@ -238,8 +269,7 @@ export function useHStepper() {
 
           // Set data for this item - create a deep copy
           if (item.data !== undefined) {
-            //state.data = item.data
-            state.data = JSON.parse(JSON.stringify(item.data))
+            state.data = deepCopy(item.data)
           }
 
           // Process child items if they exist
