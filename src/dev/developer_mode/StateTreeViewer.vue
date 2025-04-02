@@ -255,7 +255,9 @@ watch(
     </div>
     <div class="data-container-global">
       <div class="global-data-display">
-        Global Variables
+        Global Vars
+        <span class="data-label">(.globals)</span>
+
         <button
           @click="stepper.clearGlobals()"
           class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
@@ -268,7 +270,7 @@ watch(
     </div>
     <div class="data-container">
       <div class="data-display">
-        Node Data
+        Table Data <span class="data-label">(.data)</span>
         <button
           @click="stepper.clear()"
           class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
@@ -408,8 +410,8 @@ watch(
 }
 
 .data-container-global {
-  flex: 1 1 0; /* grow, can shrink, 0 basis */
-  overflow: auto;
+  flex: 0 0 auto; /* don't grow, don't shrink, auto basis */
+  overflow: visible;
   display: flex;
   flex-direction: column;
   max-height: 120px;
@@ -419,8 +421,8 @@ watch(
 }
 
 .data-container {
-  flex: 1 1 0; /* grow, can shrink, 0 basis */
-  overflow: auto;
+  flex: 0 0 auto; /* don't grow, don't shrink, auto basis */
+  overflow: visible;
   display: flex;
   flex-direction: column;
   background-color: #f1f3f3;
@@ -451,6 +453,7 @@ watch(
   overflow: auto;
   padding: 10px;
   max-height: 120px;
+  min-height: 120px;
   font-size: 0.8rem;
   font-weight: 800;
   font-family: monospace;
@@ -461,8 +464,17 @@ watch(
   flex: 1;
   overflow: auto;
   padding: 10px;
+  min-height: 180px;
   font-size: 0.8rem;
   font-weight: 800;
   font-family: monospace;
+}
+
+.data-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  font-family: monospace;
+  color: #10a8a2;
+  padding-right: 6px;
 }
 </style>

@@ -18,13 +18,13 @@ import RandomizationSidebarPanel from '@/dev/developer_mode/RandomizationSidebar
 .sidebar-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
   background-color: #f1f3f3;
 }
 
 .sidebar-footer {
   border-top: 1px solid #e4e4e4;
+  margin-top: auto;
 }
 /* DatabaseInfoSidebarPanel will take its natural height */
 :deep(.tree-viewer-container),

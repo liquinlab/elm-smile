@@ -53,6 +53,7 @@ function next() {
   if (stepper.index >= stepper.length) {
     api.goNextView()
   }
+  stepper.next()
 }
 
 function adddata() {
@@ -72,10 +73,13 @@ function adddata() {
     <component :is="stepper.data?.type" />
 
     <br />
+    <button @click="adddata()" class="button is-small is-warning m-2">Add Data</button>
+
+    <button @click="next()" class="button is-small is-success m-2">Next</button>
+
     <div class="viewer-container">
       <StateTreeViewer />
     </div>
-    <button @click="adddata()" class="button is-small is-warning m-2">Add Data</button>
   </div>
 </template>
 
@@ -84,7 +88,6 @@ function adddata() {
   width: 400px;
   margin: 0 auto;
   border: 1px solid #c5c5c5;
-  border-bottom: none;
   border-top: none;
 }
 .tree-diagram-text {

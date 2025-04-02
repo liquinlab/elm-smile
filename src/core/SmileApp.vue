@@ -204,6 +204,12 @@ onKeyDown(['Alt', '4'], (e) => {
   background-color: var(--dev-bar-background);
 }
 
+@media screen and (max-height: 920px) {
+  .sidebar {
+    overflow-y: auto;
+  }
+}
+
 .console {
   height: v-bind(height_pct);
   width: 100%;
