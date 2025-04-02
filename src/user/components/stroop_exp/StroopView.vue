@@ -11,8 +11,6 @@ import { onKeyDown } from '@vueuse/core'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 // now we create the trial stepper which will advance through the trials.
-const stepper = api.useStepper()
-stepper.clear() // don't remember across reloads
 
 /*
    Next we need to define the trials for the experiment.  Create
@@ -23,21 +21,32 @@ stepper.clear() // don't remember across reloads
    trial for later analysis.
 */
 // define the trials for the experiment
-stepper.t
-  .append([
-    { path: 'trial_a', word: 'SHIP', color: 'red', condition: 'unrelated' },
-    { path: 'trial_b', word: 'MONKEY', color: 'green', condition: 'unrelated' },
-    { path: 'trial_c', word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
-    { path: 'trial_d', word: 'RED', color: 'red', condition: 'congruent' },
-    { path: 'trial_e', word: 'GREEN', color: 'green', condition: 'congruent' },
-    { path: 'trial_f', word: 'BLUE', color: 'blue', condition: 'congruent' },
-    { path: 'trial_g', word: 'GREEN', color: 'red', condition: 'incongruent' },
-    { path: 'trial_h', word: 'BLUE', color: 'green', condition: 'incongruent' },
-    { path: 'trial_i', word: 'RED', color: 'blue', condition: 'incongruent' },
-  ])
-  .shuffle()
+const trials = smile
+  .table()
+  .append({
+    path: 'stroop',
+    rt: 'fake',
+    accuracy: 'fake',
+    response: 'fake',
+  })
+  .forEach((row) => {
+    row.append([
+      { path: 'a', word: 'SHIP', color: 'red', condition: 'unrelated' },
+      { path: 'b', word: 'MONKEY', color: 'green', condition: 'unrelated' },
+      { path: 'c', word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
+      { path: 'd', word: 'RED', color: 'red', condition: 'congruent' },
+      { path: 'e', word: 'GREEN', color: 'green', condition: 'congruent' },
+      { path: 'f', word: 'BLUE', color: 'blue', condition: 'congruent' },
+      { path: 'g', word: 'GREEN', color: 'red', condition: 'incongruent' },
+      { path: 'h', word: 'BLUE', color: 'green', condition: 'incongruent' },
+      { path: 'i', word: 'RED', color: 'blue', condition: 'incongruent' },
+    ])
+    //.shuffle()
+  })
   .append([{ path: 'summary' }])
-  .push()
+smile.push(trials, true)
+// path -> label or name
+
 
 // add the autofill/expected data fields
 // state.trials.forEach((trial) => {

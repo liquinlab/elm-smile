@@ -332,10 +332,10 @@ export function useHStepper() {
       tables.set(tableId, table)
 
       //const originalPush = table.push
-      table.push = () => {
-        // Forward to the stepper's push method
-        return stepper.push(table)
-      }
+      // table.push = () => {
+      //   // Forward to the stepper's push method
+      //   return stepper.push(table)
+      // }
       return table
     },
     // Shorthand for table()

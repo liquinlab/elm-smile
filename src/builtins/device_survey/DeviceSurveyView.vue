@@ -6,7 +6,8 @@ import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
 const stepper = api.useStepper()
-const pages = stepper.t.append([{ path: 'device_page1' }, { path: 'device_page2' }]).push()
+const pages = stepper.t.append([{ path: 'device_page1' }, { path: 'device_page2' }])
+stepper.push(pages)
 
 const forminfo = reactive({
   device_type: '', // type of device (e.g., desktop, laptop, tablet, phone)

@@ -6,7 +6,8 @@ import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
 const stepper = api.useStepper()
-const pages = stepper.t.append([{ path: 'survey_page1' }, { path: 'survey_page2' }, { path: 'survey_page3' }]).push()
+const pages = stepper.t.append([{ path: 'survey_page1' }, { path: 'survey_page2' }, { path: 'survey_page3' }])
+stepper.push(pages)
 
 const forminfo = reactive({
   dob: '',

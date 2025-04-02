@@ -27,7 +27,7 @@ const trials = stepper.t
     },
   ])
   .shuffle()
-  .push()
+stepper.push(trials)
 
 // const index = ref(0)
 // trials = shuffle(trials) // shuffle is not "in place"

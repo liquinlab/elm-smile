@@ -63,17 +63,16 @@ const api = useAPI()
 
 const stepper = api.useStepper()
 
-const trials = stepper.t
-  .append([
-    { path: 'instructions_01', component: CaptchaInstructionsText_01, props: { adjective: '' } },
-    {
-      path: 'rotate_image',
-      component: CaptchaTrialRotateImage,
-      props: { timed_task: true, max_time: 50000 },
-    },
-    { path: 'maze', component: CaptchaTrialMaze, props: { timed_task: false } },
-  ])
-  .push()
+const trials = stepper.t.append([
+  { path: 'instructions_01', component: CaptchaInstructionsText_01, props: { adjective: '' } },
+  {
+    path: 'rotate_image',
+    component: CaptchaTrialRotateImage,
+    props: { timed_task: true, max_time: 50000 },
+  },
+  { path: 'maze', component: CaptchaTrialMaze, props: { timed_task: false } },
+])
+stepper.push(trials)
 
 // const currentTab = computed(() => {
 //   return stepppages[step.index()]

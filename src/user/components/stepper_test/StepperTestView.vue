@@ -26,10 +26,8 @@ const Feedback = defineComponent({
 
 const stepper = api.useStepper()
 
-const trials = stepper.t
-  .append([{ type: Stimulus }, { type: Feedback }])
-  .repeat(3)
-  .push()
+const trials = stepper.t.append([{ type: Stimulus }, { type: Feedback }]).repeat(3)
+stepper.push(trials)
 
 const trials2 = stepper.t
   .append([
@@ -49,7 +47,7 @@ const trials2 = stepper.t
         }
       })
   })
-  .push()
+stepper.push(trials2)
 
 function next() {
   if (stepper.index >= stepper.length) {

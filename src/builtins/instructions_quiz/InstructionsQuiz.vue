@@ -2,12 +2,11 @@
 import { reactive, computed, ref, onMounted } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
-const stepper = api.useStepper()
-stepper.clear() // don't remember across reloads
+const step = api.useStepper()
 
 // read in props
 const props = defineProps({
-  quizQuestions: {
+  questions: {
     type: Object,
     required: true,
   },
@@ -16,32 +15,40 @@ const props = defineProps({
     required: false,
     default: 'instructions',
   },
-  randomizeQuestionsAndAnswers: {
+  randomizeQandA: {
     type: Boolean,
     required: false,
     default: true,
   },
 })
+let qs = props.questions
 
-const randomizedQuestions = ref(
-  props.quizQuestions.map((page) => ({
-    ...page,
-    questions: api.shuffle(
-      page.questions.map((q) => ({
-        ...q,
-        answers: api.shuffle(q.answers),
-      }))
-    ),
-  }))
-)
+function init() {
+  // randomize questions and add to stepper
+  qs = props.randomizeQandA ? getRandomizedQuestions() : props.questions
 
-function randomizeQuestions() {
-  if (props.randomizeQuestionsAndAnswers) {
-    // randomize seed
-    api.randomSeed()
+  console.log('qs', props.questions)
+  //const pages = step.t.append({ path: 'pages' })[0].append(qs)
+  const pages = step.t.append({ path: 'pages' }).forEach((row) => {
+    row.append(qs)
+  })
+  step.push(pages, true)
+
+  //const feedback = step.t.append({ path: 'feedback' })[].append([{ path: 'success' }, { path: 'retry' }])
+  const feedback = step.t.append({ path: 'feedback' }).forEach((row) => {
+    row.append([{ path: 'success' }, { path: 'retry' }]) // add to additional pages
+  })
+  step.push(feedback, true)
+  // step.push(feedback, true)
+
+  if (!step.globals.attempts) {
+    step.globals.attempts = 1
   }
-  console.log('randomizing questions')
-  randomizedQuestions.value = props.quizQuestions.map((page) => ({
+}
+
+function getRandomizedQuestions() {
+  api.randomSeed() // randomize seed
+  return props.questions.map((page) => ({
     ...page,
     questions: api.shuffle(
       page.questions.map((q) => ({
@@ -52,36 +59,30 @@ function randomizeQuestions() {
   }))
 }
 
-// Call randomization when component mounts
-onMounted(() => {
-  randomizeQuestions()
-  stepper.t
-    .append(randomizedQuestions.value)
-    .append([{ path: 'start_task' }, { path: 'retry' }]) // add to additional pages
-    .push()
-})
-
 function autofill() {
-  // Get all states except SOS and EOS
-  const quizStates = stepper.sm.states.filter(
-    (state) => state.id !== 'SOS' && state.id !== 'EOS' && state.data?.questions
-  )
-
-  // Update each state's questions with correct answers
-  quizStates.forEach((state) => {
-    if (state.data.questions) {
+  // Helper function to recursively find and update questions in states
+  function updateQuestionsInState(state) {
+    // Check if this state has questions
+    if (state.data?.questions) {
       state.data.questions = state.data.questions.map((question) => ({
         ...question,
         answer: question.multiSelect ? question.correctAnswer : question.correctAnswer[0],
       }))
     }
-  })
+
+    // Recursively check all child states
+    state._states.forEach(updateQuestionsInState)
+  }
+
+  // Start from root state and traverse all states
+  updateQuestionsInState(step.sm)
 }
+
 api.setPageAutofill(autofill)
 
 // Update quizCorrect to handle multiple answers
 const quizCorrect = computed(() =>
-  stepper.data?.questions?.every((question) => {
+  step.data?.questions?.every((question) => {
     if (Array.isArray(question.correctAnswer)) {
       // For multiselect, check if arrays have same values regardless of order
       const selectedAnswers = Array.isArray(question.answer) ? question.answer : [question.answer]
@@ -96,10 +97,10 @@ const quizCorrect = computed(() =>
 )
 
 const currentPageComplete = computed(() => {
-  if (!stepper.data?.questions) {
+  if (!step.data?.questions) {
     return false
   }
-  return stepper.data.questions.every((question) => {
+  return step.data.questions.every((question) => {
     if ('answer' in question) {
       // For multiselect, ensure at least one option is selected
       if (question.multiselect) {
@@ -114,39 +115,36 @@ const currentPageComplete = computed(() => {
 function submitQuiz() {
   api.recordTrialData({
     phase: 'INSTRUCTIONS_QUIZ',
-    questions: randomizedQuestions.value, // Update to use randomized questions
-    answers: stepper.data.questions.map((question) => question.answer),
+    questions: qs, // Update to use randomized questions
+    globals: step.globals,
   })
   if (quizCorrect.value) {
-    stepper.goTo('start_task')
+    step.goTo('feedback-success')
   } else {
-    stepper.goTo('retry')
+    step.goTo('feedback-retry')
   }
 }
 
 function returnInstructions() {
-  stepper.reset() // reset the quiz
-  randomizeQuestions() // re-randomize questions
-  api.goToView(props.returnTo)
+  step.reset() // reset the quiz
+  step.clear() // don't remember across reloads
+  init()
+  step.globals.attempts = step.globals.attempts + 1 // increment attempts
+  api.gotoView(props.returnTo) // go back to instructions
 }
 
 function finish() {
   api.goNextView()
 }
 
-// randomize questions and add to stepper
-randomizeQuestions()
-stepper.t
-  .append(randomizedQuestions.value)
-  .append([{ path: 'start_task' }, { path: 'retry' }]) // add to additional pages
-  .push()
+init()
 </script>
 
 <template>
   <div class="page prevent-select">
     <div class="formcontent">
       <!-- Replace the two quiz page sections with this single dynamic one -->
-      <div class="formstep" v-if="stepper.index <= randomizedQuestions.length && /^quiz_page\d+$/.test(stepper.path)">
+      <div class="formstep" v-if="step.index <= qs.length && /^pages-pg\d+$/.test(step.paths)">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
@@ -165,13 +163,13 @@ stepper.t
           </div>
           <div class="column">
             <div class="box is-shadowless formbox">
-              <div v-for="question in stepper.data.questions" :key="question.id" class="mb-5">
+              <div v-for="question in step.data.questions" :key="question.id" class="mb-5">
                 <FormKit
                   :type="question.multiSelect ? 'checkbox' : 'select'"
                   :label="question.question"
                   :name="question.id"
                   :placeholder="question.multiSelect ? 'Select options' : 'Select option'"
-                  v-model="stepper.data.questions[stepper.data.questions.indexOf(question)].answer"
+                  v-model="step.data.questions[step.data.questions.indexOf(question)].answer"
                   :options="question.multiSelect ? question.answers : question.answers"
                   validation="required"
                   :multiple="question.multiSelect"
@@ -181,7 +179,7 @@ stepper.t
               <div class="columns">
                 <div class="column">
                   <div class="has-text-left">
-                    <button v-if="stepper.index > 1" class="button is-warning" @click="stepper.prev()">
+                    <button v-if="step.index > 1" class="button is-warning" @click="step.prev()">
                       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous page
                     </button>
                   </div>
@@ -190,11 +188,11 @@ stepper.t
                   <div class="has-text-right">
                     <button
                       v-if="currentPageComplete"
-                      :class="['button', stepper.index === randomizedQuestions.length ? 'is-success' : 'is-warning']"
-                      @click="stepper.index === randomizedQuestions.length ? submitQuiz() : stepper.next()"
+                      :class="['button', step.index === qs.length ? 'is-success' : 'is-warning']"
+                      @click="step.index === qs.length ? submitQuiz() : step.next()"
                     >
-                      {{ stepper.index === randomizedQuestions.length ? 'Submit' : 'Next page' }}
-                      <template v-if="stepper.index !== randomizedQuestions.length">
+                      {{ step.index === qs.length ? 'Submit' : 'Next page' }}
+                      <template v-if="step.index !== qs.length">
                         &nbsp;<FAIcon icon="fa-solid fa-arrow-right" />
                       </template>
                     </button>
@@ -206,7 +204,7 @@ stepper.t
         </div>
       </div>
 
-      <div class="formstep" v-else-if="stepper.paths === 'start_task'">
+      <div class="formstep" v-else-if="step.paths === 'feedback-success'">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold has-text-centered">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Congrats! You passed.
@@ -218,7 +216,7 @@ stepper.t
         </div>
       </div>
 
-      <div class="formstep" v-else-if="stepper.paths === 'retry'">
+      <div class="formstep" v-else-if="step.paths === 'feedback-retry'">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold has-text-centered">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Sorry! You did not get all the answers correct.
@@ -259,10 +257,22 @@ stepper.t
 }
 
 .formcontent {
-  width: 80%;
+  width: 95%; /* Default for mobile */
   margin: auto;
   margin-bottom: 10px;
   padding-bottom: 10px;
   text-align: left;
+}
+
+@media screen and (min-width: 569px) {
+  .formcontent {
+    width: 85%; /* Tablet */
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .formcontent {
+    width: 98%; /* Desktop */
+  }
 }
 </style>
