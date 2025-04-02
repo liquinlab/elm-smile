@@ -398,7 +398,8 @@ export function useHStepper() {
       saveStepperState() // Save state when global variables are modified
     },
     get globals() {
-      return sm.root.data.gvars
+      _gvars.value = sm.root.data.gvars
+      return _gvars.value
     },
   }
 

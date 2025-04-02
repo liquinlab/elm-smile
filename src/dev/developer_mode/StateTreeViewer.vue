@@ -257,7 +257,7 @@ watch(
       <div class="global-data-display">
         Global Variables
         <button
-          @click="stepper.clearGvars()"
+          @click="stepper.clearGlobals()"
           class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
           data-tooltip="Delete Global Variables"
         >
