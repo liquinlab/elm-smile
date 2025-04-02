@@ -1016,7 +1016,7 @@ describe('useHStepper composable', () => {
 
       // Get current route and verify state is saved
       const currentRoute = router.currentRoute.value
-      const pageData = smilestore.getPageTrackerData(currentRoute.name)
+      const pageData = smilestore.getPageTracker(currentRoute.name)
       expect(pageData).toBeDefined()
       expect(pageData.stepperState).toBeDefined()
 
@@ -1048,7 +1048,7 @@ describe('useHStepper composable', () => {
 
       // Verify state is cleared from smilestore
       const currentRoute = router.currentRoute.value
-      const pageData = smilestore.getPageTrackerData(currentRoute.name)
+      const pageData = smilestore.getPageTracker(currentRoute.name)
       expect(pageData).toBeDefined()
       //expect(pageData.stepperState).toBeNull()
 

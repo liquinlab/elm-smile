@@ -40,7 +40,7 @@ export function useHStepper() {
   smilestore.registerPageTracker(page)
 
   // // Try to load existing state from smilestore
-  const savedState = smilestore.getPageTrackerData(page)?.stepperState
+  const savedState = smilestore.getPageTracker(page)?.data
 
   if (savedState) {
     //console.log('STEPPER: Loading saved state from smilestore')
@@ -68,9 +68,9 @@ export function useHStepper() {
   const saveStepperState = () => {
     if (smilestore.local.pageTracker[page]) {
       //console.log('STEPPER: Saving state to smilestore')
-      smilestore.local.pageTracker[page].data = {
-        ...smilestore.local.pageTracker[page].data,
-        stepperState: {
+      smilestore.local.pageTracker[page] = {
+        ...smilestore.local.pageTracker[page],
+        data: {
           stepperState: sm.json,
           transactionHistory: _transactionHistory.value,
         },

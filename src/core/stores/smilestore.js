@@ -270,47 +270,16 @@ export default defineStore('smilestore', {
       this.data.randomized_routes = {}
     },
     registerPageTracker(page) {
-      const log = useLog()
       if (this.local.pageTracker[page] === undefined) {
-        this.local.pageTracker[page] = {
-          index: 0,
-          data: {},
-        }
+        this.local.pageTracker[page] = {}
       }
     },
     getPageTracker(page) {
       return this.local.pageTracker[page]
     },
-    getPageTrackerIndex(page) {
-      return this.local.pageTracker[page]?.index
-    },
-    getPageTrackerData(page) {
-      return this.local.pageTracker[page]?.data
-    },
-    incrementPageTracker(page) {
-      const log = useLog()
-      if (this.local.pageTracker[page] !== undefined) {
-        this.local.pageTracker[page].index += 1
-        return this.local.pageTracker[page].index
-      } else {
-        log.error('SMILESTORE: page tracker not initialized for page', page)
-      }
-    },
-    decrementPageTracker(page) {
-      const log = useLog()
-      if (this.local.pageTracker[page] !== undefined) {
-        this.local.pageTracker[page].index -= 1
-        if (this.local.pageTracker[page].index < 0) {
-          this.local.pageTracker[page].index = 0
-        }
-        return this.local.pageTracker[page].index
-      } else {
-        log.error('SMILESTORE: page tracker not initialized for page', page)
-      }
-    },
     resetPageTracker(page) {
       if (this.local.pageTracker[page]) {
-        this.local.pageTracker[page].index = 0
+        this.local.pageTracker[page] = {}
       }
     },
     recordWindowEvent(type, event_data = null) {
