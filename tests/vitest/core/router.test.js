@@ -394,13 +394,13 @@ describe('useRouter methods', () => {
       const { router, api, wrapper } = await setupApp()
 
       // Start at welcome
-      await api.gotoView('welcome_anonymous')
+      await api.goToView('welcome_anonymous')
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('welcome_anonymous')
       expect(wrapper.html()).toContain('Welcome Anonymous')
 
       // Navigate to consent
-      await api.gotoView('consent')
+      await api.goToView('consent')
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('consent')
       expect(wrapper.html()).toContain('Consent')
@@ -474,7 +474,7 @@ describe('useRouter methods', () => {
 
     it('should navigate through the createTestTimeline sequential timeline', async () => {
       const { router, api } = await setupApp()
-      await api.gotoView('welcome_anonymous')
+      await api.goToView('welcome_anonymous')
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('welcome_anonymous')
 
@@ -592,7 +592,7 @@ describe('useRouter methods', () => {
       const { router, api } = await setupApp()
       expect(api.store.isKnownUser).toBe(false)
       expect(api.store.isConsented).toBe(false)
-      await api.gotoView('welcome_anonymous')
+      await api.goToView('welcome_anonymous')
       await flushPromises()
       expect(api.store.local.lastRoute).toBe('welcome_anonymous')
 
@@ -612,7 +612,7 @@ describe('useRouter methods', () => {
 
     it('should set isDone when leaving /feedback', async () => {
       const { router, api } = await setupApp()
-      await api.gotoView('welcome_anonymous')
+      await api.goToView('welcome_anonymous')
       await flushPromises()
       expect(api.store.local.lastRoute).toBe('welcome_anonymous')
 
@@ -620,7 +620,7 @@ describe('useRouter methods', () => {
       await flushPromises()
       expect(api.store.local.lastRoute).toBe('consent')
 
-      await api.gotoView('feedback')
+      await api.goToView('feedback')
       await flushPromises()
       expect(api.store.local.lastRoute).toBe('feedback')
 
@@ -637,7 +637,7 @@ describe('useRouter methods', () => {
     // test reset app and starting over
     it('should reset app when navigating to thanks', async () => {
       const { router, api } = await setupApp()
-      await api.gotoView('welcome_anonymous')
+      await api.goToView('welcome_anonymous')
       await flushPromises()
       expect(api.store.local.lastRoute).toBe('welcome_anonymous')
 
@@ -645,7 +645,7 @@ describe('useRouter methods', () => {
       await flushPromises()
       expect(api.store.local.lastRoute).toBe('consent')
 
-      await api.gotoView('feedback')
+      await api.goToView('feedback')
       await flushPromises()
       expect(api.store.local.lastRoute).toBe('feedback')
 
@@ -657,7 +657,7 @@ describe('useRouter methods', () => {
 
     it('should not reset app when navigating to thanks 2', async () => {
       const { router, api } = await setupApp()
-      await api.gotoView('welcome_anonymous')
+      await api.goToView('welcome_anonymous')
       await flushPromises()
       expect(api.store.local.lastRoute).toBe('welcome_anonymous')
 
@@ -665,11 +665,11 @@ describe('useRouter methods', () => {
       await flushPromises()
       expect(api.store.local.lastRoute).toBe('consent')
 
-      await api.gotoView('feedback')
+      await api.goToView('feedback')
       await flushPromises()
       expect(api.store.local.lastRoute).toBe('feedback')
 
-      await api.gotoView('thanks2')
+      await api.goToView('thanks2')
       await flushPromises()
       expect(api.store.local.lastRoute).toBe('thanks2')
       expect(api.resetApp).not.toHaveBeenCalled()
@@ -709,12 +709,12 @@ describe('useRouter methods', () => {
     it('show allow navigation to routes with allowAlways=true', async () => {
       const { router, api, wrapper } = await setupApp()
 
-      await api.gotoView('welcome_anonymous')
+      await api.goToView('welcome_anonymous')
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('welcome_anonymous')
       expect(wrapper.html()).toContain('Welcome Anonymous')
 
-      await api.gotoView('always_allow')
+      await api.goToView('always_allow')
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('always_allow')
     })
@@ -722,18 +722,18 @@ describe('useRouter methods', () => {
     it('should set user as consented when navigating from a route with setConsented=true', async () => {
       const { router, api, wrapper } = await setupApp()
 
-      await api.gotoView('welcome_anonymous')
+      await api.goToView('welcome_anonymous')
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('welcome_anonymous')
       expect(wrapper.html()).toContain('Welcome Anonymous')
 
-      await api.gotoView('consent')
+      await api.goToView('consent')
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('consent')
       expect(wrapper.html()).toContain('Consent')
 
       // Now navigate away from consent to trigger the guard
-      await api.gotoView('demograph')
+      await api.goToView('demograph')
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('demograph')
       expect(wrapper.html()).toContain('Demograph')
@@ -745,12 +745,12 @@ describe('useRouter methods', () => {
     it('should mark user as done when navigating from a route with setDone=true', async () => {
       const { router, api, wrapper } = await setupApp()
 
-      await api.gotoView('feedback')
+      await api.goToView('feedback')
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('feedback')
       expect(wrapper.html()).toContain('Feedback')
 
-      await api.gotoView('thanks')
+      await api.goToView('thanks')
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('thanks')
       expect(wrapper.html()).toContain('Thanks')
@@ -772,7 +772,7 @@ describe('useRouter methods', () => {
       api.setKnown()
       api.store.setLastRoute('demograph')
 
-      await api.gotoView('demograph')
+      await api.goToView('demograph')
       await flushPromises()
 
       expect(router.currentRoute.value.name).toBe('demograph')
@@ -787,11 +787,11 @@ describe('useRouter methods', () => {
       api.setConsented()
       api.store.setLastRoute('demograph')
 
-      await api.gotoView('demograph', false) // this mimics a click rather than a API navigation
+      await api.goToView('demograph', false) // this mimics a click rather than a API navigation
       await flushPromises()
 
       // Try to navigate to a different route
-      await api.gotoView('instructions', false) // this mimics a click rather than a API navigation
+      await api.goToView('instructions', false) // this mimics a click rather than a API navigation
       await flushPromises()
 
       expect(router.currentRoute.value.name).toBe('demograph')
@@ -801,15 +801,15 @@ describe('useRouter methods', () => {
       const { router, api } = await setupApp('production')
 
       // Set user as known and set last route
-      await api.gotoView('welcome_anonymous')
+      await api.goToView('welcome_anonymous')
       await flushPromises()
-      await api.gotoView('consent', false)
+      await api.goToView('consent', false)
       await flushPromises()
-      // await api.gotoView('consent', false) // this mimics a click rather than a API navigation
+      // await api.goToView('consent', false) // this mimics a click rather than a API navigation
       // await flushPromises()
 
       // Try to navigate to a different route
-      await api.gotoView('instructions', false) // this mimics a click rather than a API navigation
+      await api.goToView('instructions', false) // this mimics a click rather than a API navigation
       await flushPromises()
 
       expect(router.currentRoute.value.name).toBe('welcome_anonymous')
@@ -819,18 +819,18 @@ describe('useRouter methods', () => {
       const { router, api } = await setupApp('production')
 
       // Set user as known and set last route
-      await api.gotoView('welcome_anonymous')
+      await api.goToView('welcome_anonymous')
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('welcome_anonymous')
       await api.goNextView()
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('consent')
       expect(api.store.local.lastRoute).toBe('consent')
-      // await api.gotoView('consent', false) // this mimics a click rather than a API navigation
+      // await api.goToView('consent', false) // this mimics a click rather than a API navigation
       // await flushPromises()
 
       // Try to navigate to a different route
-      await api.gotoView('instructions', false) // this mimics a click rather than a API navigation
+      await api.goToView('instructions', false) // this mimics a click rather than a API navigation
       await flushPromises()
 
       expect(router.currentRoute.value.name).toBe('consent')
@@ -844,11 +844,11 @@ describe('useRouter methods', () => {
       api.setKnown()
       api.store.setLastRoute('demograph')
 
-      await api.gotoView('demograph') // this is an API navigation
+      await api.goToView('demograph') // this is an API navigation
       await flushPromises()
 
       // Try to navigate to a different route
-      await api.gotoView('instructions') // this is an API navigation
+      await api.goToView('instructions') // this is an API navigation
       await flushPromises()
 
       expect(router.currentRoute.value.name).toBe('instructions')
@@ -859,7 +859,7 @@ describe('useRouter methods', () => {
 
       api.store.setWithdrawn()
 
-      await api.gotoView('demograph', false)
+      await api.goToView('demograph', false)
       await flushPromises()
 
       expect(router.currentRoute.value.name).toBe('withdraw')
@@ -871,7 +871,7 @@ describe('useRouter methods', () => {
       api.config.mode = 'todd'
       api.store.setWithdrawn()
 
-      await api.gotoView('withdraw', false)
+      await api.goToView('withdraw', false)
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('withdraw')
     })
@@ -908,11 +908,11 @@ describe('useRouter methods', () => {
       api.setKnown()
       api.store.setLastRoute('demograph')
 
-      await api.gotoView('demograph') // this mimics a click rather than a API execution
+      await api.goToView('demograph') // this mimics a click rather than a API execution
       await flushPromises()
 
       // Try to navigate to a different route
-      await api.gotoView('instructions') // this mimics a click rather than a API execution
+      await api.goToView('instructions') // this mimics a click rather than a API execution
       await flushPromises()
 
       expect(router.currentRoute.value.name).toBe('instructions')

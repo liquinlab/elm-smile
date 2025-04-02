@@ -125,7 +125,7 @@ describe('useAPI composable', () => {
     expect(api.router).toBeDefined()
     expect(api.goNextView).toBeInstanceOf(Function)
     expect(api.goPrevView).toBeInstanceOf(Function)
-    expect(api.gotoView).toBeInstanceOf(Function)
+    expect(api.goToView).toBeInstanceOf(Function)
     expect(api.hasNextView).toBeInstanceOf(Function)
     expect(api.hasPrevView).toBeInstanceOf(Function)
 
@@ -210,10 +210,10 @@ describe('useAPI composable', () => {
     // Create spies for the API methods
     const goNextViewSpy = vi.spyOn(api, 'goNextView')
     const goPrevViewSpy = vi.spyOn(api, 'goPrevView')
-    const gotoViewSpy = vi.spyOn(api, 'gotoView')
+    const gotoViewSpy = vi.spyOn(api, 'goToView')
 
     // Navigate to the landing page
-    api.gotoView('landing')
+    api.goToView('landing')
     await flushPromises()
 
     // Check if the route meta is correctly set
@@ -229,13 +229,13 @@ describe('useAPI composable', () => {
     expect(goPrevViewSpy).toHaveBeenCalled()
 
     // Test gotoView
-    api.gotoView('test')
+    api.goToView('test')
     expect(gotoViewSpy).toHaveBeenCalledWith('test')
   })
 
   it('should check if next and previous views are available', async () => {
     // Navigate to the landing page
-    api.gotoView('landing')
+    api.goToView('landing')
     await flushPromises()
 
     // Check if the route meta is correctly set
@@ -250,7 +250,7 @@ describe('useAPI composable', () => {
 
     // Navigate to the test page
 
-    api.gotoView('test')
+    api.goToView('test')
     await flushPromises()
 
     // Check if only previous view is available

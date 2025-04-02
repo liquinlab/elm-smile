@@ -116,7 +116,7 @@ describe('useTimeline composable', () => {
     expect(timeline).toBeDefined()
     expect(timeline.goNextView).toBeInstanceOf(Function)
     expect(timeline.goPrevView).toBeInstanceOf(Function)
-    expect(timeline.gotoView).toBeInstanceOf(Function)
+    expect(timeline.goToView).toBeInstanceOf(Function)
     expect(timeline.lookupNext).toBeInstanceOf(Function)
   })
 
@@ -167,7 +167,7 @@ describe('useTimeline composable', () => {
     const routerPushSpy = vi.spyOn(router, 'push')
     const { timeline } = wrapper.vm
 
-    await timeline.gotoView('about')
+    await timeline.goToView('about')
 
     expect(routerPushSpy).toHaveBeenCalledWith({ name: 'about' })
     expect(mockSmilestore.global.forceNavigate).toBe(false) // Should be reset after navigation
@@ -177,7 +177,7 @@ describe('useTimeline composable', () => {
     const routerPushSpy = vi.spyOn(router, 'push')
     const { timeline } = wrapper.vm
 
-    await timeline.gotoView('contact', false)
+    await timeline.goToView('contact', false)
 
     expect(routerPushSpy).toHaveBeenCalledWith({ name: 'contact' })
     expect(mockSmilestore.global.forceNavigate).toBe(false) // Should remain false
