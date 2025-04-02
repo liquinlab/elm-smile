@@ -115,7 +115,7 @@ const currentPageComplete = computed(() => {
 function submitQuiz() {
   api.recordTrialData({
     phase: 'INSTRUCTIONS_QUIZ',
-    questions: qs, // Update to use randomized questions
+    questions: step.alldata('pages*'), // Update to use randomized questions
     globals: step.globals,
   })
   if (quizCorrect.value) {

@@ -365,6 +365,48 @@ export function useHStepper() {
       return sm.countLeafNodes
     },
 
+    // Add new alldata getter
+    alldata(pathFilter = null) {
+      // Helper function to check if a path matches a filter pattern
+      const matchesFilter = (path, filter) => {
+        if (!filter) return true // If no filter, match everything
+
+        // Convert filter pattern to regex
+        // First replace * with .* for wildcard matching
+        let pattern = filter.replace(/\*/g, '.*')
+
+        // Then escape special regex characters, but not the dots we just added
+        pattern = pattern.replace(/[+?^${}()|[\]\\]/g, '\\$&')
+
+        const regex = new RegExp(`^${pattern}`)
+
+        console.log('Checking path:', path, 'against pattern:', pattern)
+        const matches = regex.test(path)
+        console.log('Matches:', matches)
+        return matches
+      }
+
+      // Helper function to recursively get data from leaf nodes
+      const getLeafData = (state) => {
+        if (state.isLeaf) {
+          // Skip SOS and EOS nodes
+          if (state.id === 'SOS' || state.id === 'EOS') {
+            return []
+          }
+          // Check if the full path matches the filter
+          if (matchesFilter(state.paths, pathFilter)) {
+            console.log('Including data for path:', state.paths)
+            return state.data
+          }
+          return []
+        }
+        return state.states.flatMap(getLeafData)
+      }
+
+      // Start from root state and get all leaf node data
+      return getLeafData(sm)
+    },
+
     clear: () => {
       if (smilestore.local.pageTracker[page]) {
         // Remove the stepperState from the page tracker data
