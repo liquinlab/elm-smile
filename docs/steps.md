@@ -1020,12 +1020,25 @@ numbering for node identifiers.
 - [x] useHstepper dev bar
 - [x] sidebar view
 
-## Todod
+## Todo
 
-- [] useStepper in builtin/user components
-- [] autofill functionality
-- [] data saving
+- [x] useStepper in builtin/user components
+- [x] data saving
+- [x] stepper history is not persisting across reloads (see quiz, stroop for
+      example)
+- [x] added data to the step state didn't persist either (?)
+- [x] pinning route ideas
+
+- [x] serialized props issue with stepper (esp around the quiz questions)
+- [x] autofill functionality
+- [] templated name for repeats, etc...
 - [] testing for stepper component integration
+- [] tests for usehstepper
+- [] test for faker seralizing in stepstate
+- [] test for faker render in randomization
+
+# cleanup/refactoring
+
 - [] can move table modifications and transctions inside stepstate?
 - [] useHstepper shouldn't be a composable?
-- [] code review
+- [] code review/testing

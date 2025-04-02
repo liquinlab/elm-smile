@@ -13,22 +13,14 @@ const api = useAPI()
 // now we create the trial stepper which will advance through the trials.
 const smile = api.useStepper()
 
-/*
-   Next we need to define the trials for the experiment.  Create
-   a list composed of objects where each entry in the list is a trial
-   and the keys of the object are the variables that define each trial.
-   For example here we define a stroop experiment and so we mention
-   the word to display, the color of the word, and the condition of the
-   trial for later analysis.
-*/
 // define the trials for the experiment
 const trials = smile
   .table()
   .append({
     path: 'stroop',
-    rt: 'fake',
-    accuracy: 'fake',
-    response: 'fake',
+    rt: () => api.faker.rnorm(500, 50), // add the autofill/expected data fields
+    hit: () => api.faker.rbinom(1, 0.8),
+    response: () => api.faker.rchoice(['r', 'g', 'b']),
   })
   .forEach((row) => {
     row.append([
@@ -53,34 +45,20 @@ if (!smile.globals.hits) {
   smile.globals.attempts = 0
 }
 
-// add the autofill/expected data fields
-// state.trials.forEach((trial) => {
-//   if (typeof trial.reactionTime !== 'number') {
-//     trial.reactionTime = () => api.faker.rnorm(500, 50)
-//   }
-//   if (typeof trial.accuracy !== 'number') {
-//     trial.accuracy = () => api.faker.rbinom(1, 0.8)
-//   }
-//   if (typeof trial.response !== 'string') {
-//     trial.response = () => api.faker.rchoice(['r', 'g', 'b'])
-//   }
-// })
-
 // autofill all the trials
 function autofill() {
   api.log.debug('running autofill')
-  // while (step.index() < cs.trials.length) {
-  //   api.log.debug('auto stepping')
+  while (smile.index < smile.length) {
+    api.log.debug('auto stepping')
 
-  //   // autofill the trial
-  //   // api.faker.render() will autofill the trial with the expected data
-  //   // if the trial has already been filled by user it will not be changed
-  //   cs.trials[step.index()] = api.faker.render(cs.trials[step.index()])
-  //   cs.final_score = 100
-  //   api.recordTrialData(cs.trials[step.index()])
+    // autofill the trial
+    // api.faker.render() will autofill the trial with the expected data
+    // if the trial has already been filled by user it will not be changed
+    api.faker.render(smile.data)
+    api.recordTrialData(smile.data)
 
-  //   step.next()
-  // }
+    smile.next()
+  }
   // step to where we want to go
 }
 
@@ -98,22 +76,12 @@ onMounted(() => {
 // it takes a list of keys to list for each time a key
 // is pressed runs the provided function.
 const stop = onKeyDown(
-  ['r', 'R', 'g', 'G', 'b', 'B'],
+  ['r', 'R', 'g', 'G', 'b', 'B'], // list of keys to listen for
   (e) => {
     if (smile.index < smile.length) {
       e.preventDefault()
       api.log.debug('pressed ${e}')
       const reactionTime = performance.now() - trialStartTime.value
-      // if (['r', 'R'].includes(e.key)) {
-      //   // handle Red
-      //   api.log.debug('red')
-      // } else if (['g', 'G'].includes(e.key)) {
-      //   // handle Green
-      //   api.log.debug('green')
-      // } else if (['b', 'B'].includes(e.key)) {
-      //   // handle Blue
-      //   api.log.debug('blue')
-      // }
       smile.data.hit = 0
       if (smile.data.color[0] === e.key) {
         smile.data.hit = 1
@@ -121,7 +89,8 @@ const stop = onKeyDown(
       }
       smile.globals.attempts = smile.globals.attempts + 1
       //smile.data.addField('response', e.key)
-      smile.data.reactionTime = reactionTime
+      smile.data.rt = reactionTime
+      smile.data.response = e.key
       //console.log('smile.mdata', smile.mdata)
       api.recordTrialData(smile.data)
       smile.next()
@@ -148,13 +117,6 @@ function finish() {
       {{ smile.index }} / {{ smile.length }}
       <h1 class="title is-1 is-huge" :class="smile.data.color">{{ smile.data.word }}</h1>
       <p id="prompt">Type "R" for Red, "B" for blue, "G" for green.</p>
-
-      <!-- debugging 
-      <hr />
-      <div v-for="t in cs.trials">
-        <span v-for="tr in t">{{ tr }},</span>
-      </div>
-      end debugging -->
     </div>
 
     <!-- Show this when you are done with the trials and offer a button

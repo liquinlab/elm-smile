@@ -525,13 +525,32 @@ export class StepState {
           continue
         }
 
+        // Handle faker functions
+        if (typeof value === 'function') {
+          // Get the function body as string
+          const funcStr = value.toString()
+          // Check if it's a faker function call
+          if (funcStr.includes('api.faker.')) {
+            // Extract the faker function name and parameters
+            const match = funcStr.match(/api\.faker\.(\w+)\((.*)\)/)
+            if (match) {
+              const [_, fakerName, params] = match
+              cleaned[key] = {
+                __fakerFunction: true,
+                name: fakerName,
+                params: params.split(',').map((p) => p.trim()),
+              }
+              continue
+            }
+          }
+        }
+
         if (
-          typeof value === 'function' ||
           typeof value === 'undefined' ||
           value instanceof RegExp ||
           (value instanceof Object && 'nodeType' in value)
         ) {
-          // Skip functions, undefined values, RegExp, and DOM elements entirely
+          // Skip undefined values, RegExp, and DOM elements entirely
           continue
         } else {
           cleaned[key] = value
@@ -561,7 +580,7 @@ export class StepState {
       this._id = data.id
       this._currentIndex = data.currentIndex
       this._depth = data.depth
-      this._data = data.data
+      this._data = this._reconstructData(data.data)
       this._states = []
       this._parent = null
       this._root = this
@@ -572,11 +591,54 @@ export class StepState {
       state.loadFromJSON(stateData) // Load child data while preserving parent reference
       state._depth = stateData.depth
       state._currentIndex = stateData.currentIndex
-      state._data = stateData.data
+      state._data = this._reconstructData(stateData.data)
       state._root = this._root
       state._parent = this
       return state
     })
+  }
+
+  /**
+   * Reconstructs data objects, including faker functions
+   * @private
+   * @param {Object} data - The data object to reconstruct
+   * @returns {Object} The reconstructed data object
+   */
+  _reconstructData(data) {
+    if (!data) return data
+
+    const reconstructed = {}
+    for (const [key, value] of Object.entries(data)) {
+      if (value && typeof value === 'object') {
+        // Handle faker functions
+        if (value.__fakerFunction) {
+          reconstructed[key] = () => {
+            const fakerFunc = this._root.api?.faker?.[value.name]
+            if (!fakerFunc) {
+              console.warn(`Faker function ${value.name} not found during reconstruction`)
+              return null
+            }
+            return fakerFunc(...value.params)
+          }
+          continue
+        }
+
+        // Handle Vue components
+        if (value.__vueComponent) {
+          reconstructed[key] = {
+            name: value.componentName,
+            __vueComponent: true,
+          }
+          continue
+        }
+
+        // Recursively reconstruct nested objects
+        reconstructed[key] = this._reconstructData(value)
+      } else {
+        reconstructed[key] = value
+      }
+    }
+    return reconstructed
   }
 
   /**
