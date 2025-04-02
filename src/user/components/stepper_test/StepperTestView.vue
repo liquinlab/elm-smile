@@ -84,6 +84,7 @@ function adddata() {
   width: 400px;
   margin: 0 auto;
   border: 1px solid #c5c5c5;
+  border-bottom: none;
   border-top: none;
 }
 .tree-diagram-text {
