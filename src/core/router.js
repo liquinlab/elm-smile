@@ -35,7 +35,7 @@ export function addGuards(r, providedApi = null) {
       }
 
       await api.connectDB()
-      api.log.warn('ROUTER GUARD: Pinned route, redirecting to ' + api.store.dev.pinned_route)
+      api.log.error('ROUTER GUARD: Pinned route, redirecting to ' + api.store.dev.pinned_route)
       if (to.name === api.store.dev.pinned_route) {
         return true
       } else {
@@ -137,7 +137,7 @@ export function addGuards(r, providedApi = null) {
 
     // if the route requires consent and the user hasn't consented
     if (to.meta.requiresConsent && !api.store.isConsented) {
-      api.log.warn(
+      api.log.error(
         `ROUTER GUARD: This route (${to.name}) requires consent, but the user has not consented (${api.store.isConsented}).\
          Redirecting to the last route visited. (${api.store.lastRoute})`
       )
@@ -148,7 +148,7 @@ export function addGuards(r, providedApi = null) {
     }
 
     if (to.meta.requiresDone && !api.store.isDone) {
-      api.log.warn(
+      api.log.error(
         `ROUTER GUARD: This route (${to.name}) requires being marked as done, but the user is not done.\
         Redirecting to the last route visited. (${api.store.lastRoute})`
       )
