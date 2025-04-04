@@ -16,7 +16,7 @@ function removeline(src, tagName) {
 
 export default function stripDevToolPlugin() {
   let config
-  const loaderMatch = /App\.vue$/
+  const loaderMatch = /(App\.vue|SmileApp\.vue)$/
   return {
     name: 'smile-strip-dev-tool', // name of the plugin
     configResolved(resolvedConfig) {
@@ -27,30 +27,46 @@ export default function stripDevToolPlugin() {
     transform(src, id) {
       if (loaderMatch.test(id)) {
         let clean_src = src
-        // remove presentation
-        if (config.mode !== 'presentation') {
-          clean_src = removetag(clean_src, 'PresentationNavBar')
-          clean_src = removeline(clean_src, 'PresentationNavBar')
+
+        // Handle App.vue specific removals
+        if (id.endsWith('App.vue')) {
+          if (config.mode !== 'development') {
+            // Remove Notivue related components
+            clean_src = removetag(clean_src, 'Notivue')
+            clean_src = removeline(clean_src, 'Notivue')
+            clean_src = removeline(clean_src, 'notivue')
+          }
         }
 
-        if (config.mode !== 'development') {
-          // if name is .preload.js
+        // Handle SmileApp.vue specific removals
+        if (id.endsWith('SmileApp.vue')) {
+          // Remove presentation components if not in presentation mode
+          if (config.mode !== 'presentation') {
+            clean_src = removetag(clean_src, 'PresentationNavBar')
+            clean_src = removeline(clean_src, 'PresentationNavBar')
+          }
 
-          // remove tags
-          clean_src = removetag(clean_src, 'DeveloperNavBar')
-          clean_src = removetag(clean_src, 'DevDataBar')
-          clean_src = removetag(clean_src, 'Notivue')
-          clean_src = removetag(clean_src, 'Transition')
+          if (config.mode !== 'development') {
+            // Remove development components
+            clean_src = removetag(clean_src, 'DeveloperNavBar')
+            clean_src = removetag(clean_src, 'DevConsoleBar')
+            clean_src = removetag(clean_src, 'DevSideBar')
+            clean_src = removetag(clean_src, 'Transition')
+            clean_src = removetag(clean_src, 'KeyCommandNotification')
 
-          // remove lines
-          clean_src = removeline(clean_src, 'DeveloperNavBar')
-          clean_src = removeline(clean_src, 'Notivue')
-          clean_src = removeline(clean_src, 'notivue')
-          clean_src = removeline(clean_src, 'DevDataBar')
-          clean_src = removeline(clean_src, 'Transition')
+            // Remove toolbar div
+            clean_src = clean_src.replace(/<div class="toolbar">[\s\S]*?<\/div>/g, '')
 
-          return { code: clean_src }
+            // Remove related imports and lines
+            clean_src = removeline(clean_src, 'DeveloperNavBar')
+            clean_src = removeline(clean_src, 'DevConsoleBar')
+            clean_src = removeline(clean_src, 'DevSideBar')
+            clean_src = removeline(clean_src, 'Transition')
+            clean_src = removeline(clean_src, 'KeyCommandNotification')
+          }
         }
+
+        return { code: clean_src }
       }
     },
   }
