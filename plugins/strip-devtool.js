@@ -40,6 +40,11 @@ export default function stripDevToolPlugin() {
 
         // Handle SmileApp.vue specific removals
         if (id.endsWith('SmileApp.vue')) {
+          if (config.mode !== 'presentation' && config.mode !== 'development') {
+            // Remove toolbar div
+            clean_src = clean_src.replace(/<div class="toolbar">[\s\S]*?<\/div>/g, '')
+          }
+
           // Remove presentation components if not in presentation mode
           if (config.mode !== 'presentation') {
             clean_src = removetag(clean_src, 'PresentationNavBar')
@@ -53,9 +58,6 @@ export default function stripDevToolPlugin() {
             clean_src = removetag(clean_src, 'DevSideBar')
             clean_src = removetag(clean_src, 'Transition')
             clean_src = removetag(clean_src, 'KeyCommandNotification')
-
-            // Remove toolbar div
-            clean_src = clean_src.replace(/<div class="toolbar">[\s\S]*?<\/div>/g, '')
 
             // Remove related imports and lines
             clean_src = removeline(clean_src, 'DeveloperNavBar')
