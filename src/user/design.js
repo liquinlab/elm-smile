@@ -31,7 +31,6 @@ import Exp from '@/builtins/tasks/ExpView.vue'
 import Task1 from '@/builtins/tasks/Task1View.vue'
 import Task2 from '@/builtins/tasks/Task2View.vue'
 import StroopExp from '@/user/components/stroop_exp/StroopView.vue'
-import StepperTest from '@/user/components/stepper_test/StepperTestView.vue'
 
 // #3. Import smile API and timeline
 import useAPI from '@/core/composables/useAPI'
@@ -165,12 +164,6 @@ timeline.pushSeqView({
     requiresConsent: false,
     setConsented: true,
   },
-})
-
-// stepper test
-timeline.pushSeqView({
-  name: 'stepper',
-  component: StepperTest,
 })
 
 // demographic survey
