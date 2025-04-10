@@ -199,15 +199,9 @@ onKeyDown(['Alt', '4'], (e) => {
 .sidebar {
   flex: 0 0 280px;
   height: 100%;
-  overflow: hidden;
+  overflow-y: auto;
   border-left: var(--dev-bar-lines);
   background-color: var(--dev-bar-background);
-}
-
-@media screen and (max-height: 1020px) {
-  .sidebar {
-    overflow-y: auto;
-  }
 }
 
 .console {
