@@ -12,7 +12,7 @@ const mockSmilestore = {
     forceNavigate: false,
   },
   dev: {
-    current_page_done: false,
+    currentPageDone: false,
   },
   config: {
     auto_save: false,
@@ -81,7 +81,7 @@ describe('useTimeline composable', () => {
   beforeEach(() => {
     // Reset mock state
     mockSmilestore.global.forceNavigate = false
-    mockSmilestore.dev.current_page_done = false
+    mockSmilestore.dev.currentPageDone = false
     mockSmilestore.config.auto_save = false
     vi.clearAllMocks()
 
@@ -133,7 +133,7 @@ describe('useTimeline composable', () => {
       name: 'about',
       query: {},
     })
-    expect(mockSmilestore.dev.current_page_done).toBe(true)
+    expect(mockSmilestore.dev.currentPageDone).toBe(true)
   })
 
   it('should navigate to the previous view', async () => {
@@ -149,7 +149,7 @@ describe('useTimeline composable', () => {
       name: 'home',
       query: {},
     })
-    expect(mockSmilestore.dev.current_page_done).toBe(true)
+    expect(mockSmilestore.dev.currentPageDone).toBe(true)
   })
 
   it('should execute callback function when navigating', async () => {

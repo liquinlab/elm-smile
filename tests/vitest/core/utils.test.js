@@ -25,7 +25,7 @@ describe('processQuery tests', () => {
     }
     const service = 'prolific'
     processQuery(query, service)
-    expect(smilestore.data.recruitment_service).toBe(service)
+    expect(smilestore.data.recruitmentService).toBe(service)
     expect(smilestore.recruitmentService).toBe(service)
     expect(smilestore.private.recruitment_info).toStrictEqual(finalform) // this is "deep" equality
   })
@@ -44,7 +44,7 @@ describe('processQuery tests', () => {
     }
     const service = 'cloudresearch'
     processQuery(query, service)
-    expect(smilestore.data.recruitment_service).toBe(service)
+    expect(smilestore.data.recruitmentService).toBe(service)
     expect(smilestore.recruitmentService).toBe(service)
     expect(smilestore.private.recruitment_info).toStrictEqual(finalform)
   })
@@ -63,7 +63,7 @@ describe('processQuery tests', () => {
     }
     const service = 'mturk'
     processQuery(query, service)
-    expect(smilestore.data.recruitment_service).toBe(service)
+    expect(smilestore.data.recruitmentService).toBe(service)
     expect(smilestore.recruitmentService).toBe(service)
     expect(smilestore.private.recruitment_info).toStrictEqual(finalform)
   })
@@ -82,7 +82,7 @@ describe('processQuery tests', () => {
     }
     const service = 'citizensci'
     processQuery(query, service)
-    expect(smilestore.data.recruitment_service).toBe(service)
+    expect(smilestore.data.recruitmentService).toBe(service)
     expect(smilestore.recruitmentService).toBe(service)
     expect(smilestore.private.recruitment_info).toStrictEqual(finalform)
   })

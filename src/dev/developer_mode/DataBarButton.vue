@@ -10,19 +10,19 @@ import CircleProgress from '@/dev/developer_mode/CircleProgress.vue'
 
 const database_tooltip = computed(() => {
   var msg = ''
-  if (api.store.global.db_connected == true) {
+  if (api.store.global.dbConnected == true) {
     msg += 'Database connected | '
   } else {
     msg += 'Database not connected | '
   }
-  if (api.store.global.db_changes == true) {
+  if (api.store.global.dbChanges == true) {
     msg += 'Unsynced data '
   } else {
     msg += 'Data in sync '
   }
-  if (api.store.global.db_connected == true) {
+  if (api.store.global.dbConnected == true) {
     msg += '| '
-    msg += Math.round((api.store.local.approx_data_size / 1048576) * 1000) / 1000 + '% data used'
+    msg += Math.round((api.store.local.approxDataSize / 1048576) * 1000) / 1000 + '% data used'
   }
   return msg
 })
@@ -33,23 +33,23 @@ const database_tooltip = computed(() => {
     <FAIcon
       icon="fa-solid fa-database"
       class="disconnected"
-      :class="{ connected: api.store.global.db_connected == true }"
+      :class="{ connected: api.store.global.dbConnected == true }"
     />
     &nbsp;&nbsp;|&nbsp;&nbsp;
-    <template v-if="!api.store.global.db_connected">
+    <template v-if="!api.store.global.dbConnected">
       <FAIcon icon="fa-solid fa-rotate" class="has-text-grey" />
     </template>
-    <template v-else-if="api.store.global.db_changes && api.store.global.db_connected">
+    <template v-else-if="api.store.global.dbChanges && api.store.global.dbConnected">
       <FAIcon icon="fa-solid fa-rotate" class="outofsync" />
     </template>
     <template v-else>
       <FAIcon icon="fa-solid fa-rotate" class="insync" />
     </template>
-    <template v-if="!api.store.global.db_connected">
+    <template v-if="!api.store.global.dbConnected">
       &nbsp;&nbsp;|&nbsp;&nbsp;
       <div class="mt-1">
         <CircleProgress
-          :percentage="Math.round(api.store.local.approx_data_size / 1048576) * 100"
+          :percentage="Math.round(api.store.local.approxDataSize / 1048576) * 100"
           :size="12"
           :strokeWidth="40"
           slicecolor="#aaa"
@@ -61,7 +61,7 @@ const database_tooltip = computed(() => {
       &nbsp;&nbsp;|&nbsp;&nbsp;
       <div class="mt-1">
         <CircleProgress
-          :percentage="Math.round(api.store.local.approx_data_size / 1048576) * 100"
+          :percentage="Math.round(api.store.local.approxDataSize / 1048576) * 100"
           :size="12"
           :strokeWidth="40"
           slicecolor="hsl(var(--bulma-button-h), var(--bulma-button-s), calc(var(--bulma-button-background-l) + var(--bulma-button-background-l-delta)))"

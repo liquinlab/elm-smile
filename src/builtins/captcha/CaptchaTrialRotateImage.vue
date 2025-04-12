@@ -88,7 +88,7 @@ const handleClick = (e) => {
   data.final_rotation = currentRotation.value
   api.log.log(`Final rotation: ${currentRotation.value}`)
   // Save trial data before emitting
-  api.recordTrialData(data)
+  api.recordData(data)
   emit('nextPageCaptcha')
 }
 
@@ -125,7 +125,7 @@ function beginTask() {
         data.response_time = props.max_time
         data.final_rotation = currentRotation.value
         // Save trial data before emitting
-        api.recordTrialData(data)
+        api.recordData(data)
         emit('nextPageCaptcha')
       }
     }, 2)

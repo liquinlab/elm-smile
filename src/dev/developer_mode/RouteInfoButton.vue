@@ -7,9 +7,9 @@ const api = useAPI()
 
 const buttonstyle = computed(() => {
   let base = 'button is-small is-route is-jump-bar has-tooltip-arrow has-tooltip-bottom'
-  if (api.store.dev.route_panel.visible) {
+  if (api.store.dev.routePanel.visible) {
     return base + ' is-selected'
-  } else if (api.store.dev.pinned_route !== null) {
+  } else if (api.store.dev.pinnedRoute !== null) {
     return base + ' pinned'
   } else {
     return base
@@ -17,14 +17,14 @@ const buttonstyle = computed(() => {
 })
 
 const toggleRoutePanel = () => {
-  if (api.store.dev.pinned_route == null) {
-    api.store.dev.route_panel.visible = !api.store.dev.route_panel.visible
+  if (api.store.dev.pinnedRoute == null) {
+    api.store.dev.routePanel.visible = !api.store.dev.routePanel.visible
   }
 }
 
 const togglePin = () => {
-  api.store.dev.pinned_route = api.store.dev.pinned_route === null ? api.currentRouteName() : null
-  api.store.dev.route_panel.visible = false
+  api.store.dev.pinnedRoute = api.store.dev.pinnedRoute === null ? api.currentRouteName() : null
+  api.store.dev.routePanel.visible = false
 }
 </script>
 
@@ -83,7 +83,7 @@ const togglePin = () => {
     <p class="control" v-if="api.store.config.mode === 'development'">
       <button
         class="button is-small is-jump-bar has-tooltip-arrow has-tooltip-bottom"
-        :class="{ pinned: api.store.dev.pinned_route !== null }"
+        :class="{ pinned: api.store.dev.pinnedRoute !== null }"
         v-on:click="togglePin()"
         data-tooltip="Pin current route"
       >
@@ -92,7 +92,7 @@ const togglePin = () => {
         </span>
       </button>
     </p>
-    <div class="dropdown is-hoverable is-right" :class="{ 'is-active': api.store.dev.route_panel.visible }">
+    <div class="dropdown is-hoverable is-right" :class="{ 'is-active': api.store.dev.routePanel.visible }">
       <div class="dropdown-trigger">
         <p class="control is-route">
           <button :class="buttonstyle" @click="toggleRoutePanel()">
@@ -100,7 +100,7 @@ const togglePin = () => {
           </button>
         </p>
       </div>
-      <div class="dropdown-menu pt-0 mt-0" id="dropdown-menu" role="menu" v-if="api.store.dev.pinned_route === null">
+      <div class="dropdown-menu pt-0 mt-0" id="dropdown-menu" role="menu" v-if="api.store.dev.pinnedRoute === null">
         <RouteJumper :routeName="api.currentRouteName()"></RouteJumper>
       </div>
     </div>

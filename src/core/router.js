@@ -27,20 +27,20 @@ export function addGuards(r, providedApi = null) {
       api.resetApp() // set reset app on next load
     }
 
-    if (api.store.config.mode === 'development' && api.store.dev.pinned_route) {
+    if (api.store.config.mode === 'development' && api.store.dev.pinnedRoute) {
       // if pinned route doesn't exist, clear it
 
-      if (!r.hasRoute(api.store.dev.pinned_route)) {
-        api.store.dev.pinned_route = null
+      if (!r.hasRoute(api.store.dev.pinnedRoute)) {
+        api.store.dev.pinnedRoute = null
       }
 
       await api.connectDB()
-      api.log.error('ROUTER GUARD: Pinned route, redirecting to ' + api.store.dev.pinned_route)
-      if (to.name === api.store.dev.pinned_route) {
+      api.log.error('ROUTER GUARD: Pinned route, redirecting to ' + api.store.dev.pinnedRoute)
+      if (to.name === api.store.dev.pinnedRoute) {
         return true
       } else {
         return {
-          name: api.store.dev.pinned_route,
+          name: api.store.dev.pinnedRoute,
           replace: true,
         }
       }
@@ -167,7 +167,7 @@ export function addGuards(r, providedApi = null) {
     // }
 
     // if you're trying to go to the next route
-    if (from.meta !== undefined && from.meta.next === to.name && api.store.dev.current_page_done) {
+    if (from.meta !== undefined && from.meta.next === to.name && api.store.dev.currentPageDone) {
       api.log.log(
         'ROUTER GUARD: You are trying to go to the next route from ' +
           from.name +
@@ -181,7 +181,7 @@ export function addGuards(r, providedApi = null) {
     }
 
     // if you're trying to go to the next route
-    if (from.meta !== undefined && from.meta.next === to.name && !api.store.dev.current_page_done) {
+    if (from.meta !== undefined && from.meta.next === to.name && !api.store.dev.currentPageDone) {
       api.log.error(
         'ROUTER GUARD: You are trying to go to the next route from ' +
           from.name +
@@ -249,7 +249,7 @@ export function addGuards(r, providedApi = null) {
   // add additional guard to set global seed before
   r.beforeResolve((to) => {
     const api = useAPI()
-    api.store.removePageAutofill()
+    api.removeAutofill()
 
     if (api.store.local.useSeed) {
       // if we're using a seed
@@ -262,9 +262,9 @@ export function addGuards(r, providedApi = null) {
       api.randomSeed()
       api.log.log('ROUTER GUARD: Not using participant-specific seed; seed set randomly')
     }
-    api.log.clear_page_history()
-    api.store.dev.page_provides_trial_stepper = false // by default
-    api.store.dev.current_page_done = false // set the current page to done
+    api.log.clearPageHistory()
+    api.store.dev.pageProvidesTrialStepper = false // by default
+    api.store.dev.currentPageDone = false // set the current page to done
     api.log.log('ROUTER GUARD: Router navigated to /' + to.name)
   })
 

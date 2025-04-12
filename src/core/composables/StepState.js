@@ -507,6 +507,27 @@ export class StepState {
       if (!data) return data
       const cleaned = {}
       for (const [key, value] of Object.entries(data)) {
+        // Skip functions unless they are faker functions
+        if (typeof value === 'function') {
+          // Get the function body as string
+          const funcStr = value.toString()
+          // Check if it's a faker function call
+          if (funcStr.includes('api.faker.')) {
+            // Extract the faker function name and parameters
+            const match = funcStr.match(/api\.faker\.(\w+)\((.*)\)/)
+            if (match) {
+              const [_, fakerName, params] = match
+              cleaned[key] = {
+                __fakerFunction: true,
+                name: fakerName,
+                params: params.split(',').map((p) => p.trim()),
+              }
+            }
+          }
+          // Skip all other functions
+          continue
+        }
+
         // Check if it's a Vue component
         if (value && typeof value === 'object' && value.name && (value.template || value.render)) {
           cleaned[key] = {
@@ -523,26 +544,6 @@ export class StepState {
             componentName: value.name,
           }
           continue
-        }
-
-        // Handle faker functions
-        if (typeof value === 'function') {
-          // Get the function body as string
-          const funcStr = value.toString()
-          // Check if it's a faker function call
-          if (funcStr.includes('api.faker.')) {
-            // Extract the faker function name and parameters
-            const match = funcStr.match(/api\.faker\.(\w+)\((.*)\)/)
-            if (match) {
-              const [_, fakerName, params] = match
-              cleaned[key] = {
-                __fakerFunction: true,
-                name: fakerName,
-                params: params.split(',').map((p) => p.trim()),
-              }
-              continue
-            }
-          }
         }
 
         if (
@@ -607,38 +608,49 @@ export class StepState {
   _reconstructData(data) {
     if (!data) return data
 
-    const reconstructed = {}
-    for (const [key, value] of Object.entries(data)) {
-      if (value && typeof value === 'object') {
-        // Handle faker functions
-        if (value.__fakerFunction) {
-          reconstructed[key] = () => {
-            const fakerFunc = this._root.api?.faker?.[value.name]
-            if (!fakerFunc) {
-              console.warn(`Faker function ${value.name} not found during reconstruction`)
-              return null
-            }
-            return fakerFunc(...value.params)
-          }
-          continue
-        }
-
-        // Handle Vue components
-        if (value.__vueComponent) {
-          reconstructed[key] = {
-            name: value.componentName,
-            __vueComponent: true,
-          }
-          continue
-        }
-
-        // Recursively reconstruct nested objects
-        reconstructed[key] = this._reconstructData(value)
-      } else {
-        reconstructed[key] = value
-      }
+    // Handle arrays
+    if (Array.isArray(data)) {
+      return data.map((item) => this._reconstructData(item))
     }
-    return reconstructed
+
+    // Handle objects
+    if (typeof data === 'object') {
+      const reconstructed = {}
+      for (const [key, value] of Object.entries(data)) {
+        if (value && typeof value === 'object') {
+          // Handle faker functions
+          if (value.__fakerFunction) {
+            reconstructed[key] = () => {
+              const fakerFunc = this._root.api?.faker?.[value.name]
+              if (!fakerFunc) {
+                console.warn(`Faker function ${value.name} not found during reconstruction`)
+                return null
+              }
+              return fakerFunc(...value.params)
+            }
+            continue
+          }
+
+          // Handle Vue components
+          if (value.__vueComponent) {
+            reconstructed[key] = {
+              name: value.componentName,
+              __vueComponent: true,
+            }
+            continue
+          }
+
+          // Recursively reconstruct nested objects
+          reconstructed[key] = this._reconstructData(value)
+        } else {
+          reconstructed[key] = value
+        }
+      }
+      return reconstructed
+    }
+
+    // Return primitive values as is
+    return data
   }
 
   /**

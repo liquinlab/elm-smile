@@ -18,7 +18,7 @@ const email = ref('')
 // IF OTHER SERVICES PROVIDE EASY EMAIL ADDRESSES, ADD THEM HERE
 function prefill_email() {
   let emailval = ''
-  if (smilestore.data.recruitment_service === 'prolific') {
+  if (smilestore.data.recruitmentService === 'prolific') {
     emailval = `${smilestore.private.recruitment_info.prolific_id}@email.prolific.co`
   }
   return emailval

@@ -42,7 +42,7 @@ describe('Timeline tests', () => {
         api.store = {
           getRandomizedRouteByName: vi.fn(),
           setRandomizedRoute: vi.fn(),
-          registerPageTracker: vi.fn(),
+          registerStepper: vi.fn(),
           config: { mode: 'production' },
           local: {},
         }

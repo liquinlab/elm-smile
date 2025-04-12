@@ -31,7 +31,7 @@ function createTestTimeline(mode) {
     store: {
       getRandomizedRouteByName: vi.fn().mockReturnValue(null),
       setRandomizedRoute: vi.fn(),
-      registerPageTracker: vi.fn(),
+      registerStepper: vi.fn(),
       config: {
         mode: 'development',
       },

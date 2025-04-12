@@ -325,7 +325,7 @@ class Timeline {
   registerCounters() {
     // for each route, register a counter based on the name
     for (let i = 0; i < this.routes.length; i += 1) {
-      this.api.store.registerPageTracker(this.routes[i].name)
+      this.api.store.registerStepper(this.routes[i].name)
     }
   }
 

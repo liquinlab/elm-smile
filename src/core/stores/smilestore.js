@@ -80,23 +80,23 @@ function removeFirestore(config) {
 
 const init_dev = {
   // syncs with local storage
-  page_provides_autofill: null, // does current page offer autofil (transient)
-  page_provides_trial_stepper: false, // does current page provide a trial stepper (transient)
-  show_console_bar: false, // show/hide the data base bottom (transient)
-  show_side_bar: false,
-  pinned_route: null,
-  console_bar_height: 300, // height of the data bar (transient)
-  console_bar_tab: 'browse', // which tab to show in the data bar (transient)
-  search_params: '', // search parameters (transient)
-  log_filter: 'All', // what level of log messages to show (transient)
-  notification_filter: 'Errors only', // what level of notifications to show (transient)
-  last_page_limit: false, // limits logs to the last page (transient)
-  data_path: null, // path to the data (transient)
-  config_path: null, // path to the config (transient)
+  pageProvidesAutofill: null, // does current page offer autofil (transient)
+  pageProvidesTrialStepper: false, // does current page provide a trial stepper (transient)
+  showConsoleBar: false, // show/hide the data base bottom (transient)
+  showSideBar: false,
+  pinnedRoute: null,
+  consoleBarHeight: 300, // height of the data bar (transient)
+  consoleBarTab: 'browse', // which tab to show in the data bar (transient)
+  searchParams: '', // search parameters (transient)
+  logFilter: 'All', // what level of log messages to show (transient)
+  notificationFilter: 'Errors only', // what level of notifications to show (transient)
+  lastPageLimit: false, // limits logs to the last page (transient)
+  dataPath: null, // path to the data (transient)
+  configPath: null, // path to the config (transient)
   // panel locations (transient)
-  config_panel: { type: 'local', visible: false, x: -280, y: 0 },
-  randomization_panel: { visible: false, x: -130, y: 0 },
-  route_panel: { visible: false, x: -0, y: -3 },
+  configPanel: { type: 'local', visible: false, x: -280, y: 0 },
+  randomizationPanel: { visible: false, x: -130, y: 0 },
+  routePanel: { visible: false, x: -0, y: -3 },
 }
 
 const init_local = {
@@ -106,18 +106,18 @@ const init_local = {
   docRef: null,
   privateDocRef: null,
   completionCode: null,
-  current_page_done: false,
+  currentPageDone: false,
   consented: false,
   withdrawn: false,
   done: false,
   reset: false,
   totalWrites: 0,
   lastWrite: null,
-  approx_data_size: 0,
+  approxDataSize: 0,
   useSeed: true, // do you want to use a random seed based on the participant's ID?
   seedID: '',
   seedSet: false,
-  pageTracker: {},
+  viewSteppers: {},
   possibleConditions: {},
   seqtimeline: [],
   routes: [],
@@ -130,8 +130,8 @@ const init_global = {
   progress: 0,
   forceNavigate: false,
   steppers: {}, // Store for useHStepper instances
-  db_connected: false,
-  db_changes: true,
+  dbConnected: false,
+  dbChanges: true,
   urls: {
     prolific: '?PROLIFIC_PID=XXXX&STUDY_ID=XXXX&SESSION_ID=XXXXX#/welcome/prolific/',
     cloudresearch:
@@ -160,49 +160,45 @@ export default defineStore('smilestore', {
     },
     data: {
       // syncs with firestore
-      app_start_time: Date.now(),
+      appStartTime: Date.now(),
       seedID: '',
-      firebase_anon_auth_id: '',
-      firebase_doc_id: '',
-      trial_num: 0, // not being updated correctly
+      firebaseAnonAuthID: '',
+      firebaseDocID: '',
+      trialNum: 0, // not being updated correctly
       consented: false,
-      verified_visibility: false,
+      verifiedVisibility: false,
       done: false,
       starttime: null, // time consented
       endtime: null, // time finished or withdrew
-      recruitment_service: 'web', // fake
-      browser_data: [], // empty
-      // demographic_form: {}, // empty
-      // device_form: {}, // empty
+      recruitmentService: 'web', // fake
+      browserData: [], // empty
       withdrawn: false, // false
-      route_order: [],
+      routeOrder: [],
       conditions: {},
-      randomized_routes: {},
-      smile_config: removeFirestore(appconfig), //  adding config info to firebase document
-      study_data: [],
+      randomizedRoutes: {},
+      smileConfig: removeFirestore(appconfig), //  adding config info to firebase document
+      studyData: [],
     },
     config: appconfig,
   }),
 
   getters: {
-    isDataBarVisible: (state) => state.dev.show_console_bar,
+    isDataBarVisible: (state) => state.dev.showConsoleBar,
     isKnownUser: (state) => state.local.knownUser,
     isConsented: (state) => state.local.consented,
     isWithdrawn: (state) => state.local.withdrawn,
     isDone: (state) => state.local.done,
     lastRoute: (state) => state.local.lastRoute,
-    isDBConnected: (state) => state.global.db_connected,
-    hasAutofill: (state) => state.dev.page_provides_autofill,
-    searchParams: (state) => state.dev.search_params,
-    recruitmentService: (state) => state.data.recruitment_service,
+    isDBConnected: (state) => state.global.dbConnected,
+    hasAutofill: (state) => state.dev.pageProvidesAutofill,
+    searchParams: (state) => state.dev.searchParams,
+    recruitmentService: (state) => state.data.recruitmentService,
     isSeedSet: (state) => state.local.seedSet,
     getSeedID: (state) => state.local.seedID,
     getLocal: (state) => state.local,
-    getPage: (state) => state.local.pageTracker,
     getConditions: (state) => state.local.conditions,
     getRandomizedRoutes: (state) => state.local.randomizedRoutes,
-    verifiedVisibility: (state) => state.data.verified_visibility,
-    getStepper: (state) => (page) => state.global.steppers[page],
+    verifiedVisibility: (state) => state.data.verifiedVisibility,
     getShortId: (state) => {
       if (!state.local.docRef || typeof state.local.docRef !== 'string') return 'N/A'
       //const lastDashIndex = state.local.docRef.lastIndexOf('-')
@@ -216,17 +212,17 @@ export default defineStore('smilestore', {
       const log = useLog()
       log.debug('SMILESTORE: syncing conditions, randomized routes to remote')
       this.data.conditions = this.local.conditions
-      this.data.randomized_routes = this.local.randomizedRoutes
+      this.data.randomizedRoutes = this.local.randomizedRoutes
       this.data.seedID = this.local.seedID
     },
     setDBConnected() {
-      if (this.global.db_connected === false) {
+      if (this.global.dbConnected === false) {
         this.manualSyncLocalToData()
       }
-      this.global.db_connected = true
+      this.global.dbConnected = true
     },
-    setSearchParams(search_params) {
-      this.dev.search_params = search_params
+    setSearchParams(searchParams) {
+      this.dev.searchParams = searchParams
     },
     setConsented() {
       this.local.consented = true
@@ -267,30 +263,30 @@ export default defineStore('smilestore', {
       this.local.conditions = {}
       this.local.randomizedRoutes = {}
       this.data.conditions = {}
-      this.data.randomized_routes = {}
+      this.data.randomizedRoutes = {}
     },
-    registerPageTracker(page) {
-      if (this.local.pageTracker[page] === undefined) {
-        this.local.pageTracker[page] = {}
+    registerStepper(view) {
+      if (this.local.viewSteppers[view] === undefined) {
+        this.local.viewSteppers[view] = {}
       }
     },
-    getPageTracker(page) {
-      return this.local.pageTracker[page]
+    getStepper(view) {
+      return this.local.viewSteppers[view]
     },
-    resetPageTracker(page) {
-      if (this.local.pageTracker[page]) {
-        this.local.pageTracker[page] = {}
+    resetStepper(view) {
+      if (this.local.viewSteppers[view]) {
+        this.local.viewSteppers[view] = {}
       }
     },
     recordWindowEvent(type, event_data = null) {
       if (event_data) {
-        this.data.browser_data.push({
+        this.data.browserData.push({
           event_type: type,
           timestamp: fsnow(),
           event_data,
         })
       } else {
-        this.data.browser_data.push({
+        this.data.browserData.push({
           event_type: type,
           timestamp: fsnow(),
         })
@@ -336,31 +332,31 @@ export default defineStore('smilestore', {
       }
       log.log('Browser fingerprint: ' + JSON.stringify(this.data.browser_fingerprint))
     },
-    setPageAutofill(fn) {
-      this.dev.page_provides_autofill = fn
+    setAutofill(fn) {
+      this.dev.pageProvidesAutofill = fn
     },
-    removePageAutofill() {
-      this.dev.page_provides_autofill = null
+    removeAutofill() {
+      this.dev.pageProvidesAutofill = null
     },
     setRecruitmentService(service, info) {
-      this.data.recruitment_service = service
+      this.data.recruitmentService = service
       this.private.recruitment_info = info
     },
     autofill() {
-      if (this.dev.page_provides_autofill) {
-        this.dev.page_provides_autofill()
+      if (this.dev.pageProvidesAutofill) {
+        this.dev.pageProvidesAutofill()
         const log = useLog()
         log.warn('DEV MODE: Page was autofilled by a user-provided component function')
       }
     },
-    recordTrialData(data) {
-      this.data.study_data.push(JSON.parse(JSON.stringify(data)))
+    recordData(data) {
+      this.data.studyData.push(JSON.parse(JSON.stringify(data)))
     },
-    saveForm(name, data) {
+    recordProperty(name, data) {
       this.data[name + '_form'] = JSON.parse(JSON.stringify(data))
     },
     verifyVisibility(value) {
-      this.data.verified_visibility = value
+      this.data.verifiedVisibility = value
     },
     setCondition(name, cond) {
       this.local.conditions[name] = cond
@@ -368,7 +364,7 @@ export default defineStore('smilestore', {
     },
     setRandomizedRoute(name, route) {
       this.local.randomizedRoutes[name] = route
-      this.data.randomized_routes[name] = route
+      this.data.randomizedRoutes[name] = route
     },
     async setKnown() {
       const log = useLog()
@@ -392,7 +388,7 @@ export default defineStore('smilestore', {
       }
       if (data) {
         this.data = data
-        this.local.approx_data_size = sizeof(data)
+        this.local.approxDataSize = sizeof(data)
         this.setDBConnected()
       }
     },
@@ -406,19 +402,19 @@ export default defineStore('smilestore', {
       const currentTime = Date.now()
 
       // If there's a previous route, update its delta
-      if (this.data.route_order.length > 0) {
-        const lastIndex = this.data.route_order.length - 1
-        const lastRoute = this.data.route_order[lastIndex]
+      if (this.data.routeOrder.length > 0) {
+        const lastIndex = this.data.routeOrder.length - 1
+        const lastRoute = this.data.routeOrder[lastIndex]
 
         // Calculate and update the delta for the previous route
-        this.data.route_order[lastIndex] = {
+        this.data.routeOrder[lastIndex] = {
           ...lastRoute,
           timeDelta: currentTime - lastRoute.timestamp,
         }
       }
 
       // Add the new route without a delta (will be calculated on next route change)
-      this.data.route_order.push({
+      this.data.routeOrder.push({
         route,
         timestamp: currentTime,
         timeDelta: null, // Delta will be set when next route is recorded
@@ -447,11 +443,11 @@ export default defineStore('smilestore', {
         await updateSubjectDataRecord(this.data, this.local.docRef)
         await updatePrivateSubjectDataRecord(this.private, this.local.docRef)
         //console.log('data size = ', sizeof(data))
-        this.local.approx_data_size = sizeof(this.data)
+        this.local.approxDataSize = sizeof(this.data)
         this.local.totalWrites += 1
         this.local.lastWrite = Date.now()
         //this.global.snapshot = { ...smilestore.$state.data }
-        this.global.db_changes = false // reset the changes flag
+        this.global.dbChanges = false // reset the changes flag
         log.success('SMILESTORE: saveData() Request to firebase successful (force = ' + force + ')')
       } else if (!this.data.consented && !this.local.consented) {
         log.log('SMILESTORE: not saving because not consented')
@@ -462,7 +458,7 @@ export default defineStore('smilestore', {
     resetLocal() {
       // this.local.knownUser = false
       // this.local.lastRoute = 'welcome'
-      // this.global.db_connected = false
+      // this.global.dbConnected = false
       this.$reset()
     },
     getConditionByName(name) {

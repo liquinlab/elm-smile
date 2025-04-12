@@ -125,8 +125,8 @@ Runtime configuration options override the values in the `.env` files if they
 have the same name. For example, if the `.env` file contains an option
 `VITE_LAB_URL` then setting `api.setRuntimeConfig('lab_url')` will override it
 (see below for the `VITE_` syntax). However, if you create a novel runtime
-config it will be stored separately (specifically `smile_config.runtime`) in
-your data file.
+config it will be stored separately (specifically `smileConfig.runtime`) in your
+data file.
 
 ## Types of configuration variables
 

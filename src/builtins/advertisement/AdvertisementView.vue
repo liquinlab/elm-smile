@@ -3,8 +3,8 @@
 import { onMounted, ref, onBeforeUnmount } from 'vue'
 
 // import and initalize smile API
-import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
+import useViewAPI from '@/core/composables/useViewAPI'
+const api = useViewAPI()
 
 // animation library
 import { animate } from 'motion'

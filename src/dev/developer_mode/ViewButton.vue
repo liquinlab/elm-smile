@@ -5,8 +5,8 @@ import { computed } from 'vue'
 const api = useAPI()
 
 const currentState = computed(() => {
-  const sideBar = api.store.dev.show_side_bar
-  const consoleBar = api.store.dev.show_console_bar
+  const sideBar = api.store.dev.showSideBar
+  const consoleBar = api.store.dev.showConsoleBar
 
   if (sideBar && consoleBar) return 'both'
   if (!sideBar && !consoleBar) return 'none'
@@ -17,20 +17,20 @@ const currentState = computed(() => {
 const cycleState = () => {
   switch (currentState.value) {
     case 'both':
-      api.store.dev.show_side_bar = false
-      api.store.dev.show_console_bar = false
+      api.store.dev.showSideBar = false
+      api.store.dev.showConsoleBar = false
       break
     case 'none':
-      api.store.dev.show_side_bar = true
-      api.store.dev.show_console_bar = false
+      api.store.dev.showSideBar = true
+      api.store.dev.showConsoleBar = false
       break
     case 'sidebar':
-      api.store.dev.show_side_bar = false
-      api.store.dev.show_console_bar = true
+      api.store.dev.showSideBar = false
+      api.store.dev.showConsoleBar = true
       break
     case 'console':
-      api.store.dev.show_side_bar = true
-      api.store.dev.show_console_bar = true
+      api.store.dev.showSideBar = true
+      api.store.dev.showConsoleBar = true
       break
   }
 }

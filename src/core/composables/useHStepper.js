@@ -1,5 +1,6 @@
-import { ref, computed, markRaw } from 'vue'
+import { ref, computed, markRaw, reactive } from 'vue'
 import useSmileStore from '@/core/stores/smilestore'
+import useLog from '@/core/stores/log'
 import { useRoute } from 'vue-router'
 import { StepState } from '@/core/composables/StepState'
 import NestedTable from '@/core/composables/NestedTable'
@@ -7,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 export function useHStepper() {
   const smilestore = useSmileStore()
+  const log = useLog()
   const route = useRoute()
   const page = route.name
 
@@ -68,24 +70,28 @@ export function useHStepper() {
     return (_seed & 0xffffffff).toString(36).padStart(8, '0').slice(-8) // Convert to base36 string, padded to 8 chars
   }
 
-  // Register page tracker if not already registered
-  smilestore.registerPageTracker(page)
+  // Register stepper if not already registered
+  smilestore.registerStepper(page)
 
+  console.log(page, smilestore.local.viewSteppers[page])
   // // Try to load existing state from smilestore
-  const savedState = smilestore.getPageTracker(page)?.data
+  const savedState = smilestore.getStepper(page)?.data
 
   if (savedState) {
     console.log('STEPPER: Loading saved state from smilestore')
+    console.log('savedState', savedState)
     sm.loadFromJSON(savedState.stepperState)
     console.log('sm', sm)
     _data.value = sm.pathdata
     _paths.value = sm.currentPaths
     _path.value = sm.currentPath || [] // Ensure path is never null
     _index.value = sm.index
-    _gvars.value = sm.data.gvars || {}
+    _gvars.value = reactive(sm.data.gvars || {})
     _transactionHistory.value = savedState.transactionHistory || [] // Load transaction history
     //console.log('STEPPER: Loaded state from smilestore with path', sm.currentPaths)
   } else {
+    // Initialize the state machine with SOS and EOS nodes
+    console.log('STEPPER: Initializing state machine with SOS and EOS nodes')
     sm.push('SOS')
     sm.push('EOS')
     _path.value = [] // Initialize path as empty array
@@ -108,10 +114,10 @@ export function useHStepper() {
 
   // Add this helper function after the initial setup and before the stepper object
   const saveStepperState = () => {
-    if (smilestore.local.pageTracker[page]) {
-      //console.log('STEPPER: Saving state to smilestore')
-      smilestore.local.pageTracker[page] = {
-        ...smilestore.local.pageTracker[page],
+    console.log('STEPPER: Saving state to smilestore')
+    if (smilestore.local.viewSteppers[page]) {
+      console.log('STEPPER: Saving state to smilestore')
+      smilestore.local.viewSteppers[page] = {
         data: {
           stepperState: sm.json,
           transactionHistory: _transactionHistory.value,
@@ -155,7 +161,7 @@ export function useHStepper() {
   // Create the stepper object that will be returned
   const stepper = {
     // Navigation methods
-    next: () => {
+    goNextStep: () => {
       let next = sm.next()
       //console.log('next', next)
       if (next !== null) {
@@ -168,7 +174,7 @@ export function useHStepper() {
       }
       return next
     },
-    prev: () => {
+    goPrevStep: () => {
       let prev = sm.prev()
 
       if (prev !== null) {
@@ -192,7 +198,7 @@ export function useHStepper() {
         saveStepperState() // Save state after reset
       }
     },
-    goTo: (path) => {
+    goToStep: (path) => {
       //console.log('goTo', path)
       sm.goTo(path)
       _data.value = sm.pathdata
@@ -206,7 +212,7 @@ export function useHStepper() {
       _stateMachine.value = visualizeStateMachine() // Update state machine visualization
       sm.next()
     },
-    push: (table, ignoreContent = false) => {
+    addSpec: (table, ignoreContent = false) => {
       // Generate a new random number at the start of each push
 
       const tnxID = transactionId()
@@ -219,13 +225,15 @@ export function useHStepper() {
 
       // Skip the actual push if we're loading from saved state or if table was already pushed
       if (savedState && _transactionHistory.value.includes(fullTransactionId)) {
-        return table
+        log.debug('STEPPER: Skipping push of table with transaction ID', fullTransactionId)
+        return
       }
 
       // Check if we've already pushed a table with this hash
       const existingTransaction = _transactionHistory.value.find((tx) => tx === fullTransactionId)
       if (existingTransaction) {
-        return table
+        log.debug('STEPPER: Skipping push of table with transaction ID', fullTransactionId)
+        return
       }
 
       // Add combined transaction ID to transaction history
@@ -238,7 +246,8 @@ export function useHStepper() {
 
       // Check if there are any items to push
       if (table._items.length === 0) {
-        return table
+        log.debug('STEPPER: Skipping push of table with no items')
+        return
       }
 
       // Recursive function to process NestedTable structure
@@ -291,11 +300,9 @@ export function useHStepper() {
       _stateMachine.value = visualizeStateMachine() // Update state machine visualization
       // Add this before the return statement in push
       saveStepperState() // Save state after pushing new items
-
-      return table
     },
     // Expose current and index as computed properties
-    get data() {
+    get stepData() {
       if (!this.datapath) return null
 
       // Create a computed property that merges the datapath
@@ -307,20 +314,53 @@ export function useHStepper() {
         }, {})
       })
 
-      // Create a writable object that updates currentData
-      return new Proxy(mergedData.value, {
-        get: (target, prop) => {
-          return target[prop]
-        },
-        set: (target, prop, value) => {
-          if (sm.currentData) {
-            sm.currentData[prop] = value
-            saveStepperState()
+      // Helper function to create a recursive proxy
+      const createRecursiveProxy = (obj) => {
+        if (obj === null || typeof obj !== 'object') {
+          return obj
+        }
+
+        // Handle arrays
+        if (Array.isArray(obj)) {
+          return new Proxy(obj, {
+            get: (target, prop) => {
+              const value = target[prop]
+              if (typeof prop === 'string' && !isNaN(prop)) {
+                // If accessing array index, return proxied value
+                return createRecursiveProxy(value)
+              }
+              return value
+            },
+            set: (target, prop, value) => {
+              target[prop] = value
+              if (sm.currentData) {
+                sm.currentData[prop] = value
+                saveStepperState()
+              }
+              return true
+            },
+          })
+        }
+
+        // Handle objects
+        return new Proxy(obj, {
+          get: (target, prop) => {
+            const value = target[prop]
+            return createRecursiveProxy(value)
+          },
+          set: (target, prop, value) => {
+            target[prop] = value
+            if (sm.currentData) {
+              sm.currentData[prop] = value
+              saveStepperState()
+            }
             return true
-          }
-          return false
-        },
-      })
+          },
+        })
+      }
+
+      // Create the root proxy
+      return createRecursiveProxy(mergedData.value)
     },
 
     get d() {
@@ -342,13 +382,14 @@ export function useHStepper() {
         return item
       })
     },
-    get index() {
+    get stepIndex() {
       // Get all leaf nodes from the state machine
       const leafNodes = sm.leafNodes
       //console.log('leafNodes', leafNodes)
       // Find the index of our current path in the leaf nodes array
       return leafNodes.indexOf(_paths.value)
     },
+
     get paths() {
       return _paths.value
     },
@@ -366,23 +407,14 @@ export function useHStepper() {
     },
 
     // Create new table instance with access to stepper for nested tables
-    table: () => {
+    spec: () => {
       const tableId = uuidv4()
       const table = new NestedTable(sm)
 
       // Store the table in our internal map
       tables.set(tableId, table)
 
-      //const originalPush = table.push
-      // table.push = () => {
-      //   // Forward to the stepper's push method
-      //   return stepper.push(table)
-      // }
       return table
-    },
-    // Shorthand for table()
-    get t() {
-      return stepper.table()
     },
     // Add transactionHistory getter to the stepper object
     get transactionHistory() {
@@ -391,12 +423,30 @@ export function useHStepper() {
     get length() {
       return sm.countLeafNodes - 2
     },
+    get nSteps() {
+      return sm.countLeafNodes - 2
+    },
+
     get nrows() {
       return sm.countLeafNodes
     },
 
+    // timing
+    startTimer: (name = 'default') => {
+      sm.root.data.gvars[`startTime_${name}`] = Date.now()
+    },
+    elapsedTime: (name = 'default') => {
+      return Date.now() - sm.root.data.gvars[`startTime_${name}`]
+    },
+    elapsedTimeInSeconds: (name = 'default') => {
+      return (Date.now() - sm.root.data.gvars[`startTime_${name}`]) / 1000
+    },
+    elapsedTimeInMinutes: (name = 'default') => {
+      return (Date.now() - sm.root.data.gvars[`startTime_${name}`]) / 60000
+    },
+
     // Add new alldata getter
-    alldata(pathFilter = null) {
+    stepperData(pathFilter = null) {
       // Helper function to check if a path matches a filter pattern
       const matchesFilter = (path, filter) => {
         if (!filter) return true // If no filter, match everything
@@ -438,11 +488,11 @@ export function useHStepper() {
     },
 
     clear: () => {
-      if (smilestore.local.pageTracker[page]) {
+      if (smilestore.local.viewSteppers[page]) {
         // Remove the stepperState from the page tracker data
-        const pageData = smilestore.local.pageTracker[page].data || {}
+        const pageData = smilestore.local.viewSteppers[page].data || {}
         delete pageData.stepperState
-        smilestore.local.pageTracker[page].data = pageData
+        smilestore.local.viewSteppers[page].data = pageData
 
         // Clear all states and reset the state machine
         sm.clearTree() /// this only clear the tree and not the data at the top level
@@ -466,13 +516,42 @@ export function useHStepper() {
       }
     },
     clearGlobals: () => {
+      _gvars.value = reactive({})
       sm.root.data.gvars = {}
       saveStepperState() // Save state when global variables are modified
     },
     get globals() {
-      _gvars.value = sm.root.data.gvars
-      return _gvars.value
+      console.log('getting globals', _gvars.value.forminfo)
+      //_gvars.value = sm.root.data.gvars
+      // Create a recursive proxy that automatically saves changes
+      const createRecursiveProxy = (target) => {
+        if (target === null || typeof target !== 'object') {
+          return target
+        }
+
+        return new Proxy(target, {
+          get: (obj, prop) => {
+            const value = obj[prop]
+            return createRecursiveProxy(value)
+          },
+          set: (obj, prop, value) => {
+            console.log('setting global variable', prop, value)
+            obj[prop] = value
+            sm.root.data.gvars = _gvars.value
+            saveStepperState() // Save state when global variables are modified
+            return true
+          },
+        })
+      }
+
+      return createRecursiveProxy(_gvars.value)
     },
+    // set globals(value) {
+    //   console.log('setting globals', value)
+    //   _gvars.value = value
+    //   sm.root.data.gvars = value
+    //   saveStepperState() // Save state when global variables are modified
+    // },
   }
 
   // Helper function to visualize state machine

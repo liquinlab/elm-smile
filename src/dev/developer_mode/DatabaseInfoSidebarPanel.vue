@@ -21,9 +21,9 @@ function open_firebase_console(url) {
 }
 
 const sync_state = computed(() => {
-  if (api.store.global.db_changes && api.store.global.db_connected) {
+  if (api.store.global.dbChanges && api.store.global.dbConnected) {
     return 'is-warning is-completed'
-  } else if (!api.store.global.db_changes && api.store.global.db_connected) {
+  } else if (!api.store.global.dbChanges && api.store.global.dbConnected) {
     return 'is-success is-completed'
   } else {
     return ''
@@ -37,8 +37,8 @@ const stopTimer = () => {
 
 const startTimer = () => {
   timer.value = setInterval(() => {
-    //api.debug("updating timer", api.store.dev.show_console_bar)
-    if (!api.store.global.db_connected) {
+    //api.debug("updating timer", api.store.dev.showConsoleBar)
+    if (!api.store.global.dbConnected) {
       last_write_time_string.value = `Never happened`
     } else {
       var time = ((Date.now() - api.store.local.lastWrite) / 1000).toFixed(1)
@@ -96,30 +96,30 @@ const showServiceSelect = ref(false)
 
       <div
         class="step-item"
-        :class="{ 'is-success is-completed': api.store.global.db_connected }"
+        :class="{ 'is-success is-completed': api.store.global.dbConnected }"
         @click="api.connectDB()"
       >
-        <div class="step-marker" v-if="!api.store.global.db_connected">2</div>
+        <div class="step-marker" v-if="!api.store.global.dbConnected">2</div>
         <div class="step-marker" v-else><FAIcon icon="fa-solid fa-check" /></div>
-        <div class="step-details" :class="{ 'is-success is-completed': api.store.global.db_connected }">
+        <div class="step-details" :class="{ 'is-success is-completed': api.store.global.dbConnected }">
           <p class="step-title is-size-7">
             <img src="/src/assets/dev/logo_lockup_firebase_vertical.svg" width="15" />
           </p>
-          <p v-if="!api.store.global.db_connected">Not connected.</p>
+          <p v-if="!api.store.global.dbConnected">Not connected.</p>
           <p v-else>Connected.</p>
           <br />
         </div>
       </div>
       <div class="step-item" :class="sync_state">
-        <div class="step-marker" v-if="!api.store.global.db_connected">3</div>
-        <div class="step-marker" v-if="api.store.global.db_connected && api.store.global.db_changes">
+        <div class="step-marker" v-if="!api.store.global.dbConnected">3</div>
+        <div class="step-marker" v-if="api.store.global.dbConnected && api.store.global.dbChanges">
           <FAIcon icon="fa-solid fa-xmark" />
         </div>
         <div class="step-marker" v-else><FAIcon icon="fa-solid fa-check" /></div>
         <div class="step-details">
           <p class="step-title is-size-7" :class="sync_state"><FAIcon icon="fa-solid fa-rotate" /></p>
-          <p v-if="!api.store.global.db_connected">Data never synced.</p>
-          <p v-else-if="api.store.global.db_changes">Data out of sync.</p>
+          <p v-if="!api.store.global.dbConnected">Data never synced.</p>
+          <p v-else-if="api.store.global.dbChanges">Data out of sync.</p>
           <p v-else>Database is synced.</p>
         </div>
       </div>
@@ -199,14 +199,14 @@ const showServiceSelect = ref(false)
           <td class="has-text-left is-family-code" colspan="3">
             <div class="is-flex is-align-items-center">
               <template v-if="!showServiceSelect">
-                <span class="mr-2">{{ smilestore.data.recruitment_service }}</span>
+                <span class="mr-2">{{ smilestore.data.recruitmentService }}</span>
 
                 <FAIcon icon="fa-solid fa-pen-to-square" @click="showServiceSelect = true" />
               </template>
               <div v-else class="control select is-small">
                 <select
                   id="recruitment"
-                  v-model="smilestore.data.recruitment_service"
+                  v-model="smilestore.data.recruitmentService"
                   class="select is-small"
                   @change="showServiceSelect = false"
                   @blur="showServiceSelect = false"
@@ -266,8 +266,8 @@ const showServiceSelect = ref(false)
         <tr class="is-hidden-small">
           <td class="has-text-left"><b>Size:</b></td>
           <td class="has-text-left is-family-code">
-            {{ api.store.local.approx_data_size }} / 1,048,576 max ({{
-              Math.round((api.store.local.approx_data_size / 1048576) * 1000) / 1000
+            {{ api.store.local.approxDataSize }} / 1,048,576 max ({{
+              Math.round((api.store.local.approxDataSize / 1048576) * 1000) / 1000
             }}%)
           </td>
         </tr>

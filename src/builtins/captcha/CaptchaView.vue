@@ -27,8 +27,8 @@ import CaptchaShyDot from '@/builtins/captcha/CaptchaShyDot.vue'
 // mental rotation - rotate the image to match the other image
 
 // import and initalize smile API
-import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
+import useViewAPI from '@/core/composables/useViewAPI'
+const api = useViewAPI()
 
 //  need to set up not just the pages but the trials here with configuration inputs
 // for the image categorization and rotate image task need a bunch of images
@@ -61,9 +61,7 @@ const api = useAPI()
 // 5 - human brain should show stroop interference
 // 6 -
 
-const stepper = api.useStepper()
-
-const trials = stepper.t.append([
+const trials = api.spec().append([
   { path: 'instructions_01', component: CaptchaInstructionsText_01, props: { adjective: '' } },
   {
     path: 'rotate_image',
@@ -72,7 +70,7 @@ const trials = stepper.t.append([
   },
   { path: 'maze', component: CaptchaTrialMaze, props: { timed_task: false } },
 ])
-stepper.push(trials)
+api.addSpec(trials)
 
 // const currentTab = computed(() => {
 //   return stepppages[step.index()]
@@ -80,23 +78,23 @@ stepper.push(trials)
 // captcha steps
 
 function next_trial() {
-  if (stepper.index >= stepper.length) {
+  if (api.stepIndex >= api.nSteps) {
     api.goNextView()
   } else {
     api.saveData() // force a save
-    stepper.next()
+    api.goNextStep()
   }
 }
 </script>
 
 <template>
   <div class="page">
-    <div class="instructions" v-if="stepper.paths == 'EOS'">
+    <div class="instructions" v-if="api.paths == 'EOS'">
       <div class="formstep">
         <article class="message is-danger">
           <div class="message-header">
             <p>Error</p>
-            {{ stepper.index }}
+            {{ api.index }}
             <button class="delete" aria-label="delete"></button>
           </div>
           <div class="message-body">
@@ -109,10 +107,10 @@ function next_trial() {
     </div>
 
     <component
-      :is="stepper.data.component"
-      v-bind="stepper.data.props"
+      :is="api.stepData.component"
+      v-bind="api.stepData.props"
       @next-page-captcha="next_trial()"
-      :key="stepper.index"
+      :key="api.index"
       v-else
     >
     </component>

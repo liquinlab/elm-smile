@@ -2,20 +2,20 @@
 import { ref, computed, watch, onMounted, defineComponent, h } from 'vue'
 import TreeNode from './TreeNode.vue'
 import DataPathViewer from '@/dev/developer_mode/DataPathViewer.vue'
-import useSmileStore from '@/core/stores/smilestore'
+import useAPI from '@/core/composables/useAPI'
 import { useRoute } from 'vue-router'
 
+const api = useAPI()
 const route = useRoute()
-const store = useSmileStore()
 
 // Reactively get the stepper for the current page
 const stepper = computed(() => {
-  return store.global.steppers?.[route.name]
+  return api.store.global.steppers?.[route.name]
 })
 
 // Add a watcher to handle stepper initialization
 watch(
-  () => store.global.steppers?.[route.name],
+  () => api.store.global.steppers?.[route.name],
   (newStepper) => {
     if (newStepper) {
       // Force a component update when stepper becomes available
@@ -130,7 +130,7 @@ const formatData = (data) => {
 const handleNodeClick = (path) => {
   console.log('Node clicked with path:', path)
   if (stepper.value) {
-    stepper.value.goTo(path)
+    stepper.value.goToStep(path)
     // Scroll will happen via the watcher
   } else {
     console.warn('Stepper not available for path reset')
@@ -203,12 +203,12 @@ watch(
 
       <div class="field has-addons">
         <p class="control">
-          <button @click="stepper.prev()" class="button is-small nav-button">
+          <button @click="stepper.goPrevStep()" class="button is-small nav-button">
             <span><FAIcon icon="fa-solid fa-angle-left" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="stepper.next()" class="button is-small nav-button">
+          <button @click="stepper.goNextStep()" class="button is-small nav-button">
             <span><FAIcon icon="fa-solid fa-angle-right" /></span>
           </button>
         </p>
@@ -231,7 +231,7 @@ watch(
     </div>
 
     <div class="tree-container" ref="treeContainer">
-      <div class="index-display">{{ stepper.index }}/{{ stepper.length }}</div>
+      <div class="index-display">{{ stepper.stepIndex }}/{{ stepper.nSteps }}</div>
 
       <ul class="tree-root">
         <li v-if="stateMachine" class="tree-node root-node">
@@ -278,7 +278,7 @@ watch(
         >
           <span><FAIcon icon="fa-solid fa-trash" /></span>
         </button>
-        <DataPathViewer :data="stepper.data" />
+        <DataPathViewer :data="stepper.stepData" />
       </div>
     </div>
   </div>

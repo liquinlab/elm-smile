@@ -198,6 +198,11 @@ more heavily protected and is write only. You can upload these rules to your
 Firestore database in the Firebase console. Read more about Firebase rules in
 the [Firebase rules documentation](https://firebase.google.com/docs/rules).
 
+Here is an example of the rules file that works well with Smile experiments (in
+`/firebase.rules` of the main Smile repo):
+
+<<< @/../firebase.rules{js}
+
 ## Setup Slack
 
 When you're developing an experiment and push changed to Github, your experiment

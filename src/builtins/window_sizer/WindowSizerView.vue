@@ -1,8 +1,8 @@
 <script setup>
 import { reactive } from 'vue'
 // import and initalize smile API
-import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
+import useViewAPI from '@/core/composables/useViewAPI'
+const api = useViewAPI()
 const props = defineProps(['triggered'])
 
 const sizer = reactive({
@@ -88,7 +88,8 @@ hr {
 }
 
 .border-animation {
-  background-image: linear-gradient(90deg, rgb(18, 53, 90) 50%, transparent 50%),
+  background-image:
+    linear-gradient(90deg, rgb(18, 53, 90) 50%, transparent 50%),
     linear-gradient(90deg, rgb(18, 53, 90) 50%, transparent 50%),
     linear-gradient(0deg, rgb(18, 53, 90) 50%, transparent 50%),
     linear-gradient(0deg, rgb(18, 53, 90) 50%, transparent 50%);

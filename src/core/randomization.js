@@ -1,8 +1,18 @@
-// gets random integer between min (inclusive) and max (inclusive)
+/**
+ * Gets random integer between min (inclusive) and max (inclusive)
+ * @param {number} min - Minimum value (inclusive)
+ * @param {number} max - Maximum value (inclusive)
+ * @returns {number} Random integer between min and max
+ */
 export function randomInt(min, max) {
   return Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min) + 1) + Math.ceil(min))
 }
 
+/**
+ * Shuffles array in place using Fisher-Yates algorithm
+ * @param {Array} array - Array to shuffle
+ * @returns {Array} New shuffled array
+ */
 export function shuffle(array) {
   const arrayCopy = array.slice(0)
   for (let i = arrayCopy.length - 1; i > 0; i--) {
@@ -14,6 +24,12 @@ export function shuffle(array) {
   return arrayCopy
 }
 
+/**
+ * Samples elements from array without replacement
+ * @param {Array} array - Array to sample from
+ * @param {number} sampleSize - Number of elements to sample
+ * @returns {Array} Array of sampled elements
+ */
 export function sampleWithoutReplacement(array, sampleSize) {
   if (sampleSize > array.length) {
     console.error('sample size larger than array length')
@@ -21,6 +37,13 @@ export function sampleWithoutReplacement(array, sampleSize) {
   return shuffle(array).slice(0, sampleSize)
 }
 
+/**
+ * Samples elements from array with replacement, optionally using weights
+ * @param {Array} array - Array to sample from
+ * @param {number} sampleSize - Number of elements to sample
+ * @param {Array<number>} [weights] - Optional array of weights for weighted sampling
+ * @returns {Array} Array of sampled elements
+ */
 export function sampleWithReplacement(array, sampleSize, weights = undefined) {
   // if weights are not provided, normal sample with replacement
   if (!weights) {
@@ -55,6 +78,11 @@ export function sampleWithReplacement(array, sampleSize, weights = undefined) {
   return sample
 }
 
+/**
+ * Computes Cartesian product of input arrays
+ * @param {...Array} arr - Arrays to compute product of
+ * @returns {Array} Array containing all combinations
+ */
 export function expandProduct(...arr) {
   // get length of each sub array in arr
   const lengths = arr.map((x) => x.length)
@@ -66,8 +94,17 @@ export function expandProduct(...arr) {
   return arr.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())))
 }
 
-// distributions.js
-export const faker_distributions = {
+/**
+ * Collection of functions for generating random values from different distributions
+ * @namespace
+ */
+export const fakerDistributions = {
+  /**
+   * Generates random number from normal distribution
+   * @param {number} mean - Mean of distribution
+   * @param {number} sd - Standard deviation of distribution
+   * @returns {{val: number, type: string}} Object containing random value and type
+   */
   rnorm: (mean, sd) => {
     let u = 0,
       v = 0
@@ -78,16 +115,38 @@ export const faker_distributions = {
       type: 'fake',
     }
   },
+
+  /**
+   * Generates random number from uniform distribution
+   * @param {number} min - Minimum value
+   * @param {number} max - Maximum value
+   * @returns {{val: number, type: string}} Object containing random value and type
+   */
   runif: (min, max) => ({
     val: Math.random() * (max - min) + min,
     type: 'fake',
   }),
+
+  /**
+   * Generates random number from binomial distribution
+   * @param {number} n - Number of trials
+   * @param {number} p - Probability of success
+   * @returns {{val: number, type: string}} Object containing random value and type
+   */
   rbinom: (n, p) => ({
     val: Array(n)
       .fill(0)
       .reduce((acc) => acc + (Math.random() < p ? 1 : 0), 0),
     type: 'fake',
   }),
+
+  /**
+   * Generates random number from ex-Gaussian distribution
+   * @param {number} mu - Mean of normal component
+   * @param {number} sigma - Standard deviation of normal component
+   * @param {number} tau - Rate parameter of exponential component
+   * @returns {{val: number, type: string}} Object containing random value and type
+   */
   rexGaussian: (mu, sigma, tau) => {
     const x = distributions.rnorm(0, 1).val
     const z = distributions.runif(0, 1).val
@@ -96,6 +155,13 @@ export const faker_distributions = {
       type: 'fake',
     }
   },
+
+  /**
+   * Randomly selects an element from an array of options
+   * @param {Array} options - Array of options to choose from
+   * @returns {{val: *, type: string}} Object containing selected value and type
+   * @throws {Error} If options array is empty or not an array
+   */
   rchoice: (options) => {
     if (!Array.isArray(options) || options.length === 0) {
       throw new Error('rchoice requires a non-empty array of options')
@@ -106,6 +172,12 @@ export const faker_distributions = {
       type: 'fake',
     }
   },
+
+  /**
+   * Evaluates any function values in a trial object
+   * @param {Object} trial - Trial object potentially containing function values
+   * @returns {Object} Trial object with functions evaluated
+   */
   render: (trial) => {
     for (let [key, value] of Object.entries(trial)) {
       if (typeof value === 'function') {

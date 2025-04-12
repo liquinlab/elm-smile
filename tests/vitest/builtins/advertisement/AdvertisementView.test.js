@@ -10,7 +10,7 @@ const mockGoNextView = vi.fn()
 const mockPreloadAllImages = vi.fn()
 const mockPreloadAllVideos = vi.fn()
 
-vi.mock('@/core/composables/useAPI', () => ({
+vi.mock('@/core/composables/useViewAPI', () => ({
   default: () => ({
     get: vi.fn().mockResolvedValue({ data: {} }),
     post: vi.fn().mockResolvedValue({ data: {} }),

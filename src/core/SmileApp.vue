@@ -19,7 +19,7 @@ const api = useAPI()
 
 const toosmall = ref(api.isBrowserTooSmall())
 
-const height_pct = computed(() => `${api.store.dev.console_bar_height}px`)
+const height_pct = computed(() => `${api.store.dev.consoleBarHeight}px`)
 
 const showStatusBar = computed(() => {
   return api.currentRouteName() !== 'data' && api.currentRouteName() !== 'recruit' && api.config.mode != 'presentation'
@@ -44,24 +44,24 @@ onKeyDown(['Alt', '1'], (e) => {
   if (api.config.mode === 'development') {
     e.preventDefault()
 
-    const sideBar = api.store.dev.show_side_bar
-    const consoleBar = api.store.dev.show_console_bar
+    const sideBar = api.store.dev.showSideBar
+    const consoleBar = api.store.dev.showConsoleBar
 
     if (!sideBar && !consoleBar) {
-      api.store.dev.show_side_bar = true
-      api.store.dev.show_console_bar = false
+      api.store.dev.showSideBar = true
+      api.store.dev.showConsoleBar = false
       showTemporaryNotification('Alt + 1', 'Showing Sidebar')
     } else if (sideBar && !consoleBar) {
-      api.store.dev.show_side_bar = false
-      api.store.dev.show_console_bar = true
+      api.store.dev.showSideBar = false
+      api.store.dev.showConsoleBar = true
       showTemporaryNotification('Alt + 1', 'Showing Console')
     } else if (!sideBar && consoleBar) {
-      api.store.dev.show_side_bar = true
-      api.store.dev.show_console_bar = true
+      api.store.dev.showSideBar = true
+      api.store.dev.showConsoleBar = true
       showTemporaryNotification('Alt + 1', 'Showing Both Panels')
     } else {
-      api.store.dev.show_side_bar = false
-      api.store.dev.show_console_bar = false
+      api.store.dev.showSideBar = false
+      api.store.dev.showConsoleBar = false
       showTemporaryNotification('Alt + 1', 'Hiding All Panels')
     }
   }
@@ -72,21 +72,21 @@ onKeyDown(['Alt', '2'], (e) => {
   if (api.config.mode === 'development') {
     e.preventDefault()
 
-    const currentTab = api.store.dev.console_bar_tab
+    const currentTab = api.store.dev.consoleBarTab
 
     if (currentTab === 'browse') {
-      api.store.dev.console_bar_tab = 'log'
-      if (api.store.dev.show_console_bar) {
+      api.store.dev.consoleBarTab = 'log'
+      if (api.store.dev.showConsoleBar) {
         showTemporaryNotification('Alt + 2', 'Switched to Log Tab')
       }
     } else if (currentTab === 'log') {
-      api.store.dev.console_bar_tab = 'config'
-      if (api.store.dev.show_console_bar) {
+      api.store.dev.consoleBarTab = 'config'
+      if (api.store.dev.showConsoleBar) {
         showTemporaryNotification('Alt + 2', 'Switched to Config Tab')
       }
     } else {
-      api.store.dev.console_bar_tab = 'browse'
-      if (api.store.dev.show_console_bar) {
+      api.store.dev.consoleBarTab = 'browse'
+      if (api.store.dev.showConsoleBar) {
         showTemporaryNotification('Alt + 2', 'Switched to Browse Tab')
       }
     }
@@ -135,7 +135,7 @@ onKeyDown(['Alt', '4'], (e) => {
 
         <!-- Bottom console - can be toggled -->
         <Transition name="console-slide">
-          <div v-if="api.config.mode == 'development' && api.store.dev.show_console_bar" class="console">
+          <div v-if="api.config.mode == 'development' && api.store.dev.showConsoleBar" class="console">
             <DevConsoleBar />
           </div>
         </Transition>
@@ -143,7 +143,7 @@ onKeyDown(['Alt', '4'], (e) => {
 
       <!-- Sidebar - can be toggled, transitions in/out -->
       <Transition name="sidebar-slide">
-        <div v-if="api.config.mode == 'development' && api.store.dev.show_side_bar" class="sidebar">
+        <div v-if="api.config.mode == 'development' && api.store.dev.showSideBar" class="sidebar">
           <DevSideBar />
         </div>
       </Transition>

@@ -20,7 +20,8 @@ accomplish more in less time.
   experiment logic and start collecting data.
 - Participant-friendly features include the ability to withdraw from the
   experiment (while providing feedback), incremental data saving, optimized load
-  times, and graceful error handling.
+  times, ability to resume from where you left off even if reloading the pages,
+  and graceful error handling.
   <!-- and a responsive design that works on most/all
   devices.-->
 - Developer [mode](/developing) which makes it easier to debug and design

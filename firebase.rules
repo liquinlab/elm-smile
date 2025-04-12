@@ -10,7 +10,7 @@ service cloud.firestore {
     // Helper function to check if user is document owner
     function isOwner(doc) {
       return isAuthenticated() && 
-             request.auth.uid == doc.data.firebase_anon_auth_id;
+             request.auth.uid == doc.data.firebaseAnonAuthID;
     }
 
     // Rules for testing collection
@@ -19,13 +19,13 @@ service cloud.firestore {
       allow read: if isAuthenticated();  // Add this line
       match /data/{partID} {
         allow create: if isAuthenticated() && 
-                        request.resource.data.firebase_anon_auth_id == request.auth.uid;
+                        request.resource.data.firebaseAnonAuthID == request.auth.uid;
         allow read, update: if isOwner(resource);
         allow delete: if false;
 
         match /private/private_data {
           allow create: if isAuthenticated() && 
-                          request.resource.data.firebase_anon_auth_id  == request.auth.uid;
+                          request.resource.data.firebaseAnonAuthID  == request.auth.uid;
           allow read, update: if isOwner(resource);
           allow delete: if false;
         }
@@ -38,13 +38,13 @@ service cloud.firestore {
       allow read: if isAuthenticated();  // Add this line
       match /data/{partID} {
         allow create: if isAuthenticated() && 
-                        request.resource.data.firebase_anon_auth_id  == request.auth.uid;
+                        request.resource.data.firebaseAnonAuthID  == request.auth.uid;
         allow read, update: if isOwner(resource);
         allow delete: if false;
         
         match /private/private_data {
           allow create: if isAuthenticated() && 
-                          request.resource.data.firebase_anon_auth_id  == request.auth.uid;
+                          request.resource.data.firebaseAnonAuthID  == request.auth.uid;
           allow read, update: if isOwner(resource);
           allow delete: if false;
         }

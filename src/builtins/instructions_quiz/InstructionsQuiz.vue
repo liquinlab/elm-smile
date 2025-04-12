@@ -1,8 +1,7 @@
 <script setup>
 import { reactive, computed, ref, onMounted } from 'vue'
-import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
-const step = api.useStepper()
+import useViewAPI from '@/core/composables/useViewAPI'
+const api = useViewAPI()
 
 // read in props
 const props = defineProps({
@@ -28,22 +27,27 @@ function init() {
   qs = props.randomizeQandA ? getRandomizedQuestions() : props.questions
 
   console.log('qs', props.questions)
-  //const pages = step.t.append({ path: 'pages' })[0].append(qs)
-  const pages = step.t.append({ path: 'pages' }).forEach((row) => {
-    row.append(qs)
-  })
-  step.push(pages, true)
+  const pages = api
+    .spec()
+    .append({ path: 'pages' })
+    .forEach((row) => {
+      row.append(qs)
+    })
+  api.addSpec(pages, true)
 
-  //const feedback = step.t.append({ path: 'feedback' })[].append([{ path: 'success' }, { path: 'retry' }])
-  const feedback = step.t.append({ path: 'feedback' }).forEach((row) => {
-    row.append([{ path: 'success' }, { path: 'retry' }]) // add to additional pages
-  })
-  step.push(feedback, true)
-  // step.push(feedback, true)
+  const feedback = api
+    .spec()
+    .append({ path: 'feedback' })
+    .forEach((row) => {
+      row.append([{ path: 'success' }, { path: 'retry' }]) // add to additional pages
+    })
+  api.addSpec(feedback, true)
 
-  if (!step.globals.attempts) {
-    step.globals.attempts = 1
+  if (!api.globals.attempts) {
+    api.globals.attempts = 1
   }
+
+  console.log('api.stepData.questions', api.stepData.questions)
 }
 
 function getRandomizedQuestions() {
@@ -63,7 +67,7 @@ function autofill() {
   // Helper function to recursively find and update questions in states
   function updateQuestionsInState(state) {
     // Check if this state has questions
-    if (state.data?.questions) {
+    if (state.data?.questions && Array.isArray(state.data.questions)) {
       state.data.questions = state.data.questions.map((question) => ({
         ...question,
         answer: question.multiSelect ? question.correctAnswer : question.correctAnswer[0],
@@ -75,14 +79,15 @@ function autofill() {
   }
 
   // Start from root state and traverse all states
-  updateQuestionsInState(step.sm)
+  console.log('api.sm', api.sm)
+  updateQuestionsInState(api.sm)
 }
 
-api.setPageAutofill(autofill)
+api.setAutofill(autofill)
 
 // Update quizCorrect to handle multiple answers
 const quizCorrect = computed(() =>
-  step.data?.questions?.every((question) => {
+  api.stepData?.questions?.every((question) => {
     if (Array.isArray(question.correctAnswer)) {
       // For multiselect, check if arrays have same values regardless of order
       const selectedAnswers = Array.isArray(question.answer) ? question.answer : [question.answer]
@@ -97,10 +102,10 @@ const quizCorrect = computed(() =>
 )
 
 const currentPageComplete = computed(() => {
-  if (!step.data?.questions) {
+  if (!api.stepData?.questions || !Array.isArray(api.stepData.questions)) {
     return false
   }
-  return step.data.questions.every((question) => {
+  return api.stepData.questions.every((question) => {
     if ('answer' in question) {
       // For multiselect, ensure at least one option is selected
       if (question.multiselect) {
@@ -113,24 +118,24 @@ const currentPageComplete = computed(() => {
 })
 
 function submitQuiz() {
-  api.recordTrialData({
+  api.recordData({
     phase: 'INSTRUCTIONS_QUIZ',
-    questions: step.alldata('pages*'), // Update to use randomized questions
-    globals: step.globals,
+    questions: api.stepperData('pages*'), // Update to use randomized questions
+    globals: api.globals,
   })
   if (quizCorrect.value) {
-    step.goTo('feedback-success')
+    api.goToStep('feedback-success')
   } else {
-    step.goTo('feedback-retry')
+    api.goToStep('feedback-retry')
   }
 }
 
 function returnInstructions() {
-  step.reset() // reset the quiz
-  step.clear() // don't remember across reloads
-  init()
-  step.globals.attempts = step.globals.attempts + 1 // increment attempts
-  api.gotoView(props.returnTo) // go back to instructions
+  api.reset() // reset the quiz
+  api.clear() // don't remember across reloads
+  //init()
+  api.globals.attempts = api.globals.attempts + 1 // increment attempts
+  api.goToView(props.returnTo) // go back to instructions
 }
 
 function finish() {
@@ -144,7 +149,7 @@ init()
   <div class="page prevent-select">
     <div class="formcontent">
       <!-- Replace the two quiz page sections with this single dynamic one -->
-      <div class="formstep" v-if="step.index <= qs.length && /^pages-pg\d+$/.test(step.paths)">
+      <div class="formstep" v-if="api.stepIndex <= qs.length && /^pages-pg\d+$/.test(api.paths)">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
@@ -163,14 +168,14 @@ init()
           </div>
           <div class="column">
             <div class="box is-shadowless formbox">
-              <div v-for="question in step.data.questions" :key="question.id" class="mb-5">
+              <div v-for="(question, index) in api.stepData.questions" :key="question.id" class="mb-5">
                 <FormKit
                   :type="question.multiSelect ? 'checkbox' : 'select'"
                   :label="question.question"
                   :name="question.id"
                   :placeholder="question.multiSelect ? 'Select options' : 'Select option'"
-                  v-model="step.data.questions[step.data.questions.indexOf(question)].answer"
-                  :options="question.multiSelect ? question.answers : question.answers"
+                  v-model="api.stepData.questions[index].answer"
+                  :options="question.answers"
                   validation="required"
                   :multiple="question.multiSelect"
                 />
@@ -179,7 +184,7 @@ init()
               <div class="columns">
                 <div class="column">
                   <div class="has-text-left">
-                    <button v-if="step.index > 1" class="button is-warning" @click="step.prev()">
+                    <button v-if="api.stepIndex > 1" class="button is-warning" @click="api.goPrevStep()">
                       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous page
                     </button>
                   </div>
@@ -188,11 +193,11 @@ init()
                   <div class="has-text-right">
                     <button
                       v-if="currentPageComplete"
-                      :class="['button', step.index === qs.length ? 'is-success' : 'is-warning']"
-                      @click="step.index === qs.length ? submitQuiz() : step.next()"
+                      :class="['button', api.stepIndex === qs.length ? 'is-success' : 'is-warning']"
+                      @click="api.stepIndex === qs.length ? submitQuiz() : api.goNextStep()"
                     >
-                      {{ step.index === qs.length ? 'Submit' : 'Next page' }}
-                      <template v-if="step.index !== qs.length">
+                      {{ api.stepIndex === qs.length ? 'Submit' : 'Next page' }}
+                      <template v-if="api.stepIndex !== qs.length">
                         &nbsp;<FAIcon icon="fa-solid fa-arrow-right" />
                       </template>
                     </button>
@@ -204,7 +209,7 @@ init()
         </div>
       </div>
 
-      <div class="formstep" v-else-if="step.paths === 'feedback-success'">
+      <div class="formstep" v-else-if="api.paths === 'feedback-success'">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold has-text-centered">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Congrats! You passed.
@@ -216,7 +221,7 @@ init()
         </div>
       </div>
 
-      <div class="formstep" v-else-if="step.paths === 'feedback-retry'">
+      <div class="formstep" v-else-if="api.paths === 'feedback-retry'">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold has-text-centered">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Sorry! You did not get all the answers correct.

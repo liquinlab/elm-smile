@@ -209,7 +209,7 @@ The preferred way to write data to the store is to use the [Smile API](/api):
 import SmileAPI from '@/core/composables/useAPI'
 const api = SmileAPI()
 
-api.recordTrialData({
+api.recordData({
         trialnum: step_index.value,
         word: step.value.word,
         color: step.value.color,
@@ -254,8 +254,8 @@ Specifically, it records window resize events, and changes in focus (blur means
 when someone clicks on a window other than the current browser and focus is an
 even when the window is brought back to the front). These fields can sometimes
 be used to detect odd behaviors such as using another window to search for
-answers or dual-tasking. The data is tracked in `smilestore.data.browser_data`
-in a easy to parse JSON structure.
+answers or dual-tasking. The data is tracked in `smilestore.data.browserData` in
+a easy to parse JSON structure.
 
 ## Automatic saving/persistance
 

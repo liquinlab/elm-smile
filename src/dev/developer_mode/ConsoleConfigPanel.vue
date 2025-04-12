@@ -7,13 +7,13 @@ const api = SmileAPI()
 const browse_panels = reactive({ path: ['/', null, null] })
 
 onMounted(() => {
-  if (api.store.dev.config_path !== null) {
-    browse_panels.path = JSON.parse(api.store.dev.config_path) // hydrate from api.store.localstorage
+  if (api.store.dev.configPath !== null) {
+    browse_panels.path = JSON.parse(api.store.dev.configPath) // hydrate from api.store.localstorage
   }
 })
 
 function save_path() {
-  api.store.dev.config_path = JSON.stringify(browse_panels.path)
+  api.store.dev.configPath = JSON.stringify(browse_panels.path)
 }
 
 const n_active_panels = computed(() => {

@@ -1,6 +1,10 @@
 import useSmileStore from '@/core/stores/smilestore' // get access to the global store
 import useLog from '@/core/stores/log'
 
+/**
+ * Gets URL query parameters from the current window location
+ * @returns {Object} Dictionary of query parameter key-value pairs
+ */
 export function getQueryParams() {
   const queryString = window.location.search
   const urlParams = new URLSearchParams(queryString)
@@ -11,6 +15,11 @@ export function getQueryParams() {
   return queryDict
 }
 
+/**
+ * Processes URL query parameters to determine recruitment service and store participant info
+ * @param {Object} query - Query parameters object
+ * @param {string} service - Recruitment service name ('prolific', 'cloudresearch', 'mturk', 'citizensci')
+ */
 export function processQuery(query, service) {
   const smilestore = useSmileStore()
   const urlParams = query

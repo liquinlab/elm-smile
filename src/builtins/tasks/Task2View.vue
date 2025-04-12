@@ -1,11 +1,11 @@
 <script setup>
 import { ref, computed } from 'vue'
 // import and initalize smile API
-import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
+import useViewAPI from '@/core/composables/useViewAPI'
+const api = useViewAPI()
 
-const stepper = api.useStepper()
-const trials = stepper.t
+const trials = api
+  .spec()
   .append([
     {
       path: 'task2_trial_a',
@@ -27,8 +27,7 @@ const trials = stepper.t
     },
   ])
   .shuffle()
-stepper.push(trials)
-
+api.addSpec(trials)
 // const index = ref(0)
 // trials = shuffle(trials) // shuffle is not "in place"
 
@@ -37,16 +36,16 @@ stepper.push(trials)
 // set up the call backs that take you through the task
 
 function next() {
-  if (stepper.index < trials.length) {
-    stepper.next()
+  if (api.index < trials.length) {
+    api.goNextStep()
   } else {
     api.goNextView()
   }
 }
 
 function prev() {
-  if (stepper.index > 0) {
-    stepper.prev()
+  if (api.index > 0) {
+    api.goPrevStep()
   }
 }
 // custom advance to next route when we finish showing all the trials
@@ -62,8 +61,8 @@ function prev() {
 <template>
   <div class="page prevent-select">
     <h1 class="title is-3">Task 2</h1>
-    {{ stepper.data.sentence }}/{{ stepper.index }}<br /><br />
-    <button class="button is-success is-light" id="finish" @click="prev()" v-if="stepper.index > 1">
+    {{ api.stepData.sentence }}/{{ api.index }}<br /><br />
+    <button class="button is-success is-light" id="finish" @click="prev()" v-if="api.index > 1">
       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; prev
     </button>
     &nbsp;&nbsp;&nbsp;

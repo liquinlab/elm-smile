@@ -1,10 +1,16 @@
 import { defineStore } from 'pinia'
 import appconfig from '@/core/config'
 import { push } from 'notivue'
-
-//import useAPI from '@/core/composables/useAPI'
 import useSmileStore from '@/core/stores/smilestore'
 
+/**
+ * Gets a formatted stack trace string from the current execution context
+ * @returns {string} A formatted string containing the file path, line number and column number of the caller,
+ *                   or '(could not parse trace)' if parsing fails
+ * @example
+ * // Returns something like: "src/components/MyComponent.vue (line 42, column 3)"
+ * const trace = getLogTrace();
+ */
 function getLogTrace() {
   // some browsers use 'at ', some use '@'
   const lines = new Error().stack.split('\n').filter((line) => line.includes('at ') || line.includes('@'))
@@ -22,6 +28,14 @@ function getLogTrace() {
   }
 }
 
+/**
+ * Converts an array of arguments into a single string representation
+ * @param {Array} args - Array of arguments to convert to string
+ * @returns {string} Space-separated string of all arguments, with objects JSON stringified
+ * @example
+ * // Returns "hello 42 {"foo":"bar"}"
+ * argsToString(["hello", 42, {foo: "bar"}])
+ */
 function argsToString(args) {
   return args
     .map((arg) => {
@@ -38,19 +52,47 @@ function argsToString(args) {
     .join(' ')
 }
 
+/**
+ * Pinia store for managing application logging functionality
+ * @returns {Object} Store instance with state and actions for logging
+ * @example
+ * const logStore = useLogStore()
+ * logStore.log('Hello world') // Logs a message
+ * logStore.warn('Warning message') // Logs a warning
+ * logStore.debug('Debug info') // Logs debug info in development mode
+ */
 export default defineStore('log', {
+  /**
+   * State for the log store
+   * @returns {Object} Store state object
+   * @property {Array} history - Array containing all log messages across the entire session
+   * @property {Array} page_history - Array containing log messages for the current page/route only
+   */
   state: () => ({
     history: [],
     page_history: [],
   }),
   actions: {
-    add_to_history(msg) {
+    /**
+     * Adds a message to both the global history and page history arrays
+     * @param {Object} msg - The message object to add to history
+     */
+    addToHistory(msg) {
       this.history.push(msg)
       this.page_history.push(msg)
     },
-    clear_page_history() {
+
+    /**
+     * Clears the page-specific history array while preserving global history
+     */
+    clearPageHistory() {
       this.page_history = []
     },
+
+    /**
+     * Logs a standard message to history
+     * @param {...*} args - Arguments to log, will be converted to string
+     */
     log(...args) {
       const message = argsToString(args)
       const msg = {
@@ -59,8 +101,13 @@ export default defineStore('log', {
         message: message,
         trace: getLogTrace(),
       }
-      this.add_to_history(msg)
+      this.addToHistory(msg)
     },
+
+    /**
+     * Logs a debug message to history and console in development mode
+     * @param {...*} args - Arguments to log, will be converted to string
+     */
     debug(...args) {
       const message = argsToString(args)
       const msg = {
@@ -72,8 +119,13 @@ export default defineStore('log', {
       if (appconfig.mode === 'development') {
         console.log(message)
       }
-      this.add_to_history(msg)
+      this.addToHistory(msg)
     },
+
+    /**
+     * Logs a warning message to history and optionally shows notification based on settings
+     * @param {...*} args - Arguments to log, will be converted to string
+     */
     warn(...args) {
       const smilestore = useSmileStore()
       const message = argsToString(args)
@@ -84,16 +136,21 @@ export default defineStore('log', {
         trace: getLogTrace(),
       }
       if (
-        smilestore.dev.notification_filter !== 'None' &&
-        (smilestore.dev.notification_filter == 'Warnings and Errors' ||
-          smilestore.dev.notification_filter == 'Warnings only') &&
+        smilestore.dev.notificationFilter !== 'None' &&
+        (smilestore.dev.notificationFilter == 'Warnings and Errors' ||
+          smilestore.dev.notificationFilter == 'Warnings only') &&
         appconfig.mode === 'development'
       ) {
         push.warning(message)
       }
       console.warn(message)
-      this.add_to_history(msg)
+      this.addToHistory(msg)
     },
+
+    /**
+     * Logs an error message to history and optionally shows notification based on settings
+     * @param {...*} args - Arguments to log, will be converted to string
+     */
     error(...args) {
       const smilestore = useSmileStore()
       const message = argsToString(args)
@@ -104,16 +161,21 @@ export default defineStore('log', {
         trace: getLogTrace(),
       }
       if (
-        smilestore.dev.notification_filter !== 'None' &&
-        (smilestore.dev.notification_filter == 'Warnings and Errors' ||
-          smilestore.dev.notification_filter == 'Errors only') &&
+        smilestore.dev.notificationFilter !== 'None' &&
+        (smilestore.dev.notificationFilter == 'Warnings and Errors' ||
+          smilestore.dev.notificationFilter == 'Errors only') &&
         appconfig.mode === 'development'
       ) {
         push.error(message)
       }
       console.error(message)
-      this.add_to_history(msg)
+      this.addToHistory(msg)
     },
+
+    /**
+     * Logs a success message to history and optionally shows notification based on settings
+     * @param {...*} args - Arguments to log, will be converted to string
+     */
     success(...args) {
       const smilestore = useSmileStore()
       const message = argsToString(args)
@@ -124,14 +186,14 @@ export default defineStore('log', {
         trace: getLogTrace(),
       }
       if (
-        smilestore.dev.notification_filter !== 'None' &&
-        (smilestore.dev.notification_filter == 'All' || smilestore.dev.notification_filter == 'Success only') &&
+        smilestore.dev.notificationFilter !== 'None' &&
+        (smilestore.dev.notificationFilter == 'All' || smilestore.dev.notificationFilter == 'Success only') &&
         appconfig.mode === 'development'
       ) {
         push.success(message)
       }
       console.log(message)
-      this.add_to_history(msg)
+      this.addToHistory(msg)
     },
   },
 })

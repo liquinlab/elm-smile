@@ -70,7 +70,7 @@ that was used to generate it and the git commit hash of the code at the time it
 was run. This allows you to know exactly which version of the code was used to
 generate any given data file.
 
-In the Firestore document, this information is stored in `smile_config.github`
+In the Firestore document, this information is stored in `smileConfig.github`
 field and includes the repo name, owner, branch, last commit message, last
 commit hash, and the URL of the commmit.
 

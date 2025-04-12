@@ -6,12 +6,12 @@ const api = SmileAPI()
 import useLog from '@/core/stores/log'
 const log = useLog()
 
-const height_pct = computed(() => `${api.store.dev.console_bar_height - 67}px`)
+const height_pct = computed(() => `${api.store.dev.consoleBarHeight - 67}px`)
 
 function filter_log(msg) {
-  const search_match = msg.message.toLowerCase().includes(api.store.dev.search_params.toLowerCase())
+  const search_match = msg.message.toLowerCase().includes(api.store.dev.searchParams.toLowerCase())
   let type_match = true
-  switch (api.store.dev.log_filter) {
+  switch (api.store.dev.logFilter) {
     case 'All':
       break
     case 'Debug only':
@@ -55,7 +55,7 @@ function getBgClass(msg) {
         <li>
           <label class="checkbox">
             <b>Since last page change:</b>&nbsp;
-            <input type="checkbox" v-model="api.store.dev.last_page_limit" />
+            <input type="checkbox" v-model="api.store.dev.lastPageLimit" />
           </label>
         </li>
         <li>
@@ -64,13 +64,13 @@ function getBgClass(msg) {
             class="input is-small search"
             placeholder="Search..."
             type="text"
-            v-model="api.store.dev.search_params"
+            v-model="api.store.dev.searchParams"
           />
         </li>
         <li>
           <b>Filter:</b>&nbsp;
           <div class="select is-small">
-            <select v-model="api.store.dev.log_filter">
+            <select v-model="api.store.dev.logFilter">
               <option>All</option>
               <option>Current page only</option>
               <option>Debug only</option>
@@ -83,7 +83,7 @@ function getBgClass(msg) {
         <li>
           <b>Notifications:</b>&nbsp;
           <div class="select is-small">
-            <select v-model="api.store.dev.notification_filter">
+            <select v-model="api.store.dev.notificationFilter">
               <option>All</option>
               <option>None</option>
               <option>Warnings and Errors</option>
@@ -98,7 +98,7 @@ function getBgClass(msg) {
 
     <div class="scrollablelog">
       <aside class="menu">
-        <ul class="menu-list" v-if="api.store.dev.last_page_limit">
+        <ul class="menu-list" v-if="api.store.dev.lastPageLimit">
           <template v-for="msg in log.page_history">
             <li :class="getBgClass(msg)" v-if="filter_log(msg)">
               <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />

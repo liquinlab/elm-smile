@@ -26,8 +26,11 @@ const Feedback = defineComponent({
 
 const stepper = api.useStepper()
 
-const trials = stepper.t.append([{ type: Stimulus }, { type: Feedback }]).repeat(3)
-stepper.push(trials)
+const trials = stepper
+  .spec()
+  .append([{ type: Stimulus }, { type: Feedback }])
+  .repeat(3)
+stepper.addSpec(trials)
 
 const trials2 = stepper.t
   .append([
@@ -47,18 +50,18 @@ const trials2 = stepper.t
         }
       })
   })
-stepper.push(trials2)
+stepper.addSpec(trials2)
 
 function next() {
   if (stepper.index >= stepper.length) {
     api.goNextView()
   }
-  stepper.next()
+  stepper.goNextStep()
 }
 
 function adddata() {
-  const trials = stepper.t.append([{ type: 'added', id: stepper.nrows - 2 }])
-  stepper.push(trials)
+  const trials = stepper.spec().append([{ type: 'added', id: stepper.nrows - 2 }])
+  stepper.addSpec(trials)
 }
 </script>
 
@@ -68,9 +71,9 @@ function adddata() {
     <div class="tree-diagram-text">
       <b>Path</b>: {{ stepper.paths }}<br />
       <b>Index</b>: {{ stepper.index }}<br />
-      <b>Data on Path</b>: {{ stepper.data }}<br />
+      <b>Data on Path</b>: {{ stepper.stepData }}<br />
     </div>
-    <component :is="stepper.data?.type" />
+    <component :is="stepper.stepData?.type" />
 
     <br />
     <button @click="adddata()" class="button is-small is-warning m-2">Add Data</button>

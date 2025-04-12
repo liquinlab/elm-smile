@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
-import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
+import useViewAPI from '@/core/composables/useViewAPI'
+const api = useViewAPI()
 
 const cond = api.getConditionByName('instructionsVersion')
 

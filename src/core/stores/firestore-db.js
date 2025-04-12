@@ -1,3 +1,8 @@
+/**
+ * Firebase/Firestore database configuration and utility functions
+ * @module firestore-db
+ */
+
 import { initializeApp } from 'firebase/app'
 import { getAuth, signInAnonymously } from 'firebase/auth'
 import {
@@ -13,9 +18,8 @@ import {
 } from 'firebase/firestore'
 import appconfig from '@/core/config'
 import useLog from '@/core/stores/log'
-// initialize firebase connection
-// since this is a module these will run once at the start
 
+// Initialize Firebase connection
 const firebaseApp = initializeApp(appconfig.firebaseConfig)
 const auth = getAuth(firebaseApp)
 let db
@@ -35,9 +39,16 @@ if (appconfig.mode === 'development' || appconfig.mode === 'testing') {
   mode = 'testing'
 }
 
+/**
+ * Get current Firestore timestamp
+ * @returns {Timestamp} Current Firestore timestamp
+ */
 export const fsnow = () => Timestamp.now()
 
-// handle anonymous authentication
+/**
+ * Authenticate anonymously with Firebase
+ * @returns {Promise<Object|null>} Firebase user object if successful, null if failed
+ */
 export const anonymousAuth = async () => {
   const log = useLog()
   try {
@@ -50,7 +61,13 @@ export const anonymousAuth = async () => {
   }
 }
 
-// Add validation function as an internal helper
+/**
+ * Validates data structure for Firestore compatibility
+ * @param {*} data - Data to validate
+ * @param {string} [path=''] - Current path in object for error reporting
+ * @returns {boolean} True if valid
+ * @throws {Error} If data structure is invalid for Firestore
+ */
 const validateFirestoreData = (data, path = '') => {
   // Check if value is null or undefined
   if (data === null || data === undefined) {
@@ -106,7 +123,13 @@ const validateFirestoreData = (data, path = '') => {
   throw new Error(`Unsupported data type at path: ${path}. Value type: ${typeof data}`)
 }
 
-// create a collection
+/**
+ * Updates a subject's data record
+ * @param {Object} data - Data to update
+ * @param {string} docid - Document ID
+ * @returns {Promise<void>}
+ * @throws {Error} If update fails
+ */
 export const updateSubjectDataRecord = async (data, docid) => {
   const log = useLog()
   try {
@@ -119,6 +142,13 @@ export const updateSubjectDataRecord = async (data, docid) => {
   }
 }
 
+/**
+ * Updates a subject's private data record
+ * @param {Object} data - Private data to update
+ * @param {string} docid - Document ID
+ * @returns {Promise<void>}
+ * @throws {Error} If update fails
+ */
 export const updatePrivateSubjectDataRecord = async (data, docid) => {
   const log = useLog()
   // is it weird to have a aync method that doesn't return anything?
@@ -133,6 +163,11 @@ export const updatePrivateSubjectDataRecord = async (data, docid) => {
   }
 }
 
+/**
+ * Loads a document by ID
+ * @param {string} docid - Document ID to load
+ * @returns {Promise<Object|undefined>} Document data if found and authorized, undefined otherwise
+ */
 export const loadDoc = async (docid) => {
   const log = useLog()
 
@@ -145,7 +180,7 @@ export const loadDoc = async (docid) => {
     if (docSnap.exists()) {
       const data = docSnap.data()
       // console.log('Document data:', data)
-      if (data.firebase_anon_auth_id === user.uid) {
+      if (data.firebaseAnonAuthID === user.uid) {
         return data
       } else {
         log.error('FIRESTORE-DB: User does not have access to this document')
@@ -160,6 +195,11 @@ export const loadDoc = async (docid) => {
   }
 }
 
+/**
+ * Creates a new document
+ * @param {Object} data - Data to store in new document
+ * @returns {Promise<string|null>} Document ID if created successfully, null if failed
+ */
 export const createDoc = async (data) => {
   const log = useLog()
   try {
@@ -188,15 +228,15 @@ export const createDoc = async (data) => {
     // Add a new document with a generated id.
     const docRef = await addDoc(collection(db, `${mode}/${appconfig.project_ref}/data`), {
       ...data,
-      firebase_anon_auth_id: user.uid,
+      firebaseAnonAuthID: user.uid,
     })
 
     // Update the document with its own ID
     await updateDoc(docRef, {
-      firebase_doc_id: docRef.id,
+      firebaseDocID: docRef.id,
     })
 
-    data.firebase_anon_auth_id = user.uid
+    data.firebaseAnonAuthID = user.uid
     log.log(`FIRESTORE-DB: New document written with ID: ${docRef.id} for user ${user.uid})`)
     return docRef.id
   } catch (e) {
@@ -205,6 +245,12 @@ export const createDoc = async (data) => {
   }
 }
 
+/**
+ * Creates a private document
+ * @param {Object} data - Private data to store
+ * @param {string} docId - Parent document ID
+ * @returns {Promise<string|null>} Document ID if created successfully, null if failed
+ */
 export const createPrivateDoc = async (data, docId) => {
   const log = useLog()
   log.log(`FIRESTORE-DB: trying to create a private document in ${docId}`)
@@ -217,7 +263,7 @@ export const createPrivateDoc = async (data, docId) => {
     const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/${docId}/private/`, 'private_data')
     await setDoc(docRef, {
       ...data,
-      firebase_anon_auth_id: user.uid,
+      firebaseAnonAuthID: user.uid,
     })
     log.log(`FIRESTORE-DB: Private document written with ID: `, docRef.id)
     return docRef.id
@@ -227,7 +273,6 @@ export const createPrivateDoc = async (data, docId) => {
   }
 }
 
-// export default createDoc
 export default db
 
 // const db_type = collection(db, mode) // or should this be collection?

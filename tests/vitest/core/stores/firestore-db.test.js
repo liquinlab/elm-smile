@@ -171,7 +171,7 @@ describe('firestore-db', () => {
       }
       const mockData = {
         field: 'value',
-        firebase_anon_auth_id: 'test-uid',
+        firebaseAnonAuthID: 'test-uid',
       }
 
       vi.mocked(signInAnonymously).mockResolvedValueOnce(mockCredential)
@@ -212,7 +212,7 @@ describe('firestore-db', () => {
       }
       const mockData = {
         field: 'value',
-        firebase_anon_auth_id: 'different-uid',
+        firebaseAnonAuthID: 'different-uid',
       }
 
       vi.mocked(signInAnonymously).mockResolvedValueOnce(mockCredential)

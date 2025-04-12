@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted } from 'vue'
-import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
+import useViewAPI from '@/core/composables/useViewAPI'
+const api = useViewAPI()
 
 function finish() {
   // smilestore.saveData()

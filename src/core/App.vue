@@ -33,7 +33,7 @@ smilestore.$subscribe((mutation, newstate) => {
       }
 
       api.log.log(`SMILESTORE: smilestore.data value changed for ${key}: from ${oldv} to ${newv}`)
-      smilestore.global.db_changes = true
+      smilestore.global.dbChanges = true
     }
   })
   snapshot = { ...newstate.data }

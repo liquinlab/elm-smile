@@ -2,49 +2,53 @@
 import { reactive, computed } from 'vue'
 
 // import and initalize smile API
-import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
+import useViewAPI from '@/core/composables/useViewAPI'
+const api = useViewAPI()
 
-const stepper = api.useStepper()
-const pages = stepper.t.append([{ path: 'device_page1' }, { path: 'device_page2' }])
-stepper.push(pages)
+const pages = api.spec().append([{ path: 'device_page1' }, { path: 'device_page2' }])
+api.addSpec(pages)
 
-const forminfo = reactive({
-  device_type: '', // type of device (e.g., desktop, laptop, tablet, phone)
-  connection: '', // type of internet connection (e.g., wifi, ethernet, cellular)
-  connection_quality: '', // self-reported connection quality
-  browser: '', // self-reported browser
-  pointer: '', // self-reported pointing device (mouse, trackpad, touchscreen)
-  assistive_technology: '', // self-reported assistive technology
-  tools: '', // self-report of tools
-})
+if (!api.globals.forminfo) {
+  api.globals.forminfo = reactive({
+    device_type: '', // type of device (e.g., desktop, laptop, tablet, phone)
+    connection: '', // type of internet connection (e.g., wifi, ethernet, cellular)
+    connection_quality: '', // self-reported connection quality
+    browser: '', // self-reported browser
+    pointer: '', // self-reported pointing device (mouse, trackpad, touchscreen)
+    assistive_technology: '', // self-reported assistive technology
+    tools: '', // self-report of tools
+  })
+}
 
 const page_one_complete = computed(
   () =>
-    forminfo.device_type !== '' &&
-    forminfo.connection !== '' &&
-    forminfo.connection_quality !== '' &&
-    forminfo.browser !== ''
+    api.globals.forminfo.device_type !== '' &&
+    api.globals.forminfo.connection !== '' &&
+    api.globals.forminfo.connection_quality !== '' &&
+    api.globals.forminfo.browser !== ''
 )
 
 const page_two_complete = computed(
-  () => forminfo.pointer !== '' && forminfo.assistive_technology !== '' && forminfo.tools !== ''
+  () =>
+    api.globals.forminfo.pointer !== '' &&
+    api.globals.forminfo.assistive_technology !== '' &&
+    api.globals.forminfo.tools !== ''
 )
 
 function autofill() {
-  forminfo.device_type = 'Desktop Computer'
-  forminfo.connection = 'Wifi'
-  forminfo.connection_quality = 'Fast'
-  forminfo.browser = 'ARC'
-  forminfo.pointer = 'Mouse'
-  forminfo.assistive_technology = 'No'
-  forminfo.tools = 'No'
+  api.globals.forminfo.device_type = 'Desktop Computer'
+  api.globals.forminfo.connection = 'Wifi'
+  api.globals.forminfo.connection_quality = 'Fast'
+  api.globals.forminfo.browser = 'ARC'
+  api.globals.forminfo.pointer = 'Mouse'
+  api.globals.forminfo.assistive_technology = 'No'
+  api.globals.forminfo.tools = 'No'
 }
 
-api.setPageAutofill(autofill)
+api.setAutofill(autofill)
 
 function finish() {
-  api.saveForm('device', forminfo)
+  api.recordForm('deviceForm', api.globals.forminfo)
   api.goNextView()
 }
 </script>
@@ -58,7 +62,7 @@ function finish() {
         to improve the quality of our experiments in the future.
       </p>
 
-      <div class="formstep" v-if="stepper.paths === 'device_page1'">
+      <div class="formstep" v-if="api.paths === 'device_page1'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -87,7 +91,7 @@ function finish() {
                   'I\'m not sure',
                   'I\'d rather not say',
                 ]"
-                v-model="forminfo.device_type"
+                v-model="api.globals.forminfo.device_type"
               />
               <FormKit
                 type="select"
@@ -107,7 +111,7 @@ function finish() {
                   'I\'m not sure',
                   'I\'d rather not say',
                 ]"
-                v-model="forminfo.connection"
+                v-model="api.globals.forminfo.connection"
               />
               <FormKit
                 type="select"
@@ -123,7 +127,7 @@ function finish() {
                   'I\'m not sure',
                   'I\'d rather not say',
                 ]"
-                v-model="forminfo.connection_quality"
+                v-model="api.globals.forminfo.connection_quality"
               />
               <FormKit
                 type="select"
@@ -146,13 +150,13 @@ function finish() {
                   'I\'m not sure',
                   'I\'d rather not say',
                 ]"
-                v-model="forminfo.browser"
+                v-model="api.globals.forminfo.browser"
               />
               <hr />
               <div class="columns">
                 <div class="column">
                   <div class="has-text-right">
-                    <button class="button is-warning" id="finish" v-if="page_one_complete" @click="stepper.next()">
+                    <button class="button is-warning" id="finish" v-if="page_one_complete" @click="api.goNextStep()">
                       Continue &nbsp;
                       <FAIcon icon="fa-solid fa-arrow-right" />
                     </button>
@@ -164,7 +168,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-else-if="stepper.paths === 'device_page2'">
+      <div class="formstep" v-else-if="api.paths === 'device_page2'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -196,7 +200,7 @@ function finish() {
                   'I\'m not sure',
                   'I\'d rather not say',
                 ]"
-                v-model="forminfo.pointer"
+                v-model="api.globals.forminfo.pointer"
               />
               <FormKit
                 type="select"
@@ -205,7 +209,7 @@ function finish() {
                 help="Examples include screen readers, screen magnifiers, or voice input systems."
                 placeholder="Select an option"
                 :options="['No', 'Yes', 'I\'m not sure', 'I\'d rather not say']"
-                v-model="forminfo.assistive_technology"
+                v-model="api.globals.forminfo.assistive_technology"
               />
               <FormKit
                 type="select"
@@ -214,13 +218,13 @@ function finish() {
                 help="Examples include browser extensions that help you fill forms, enter text, or navigate the web or copying answers from AI/Large Language Models."
                 placeholder="Select an option"
                 :options="['No', 'Yes', 'I\'m not sure', 'I\'d rather not say']"
-                v-model="forminfo.tools"
+                v-model="api.globals.forminfo.tools"
               />
               <hr />
               <div class="columns">
                 <div class="column">
                   <div class="has-text-left">
-                    <button class="button is-warning" id="finish" @click="stepper.prev()">
+                    <button class="button is-warning" id="finish" @click="api.goPrevStep()">
                       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous
                     </button>
                   </div>

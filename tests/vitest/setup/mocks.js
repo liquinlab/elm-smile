@@ -33,8 +33,8 @@ vi.mock('@/core/stores/log', () => {
     default: vi.fn().mockReturnValue({
       history: [],
       page_history: [],
-      add_to_history: vi.fn(),
-      clear_page_history: vi.fn(),
+      addToHistory: vi.fn(),
+      clearPageHistory: vi.fn(),
       log: vi.fn(mockLogFn('log')),
       debug: vi.fn(mockLogFn('debug')),
       warn: vi.fn(mockLogFn('warn')),
@@ -62,7 +62,7 @@ vi.mock('@/core/randomization', () => {
     shuffle: vi.fn(),
     sampleWithReplacement: vi.fn((arr) => arr[0]),
     sampleWithoutReplacement: vi.fn(),
-    faker_distributions: {},
+    fakerDistributions: {},
   }
 })
 

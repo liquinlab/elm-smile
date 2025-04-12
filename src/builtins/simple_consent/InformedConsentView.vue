@@ -11,8 +11,8 @@ const props = defineProps({
   },
 })
 // import and initalize smile API
-import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
+import useViewAPI from '@/core/composables/useViewAPI'
+const api = useViewAPI()
 
 function finish() {
   api.goNextView()
@@ -24,25 +24,33 @@ if (appconfig.anonymous_mode) {
 }
 
 function wiggle() {
-  if (agree.value) {
+  if (api.globals.agree) {
     animate(button.value, { rotate: [0, 5, -5, 5, -5, 0] }, { duration: 1.25 }).finished.then(() => {
       timer = setTimeout(wiggle, 2000) // Reinitialize the timer after animation
     })
   }
 }
 
-const agree = ref(false)
+// if (!api.globals.agree?.value) {
+//   api.globals.agree = ref(false)
+// }
 const name = ref('enter your name')
 const button = ref(null)
 let timer
 
-watch(agree, (newVal) => {
-  if (newVal) {
-    console.log('agree changed')
-    //button.value.focus()
-    timer = setTimeout(wiggle, 3000)
-  }
-})
+if (!('agree' in api.globals)) {
+  api.globals.agree = ref(false)
+}
+
+if (api.globals.agree) {
+  watch(api.globals.agree, (newVal) => {
+    if (newVal) {
+      console.log('agree changed')
+      //button.value.focus()
+      timer = setTimeout(wiggle, 3000)
+    }
+  })
+}
 
 onBeforeUnmount(() => {
   clearTimeout(timer)
@@ -68,7 +76,7 @@ onBeforeUnmount(() => {
               <hr />
 
               <FormKit
-                v-model="agree"
+                v-model="api.globals.agree"
                 type="checkbox"
                 name="consent_toggle"
                 label="I consent and am over 18 years old."
@@ -83,7 +91,13 @@ onBeforeUnmount(() => {
 
               <br />
 
-              <button ref="button" class="button is-warning is-fullwidth" id="finish" v-if="agree" @click="finish()">
+              <button
+                ref="button"
+                class="button is-warning is-fullwidth"
+                id="finish"
+                v-if="api.globals.agree"
+                @click="finish()"
+              >
                 Let's start &nbsp;
                 <FAIcon icon="fa-solid fa-arrow-right" />
               </button>

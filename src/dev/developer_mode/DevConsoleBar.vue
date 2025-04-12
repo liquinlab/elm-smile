@@ -11,9 +11,9 @@ const api = useAPI()
   <nav class="databar">
     <aside class="menu datamenu">
       <ul class="menu-list">
-        <li :class="{ active: api.store.dev.console_bar_tab == 'browse' }">
+        <li :class="{ active: api.store.dev.consoleBarTab == 'browse' }">
           <a
-            @click="api.store.dev.console_bar_tab = 'browse'"
+            @click="api.store.dev.consoleBarTab = 'browse'"
             class="has-tooltip-arrow has-tooltip-right"
             data-tooltip="Data Explorer"
           >
@@ -21,9 +21,9 @@ const api = useAPI()
           </a>
         </li>
 
-        <li :class="{ active: api.store.dev.console_bar_tab == 'log' }">
+        <li :class="{ active: api.store.dev.consoleBarTab == 'log' }">
           <a
-            @click="api.store.dev.console_bar_tab = 'log'"
+            @click="api.store.dev.consoleBarTab = 'log'"
             class="has-tooltip-arrow has-tooltip-right"
             data-tooltip="Narrative Log"
           >
@@ -31,9 +31,9 @@ const api = useAPI()
           </a>
         </li>
 
-        <li :class="{ active: api.store.dev.console_bar_tab == 'config' }">
+        <li :class="{ active: api.store.dev.consoleBarTab == 'config' }">
           <a
-            @click="api.store.dev.console_bar_tab = 'config'"
+            @click="api.store.dev.consoleBarTab = 'config'"
             class="has-tooltip-arrow has-tooltip-right"
             data-tooltip="Configuration"
           >
@@ -47,13 +47,13 @@ const api = useAPI()
       <nav class="databar-panel-header logpanel" role="navigation" aria-label="data navigation">
         <div id="navbardatabase" class="databar-panel-header-menu">
           <div class="databar-panel-header-start">
-            <div class="databar-panel-header-item info" v-if="api.store.dev.console_bar_tab == 'browse'">
+            <div class="databar-panel-header-item info" v-if="api.store.dev.consoleBarTab == 'browse'">
               <FAIcon icon="fa-solid fa-magnifying-glass icon" />&nbsp;&nbsp;<b>Data Explorer</b>
             </div>
-            <div class="databar-panel-header-item info" v-if="api.store.dev.console_bar_tab == 'log'">
+            <div class="databar-panel-header-item info" v-if="api.store.dev.consoleBarTab == 'log'">
               <FAIcon icon="fa-solid fa-book icon" />&nbsp;&nbsp;<b>Narrative Log</b>
             </div>
-            <div class="databar-panel-header-item info" v-if="api.store.dev.console_bar_tab == 'config'">
+            <div class="databar-panel-header-item info" v-if="api.store.dev.consoleBarTab == 'config'">
               <FAIcon icon="fa-solid fa-gear icon" />&nbsp;&nbsp;<b>Configuration</b>
             </div>
           </div>
@@ -63,9 +63,9 @@ const api = useAPI()
       </nav>
 
       <!-- content of panel here -->
-      <ConsoleDatabaseBrowsePanel v-if="api.store.dev.console_bar_tab == 'browse'"></ConsoleDatabaseBrowsePanel>
-      <ConsoleLogPanel v-if="api.store.dev.console_bar_tab == 'log'"></ConsoleLogPanel>
-      <ConsoleConfigPanel v-if="api.store.dev.console_bar_tab == 'config'"></ConsoleConfigPanel>
+      <ConsoleDatabaseBrowsePanel v-if="api.store.dev.consoleBarTab == 'browse'"></ConsoleDatabaseBrowsePanel>
+      <ConsoleLogPanel v-if="api.store.dev.consoleBarTab == 'log'"></ConsoleLogPanel>
+      <ConsoleConfigPanel v-if="api.store.dev.consoleBarTab == 'config'"></ConsoleConfigPanel>
     </section>
   </nav>
 </template>

@@ -6,7 +6,7 @@ import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 const emit = defineEmits(['selected'])
 
-const height_pct = computed(() => `${api.store.dev.console_bar_height - 90}px`)
+const height_pct = computed(() => `${api.store.dev.consoleBarHeight - 90}px`)
 
 const header = computed(() => {
   if (props.data === undefined || props.data === null) {

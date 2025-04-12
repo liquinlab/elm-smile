@@ -129,7 +129,7 @@ const getData = async (path, completeOnly, filename, saveRecruitmentInfo = false
   const data = []
   for (const doc of querySnapshot.docs) {
     const docData = doc.data()
-    docData.smile_config.firebaseConfig = {}
+    docData.smileConfig.firebaseConfig = {}
     if (saveRecruitmentInfo) {
       const privateData = []
       const privateQuerySnapshot = await getDocs(collection(db, path + '/' + doc.id + '/private'))

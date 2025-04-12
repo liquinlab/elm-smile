@@ -39,19 +39,19 @@ function autofill() {
   forminfo.household_income = '$100,000–$199,999'
 }
 
-api.setPageAutofill(autofill)
+api.setAutofill(autofill)
 </script>
 ```
 
 In this example the `autofill()` function sets the values of the form fields to
-deterministic "standin" values. Then we call `api.setPageAutofill(autofill)` to
+deterministic "standin" values. Then we call `api.setAutofill(autofill)` to
 register this function as available.
 
 When a [View](/views) has an autofill function registered a special button will
 appear in the [developer tools](/developermode) menu bar that, when clicked,
 will autofill the form values using this function.
 
-You can call `api.removePageAutofill()` to remove the autofill function from the
+You can call `api.removeAutofill()` to remove the autofill function from the
 developer tools if needed. When you navigate on the timeline to a new View the
 autofill function is automatically removed so it must be re-registered within
 each view.
@@ -103,7 +103,7 @@ var trials = []
 
 // add the data fields
 for (let trialType of trialTypes) {
-  trials.push({
+  trials.addSpec({
     ...trialType,
     reactionTime: () => api.faker.rnorm(500, 50),
     accuracy: () => api.faker.rbinom(1, 0.8),
@@ -133,23 +133,23 @@ function autofill() {
 
     var t = api.faker.render(trials[step.index()])
     api.debug(t)
-    api.recordTrialData(t)
+    api.recordData(t)
 
     step.next()
   }
 }
 
-api.setPageAutofill(autofill)
+api.setAutofill(autofill)
 ```
 
 In this example we first shuffle the abstract trial definitions. Then we define
 an `autofill()` function. This function will be called when the autofill button
-is clicked after it is registered `api.setPageAutofill(autofill)`. Inside this
+is clicked after it is registered `api.setAutofill(autofill)`. Inside this
 function is steps through each trial, rendering the data for that trial, saving
 it to the smilestore database, then advancing to the next step. The rendering
 step calls the `api.faker.*()` methods as defined and makes "fake" data for the
 trial. This data is then [recorded to the database](/datastorage) using
-`api.recordTrialData()`.
+`api.recordData()`.
 
 ## The Autofill API
 
@@ -158,13 +158,13 @@ developing your app to help you quickly skip forms and generate fake data. The
 API is available through the [Smile API](/api) object. The following functions
 are available:
 
-### `api.setPageAutofill(autofillFunction)`
+### `api.setAutofill(autofillFunction)`
 
 Registers a function to be called when the autofill button is clicked. This is
 just a pure JavaScript function that sets the values of the form fields to the
 desired values. The function should have no arguments.
 
-### `api.removePageAutofill()`
+### `api.removeAutofill()`
 
 This removes the autofill function from the developer tools menu bar. This
 called automatically when each [view](/views) is advanced on the

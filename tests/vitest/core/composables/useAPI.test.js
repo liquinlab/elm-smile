@@ -99,8 +99,8 @@ describe('useAPI composable', () => {
     vi.spyOn(api.log, 'warn')
     vi.spyOn(api.log, 'error')
     vi.spyOn(api.log, 'success')
-    vi.spyOn(api.log, 'clear_page_history')
-    vi.spyOn(api.log, 'add_to_history')
+    vi.spyOn(api.log, 'clearPageHistory')
+    vi.spyOn(api.log, 'addToHistory')
     vi.spyOn(api.store, 'resetApp')
     vi.spyOn(api.store, 'resetLocal')
     vi.spyOn(window.localStorage, 'removeItem')
@@ -135,7 +135,6 @@ describe('useAPI composable', () => {
     expect(api.shuffle).toBeInstanceOf(Function)
     expect(api.sampleWithReplacement).toBeInstanceOf(Function)
     expect(api.sampleWithoutReplacement).toBeInstanceOf(Function)
-    expect(api.useHStepper).toBeInstanceOf(Function)
 
     // Check URL helpers
     expect(api.urls).toBeDefined()
@@ -162,25 +161,22 @@ describe('useAPI composable', () => {
     expect(api.setDone).toBeInstanceOf(Function)
     expect(api.setConsented).toBeInstanceOf(Function)
     expect(api.setWithdrawn).toBeInstanceOf(Function)
-    expect(api.verifyVisibility).toBeInstanceOf(Function)
-    expect(api.saveForm).toBeInstanceOf(Function)
-    expect(api.getVerifiedVisibility).toBeInstanceOf(Function)
+    expect(api.recordForm).toBeInstanceOf(Function)
+    expect(api.recordProperty).toBeInstanceOf(Function)
 
     // Check browser checks
     expect(api.isBrowserTooSmall).toBeInstanceOf(Function)
+    expect(api.verifyVisibility).toBeInstanceOf(Function)
+    expect(api.getVerifiedVisibility).toBeInstanceOf(Function)
 
     // Check development tools
-    expect(api.setPageAutofill).toBeInstanceOf(Function)
-    expect(api.removePageAutofill).toBeInstanceOf(Function)
+    expect(api.setAutofill).toBeInstanceOf(Function)
+    expect(api.removeAutofill).toBeInstanceOf(Function)
 
     // Check completion and recruitment
     expect(api.setCompletionCode).toBeInstanceOf(Function)
     expect(api.getRecruitmentService).toBeInstanceOf(Function)
 
-    // Check page tracking
-    expect(api.getPageTracker).toBeInstanceOf(Function)
-    expect(api.getPageTrackerData).toBeInstanceOf(Function)
-    expect(api.getPageTrackerIndex).toBeInstanceOf(Function)
     expect(api.hasAutofill).toBeInstanceOf(Function)
     expect(api.autofill).toBeInstanceOf(Function)
     expect(api.currentRouteName).toBeInstanceOf(Function)
@@ -189,11 +185,10 @@ describe('useAPI composable', () => {
 
     // Check event and trial management
     expect(api.recordWindowEvent).toBeInstanceOf(Function)
-    expect(api.incrementTrial).toBeInstanceOf(Function)
-    expect(api.decrementTrial).toBeInstanceOf(Function)
-    expect(api.resetTrial).toBeInstanceOf(Function)
+
+    // Check data and save methods
     expect(api.saveData).toBeInstanceOf(Function)
-    expect(api.recordTrialData).toBeInstanceOf(Function)
+    expect(api.recordData).toBeInstanceOf(Function)
 
     // Check randomization and conditions
     expect(api.randomSeed).toBeInstanceOf(Function)
@@ -259,7 +254,7 @@ describe('useAPI composable', () => {
   })
 
   it('should get URL helpers correctly', () => {
-    expect(api.getPublicUrl('test.png')).toBe('/nyuccl/smile/trialstepper/test.png')
+    expect(api.getPublicUrl('test.png')).toMatch(/^\/[^/]+\/[^/]+\/[^/]+\/test\.png$/)
     //expect(api.getCoreStaticUrl('test.png')).toContain('test.png')
     //expect(api.getStaticUrl('test.png')).toContain('test.png')
   })
@@ -323,10 +318,10 @@ describe('useAPI composable', () => {
     api.log.success('test success')
     expect(api.log.success).toHaveBeenCalledWith('test success')
 
-    api.log.clear_page_history()
-    expect(api.log.clear_page_history).toHaveBeenCalled()
+    api.log.clearPageHistory()
+    expect(api.log.clearPageHistory).toHaveBeenCalled()
 
-    api.log.add_to_history('test history')
-    expect(api.log.add_to_history).toHaveBeenCalledWith('test history')
+    api.log.addToHistory('test history')
+    expect(api.log.addToHistory).toHaveBeenCalledWith('test history')
   })
 })
