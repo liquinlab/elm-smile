@@ -6,8 +6,8 @@ const api = useViewAPI()
 const props = defineProps(['triggered'])
 
 const sizer = reactive({
-  w: api.config.windowsizer_request.width + 'px',
-  h: api.config.windowsizer_request.height + 'px',
+  w: api.config.windowsizerRequest.width + 'px',
+  h: api.config.windowsizerRequest.height + 'px',
 })
 
 function finish() {

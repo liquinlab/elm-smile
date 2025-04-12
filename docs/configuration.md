@@ -79,18 +79,18 @@ clear and convenient way to set them (it is also easier to share the design.js
 file).
 
 ```js
-api.setRuntimeConfig('allow_repeats', false)
+api.setRuntimeConfig('allowRepeats', false)
 
-api.setRuntimeConfig('windowsizer_request', { width: 800, height: 600 })
-api.setRuntimeConfig('windowsizer_aggressive', true)
+api.setRuntimeConfig('windowsizerRequest', { width: 800, height: 600 })
+api.setRuntimeConfig('windowsizerAggressive', true)
 
-api.setRuntimeConfig('anonymous_mode', false)
-api.setRuntimeConfig('lab_url', 'https://gureckislab.org')
-api.setRuntimeConfig('brand_logo_fn', 'universitylogo.png')
+api.setRuntimeConfig('anonymousMode', false)
+api.setRuntimeConfig('labURL', 'https://gureckislab.org')
+api.setRuntimeConfig('brandLogoFn', 'universitylogo.png')
 
-api.setRuntimeConfig('max_writes', 1000)
-api.setRuntimeConfig('min_write_interval', 2000)
-api.setRuntimeConfig('auto_save', true)
+api.setRuntimeConfig('maxWrites', 1000)
+api.setRuntimeConfig('minWriteInterval', 2000)
+api.setRuntimeConfig('autoSave', true)
 ```
 
 ::: danger Warning!
@@ -123,7 +123,7 @@ const payrate = api.getRuntimeConfig('payrate')
 
 Runtime configuration options override the values in the `.env` files if they
 have the same name. For example, if the `.env` file contains an option
-`VITE_LAB_URL` then setting `api.setRuntimeConfig('lab_url')` will override it
+`VITE_LAB_URL` then setting `api.setRuntimeConfig('labURL')` will override it
 (see below for the `VITE_` syntax). However, if you create a novel runtime
 config it will be stored separately (specifically `smileConfig.runtime`) in your
 data file.
@@ -452,35 +452,7 @@ the environment variable.
 If you look at the content of `src/config.js` you can see how these items are
 pulled into a global configuration object.
 
-```
-// config.js
-
-// global configuration options for the smile app
-
-export default {
-    project_name: import.meta.env.VITE_PROJECT_NAME, // autocompute this on intitialization
-    code_name: import.meta.env.VITE_CODE_NAME,
-    code_name_url: import.meta.env.VITE_CODE_NAME_DEPLOY_URL,
-    github: {
-        repo_name: import.meta.env.VITE_GIT_REPO_NAME,
-        owner: import.meta.env.VITE_GIT_OWNER,
-        branch: import.meta.env.VITE_GIT_BRANCH_NAME,
-        last_commit_msg: import.meta.env.VITE_GIT_LAST_MSG,
-        last_commit_hash: import.meta.env.VITE_GIT_HASH, // autocompute this all the time
-        commit_url: 'https://github.com/' + import.meta.env.VITE_GIT_OWNER + '/' + import.meta.env.VITE_GIT_REPO_NAME + '/commit/' + import.meta.env.VITE_GIT_HASH
-    },
-    allow_repeats: import.meta.env.VITE_ALLOW_REPEATS,
-    deploy_url: import.meta.env.VITE_DEPLOY_URL, // auto compute this
-    firebaseConfig : {
-        apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
-        authDomain: import.meta.env.VITE_FIREBASE_AUTHDOMAIN,
-        projectId: import.meta.env.VITE_FIREBASE_PROJECTID,
-        storageBucket: import.meta.env.VITE_FIREBASE_STORAGEBUCKET,
-        messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGINGSENDERID,
-        appId: import.meta.env.VITE_FIREBASE_APPID
-    }
-}
-```
+<<< ../src/core/config.js
 
 It is important to keep in mind that variables passed to `src/core/config.js`
 will not necessarily appear in GitHub but **will** be visible to people

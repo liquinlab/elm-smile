@@ -543,7 +543,7 @@ timeline.registerView({
   name: 'withdraw',
   meta: {
     requiresWithdraw: true,
-    resetApp: api.getConfig('allow_repeats'),
+    resetApp: api.getConfig('allowRepeats'),
   },
   component: Withdraw,
 })
@@ -591,7 +591,7 @@ timeline.pushSeqView({
   component: Thanks,
   meta: {
     requiresDone: true,
-    resetApp: api.getConfig('allow_repeats'),
+    resetApp: api.getConfig('allowRepeats'),
   },
 })
 ```

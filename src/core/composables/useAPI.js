@@ -209,7 +209,7 @@ class SmileAPI {
    * @returns {void}
    */
   resetLocalState() {
-    localStorage.removeItem(this.config.local_storage_key)
+    localStorage.removeItem(this.config.localStorageKey)
     this.store.resetLocal()
     const url = window.location.href
     window.location.href = url.substring(0, url.lastIndexOf('#/'))
@@ -370,10 +370,10 @@ class SmileAPI {
    */
   isBrowserTooSmall() {
     let val = false
-    if (this.store.config.windowsizer_aggressive === true && this.store.data.verifiedVisibility === true) {
+    if (this.store.config.windowsizerAggressive === true && this.store.data.verifiedVisibility === true) {
       val =
-        window.innerWidth < this.store.config.windowsizer_request.width + 40 ||
-        window.innerHeight < this.store.config.windowsizer_request.height + 40
+        window.innerWidth < this.store.config.windowsizerRequest.width + 40 ||
+        window.innerHeight < this.store.config.windowsizerRequest.height + 40
     }
     return val
   }

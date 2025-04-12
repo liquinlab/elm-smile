@@ -6,7 +6,7 @@ import config from '@/core/config'
 // Mock must be defined inline without external variables
 vi.mock('@/core/config', () => ({
   default: {
-    max_stepper_rows: 5000,
+    maxStepperRows: 5000,
   },
 }))
 
@@ -502,7 +502,7 @@ describe('NestedTable', () => {
       const smallTable = table.append([{ color: 'blue', shape: 'square' }])
 
       expect(() => {
-        const largeTable = table.append(Array(config.max_stepper_rows + 1).fill({ color: 'red', shape: 'circle' }))
+        const largeTable = table.append(Array(config.maxStepperRows + 1).fill({ color: 'red', shape: 'circle' }))
         smallTable.append(largeTable)
       }).toThrow(/Cannot append \d+ rows as it exceeds the safety limit of \d+/)
     })
@@ -587,7 +587,7 @@ describe('NestedTable', () => {
 
     it('should throw error if the number of elements is create the the max table size', () => {
       expect(() => {
-        table.range(config.max_stepper_rows + 1)
+        table.range(config.maxStepperRows + 1)
       }).toThrow(/Cannot append \d+ rows as it exceeds the safety limit of \d+/)
     })
   })
@@ -835,7 +835,7 @@ describe('NestedTable', () => {
     it('should throw error when zip would exceed safety limit', () => {
       // Create arrays that would exceed the limit when zipped
       const trials = {
-        shape: Array(config.max_stepper_rows + 1).fill('circle'),
+        shape: Array(config.maxStepperRows + 1).fill('circle'),
         color: ['red', 'green'],
       }
 
@@ -1051,7 +1051,7 @@ describe('NestedTable', () => {
 
     it('should throw error when result would exceed safety limit', () => {
       const table1 = new NestedTable(sm)
-      table1.append(Array(config.max_stepper_rows - 1).fill({ value: 'a' }))
+      table1.append(Array(config.maxStepperRows - 1).fill({ value: 'a' }))
       const table2 = new NestedTable(sm)
       table2.append([{ value: 'b' }, { value: 'c' }])
 
@@ -1507,7 +1507,7 @@ describe('NestedTable', () => {
       expect(() => {
         table1.sample({
           type: 'with-replacement',
-          size: config.max_stepper_rows + 1,
+          size: config.maxStepperRows + 1,
         })
       }).toThrow(/sample\(\) would generate \d+ rows, which exceeds the safety limit/)
     })
@@ -2480,12 +2480,12 @@ describe('NestedTable', () => {
   //   const table = new NestedTable(sm)
   //
   //   // Test initial value exceeding limit
-  //   const tooManyItems = Array(config.max_stepper_rows + 1).fill({ value: 1 })
+  //   const tooManyItems = Array(config.maxStepperRows + 1).fill({ value: 1 })
   //   expect(() => table.append(tooManyItems)).toThrow(/exceeds the safety limit/)
   //
   //   // Test accumulating too many rows
   //   const almostFullTable = new NestedTable(sm)
-  //   const items = Array(config.max_stepper_rows - 1).fill({ value: 1 })
+  //   const items = Array(config.maxStepperRows - 1).fill({ value: 1 })
   //   almostFullTable.append(items)
   //
   //   // Adding two more should fail
@@ -2493,7 +2493,7 @@ describe('NestedTable', () => {
   //
   //   // Adding one more should succeed
   //   almostFullTable.append({ value: 1 })
-  //   expect(almostFullTable.length).toBe(config.max_stepper_rows)
+  //   expect(almostFullTable.length).toBe(config.maxStepperRows)
   //
   //   // Test appending table that would exceed limit
   //   const sourceTable = new NestedTable(sm)

@@ -229,7 +229,7 @@ Next select "Webhook" as the type of workflow you are creating.
 ![Slack config](/images/labconfig-slack2.png)
 
 Click add variables and add the following three variables names to your workflow
-(`github_username`, `deploy_url`, and `github_hash`):
+(`github_username`, `deployURL`, and `github_hash`):
 
 ![Slack config](/images/labconfig-slack3.png)
 

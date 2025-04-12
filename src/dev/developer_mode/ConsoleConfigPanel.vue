@@ -76,7 +76,7 @@ function panel_jump(index) {
 }
 
 function resetDevState() {
-  localStorage.removeItem(api.config.dev_local_storage_key) // delete the local store
+  localStorage.removeItem(api.config.devLocalStorageKey) // delete the local store
   location.reload()
 }
 </script>

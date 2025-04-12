@@ -15,7 +15,7 @@ const mockSmilestore = {
     currentPageDone: false,
   },
   config: {
-    auto_save: false,
+    autoSave: false,
   },
   saveData: vi.fn(),
 }
@@ -82,7 +82,7 @@ describe('useTimeline composable', () => {
     // Reset mock state
     mockSmilestore.global.forceNavigate = false
     mockSmilestore.dev.currentPageDone = false
-    mockSmilestore.config.auto_save = false
+    mockSmilestore.config.autoSave = false
     vi.clearAllMocks()
 
     // Create a fresh router for each test
@@ -210,9 +210,9 @@ describe('useTimeline composable', () => {
     expect(nextRoute).toBeNull()
   })
 
-  it('should save data when auto_save is enabled', async () => {
-    // Enable auto_save
-    mockSmilestore.config.auto_save = true
+  it('should save data when autoSave is enabled', async () => {
+    // Enable autoSave
+    mockSmilestore.config.autoSave = true
 
     await router.push({ name: 'home' })
 
@@ -224,9 +224,9 @@ describe('useTimeline composable', () => {
     expect(mockLog.log).toHaveBeenCalledWith('TIMELINE STEPPER: Attempting auto saving on navigateTo() navigation')
   })
 
-  it('should not save data when auto_save is disabled', async () => {
-    // Ensure auto_save is disabled
-    mockSmilestore.config.auto_save = false
+  it('should not save data when autoSave is disabled', async () => {
+    // Ensure autoSave is disabled
+    mockSmilestore.config.autoSave = false
 
     await router.push({ name: 'home' })
 

@@ -134,7 +134,7 @@ export const updateSubjectDataRecord = async (data, docid) => {
   const log = useLog()
   try {
     validateFirestoreData(data)
-    const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/`, docid)
+    const docRef = doc(db, `${mode}/${appconfig.projectRef}/data/`, docid)
     await setDoc(docRef, data, { merge: true })
   } catch (e) {
     log.error('FIRESTORE-DB: Error updating document:', e.message)
@@ -153,7 +153,7 @@ export const updatePrivateSubjectDataRecord = async (data, docid) => {
   const log = useLog()
   // is it weird to have a aync method that doesn't return anything?
   try {
-    const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/${docid}/private/`, 'private_data')
+    const docRef = doc(db, `${mode}/${appconfig.projectRef}/data/${docid}/private/`, 'private_data')
     setDoc(docRef, data, {
       merge: true,
     })
@@ -175,7 +175,7 @@ export const loadDoc = async (docid) => {
     const user = await anonymousAuth()
     if (!user) throw new Error('Authentication failed')
 
-    const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/`, docid)
+    const docRef = doc(db, `${mode}/${appconfig.projectRef}/data/`, docid)
     const docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
       const data = docSnap.data()
@@ -208,25 +208,25 @@ export const createDoc = async (data) => {
 
     validateFirestoreData(data)
 
-    log.log(`FIRESTORE-DB: trying to create a main document.`, appconfig.project_ref)
+    log.log(`FIRESTORE-DB: trying to create a main document.`, appconfig.projectRef)
 
-    const expRef = doc(db, mode, appconfig.project_ref)
+    const expRef = doc(db, mode, appconfig.projectRef)
     // Check if document exists first
     const docSnap = await getDoc(expRef)
     if (!docSnap.exists()) {
       await setDoc(expRef, {
-        project_name: appconfig.project_name,
-        project_ref: appconfig.project_ref,
-        code_name: appconfig.code_name,
-        code_name_url: appconfig.code_name_url,
+        projectName: appconfig.projectName,
+        projectRef: appconfig.projectRef,
+        codeName: appconfig.codeName,
+        codeNameURL: appconfig.codeNameURL,
       })
-      log.log('FIRESTORE-DB: New experiment registered with ID: ', `${mode}/${appconfig.project_ref}`)
+      log.log('FIRESTORE-DB: New experiment registered with ID: ', `${mode}/${appconfig.projectRef}`)
     }
 
-    log.log(`FIRESTORE-DB: trying to create a main document.`, appconfig.project_ref)
+    log.log(`FIRESTORE-DB: trying to create a main document.`, appconfig.projectRef)
 
     // Add a new document with a generated id.
-    const docRef = await addDoc(collection(db, `${mode}/${appconfig.project_ref}/data`), {
+    const docRef = await addDoc(collection(db, `${mode}/${appconfig.projectRef}/data`), {
       ...data,
       firebaseAnonAuthID: user.uid,
     })
@@ -260,7 +260,7 @@ export const createPrivateDoc = async (data, docId) => {
 
     validateFirestoreData(data)
     // Add a new document with a generated id.
-    const docRef = doc(db, `${mode}/${appconfig.project_ref}/data/${docId}/private/`, 'private_data')
+    const docRef = doc(db, `${mode}/${appconfig.projectRef}/data/${docId}/private/`, 'private_data')
     await setDoc(docRef, {
       ...data,
       firebaseAnonAuthID: user.uid,

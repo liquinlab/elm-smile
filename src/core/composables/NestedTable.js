@@ -115,17 +115,17 @@ class NestedTable {
             }
 
             // Check if initial value exceeds limit
-            if (itemsToAdd > config.max_stepper_rows) {
+            if (itemsToAdd > config.maxStepperRows) {
               throw new Error(
-                `Cannot append ${itemsToAdd} rows as it exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to append.`
+                `Cannot append ${itemsToAdd} rows as it exceeds the safety limit of ${config.maxStepperRows}. Consider reducing the number of rows to append.`
               )
             }
 
             // Check if appending would exceed limit
             const newLength = target._items.length + itemsToAdd
-            if (newLength > config.max_stepper_rows) {
+            if (newLength > config.maxStepperRows) {
               throw new Error(
-                `append() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to append.`
+                `append() would generate ${newLength} rows, which exceeds the safety limit of ${config.maxStepperRows}. Consider reducing the number of rows to append.`
               )
             }
 
@@ -266,9 +266,9 @@ class NestedTable {
 
             // Check safety limit first
             const newLength = target._items.length + maxLength
-            if (newLength > config.max_stepper_rows) {
+            if (newLength > config.maxStepperRows) {
               throw new Error(
-                `zip() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of values in your arrays.`
+                `zip() would generate ${newLength} rows, which exceeds the safety limit of ${config.maxStepperRows}. Consider reducing the number of values in your arrays.`
               )
             }
 
@@ -345,9 +345,9 @@ class NestedTable {
             }
 
             // Check if n exceeds safety limit
-            if (n > config.max_stepper_rows) {
+            if (n > config.maxStepperRows) {
               throw new Error(
-                `Cannot append ${n} rows as it exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to append.`
+                `Cannot append ${n} rows as it exceeds the safety limit of ${config.maxStepperRows}. Consider reducing the number of rows to append.`
               )
             }
 
@@ -380,9 +380,9 @@ class NestedTable {
             if (n <= 0 || target._items.length === 0) return selfProxy
 
             const totalRows = target._items.length * n
-            if (totalRows > config.max_stepper_rows) {
+            if (totalRows > config.maxStepperRows) {
               throw new Error(
-                `repeat() would generate ${totalRows} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the repeat count.`
+                `repeat() would generate ${totalRows} rows, which exceeds the safety limit of ${config.maxStepperRows}. Consider reducing the repeat count.`
               )
             }
 
@@ -495,9 +495,9 @@ class NestedTable {
             const rng = seed ? seedrandom(seed) : Math.random
 
             // Check safety limit first
-            if (size && size > config.max_stepper_rows) {
+            if (size && size > config.maxStepperRows) {
               throw new Error(
-                `sample() would generate ${size} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the sample size.`
+                `sample() would generate ${size} rows, which exceeds the safety limit of ${config.maxStepperRows}. Consider reducing the sample size.`
               )
             }
 
@@ -729,9 +729,9 @@ class NestedTable {
 
             // Check if the operation would exceed max rows
             const newLength = target._items.length + inputItems.length
-            if (newLength > config.max_stepper_rows) {
+            if (newLength > config.maxStepperRows) {
               throw new Error(
-                `interleave() would generate ${newLength} rows, which exceeds the safety limit of ${config.max_stepper_rows}. Consider reducing the number of rows to interleave.`
+                `interleave() would generate ${newLength} rows, which exceeds the safety limit of ${config.maxStepperRows}. Consider reducing the number of rows to interleave.`
               )
             }
 
@@ -793,9 +793,9 @@ class NestedTable {
 
             // Check safety limit first
             const newLength = target._items.length + totalCombinations
-            if (newLength > config.max_stepper_rows) {
+            if (newLength > config.maxStepperRows) {
               throw new Error(
-                `outer() would generate ${totalCombinations} combinations, which exceeds the safety limit of ${config.max_stepper_rows}. Consider using zip() or reducing the number of values in your arrays.`
+                `outer() would generate ${totalCombinations} combinations, which exceeds the safety limit of ${config.maxStepperRows}. Consider using zip() or reducing the number of values in your arrays.`
               )
             }
 

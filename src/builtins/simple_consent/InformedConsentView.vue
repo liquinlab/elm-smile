@@ -18,7 +18,7 @@ function finish() {
   api.goNextView()
 }
 
-if (appconfig.anonymous_mode) {
+if (appconfig.anonymousMode) {
   // Skip the consent form if in anonymous mode
   finish()
 }

@@ -13,7 +13,7 @@ var timer = ref(null)
 const firebase_url = computed(() => {
   const mode = api.config.mode == 'development' ? 'testing' : 'real'
 
-  return `https://console.firebase.google.com/u/0/project/${api.config.firebaseConfig.projectId}/firestore/data/~2F${mode}~2F${api.config.project_ref}~2Fdata~2F${api.store.local.docRef}`
+  return `https://console.firebase.google.com/u/0/project/${api.config.firebaseConfig.projectId}/firestore/data/~2F${mode}~2F${api.config.projectRef}~2Fdata~2F${api.store.local.docRef}`
 })
 
 function open_firebase_console(url) {
@@ -248,7 +248,7 @@ const showServiceSelect = ref(false)
         <tr class="is-hidden-small">
           <td class="has-text-left"><b>Writes:</b></td>
           <td class="has-text-left is-family-code">
-            {{ api.store.local.totalWrites }} out of {{ api.config.max_writes }} max
+            {{ api.store.local.totalWrites }} out of {{ api.config.maxWrites }} max
           </td>
         </tr>
         <tr class="is-hidden-small">
@@ -260,7 +260,7 @@ const showServiceSelect = ref(false)
         <tr class="is-hidden-small">
           <td class="has-text-left"><b>Auto save:</b></td>
           <td class="has-text-left is-family-code">
-            {{ api.config.auto_save }}
+            {{ api.config.autoSave }}
           </td>
         </tr>
         <tr class="is-hidden-small">

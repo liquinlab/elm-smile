@@ -270,7 +270,7 @@ describe('useAPI composable', () => {
 
     // Test resetLocalState
     api.resetLocalState()
-    expect(window.localStorage.removeItem).toHaveBeenCalledWith(api.config.local_storage_key)
+    expect(window.localStorage.removeItem).toHaveBeenCalledWith(api.config.localStorageKey)
     expect(api.store.resetLocal).toHaveBeenCalled()
   })
 

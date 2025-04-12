@@ -44,7 +44,7 @@ const props = defineProps({
             <p><FAIcon icon="bahai" />&nbsp;&nbsp;Who are we?</p>
           </div>
           <div class="message-body is-size-7 has-text-left">
-            <div v-if="!appconfig.anonymous_mode">
+            <div v-if="!appconfig.anonymousMode">
               We are the <a href="http://gureckislab.org" target="_blank">Computation and Cognition Lab</a> at New York
               University under the direction to
               <a href="http://todd.gureckislab.org" target="_blank">Dr. Todd Gureckis</a>. Our lab uses games and other

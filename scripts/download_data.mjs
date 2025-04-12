@@ -156,7 +156,7 @@ const run = async () => {
   // show script introduction
   init()
   const env = dotenv.config({ path: 'env/.env.git.local' })
-  // const project_ref = `${env.parsed.VITE_GIT_OWNER}-${env.parsed.VITE_PROJECT_NAME}-${env.parsed.VITE_GIT_BRANCH_NAME}`
+  // const projectRef = `${env.parsed.VITE_GIT_OWNER}-${env.parsed.VITE_PROJECT_NAME}-${env.parsed.VITE_GIT_BRANCH_NAME}`
 
   // ask questions
 

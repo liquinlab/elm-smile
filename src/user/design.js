@@ -45,18 +45,18 @@ const smilestore = useSmileStore()
 
 // #4.  Set runtime configuration options
 //      See http://smile.gureckislab.org/configuration.html#experiment-options-env
-api.setRuntimeConfig('allow_repeats', false)
+api.setRuntimeConfig('allowRepeats', false)
 
-api.setRuntimeConfig('windowsizer_request', { width: 800, height: 600 })
-api.setRuntimeConfig('windowsizer_aggressive', true)
+api.setRuntimeConfig('windowsizerRequest', { width: 800, height: 600 })
+api.setRuntimeConfig('windowsizerAggressive', true)
 
-api.setRuntimeConfig('anonymous_mode', false)
-api.setRuntimeConfig('lab_url', 'https://gureckislab.org')
-api.setRuntimeConfig('brand_logo_fn', 'universitylogo.png')
+api.setRuntimeConfig('anonymousMode', false)
+api.setRuntimeConfig('labURL', 'https://gureckislab.org')
+api.setRuntimeConfig('brandLogoFn', 'universitylogo.png')
 
-api.setRuntimeConfig('max_writes', 1000)
-api.setRuntimeConfig('min_write_interval', 2000)
-api.setRuntimeConfig('auto_save', true)
+api.setRuntimeConfig('maxWrites', 1000)
+api.setRuntimeConfig('minWriteInterval', 2000)
+api.setRuntimeConfig('autoSave', true)
 
 api.setRuntimeConfig('payrate', '$15USD/hour prorated for estimated completition time + performance related bonus')
 
@@ -266,7 +266,7 @@ timeline.pushSeqView({
   component: Thanks,
   meta: {
     requiresDone: true,
-    resetApp: api.getConfig('allow_repeats'),
+    resetApp: api.getConfig('allowRepeats'),
   },
 })
 
@@ -275,7 +275,7 @@ timeline.registerView({
   name: 'withdraw',
   meta: {
     requiresWithdraw: true,
-    resetApp: api.getConfig('allow_repeats'),
+    resetApp: api.getConfig('allowRepeats'),
   },
   component: Withdraw,
 })

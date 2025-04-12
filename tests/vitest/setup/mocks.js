@@ -88,12 +88,12 @@ vi.mock('@/core/composables/useStepper', () => {
 //   return {
 //     default: {
 //       mode: 'development',
-//       local_storage_key: 'smile_test',
-//       windowsizer_aggressive: false,
-//       windowsizer_request: { width: 800, height: 600 },
-//       max_writes: 100,
-//       min_write_interval: 1000,
-//       dev_local_storage_key: 'smile_dev_test',
+//       localStorageKey: 'smile_test',
+//       windowsizerAggressive: false,
+//       windowsizerRequest: { width: 800, height: 600 },
+//       maxWrites: 100,
+//       minWriteInterval: 1000,
+//       devLocalStorageKey: 'smile_dev_test',
 //     },
 //   }
 // })

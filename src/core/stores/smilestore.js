@@ -24,7 +24,7 @@ import useLog from '@/core/stores/log'
 
 // get local storage
 
-const existingLocalStorage = JSON.parse(localStorage.getItem(appconfig.local_storage_key))
+const existingLocalStorage = JSON.parse(localStorage.getItem(appconfig.localStorageKey))
 
 let seed
 // if there is no local storage, then definitely have to set seed
@@ -56,7 +56,7 @@ if (seed) {
 
   // save to local storage
   localStorage.setItem(
-    appconfig.local_storage_key,
+    appconfig.localStorageKey,
     JSON.stringify({ ...existingLocalStorage, seedID: seed, seedSet: true })
   )
 }
@@ -78,7 +78,7 @@ function removeFirestore(config) {
   return rest
 }
 
-const init_dev = {
+const initDev = {
   // syncs with local storage
   pageProvidesAutofill: null, // does current page offer autofil (transient)
   pageProvidesTrialStepper: false, // does current page provide a trial stepper (transient)
@@ -99,7 +99,7 @@ const init_dev = {
   routePanel: { visible: false, x: -0, y: -3 },
 }
 
-const init_local = {
+const initLocal = {
   // syncs with local storage
   knownUser: false,
   lastRoute: initLastRoute(appconfig.mode),
@@ -125,7 +125,7 @@ const init_local = {
   randomizedRoutes: {}, // tracking randomized route assignments both locally and remotely
 }
 
-const init_global = {
+const initGlobal = {
   // ephemeral state, resets on browser refresh
   progress: 0,
   forceNavigate: false,
@@ -147,16 +147,16 @@ const init_global = {
 export default defineStore('smilestore', {
   // arrow function recommended for full type inference
   state: () => ({
-    local: useStorage(appconfig.local_storage_key, init_local, localStorage, { mergeDefaults: true }),
-    global: init_global,
+    local: useStorage(appconfig.localStorageKey, initLocal, localStorage, { mergeDefaults: true }),
+    global: initGlobal,
     dev:
       appconfig.mode === 'development'
-        ? useStorage(appconfig.dev_local_storage_key, init_dev, localStorage, { mergeDefaults: true })
-        : init_dev,
+        ? useStorage(appconfig.devLocalStorageKey, initDev, localStorage, { mergeDefaults: true })
+        : initDev,
     private: {
-      recruitment_info: {},
-      withdraw_data: {},
-      browser_fingerprint: {}, // empty
+      recruitmentInfo: {},
+      withdrawData: {},
+      browserFingerprint: {}, // empty
     },
     data: {
       // syncs with firestore
@@ -236,7 +236,7 @@ export default defineStore('smilestore', {
     setWithdrawn(forminfo) {
       this.local.withdrawn = true
       this.data.withdrawn = true
-      this.private.withdraw_data = forminfo
+      this.private.withdrawData = forminfo
       this.data.endtime = fsnow()
     },
     setDone() {
@@ -324,13 +324,13 @@ export default defineStore('smilestore', {
     },
     setFingerPrint(ip, userAgent, language, webdriver) {
       const log = useLog()
-      this.private.browser_fingerprint = {
+      this.private.browserFingerprint = {
         ip,
         userAgent,
         language,
         webdriver,
       }
-      log.log('Browser fingerprint: ' + JSON.stringify(this.data.browser_fingerprint))
+      log.log('Browser fingerprint: ' + JSON.stringify(this.data.browserFingerprint))
     },
     setAutofill(fn) {
       this.dev.pageProvidesAutofill = fn
@@ -340,7 +340,7 @@ export default defineStore('smilestore', {
     },
     setRecruitmentService(service, info) {
       this.data.recruitmentService = service
-      this.private.recruitment_info = info
+      this.private.recruitmentInfo = info
     },
     autofill() {
       if (this.dev.pageProvidesAutofill) {
@@ -353,7 +353,7 @@ export default defineStore('smilestore', {
       this.data.studyData.push(JSON.parse(JSON.stringify(data)))
     },
     recordProperty(name, data) {
-      this.data[name + '_form'] = JSON.parse(JSON.stringify(data))
+      this.data[name] = JSON.parse(JSON.stringify(data))
     },
     verifyVisibility(value) {
       this.data.verifiedVisibility = value
@@ -423,16 +423,16 @@ export default defineStore('smilestore', {
     async saveData(force = false) {
       const log = useLog()
       if (this.isDBConnected) {
-        if (!force && this.local.totalWrites >= appconfig.max_writes) {
+        if (!force && this.local.totalWrites >= appconfig.maxWrites) {
           log.error(
             'SMILESTORE: max writes reached to firebase.  Data NOT saved.  Call saveData() less numerously to avoid problems/cost issues.'
           )
           return
         }
 
-        if (!force && this.local.lastWrite && Date.now() - this.local.lastWrite < appconfig.min_write_interval) {
+        if (!force && this.local.lastWrite && Date.now() - this.local.lastWrite < appconfig.minWriteInterval) {
           log.error(
-            `SMILESTORE: write interval too short for firebase (${appconfig.min_write_interval}).  \
+            `SMILESTORE: write interval too short for firebase (${appconfig.minWriteInterval}).  \
             Data NOT saved. Call saveData() less frequently to avoid problems/cost issues. See env/.env \
             file to alter this setting.`
           )

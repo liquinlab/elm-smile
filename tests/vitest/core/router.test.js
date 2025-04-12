@@ -19,7 +19,7 @@ function createTestTimeline(mode) {
   const mockMiniAPI = {
     config: {
       mode: mode,
-      local_storage_key: 'test_storage',
+      localStorageKey: 'test_storage',
     },
     log: {
       debug: vi.fn(),
@@ -175,7 +175,7 @@ function createTestTimeline(mode) {
     component: MockComponent('Withdraw'),
     meta: {
       requiresWithdraw: true,
-      //resetApp: api.getConfig('allow_repeats'),
+      //resetApp: api.getConfig('allowRepeats'),
     },
   })
 
@@ -268,17 +268,17 @@ async function setupApp(mode = 'production') {
 
 // resets the local storage.  simulates deleting it in the browser
 function resetLocalStorage() {
-  localStorage.setItem(appconfig.local_storage_key, null)
+  localStorage.setItem(appconfig.localStorageKey, null)
 }
 
 // sets a json version of data in local storage
 function setLocalStorage(data) {
-  localStorage.setItem(appconfig.local_storage_key, JSON.stringify(data))
+  localStorage.setItem(appconfig.localStorageKey, JSON.stringify(data))
 }
 
 // returns the local storage as a javascript object
 function getLocalStorage() {
-  return JSON.parse(localStorage.getItem(appconfig.local_storage_key))
+  return JSON.parse(localStorage.getItem(appconfig.localStorageKey))
 }
 
 describe('useRouter methods', () => {

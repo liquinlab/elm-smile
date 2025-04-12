@@ -631,7 +631,7 @@ timeline.pushSeqView({
   component: Thanks,
   meta: {
     requiresDone: true,
-    resetApp: smilestore.config.allow_repeats,
+    resetApp: smilestore.config.allowRepeats,
   },
 })
 ```

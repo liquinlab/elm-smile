@@ -19,7 +19,7 @@ const email = ref('')
 function prefill_email() {
   let emailval = ''
   if (smilestore.data.recruitmentService === 'prolific') {
-    emailval = `${smilestore.private.recruitment_info.prolific_id}@email.prolific.co`
+    emailval = `${smilestore.private.recruitmentInfo.prolific_id}@email.prolific.co`
   }
   return emailval
 }
@@ -52,12 +52,12 @@ function submitWithdraw() {
 <template>
   <div class="infobar" role="navigation" aria-label="main navigation">
     <div class="infobar-brand">
-      <a class="infobar-logo" :href="appconfig.lab_url" target="_new" v-if="!appconfig.anonymous_mode">
-        <img :src="api.getStaticUrl(appconfig.brand_logo_fn)" width="90" />
+      <a class="infobar-logo" :href="appconfig.labURL" target="_new" v-if="!appconfig.anonymousMode">
+        <img :src="api.getStaticUrl(appconfig.brandLogoFn)" width="90" />
       </a>
       <div class="infobar-item">
         <p class="is-size-7 studyinfo pt-2">
-          Study: {{ smilestore.config.code_name }}<br />Version: {{ smilestore.config.github.last_commit_hash
+          Study: {{ smilestore.config.codeName }}<br />Version: {{ smilestore.config.github.lastCommitHash
           }}{{
             appconfig.mode === 'testing' || appconfig.mode === 'development' || appconfig.mode === 'presentation'
               ? '-' + appconfig.mode
@@ -69,7 +69,7 @@ function submitWithdraw() {
     </div>
     <div id="infobar" class="infobar-menu is-active">
       <div class="infobar-end">
-        <div class="infobar-item" v-if="!appconfig.anonymous_mode">
+        <div class="infobar-item" v-if="!appconfig.anonymousMode">
           <div class="buttons">
             <button class="button is-info is-small is-light" v-if="api.store.local.consented" @click="toggleConsent()">
               <FAIcon icon="magnifying-glass" />&nbsp;&nbsp;View consent
