@@ -1,3 +1,19 @@
+/**
+ * @module useHStepper
+ * @description Hierarchical stepper composable for managing multi-step processes in views.
+ * Provides functionality for:
+ * - Managing hierarchical state transitions
+ * - Tracking step data and history
+ * - Handling nested tables and transactions
+ * - Managing global variables and timing
+ *
+ * The stepper maintains state using a tree structure that:
+ * - Tracks the current path and available paths
+ * - Manages step data and transaction history
+ * - Provides utilities for timing and data access
+ * - Handles nested table instances
+ */
+
 import { ref, computed, markRaw, reactive } from 'vue'
 import useSmileStore from '@/core/stores/smilestore'
 import useLog from '@/core/stores/log'

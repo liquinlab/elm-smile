@@ -1,8 +1,40 @@
+/**
+ * @module NestedTable
+ * @description A module providing a hierarchical data structure for managing nested tables and data operations.
+ * Provides functionality for:
+ * - Managing nested data structures
+ * - Performing hierarchical operations
+ * - Tracking paths and relationships
+ * - Handling data transformations
+ *
+ * The NestedTable structure enables:
+ * - Chainable operations on nested data
+ * - Path-based data access and modification
+ * - Parent-child relationship tracking
+ * - Flexible data storage and retrieval
+ *
+ * Used with StepState and HStepper for complex hierarchical data management.
+ */
 import seedrandom from 'seedrandom'
 import config from '@/core/config'
 import { v4 as uuidv4 } from 'uuid'
 
 // Helper function to handle array padding/looping
+/**
+ * Adjusts an array to a target length by either padding or looping its contents
+ * @param {Array} arr - The input array to adjust
+ * @param {number} targetLength - The desired length of the output array
+ * @param {string} [method='pad'] - The method to use: 'pad' or 'loop'
+ * @param {*} [padValue=undefined] - Value to pad with when using 'pad' method. If undefined, uses last array element
+ * @returns {Array} A new array of the target length
+ * @example
+ * // Pad with last value
+ * adjustArrayLength([1,2], 4) // returns [1,2,2,2]
+ * // Pad with specific value
+ * adjustArrayLength([1,2], 4, 'pad', 0) // returns [1,2,0,0]
+ * // Loop values
+ * adjustArrayLength([1,2], 5, 'loop') // returns [1,2,1,2,1]
+ */
 function adjustArrayLength(arr, targetLength, method = 'pad', padValue = undefined) {
   if (arr.length >= targetLength) return arr.slice(0, targetLength)
 

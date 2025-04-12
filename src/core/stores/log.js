@@ -1,3 +1,12 @@
+/**
+ * @module log
+ * @description Pinia store for managing application logging functionality. Provides methods for:
+ * - Logging messages at different levels (debug, info, warn, error)
+ * - Capturing stack traces
+ * - Formatting log messages
+ * - Notifying users of important events
+ * - Integrating with the application's global state management
+ */
 import { defineStore } from 'pinia'
 import appconfig from '@/core/config'
 import { push } from 'notivue'

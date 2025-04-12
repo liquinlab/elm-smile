@@ -1,6 +1,19 @@
 /**
- * Firebase/Firestore database configuration and utility functions
+ * Firebase/Firestore database configuration and utility functions.
+ * Provides functionality for:
+ * - Firebase/Firestore initialization and configuration
+ * - Authentication utilities
+ * - Database operations (read/write)
+ * - Timestamp management
+ *
+ * This module handles:
+ * - Setting up Firebase/Firestore connections
+ * - Managing authentication state
+ * - Providing database operation utilities
+ * - Supporting both production and testing environments
+ *
  * @module firestore-db
+ * @description Core Firebase/Firestore database functionality for the application
  */
 
 import { initializeApp } from 'firebase/app'

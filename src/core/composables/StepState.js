@@ -1,5 +1,6 @@
 /**
- * A tree-based state management class for hierarchical navigation.
+ * @class StepState
+ * @description A tree-based state management class for hierarchical navigation.
  *
  * StepState represents a node in a tree structure where each node can have:
  * - A id (string, number, or custom type)
@@ -8,6 +9,14 @@
  * - Navigation capabilities (next/prev)
  *
  * Used with StepperStateMachine for higher-level state management.
+ *
+ * @property {*} _id - The node's unique identifier
+ * @property {StepState[]} _states - Array of child nodes/states
+ * @property {number} _currentIndex - Index tracking current position in children
+ * @property {number} _depth - Depth of this node in the tree (0 for root)
+ * @property {StepState|null} _parent - Reference to parent node
+ * @property {StepState} _root - Reference to root node
+ * @property {Object} _data - Associated data for this node
  */
 export class StepState {
   /**

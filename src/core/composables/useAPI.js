@@ -1,3 +1,20 @@
+/**
+ * @module useAPI
+ * @description Creates and returns a reactive SmileAPI instance that provides core functionality for SMILE experiments.
+ * Combines access to:
+ * - Store management (Pinia store)
+ * - Logging capabilities
+ * - Routing and navigation
+ * - Timeline management
+ * - Randomization utilities
+ *
+ * This composable serves as the main entry point for components to interact with the SMILE framework's
+ * core functionality. It initializes all required dependencies and returns a reactive API object
+ * that maintains reactivity when used in components.
+ *
+ * @returns {Object} A reactive SmileAPI instance with all core framework capabilities
+ */
+
 import { reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import useSmileStore from '@/core/stores/smilestore'

@@ -1,3 +1,10 @@
+/**
+ * @module useViewAPI
+ * @description Creates a view-specific API instance that combines core API functionality with stepper controls
+ * @returns {Object} A reactive object containing:
+ * - All methods and properties from the core API
+ * - All methods and properties from the stepper
+ */
 import { reactive } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 import { useStepper } from '@/core/composables/useStepper'
@@ -15,7 +22,6 @@ import { onKeyDown, onKeyPressed, onKeyUp, useMouse, useMousePressed } from '@vu
  * It inherits core API functionality and adds stepper controls, data recording capabilities,
  * and input event handlers. The returned object is made reactive to ensure reactivity in templates.
  */
-
 export default function useViewAPI() {
   const api = useAPI()
   const stepper = useStepper()

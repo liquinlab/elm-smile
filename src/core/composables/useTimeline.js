@@ -1,3 +1,19 @@
+/**
+ * @module useTimeline
+ * @description Timeline management composable for handling view navigation in the SMILE framework.
+ * Provides functionality for:
+ * - Sequential navigation between views
+ * - Route metadata handling
+ * - Navigation state management
+ * - Next/previous view lookups
+ *
+ * The timeline ensures proper view sequencing and maintains navigation state by:
+ * - Checking route metadata for navigation rules
+ * - Handling navigation guards
+ * - Managing query parameters between routes
+ * - Providing navigation utilities for views
+ */
+
 import { useRoute, useRouter } from 'vue-router'
 import _ from 'lodash'
 import useSmileStore from '@/core/stores/smilestore'

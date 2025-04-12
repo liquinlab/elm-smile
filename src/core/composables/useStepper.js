@@ -1,3 +1,11 @@
+/**
+ * @module useStepper
+ * @description Manages stepper instances on a per-page basis.
+ * Provides functionality for:
+ * - Creating or retrieving a stepper instance for the current page
+ * - Setting the pageProvidesTrialStepper flag in the dev store
+ * - Storing the stepper instance in the global smilestore
+ */
 import { useHStepper } from './useHStepper'
 import useSmileStore from '@/core/stores/smilestore'
 import { useRoute } from 'vue-router'
