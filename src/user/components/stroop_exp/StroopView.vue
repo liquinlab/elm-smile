@@ -61,9 +61,6 @@ function updateScore() {
 }
 
 // Handle the key presses for the task
-// onKeyDown is a composable from the VueUse package
-// it takes a list of keys to list for each time a key
-// is pressed runs the provided function.
 const stop = api.onKeyDown(
   ['r', 'R', 'g', 'G', 'b', 'B'], // list of keys to listen for
   (e) => {

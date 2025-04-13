@@ -8,6 +8,12 @@ const emit = defineEmits(['selected'])
 
 const height_pct = computed(() => `${api.store.dev.consoleBarHeight - 90}px`)
 
+function truncateText(text, maxLength = 20) {
+  if (!text) return text
+  if (text.length <= maxLength) return text
+  return text.substring(0, maxLength) + '...'
+}
+
 const header = computed(() => {
   if (props.data === undefined || props.data === null) {
     return null
@@ -56,13 +62,13 @@ function option_selected(option) {
       <li v-for="(option, key) in data_field" :class="{ active: key === props.selected }">
         <div v-if="option === null || (typeof option != 'object' && !Array.isArray(option))">
           <a>
-            <b>{{ key }}</b
-            >: {{ option === null ? 'null' : option }}
+            <b>{{ truncateText(key) }}</b
+            >: {{ option === null ? 'null' : truncateText(String(option)) }}
           </a>
         </div>
         <div v-else @click="option_selected(key)">
           <a>
-            <b>{{ key }}</b>
+            <b>{{ truncateText(key) }}</b>
             <div class="arrow">
               <FAIcon icon=" fa-solid fa-angle-right" />
             </div>

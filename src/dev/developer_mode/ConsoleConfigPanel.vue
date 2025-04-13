@@ -123,7 +123,7 @@ function resetDevState() {
           </div>
         </div>
       </div>
-      <div class="column colcontent is-3 edge">
+      <div class="column colcontent is-3 edge isdark">
         <!-- two from end -->
         <ConfigList
           :data="panel_path(2)"
