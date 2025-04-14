@@ -9,7 +9,7 @@
 import { useHStepper } from './useHStepper'
 import useSmileStore from '@/core/stores/smilestore'
 import { useRoute } from 'vue-router'
-
+import { onKeyDown } from '@vueuse/core'
 /**
  * Creates or retrieves a stepper instance for the current page
  * @function useStepper
@@ -36,6 +36,29 @@ export function useStepper() {
       smilestore.global.steppers = {}
     }
     smilestore.global.steppers[page] = useHStepper()
+  }
+
+  // Add shortcuts for arrow keys
+  if (smilestore.config.mode == 'development') {
+    /**
+     * Handle right arrow key press to advance to next step
+     * @listens keydown.ArrowRight
+     * @param {KeyboardEvent} e - The keyboard event
+     */
+    onKeyDown(['ArrowRight'], (e) => {
+      e.preventDefault()
+      smilestore.global.steppers[page].goNextStep()
+    })
+
+    /**
+     * Handle left arrow key press to go back to previous step
+     * @listens keydown.ArrowLeft
+     * @param {KeyboardEvent} e - The keyboard event
+     */
+    onKeyDown(['ArrowLeft'], (e) => {
+      e.preventDefault()
+      smilestore.global.steppers[page].goPrevStep()
+    })
   }
 
   // Return the existing stepper instance

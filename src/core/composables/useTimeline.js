@@ -138,5 +138,5 @@ export default function useTimeline() {
     navigateTo(prevView())
   }
 
-  return { goNextView, goPrevView, goToView, lookupNext }
+  return { goNextView, goPrevView, goToView, lookupNext, nextView, prevView }
 }

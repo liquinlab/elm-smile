@@ -142,6 +142,18 @@ class SmileAPI {
    */
   hasPrevView = () => !!this.route.meta.prev && this.route.meta.sequential
 
+  /**
+   * Get the next view in the navigation sequence
+   * @returns {Object|null} Route object with name and query params, or null if no next view
+   */
+  nextView = () => this.timeline.nextView()
+
+  /**
+   * Get the previous view in the navigation sequence
+   * @returns {Object|null} Route object with name and query params, or null if no previous view
+   */
+  prevView = () => this.timeline.prevView()
+
   // Randomization utilities
   /**
    * Collection of faker distributions for generating random data
@@ -623,13 +635,13 @@ class SmileAPI {
  * @returns {SmileAPI} A reactive SmileAPI instance with timeline, routing and store functionality
  */
 export default function useAPI() {
-  const { goNextView, goPrevView, goToView } = useTimeline()
+  const { goNextView, goPrevView, goToView, nextView, prevView } = useTimeline()
   const route = useRoute()
   const router = useRouter()
   const store = useSmileStore()
   const logStore = useLog()
 
-  const timeline = { goNextView, goPrevView, goToView }
+  const timeline = { goNextView, goPrevView, goToView, nextView, prevView }
   const api = new SmileAPI(store, logStore, route, router, timeline)
   return reactive(api)
 }
