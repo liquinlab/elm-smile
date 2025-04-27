@@ -38,14 +38,14 @@ describe('StepState', () => {
     })
 
     it('should allow nested states', () => {
-      stepper.push('level1')
-      stepper['level1'].push('level2')
-      stepper['level1']['level2'].push('level3')
-      stepper['level1']['level2']['level3'].push('level4')
-      expect(stepper['level1']).toBeTruthy()
-      expect(stepper['level1']['level2']).toBeTruthy()
-      expect(stepper['level1']['level2']['level3']).toBeTruthy()
-      expect(stepper['level1']['level2']['level3']['level4']).toBeTruthy()
+      const level1 = stepper.push('level1')
+      const level2 = level1.push('level2')
+      const level3 = level2.push('level3')
+      const level4 = level3.push('level4')
+      expect(level1).toBeTruthy()
+      expect(level2).toBeTruthy()
+      expect(level3).toBeTruthy()
+      expect(level4).toBeTruthy()
     })
   })
 
@@ -95,6 +95,47 @@ describe('StepState', () => {
       expect(child.parent).toBe(stepper)
       expect(child2.id).toBe(1)
       expect(child2.parent).toBe(stepper)
+    })
+
+    it('should allow setting valid indices', () => {
+      stepper.push('child1')
+      stepper.push('child2')
+      stepper.push('child3')
+
+      // Test valid indices
+      stepper.index = 0
+      expect(stepper.index).toBe(0)
+      stepper.index = 1
+      expect(stepper.index).toBe(1)
+      stepper.index = 2
+      expect(stepper.index).toBe(2)
+      stepper.index = -1
+      expect(stepper.index).toBe(-1)
+    })
+
+    it('should throw error for invalid indices', () => {
+      stepper.push('child1')
+      stepper.push('child2')
+
+      // Test invalid indices
+      expect(() => {
+        stepper.index = 3
+      }).toThrow('Invalid index: 3. Index must be -1 or between 0 and 1')
+      expect(() => {
+        stepper.index = -2
+      }).toThrow('Invalid index: -2. Index must be -1 or between 0 and 1')
+      expect(() => {
+        stepper.index = 1.5
+      }).toThrow('Invalid index: 1.5. Index must be -1 or between 0 and 1')
+    })
+
+    it('should handle empty state array', () => {
+      // With no children, only -1 is valid
+      stepper.index = -1
+      expect(stepper.index).toBe(-1)
+      expect(() => {
+        stepper.index = 0
+      }).toThrow('Invalid index: 0. Index must be -1 or between 0 and -1')
     })
   })
 
@@ -274,12 +315,12 @@ describe('StepState', () => {
       expect(root.currentPath).toEqual(['inserted2'])
     })
 
-    it('should not allow values containing hyphens', () => {
+    it('should not allow values containing slashes', () => {
       const root = new StepState()
-      expect(() => root.insert('test-value')).toThrow(/State id cannot contain hyphens/)
-      expect(() => root.insert('value-with-hyphens')).toThrow(/State id cannot contain hyphens/)
-      expect(() => root.insert('value-')).toThrow(/State id cannot contain hyphens/)
-      expect(() => root.insert('-value')).toThrow(/State id cannot contain hyphens/)
+      expect(() => root.insert('test/value')).toThrow(/State id cannot contain slashes/)
+      expect(() => root.insert('value/with/slashes')).toThrow(/State id cannot contain slashes/)
+      expect(() => root.insert('value/')).toThrow(/State id cannot contain slashes/)
+      expect(() => root.insert('/value')).toThrow(/State id cannot contain slashes/)
     })
 
     it('should allow values without hyphens', () => {
@@ -333,25 +374,25 @@ describe('StepState', () => {
     // the path is an array of values
     // the paths is a string of values separated by hyphens
 
-    describe('.path and .paths', () => {
+    describe('.path and .pathString', () => {
       it('should get empty path for root node', () => {
         expect(stepper.path).toEqual([])
-        expect(stepper.paths).toBe('')
+        expect(stepper.pathString).toBe('')
       })
 
-      it('should get correct .path and .paths for single level', () => {
+      it('should get correct .path and .pathString for single level', () => {
         const child = stepper.push('child')
         expect(child.path).toEqual(['child'])
-        expect(child.paths).toBe('child')
+        expect(child.pathString).toBe('child')
       })
 
-      it('should get correct .path and .paths for multiple levels', () => {
+      it('should get correct .path and .pathString for multiple levels', () => {
         const child = stepper.push('child')
         const grandchild = child.push('grandchild')
         const greatgrandchild = grandchild.push('great')
 
         expect(greatgrandchild.path).toEqual(['child', 'grandchild', 'great'])
-        expect(greatgrandchild.paths).toBe('child-grandchild-great')
+        expect(greatgrandchild.pathString).toBe('child/grandchild/great')
       })
 
       it('should handle numeric values in path', () => {
@@ -359,7 +400,7 @@ describe('StepState', () => {
         const grandchild = child.push('named')
 
         expect(grandchild.path).toEqual([0, 'named']) // Changed from ['0', 'named']
-        expect(grandchild.paths).toBe('0-named')
+        expect(grandchild.pathString).toBe('0/named')
       })
     })
 
@@ -369,14 +410,14 @@ describe('StepState', () => {
         const grandchild = child.push('grandchild')
         // Navigate through the tree to set indices
         stepper.next() // moves to child
-        stepper['child'].next() // moves to grandchild
-        expect(grandchild.currentPaths).toBe('child-grandchild')
+        child.next() // moves to grandchild
+        expect(grandchild.currentPathString).toBe('child/grandchild')
       })
 
       it('should get current path correctly', () => {
         const child1 = stepper.push('child1')
-        child1.push('grandchild1')
-        stepper.push('child2')
+        const grandchild1 = child1.push('grandchild1')
+        const child2 = stepper.push('child2')
 
         // Initially at first child
         expect(stepper.currentPath).toEqual(['child1', 'grandchild1'])
@@ -388,8 +429,8 @@ describe('StepState', () => {
 
       it('should get current path correctly when called on a child', () => {
         const child1 = stepper.push('child1')
-        child1.push('grandchild1')
-        stepper.push('child2')
+        const grandchild1 = child1.push('grandchild1')
+        const child2 = stepper.push('child2')
 
         // Initially at first child
         expect(stepper.currentPath).toEqual(['child1', 'grandchild1'])
@@ -408,13 +449,13 @@ describe('StepState', () => {
         const child2 = stepper.push('child2')
         const namedChild = child2.push('named')
 
-        expect(stepper.currentPaths).toBe('child1-0')
+        expect(stepper.currentPathString).toBe('child1/0')
 
         stepper.next() // moves to second auto-indexed child
-        expect(stepper.currentPaths).toBe('child1-1')
+        expect(stepper.currentPathString).toBe('child1/1')
 
         stepper.next() // moves to named child
-        expect(stepper.currentPaths).toBe('child2-named')
+        expect(stepper.currentPathString).toBe('child2/named')
       })
     })
   })
@@ -539,7 +580,7 @@ describe('StepState', () => {
       const grandchild2 = child1.push('grandchild2')
 
       // Reset using hyphen-separated string
-      stepper.goTo('child1-grandchild1')
+      stepper.goTo('child1/grandchild1')
       expect(stepper.currentPath).toEqual(['child1', 'grandchild1'])
     })
 
@@ -600,19 +641,19 @@ describe('StepState', () => {
       grandchild3.data = { level: 4 }
 
       // Initially at first path
-      expect(stepper.pathdata).toEqual([{ level: 1 }, { level: 2 }])
+      expect(stepper.pathData).toEqual([{ level: 1 }, { level: 2 }])
 
       // Reset to a different path
       stepper.goTo(['child2', 'grandchild3'])
-      expect(stepper.pathdata).toEqual([{ level: 1 }, { level: 4 }])
+      expect(stepper.pathData).toEqual([{ level: 1 }, { level: 4 }])
 
       // Reset to another path
       stepper.goTo(['child1', 'grandchild2'])
-      expect(stepper.pathdata).toEqual([{ level: 1 }, { level: 3 }])
+      expect(stepper.pathData).toEqual([{ level: 1 }, { level: 3 }])
 
       // Reset to a path with no data
       stepper.goTo(['child1'])
-      expect(stepper.pathdata).toEqual([{ level: 1 }, { level: 2 }])
+      expect(stepper.pathData).toEqual([{ level: 1 }, { level: 2 }])
     })
   })
 
@@ -748,55 +789,50 @@ describe('StepState', () => {
 
   describe('proxy behavior', () => {
     it('should allow chained access to nested states', () => {
-      stepper.push('parent')
-      stepper['parent'].push('child')
-      expect(stepper['parent']).toBeTruthy()
-      expect(stepper['parent']['child']).toBeTruthy()
+      const parent = stepper.push('parent')
+      const child = parent.push('child')
+      expect(parent).toBeTruthy()
+      expect(child).toBeTruthy()
     })
 
     it('should support deep nested state access and manipulation', () => {
       // Create a deep chain: level1 -> level2 -> level3 -> level4
-      stepper.push('level1')
-      stepper['level1'].push('level2')
-      stepper['level1']['level2'].push('level3')
-      stepper['level1']['level2']['level3'].push('level4')
+      const level1 = stepper.push('level1')
+      const level2 = level1.push('level2')
+      const level3 = level2.push('level3')
+      const level4 = level3.push('level4')
 
       // Verify each level exists and can be accessed
-      expect(stepper['level1']).toBeTruthy()
-      expect(stepper['level1']['level2']).toBeTruthy()
-      expect(stepper['level1']['level2']['level3']).toBeTruthy()
-      expect(stepper['level1']['level2']['level3']['level4']).toBeTruthy()
+      expect(level1).toBeTruthy()
+      expect(level2).toBeTruthy()
+      expect(level3).toBeTruthy()
+      expect(level4).toBeTruthy()
 
       // Verify we can add a sibling at a deep level
-      stepper['level1']['level2']['level3'].push('level4sibling')
-      expect(stepper['level1']['level2']['level3']['level4sibling']).toBeTruthy()
+      const level4sibling = level3.push('level4sibling')
+      expect(level4sibling).toBeTruthy()
 
       // Verify non-existent paths at deep levels return undefined
-      expect(stepper['level1']['level2']['nonexistent']).toBeUndefined()
-      expect(stepper['level1']['level2']['level3']['nonexistent']).toBeUndefined()
+      expect(level2.getNode('nonexistent')).toBeNull()
+      expect(level3.getNode('nonexistent')).toBeNull()
     })
 
     it('should return undefined for non-existent paths', () => {
-      expect(stepper['nonexistent']).toBeUndefined()
+      expect(stepper.getNode('nonexistent')).toBeNull()
     })
   })
 
   describe('root reference', () => {
-    it('should set _root to self when creating root instance', () => {
-      const root = new StepState()
-      expect(root._root).toStrictEqual(root)
-    })
-
     it('should maintain reference to root through nested instances', () => {
       const root = new StepState()
-      root.push('level1')
-      root['level1'].push('level2')
-      root['level1']['level2'].push('level3')
+      const level1 = root.push('level1')
+      const level2 = level1.push('level2')
+      const level3 = level2.push('level3')
 
       // Verify each level has reference to the root
-      expect(root['level1']._root).toStrictEqual(root)
-      expect(root['level1']['level2']._root).toStrictEqual(root)
-      expect(root['level1']['level2']['level3']._root).toStrictEqual(root)
+      expect(level1._root).toStrictEqual(root)
+      expect(level2._root).toStrictEqual(root)
+      expect(level3._root).toStrictEqual(root)
     })
 
     it('should allow operations at root level from nested instances', () => {
@@ -805,7 +841,7 @@ describe('StepState', () => {
       root.push('B')
 
       // Access root's treeDiagram from a nested instance
-      const nestedDiagram = root['A']._root.treeDiagram
+      const nestedDiagram = root.getNode('A')._root.treeDiagram
       const rootDiagram = root.treeDiagram
 
       expect(nestedDiagram).toBe(rootDiagram)
@@ -813,24 +849,24 @@ describe('StepState', () => {
 
     it('should get root node correctly using root getter', () => {
       const root = new StepState()
-      root.push('level1')
-      root['level1'].push('level2')
-      root['level1']['level2'].push('level3')
+      const level1 = root.push('level1')
+      const level2 = level1.push('level2')
+      const level3 = level2.push('level3')
 
       // Test root getter at different levels
       expect(root.root).toStrictEqual(root)
-      expect(root['level1'].root).toStrictEqual(root)
-      expect(root['level1']['level2'].root).toStrictEqual(root)
-      expect(root['level1']['level2']['level3'].root).toStrictEqual(root)
+      expect(level1.root).toStrictEqual(root)
+      expect(level2.root).toStrictEqual(root)
+      expect(level3.root).toStrictEqual(root)
     })
   })
 
   describe('clear operations', () => {
     it('should clear all states and reset properties', () => {
       const root = new StepState()
-      root.push('A')
-      root['A'].push('B')
-      root['A']['B'].push('C')
+      const a = root.push('A')
+      const b = a.push('B')
+      const c = b.push('C')
       root.data = { test: 'data' }
 
       // Clear the state
@@ -845,44 +881,44 @@ describe('StepState', () => {
 
     it('should clear nested states recursively', () => {
       const root = new StepState()
-      root.push('A')
-      root['A'].push('B')
-      root['A']['B'].push('C')
-      root['A'].data = { test: 'data' }
+      const a = root.push('A')
+      const b = a.push('B')
+      const c = b.push('C')
+      a.data = { test: 'data' }
 
       // Clear a nested state
-      root['A'].clear()
+      a.clear()
 
       // Verify the cleared state and its children are reset
-      expect(root['A'].states).toEqual([])
-      expect(root['A'].index).toBe(0)
-      expect(root['A'].data).toEqual({})
-      expect(root['A']._root).toStrictEqual(root)
+      expect(a.states).toEqual([])
+      expect(a.index).toBe(0)
+      expect(a.data).toEqual({})
+      expect(a._root).toStrictEqual(root)
     })
 
     it('should maintain root reference after clearing', () => {
       const root = new StepState()
-      root.push('A')
-      root['A'].push('B')
+      const a = root.push('A')
+      const b = a.push('B')
 
       // Clear a nested state
-      root['A'].clear()
+      a.clear()
 
       // Verify root reference is maintained
-      expect(root['A']._root).toStrictEqual(root)
+      expect(a._root).toStrictEqual(root)
     })
   })
 
   describe('cleartree operations', () => {
     it('should clear all states but preserve data', () => {
       const root = new StepState()
-      root.push('A')
-      root['A'].push('B')
-      root['A']['B'].push('C')
+      const a = root.push('A')
+      const b = a.push('B')
+      const c = b.push('C')
       root.data = { test: 'data' }
 
       // Clear the tree
-      root.clearTree()
+      root.clearSubTree()
 
       // Verify states are cleared but data is preserved
       expect(root.states).toEqual([])
@@ -892,177 +928,38 @@ describe('StepState', () => {
 
     it('should clear nested states recursively but preserve data', () => {
       const root = new StepState()
-      root.push('A')
-      root['A'].push('B')
-      root['A']['B'].push('C')
-      root['A'].data = { test: 'data' }
+      const a = root.push('A')
+      const b = a.push('B')
+      const c = b.push('C')
+      a.data = { test: 'data' }
 
       // Clear a nested state
-      root['A'].clearTree()
+      a.clearSubTree()
 
       // Verify the cleared state and its children are reset but data is preserved
-      expect(root['A'].states).toEqual([])
-      expect(root['A'].index).toBe(0)
-      expect(root['A'].data).toEqual({ test: 'data' })
+      expect(a.states).toEqual([])
+      expect(a.index).toBe(0)
+      expect(a.data).toEqual({ test: 'data' })
     })
 
     it('should maintain root reference after clearing tree', () => {
       const root = new StepState()
-      root.push('A')
-      root['A'].push('B')
+      const a = root.push('A')
+      const b = a.push('B')
 
       // Clear a nested state
-      root['A'].clearTree()
+      a.clearSubTree()
 
       // Verify root reference is maintained
-      expect(root['A']._root).toStrictEqual(root)
-    })
-  })
-
-  describe('node access', () => {
-    it('should get node by index and value correctly', () => {
-      const child1 = stepper.push('child1')
-      const child2 = stepper.push('child2')
-      const child3 = stepper.push('child3')
-
-      // Test getting by index
-      expect(stepper.getNode(0)).toBe(child1)
-      expect(stepper.getNode(1)).toBe(child2)
-      expect(stepper.getNode(2)).toBe(child3)
-      expect(stepper.getNode(3)).toBeNull()
-
-      // Test getting by value
-      expect(stepper.getNode('child1')).toBe(child1)
-      expect(stepper.getNode('child2')).toBe(child2)
-      expect(stepper.getNode('child3')).toBe(child3)
-      expect(stepper.getNode('nonexistent')).toBeNull()
-    })
-  })
-
-  describe.skip('delete operations', () => {
-    it('should handle delete operations correctly', () => {
-      expect(true).toBe(false)
-    })
-  })
-
-  describe('leaf nodes', () => {
-    it('should get the leaf nodes correctly', () => {
-      const child1 = stepper.push('child1')
-      const child2 = stepper.push('child2')
-      const child3 = stepper.push('child3')
-      const child4 = stepper.push('child4')
-      const grandchild1 = child1.push('grandchild1')
-      const grandchild2 = child1.push('grandchild2')
-      const grandchild3 = child1.push('grandchild3')
-      const grandchild4 = child2.push('grandchild4')
-      const grandchild5 = child2.push('grandchild5')
-      const grandchild6 = child3.push('grandchild6')
-      const grandchild7 = child4.push('grandchild7')
-      // add greatgrandchild to some of the grandchildren
-      const greatgrandchild1 = grandchild1.push('greatgrandchild1')
-      const greatgrandchild2 = grandchild2.push('greatgrandchild2')
-      const greatgrandchild3 = grandchild3.push('greatgrandchild3')
-      const greatgrandchild4 = grandchild3.push('greatgrandchild4')
-      const greatgrandchild6 = grandchild7.push('greatgrandchild6')
-      const greatgrandchild7 = grandchild7.push('greatgrandchild7')
-
-      expect(stepper.leafNodes).toEqual([
-        'child1-grandchild1-greatgrandchild1',
-        'child1-grandchild2-greatgrandchild2',
-        'child1-grandchild3-greatgrandchild3',
-        'child1-grandchild3-greatgrandchild4',
-        'child2-grandchild4',
-        'child2-grandchild5',
-        'child3-grandchild6',
-        'child4-grandchild7-greatgrandchild6',
-        'child4-grandchild7-greatgrandchild7',
-      ])
-    })
-  })
-
-  describe('leaf node operations', () => {
-    it('should correctly identify leaf nodes', () => {
-      const child1 = stepper.push('child1')
-      const child2 = stepper.push('child2')
-      const grandchild1 = child1.push('grandchild1')
-      const grandchild2 = child1.push('grandchild2')
-
-      // Root node is not a leaf
-      expect(stepper.isLeaf).toBe(false)
-
-      // Child nodes with children are not leaves
-      expect(child1.isLeaf).toBe(false)
-      expect(child2.isLeaf).toBe(true)
-
-      // Grandchild nodes without children are leaves
-      expect(grandchild1.isLeaf).toBe(true)
-      expect(grandchild2.isLeaf).toBe(true)
-    })
-
-    it('should correctly identify first leaf node', () => {
-      const child1 = stepper.push('child1')
-      const child2 = stepper.push('child2')
-      const grandchild1 = child1.push('grandchild1')
-      const grandchild2 = child1.push('grandchild2')
-      const grandchild3 = child2.push('grandchild3')
-
-      // First leaf should be grandchild1
-      expect(grandchild1.isFirstLeaf).toBe(true)
-      expect(grandchild2.isFirstLeaf).toBe(false)
-      expect(grandchild3.isFirstLeaf).toBe(false)
-    })
-
-    it('should handle SOS and EOS nodes in first leaf check', () => {
-      const sos = stepper.push('SOS')
-      const child1 = stepper.push('child1')
-      const child2 = stepper.push('child2')
-      const eos = stepper.push('EOS')
-      const grandchild1 = child1.push('grandchild1')
-      const grandchild2 = child1.push('grandchild2')
-
-      // SOS and EOS nodes should not be considered first leaves
-      expect(sos.isFirstLeaf).toBe(false)
-      expect(eos.isFirstLeaf).toBe(false)
-
-      // First actual leaf should be grandchild1
-      expect(grandchild1.isFirstLeaf).toBe(true)
-      expect(grandchild2.isFirstLeaf).toBe(false)
-    })
-
-    it('should handle empty tree in first leaf check', () => {
-      // Root node is not a leaf
-      expect(stepper.isLeaf).toBe(true)
-      expect(stepper.isFirstLeaf).toBe(false) // SOS is not a leaf
-    })
-
-    it('should handle single node tree in first leaf check', () => {
-      const child = stepper.push('child')
-      expect(child.isLeaf).toBe(true)
-      expect(child.isFirstLeaf).toBe(true)
-    })
-
-    it('should handle complex tree structure in first leaf check', () => {
-      const child1 = stepper.push('child1')
-      const child2 = stepper.push('child2')
-      const grandchild1 = child1.push('grandchild1')
-      const grandchild2 = child1.push('grandchild2')
-      const grandchild3 = child2.push('grandchild3')
-      const greatgrandchild1 = grandchild1.push('greatgrandchild1')
-      const greatgrandchild2 = grandchild1.push('greatgrandchild2')
-
-      // First leaf should be greatgrandchild1
-      expect(greatgrandchild1.isFirstLeaf).toBe(true)
-      expect(greatgrandchild2.isFirstLeaf).toBe(false)
-      expect(grandchild2.isFirstLeaf).toBe(false)
-      expect(grandchild3.isFirstLeaf).toBe(false)
+      expect(a._root).toStrictEqual(root)
     })
   })
 
   describe('visualization', () => {
     it('should generate tree representation', () => {
-      stepper.push('A')
-      stepper['A'].push('B')
-      stepper['A']['B'].push('C')
+      const a = stepper.push('A')
+      const b = a.push('B')
+      const c = b.push('C')
 
       const diagram = stepper.treeDiagram
       expect(diagram).toBeTypeOf('string')
@@ -1160,51 +1057,16 @@ describe('StepState', () => {
       const greatgrandchild7 = grandchild7.push('greatgrandchild7')
 
       expect(stepper.leafNodes).toEqual([
-        'child1-grandchild1-greatgrandchild1',
-        'child1-grandchild2-greatgrandchild2',
-        'child1-grandchild3-greatgrandchild3',
-        'child1-grandchild3-greatgrandchild4',
-        'child2-grandchild4',
-        'child2-grandchild5',
-        'child3-grandchild6',
-        'child4-grandchild7-greatgrandchild6',
-        'child4-grandchild7-greatgrandchild7',
+        'child1/grandchild1/greatgrandchild1',
+        'child1/grandchild2/greatgrandchild2',
+        'child1/grandchild3/greatgrandchild3',
+        'child1/grandchild3/greatgrandchild4',
+        'child2/grandchild4',
+        'child2/grandchild5',
+        'child3/grandchild6',
+        'child4/grandchild7/greatgrandchild6',
+        'child4/grandchild7/greatgrandchild7',
       ])
-    })
-  })
-
-  describe('serialization', () => {
-    it('should serialize and deserialize correctly', () => {
-      const child = stepper.push('child')
-      child.push('grandchild')
-      stepper.next() // Advance to create some state
-
-      const serialized = stepper.json
-      const newState = new StepState('root')
-      newState.loadFromJSON(serialized)
-
-      expect(newState.json).toEqual(serialized)
-    })
-
-    it('should preserve navigation state after serialization', () => {
-      // Create a simple tree and advance through it
-      const child1 = stepper.push('child1')
-      const child2 = stepper.push('child2')
-      const child3 = stepper.push('child3')
-      const child4 = stepper.push('child4')
-      stepper.next() // to child2
-      stepper.next() // to child3
-
-      // Serialize and deserialize
-      const serialized = stepper.json
-      const newState = new StepState('/')
-      newState.loadFromJSON(serialized)
-
-      // Verify navigation works as expected
-      expect(newState.next().id).toBe('child4') // Can go backwards
-      expect(newState.prev().id).toBe('child3') // Can go backwards
-      expect(newState.next().id).toBe('child4') // Can go forwards
-      expect(newState.next()).toBeNull() // Preserves end of sequence
     })
   })
 
@@ -1291,31 +1153,31 @@ describe('StepState', () => {
 
     it('should store data during push', () => {
       const data = { test: 'value' }
-      stepper.push('first', data)
-      expect(stepper['first'].data).toEqual(data)
+      const first = stepper.push('first', data)
+      expect(first.data).toEqual(data)
     })
 
     it('should update existing data', () => {
-      stepper.push('first', { test: 'value' })
+      const first = stepper.push('first', { test: 'value' })
       const newData = { updated: 'value' }
-      stepper['first'].data = newData
-      expect(stepper['first'].data).toEqual(newData)
+      first.data = newData
+      expect(first.data).toEqual(newData)
     })
 
     it('should set data at specified path', () => {
-      stepper.push('first')
-      stepper['first'].push('second')
+      const first = stepper.push('first')
+      const second = first.push('second')
       const data = { test: 'value' }
       stepper.setDataAtPath(['first', 'second'], data)
-      expect(stepper['first']['second'].data).toEqual(data)
+      expect(second.data).toEqual(data)
     })
 
     it('should set data using string path', () => {
-      stepper.push('first')
-      stepper['first'].push('second')
+      const first = stepper.push('first')
+      const second = first.push('second')
       const data = { test: 'value' }
-      stepper.setDataAtPath('first-second', data)
-      expect(stepper['first']['second'].data).toEqual(data)
+      stepper.setDataAtPath('first/second', data)
+      expect(second.data).toEqual(data)
     })
 
     it('should throw error for invalid path in setDataAtPath', () => {
@@ -1323,8 +1185,8 @@ describe('StepState', () => {
     })
 
     it('should require object data in setDataAtPath', () => {
-      stepper.push('first')
-      stepper['first'].push('second')
+      const first = stepper.push('first')
+      const second = first.push('second')
 
       // Should accept objects
       expect(() => stepper.setDataAtPath(['first', 'second'], {})).not.toThrow()
@@ -1346,8 +1208,8 @@ describe('StepState', () => {
     })
 
     it('should return empty object for nodes without data', () => {
-      stepper.push('first')
-      expect(stepper['first'].data).toEqual({})
+      const first = stepper.push('first')
+      expect(first.data).toEqual({})
     })
 
     describe('datapath', () => {
@@ -1364,19 +1226,15 @@ describe('StepState', () => {
         //stepper.next() // moves to grandchild
 
         // Should get data from child1 and grandchild
-        expect(stepper.pathdata).toEqual([{ level: 1 }, { level: 2 }])
+        expect(stepper.pathData).toEqual([{ level: 1 }, { level: 2 }])
       })
 
       it('should return empty array for path with no data', () => {
-        stepper.push('first')
-        stepper['first'].push('second')
-        stepper['first']['second'].push('third')
+        const first = stepper.push('first')
+        const second = first.push('second')
+        const third = second.push('third')
 
-        //stepper.next() // move to grandchild
-        //stepper['first'].next()
-        //stepper['first']['second'].next()
-
-        const pathData = stepper['first']['second']['third'].pathdata
+        const pathData = third.pathData
         expect(pathData).toEqual([])
       })
 
@@ -1391,7 +1249,7 @@ describe('StepState', () => {
         //stepper.next() // moves to grandchild
 
         // Should only get grandchild data
-        expect(stepper.pathdata).toEqual([{ data: 'test' }])
+        expect(stepper.pathData).toEqual([{ data: 'test' }])
       })
 
       it('should ignore root node data', () => {
@@ -1402,7 +1260,7 @@ describe('StepState', () => {
         stepper.next() // move to child
 
         // Should not include root data
-        expect(stepper.pathdata).toEqual([{ child: 'data' }])
+        expect(stepper.pathData).toEqual([{ child: 'data' }])
       })
 
       it('should handle complex paths with multiple data points', () => {
@@ -1420,7 +1278,7 @@ describe('StepState', () => {
         //stepper.next() // moves to greatgrandchild
 
         // Should get data from the path child1 -> grandchild1 -> greatgrandchild
-        expect(stepper.pathdata).toEqual([{ level: 1 }, { level: 2 }, { level: 3 }])
+        expect(stepper.pathData).toEqual([{ level: 1 }, { level: 2 }, { level: 3 }])
       })
 
       it('should return empty array when no data exists along path', () => {
@@ -1429,7 +1287,7 @@ describe('StepState', () => {
 
         //stepper.next() // move to grandchild
 
-        expect(stepper.pathdata).toEqual([])
+        expect(stepper.pathData).toEqual([])
       })
     })
 
@@ -1497,25 +1355,26 @@ describe('StepState', () => {
 
     describe('setDataAtPath', () => {
       it('should set data at a specific path', () => {
-        stepper.push('parent')
-        stepper['parent'].push('child')
-        stepper.setDataAtPath('parent-child', { data: 'test' })
+        const parent = stepper.push('parent')
+        const child = parent.push('child')
+        stepper.setDataAtPath('parent/child', { data: 'test' })
+        expect(child.data).toEqual({ data: 'test' })
       })
 
       it('should set data at specified path', () => {
-        stepper.push('first')
-        stepper['first'].push('second')
+        const first = stepper.push('first')
+        const second = first.push('second')
         const data = { test: 'value' }
         stepper.setDataAtPath(['first', 'second'], data)
-        expect(stepper['first']['second'].data).toEqual(data)
+        expect(second.data).toEqual(data)
       })
 
       it('should set data using string path', () => {
-        stepper.push('first')
-        stepper['first'].push('second')
+        const first = stepper.push('first')
+        const second = first.push('second')
         const data = { test: 'value' }
-        stepper.setDataAtPath('first-second', data)
-        expect(stepper['first']['second'].data).toEqual(data)
+        stepper.setDataAtPath('first/second', data)
+        expect(second.data).toEqual(data)
       })
 
       it('should throw error for invalid path in setDataAtPath', () => {
@@ -1524,108 +1383,71 @@ describe('StepState', () => {
     })
   })
 
-  describe('data serialization', () => {
-    let stepper
-
-    beforeEach(() => {
-      stepper = new StepState('/')
+  describe('existingPaths', () => {
+    it('should return empty set for root node with no children', () => {
+      expect(stepper.existingPaths).toEqual(new Set([]))
     })
 
-    it('should serialize and deserialize simple data types', () => {
-      const testData = {
-        string: 'test',
-        number: 42,
-        boolean: true,
-        null: null,
-        array: [1, 2, 3],
-        nestedObject: { a: 1, b: 2 },
-      }
+    it('should return correct paths for single level of children', () => {
+      stepper.push('child1')
+      stepper.push('child2')
+      stepper.push('child3')
 
-      stepper.data = testData
-      const serialized = stepper.json
-      const newState = new StepState('/')
-      newState.loadFromJSON(serialized)
-
-      expect(newState.data).toEqual(testData)
+      const expectedPaths = new Set(['child1', 'child2', 'child3'])
+      expect(stepper.existingPaths).toEqual(expectedPaths)
     })
 
-    it('should handle data serialization in nested nodes', () => {
-      const child = stepper.push('child')
-      child.data = { childData: 'test' }
-      const grandchild = child.push('grandchild')
-      grandchild.data = { grandchildData: 123 }
-
-      const serialized = stepper.json
-      const newState = new StepState('/')
-      newState.loadFromJSON(serialized)
-
-      expect(newState.getNode('child').data).toEqual({ childData: 'test' })
-      expect(newState.getNode('child').getNode('grandchild').data).toEqual({ grandchildData: 123 })
-    })
-
-    it('should reload a complex table and set the paths correctly', () => {
+    it('should return correct paths for nested children', () => {
       const child1 = stepper.push('child1')
       const child2 = stepper.push('child2')
-      const child3 = stepper.push('child3')
-      const child4 = stepper.push('child4')
-      const grandchild1 = child1.push('grandchild1')
-      const grandchild2 = child1.push('grandchild2')
-      const grandchild3 = child1.push('grandchild3')
-      const grandchild4 = child2.push('grandchild4')
-      const grandchild5 = child2.push('grandchild5')
-      const grandchild6 = child3.push('grandchild6')
-      const grandchild7 = child4.push('grandchild7')
-      // add greatgrandchild to some of the grandchildren
-      const greatgrandchild1 = grandchild1.push('greatgrandchild1')
-      const greatgrandchild2 = grandchild2.push('greatgrandchild2')
-      const greatgrandchild3 = grandchild3.push('greatgrandchild3')
-      const greatgrandchild4 = grandchild3.push('greatgrandchild4')
-      const greatgrandchild6 = grandchild7.push('greatgrandchild6')
-      const greatgrandchild7 = grandchild7.push('greatgrandchild7')
+      child1.push('grandchild1')
+      child1.push('grandchild2')
+      child2.push('grandchild3')
 
-      stepper.next()
-      stepper.next()
-      stepper.next()
-      stepper.next()
-      expect(stepper.currentPaths).toEqual('child2-grandchild4')
-
-      const serialized = stepper.json
-      const newState = new StepState('/')
-      newState.loadFromJSON(serialized)
-
-      expect(newState.currentPaths).toEqual('child2-grandchild4')
-      expect(grandchild4.paths).toEqual('child2-grandchild4')
-
-      newState.next()
-      newState.next()
-      expect(newState.currentPaths).toEqual('child3-grandchild6')
-      expect(grandchild6.paths).toEqual('child3-grandchild6')
-
-      // Verify parent references are maintained after deserialization
-      expect(newState.parent).toBeNull() // Root state should have null parent
-      expect(newState['child1'].parent).toBe(newState)
+      const expectedPaths = new Set(['child1/grandchild1', 'child1/grandchild2', 'child2/grandchild3'])
+      expect(stepper.existingPaths).toEqual(expectedPaths)
     })
 
-    it('should handle non-serializable data types', () => {
-      const nonSerializableData = {
-        function: () => console.log('hello'),
-        vueComponent: { template: '<div></div>', setup: () => ({}) },
-        domElement: typeof window !== 'undefined' ? document.createElement('div') : {},
-        regexp: /test/,
-        undefined: undefined,
-      }
+    it('should handle mixed numeric and string IDs', () => {
+      const child1 = stepper.push('child1')
+      const child2 = stepper.push() // auto-numbered
+      child1.push('grandchild1')
+      child1.push() // auto-numbered
+      child2.push('grandchild2')
 
-      stepper.data = nonSerializableData
-      const serialized = stepper.json
-      const newState = new StepState('/')
-      newState.loadFromJSON(serialized)
+      const expectedPaths = new Set([
+        'child1/grandchild1',
+        'child1/1',
+        '1/grandchild2', // Fixed: child2 gets ID 1 because child1 has ID 'child1'
+      ])
+      expect(stepper.existingPaths).toEqual(expectedPaths)
+    })
 
-      const deserializedData = newState.data
-      expect(deserializedData.function).toBeUndefined()
-      expect(deserializedData.undefined).toBeUndefined()
-      // DOM elements and RegExp are skipped entirely during serialization
-      expect(deserializedData.domElement).toBeUndefined()
-      expect(deserializedData.regexp).toBeUndefined()
+    it('should handle deep nesting', () => {
+      const child1 = stepper.push('child1')
+      const grandchild1 = child1.push('grandchild1')
+      const greatgrandchild1 = grandchild1.push('greatgrandchild1')
+      const greatgrandchild2 = grandchild1.push('greatgrandchild2')
+
+      const expectedPaths = new Set(['child1/grandchild1/greatgrandchild1', 'child1/grandchild1/greatgrandchild2'])
+      expect(stepper.existingPaths).toEqual(expectedPaths)
+    })
+
+    it('should handle complex tree structure', () => {
+      const child1 = stepper.push('child1')
+      const child2 = stepper.push('child2')
+      const grandchild1 = child1.push('grandchild1')
+      const grandchild2 = child1.push('grandchild2')
+      const grandchild3 = child2.push('grandchild3')
+      const greatgrandchild1 = grandchild1.push('greatgrandchild1')
+      const greatgrandchild2 = grandchild2.push('greatgrandchild2')
+
+      const expectedPaths = new Set([
+        'child1/grandchild1/greatgrandchild1',
+        'child1/grandchild2/greatgrandchild2',
+        'child2/grandchild3',
+      ])
+      expect(stepper.existingPaths).toEqual(expectedPaths)
     })
   })
 })
