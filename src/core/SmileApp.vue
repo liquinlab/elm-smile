@@ -1,26 +1,68 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { onKeyDown } from '@vueuse/core'
+/**
+ * @fileoverview Main SmileApp component that handles the core application layout and mode-specific components
+ */
 
-// load sub-components used in this compomnents
+import { ref, computed } from 'vue'
+
+/**
+ * Developer mode components for debugging and development tools
+ * @requires DeveloperNavBar Navigation bar for developer mode
+ * @requires DevConsoleBar Console bar for developer tools
+ * @requires DevSideBar Side bar for developer tools
+ */
 import DeveloperNavBar from '@/dev/developer_mode/DeveloperNavBar.vue'
 import DevConsoleBar from '@/dev/developer_mode/DevConsoleBar.vue'
 import DevSideBar from '@/dev/developer_mode/DevSideBar.vue'
+
+/**
+ * Presentation mode components
+ * @requires PresentationNavBar Navigation bar for presentation mode
+ */
 import PresentationNavBar from '@/dev/presentation_mode/PresentationNavBar.vue'
 
-// bars that are part of the actual experiments
+/**
+ * Built-in experiment components
+ * @requires StatusBar Status bar component
+ * @requires WindowSizerView Window size warning component
+ */
 import StatusBar from '@/builtins/navbars/StatusBar.vue'
 import WindowSizerView from '@/builtins/window_sizer/WindowSizerView.vue'
 
-// import and initalize smile API
+/**
+ * Import API and notification components
+ * @requires useAPI SMILE API composable
+ * @requires KeyCommandNotification Notification component for keyboard commands
+ */
 import useAPI from '@/core/composables/useAPI'
 import KeyCommandNotification from '@/dev/developer_mode/KeyCommandNotification.vue'
+
+/**
+ * Initialize SMILE API instance
+ * @constant {Object} api Global API instance
+ */
 const api = useAPI()
 
+/**
+ * Reactive reference tracking if browser window is too small
+ * @type {import('vue').Ref<boolean>}
+ */
 const toosmall = ref(api.isBrowserTooSmall())
 
+/**
+ * Computed property for console bar height in pixels
+ * @type {import('vue').ComputedRef<string>}
+ */
 const height_pct = computed(() => `${api.store.dev.consoleBarHeight}px`)
 
+/**
+ * Computed property that determines whether to show the status bar
+ *
+ * @returns {boolean} True if status bar should be shown, false otherwise
+ * - Returns false if current route is 'data' or 'recruit'
+ * - Returns false if app is in presentation mode
+ * - Returns true otherwise
+ */
 const showStatusBar = computed(() => {
   return api.currentRouteName() !== 'data' && api.currentRouteName() !== 'recruit' && api.config.mode != 'presentation'
 })
@@ -30,6 +72,19 @@ const showNotification = ref(false)
 const notificationCommand = ref('')
 const notificationAction = ref('')
 
+/**
+ * Shows a temporary notification with a command and action that automatically hides after 1.5 seconds
+ *
+ * @param {string} command - The command text to display in the notification
+ * @param {string} action - The action text to display in the notification
+ *
+ * Sets the notification content and shows it by updating reactive refs:
+ * - notificationCommand
+ * - notificationAction
+ * - showNotification
+ *
+ * Uses setTimeout to automatically hide the notification after 1.5 seconds
+ */
 const showTemporaryNotification = (command, action) => {
   notificationCommand.value = command
   notificationAction.value = action
