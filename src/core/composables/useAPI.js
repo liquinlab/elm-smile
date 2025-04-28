@@ -51,7 +51,7 @@ import {
  * @property {Object} urls - Global URL configurations
  * @property {Object} log - Logging methods interface
  */
-class SmileAPI {
+export class SmileAPI {
   /**
    * Creates a new SmileAPI instance
    * @param {Object} store - The Smile store instance containing application state
@@ -630,6 +630,7 @@ class SmileAPI {
     }
   }
 }
+
 /**
  * Creates and returns a reactive SmileAPI instance with necessary dependencies
  * @returns {SmileAPI} A reactive SmileAPI instance with timeline, routing and store functionality
