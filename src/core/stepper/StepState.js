@@ -10,7 +10,7 @@
  *
  * Used with StepperStateMachine for higher-level state management.
  *
- * @property {*} _id - The node's unique identifier
+ * @property {*} _id - The node's unique identifier (used to create a path to this node)
  * @property {StepState[]} _states - Array of child nodes/states
  * @property {number} _currentIndex - Index tracking current position in children
  * @property {number} _depth - Depth of this node in the tree (0 for root)
@@ -156,7 +156,7 @@ export class StepState {
    *
    * @returns {Array} Array of data values from all child states
    */
-  get rowsdata() {
+  get rowsData() {
     return this._states.map((item) => item.data)
   }
 
@@ -165,7 +165,7 @@ export class StepState {
    *
    * @returns {Array} Array of data values from all child states
    */
-  get statesdata() {
+  get statesData() {
     return this._states.map((item) => item.data)
   }
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { StepState } from '@/core/composables/StepState'
+import { StepState } from '@/core/stepper/StepState'
 
 describe('StepState', () => {
   let stepper

@@ -6,10 +6,17 @@
  * - Setting the pageProvidesTrialStepper flag in the dev store
  * - Storing the stepper instance in the global smilestore
  */
-import { useHStepper } from './useHStepper'
+import { ref, computed, markRaw, reactive } from 'vue'
+import Stepper from '@/core/stepper/Stepper'
 import useSmileStore from '@/core/stores/smilestore'
 import { useRoute } from 'vue-router'
 import { onKeyDown } from '@vueuse/core'
+
+/**
+ * @class StepperAPI
+ * @description Wraps a Stepper instance to provide a consistent API for managing multi-step processes
+ */
+
 /**
  * Creates or retrieves a stepper instance for the current page
  * @function useStepper
@@ -22,6 +29,7 @@ import { onKeyDown } from '@vueuse/core'
  * The stepper provides functionality for managing multi-step processes and
  * tracking state within experiment views.
  */
+
 export function useStepper() {
   const smilestore = useSmileStore()
   const route = useRoute()
@@ -30,39 +38,26 @@ export function useStepper() {
   // Set pageProvidesTrialStepper to true for the dev bar
   smilestore.dev.pageProvidesTrialStepper = true
 
-  // Initialize the stepper in global smilestore if it doesn't exist
-  if (!smilestore.global.steppers?.[page]) {
-    if (!smilestore.global.steppers) {
-      smilestore.global.steppers = {}
+  // Check if stepper already exists in global state
+  let stepper = smilestore.global.steppers?.[page]
+
+  if (!stepper) {
+    // Create new stepper instance if none exists
+    const savedState = smilestore.getStepper(page)?.data
+    if (savedState) {
+      console.log('STEPPER: Loading saved state from smilestore')
+      stepper = new Stepper({ serializedState: savedState.stepperState })
+    } else {
+      console.log('STEPPER: Initializing state machine with SOS and EOS nodes')
+      stepper = new Stepper({ id: '/', parent: null, data: { gvars: {} } }) // explicit init
     }
-    smilestore.global.steppers[page] = useHStepper()
+
+    // Register stepper if not already registered
+    smilestore.registerStepper(page, stepper)
   }
 
-  // Add shortcuts for arrow keys
-  if (smilestore.config.mode == 'development') {
-    /**
-     * Handle right arrow key press to advance to next step
-     * @listens keydown.ArrowRight
-     * @param {KeyboardEvent} e - The keyboard event
-     */
-    onKeyDown(['ArrowRight'], (e) => {
-      e.preventDefault()
-      smilestore.global.steppers[page].goNextStep()
-    })
-
-    /**
-     * Handle left arrow key press to go back to previous step
-     * @listens keydown.ArrowLeft
-     * @param {KeyboardEvent} e - The keyboard event
-     */
-    onKeyDown(['ArrowLeft'], (e) => {
-      e.preventDefault()
-      smilestore.global.steppers[page].goPrevStep()
-    })
-  }
-
-  // Return the existing stepper instance
-  return smilestore.global.steppers[page]
+  // Return the StepperAPI instance
+  return stepper
 }
 
 export default useStepper

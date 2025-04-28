@@ -159,7 +159,7 @@ const initGlobal = {
   // ephemeral state, resets on browser refresh
   progress: 0,
   forceNavigate: false,
-  steppers: {}, // Store for useHStepper instances
+  steppers: {}, // Store for HStepper instances
   dbConnected: false,
   dbChanges: true,
   urls: {
@@ -379,12 +379,21 @@ export default defineStore('smilestore', {
     /**
      * Registers a stepper for a given view
      * @param {string} view - View name to register stepper for
-     * @description Adds a new stepper object to the local state's viewSteppers array.
+     * @param {Stepper} [stepper] - Optional Stepper instance to register
+     * @description Adds a new stepper object to the local state's viewSteppers array and optionally registers a Stepper instance in global state.
+     * @returns {Stepper} The registered stepper instance
      */
-    registerStepper(view) {
+    registerStepper(view, stepper) {
       if (this.local.viewSteppers[view] === undefined) {
         this.local.viewSteppers[view] = {}
       }
+      if (stepper) {
+        if (!this.global.steppers) {
+          this.global.steppers = {}
+        }
+        this.global.steppers[view] = stepper
+      }
+      return this.global.steppers?.[view]
     },
 
     /**

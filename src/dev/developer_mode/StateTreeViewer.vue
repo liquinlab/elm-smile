@@ -4,36 +4,38 @@ import TreeNode from './TreeNode.vue'
 import DataPathViewer from '@/dev/developer_mode/DataPathViewer.vue'
 import useAPI from '@/core/composables/useAPI'
 import { useRoute } from 'vue-router'
-
+import useViewAPI from '@/core/composables/useViewAPI'
 const api = useAPI()
+const vapi = useViewAPI()
 const route = useRoute()
 
 // Reactively get the stepper for the current page
-const stepper = computed(() => {
-  return api.store.global.steppers?.[route.name]
-})
+// const stepper = computed(() => {
+//   return api.store.global.steppers?.[route.name]
+// })
+const stepper = computed(() => vapi.stepper)
 
 // Add a watcher to handle stepper initialization
-watch(
-  () => api.store.global.steppers?.[route.name],
-  (newStepper) => {
-    if (newStepper) {
-      // Force a component update when stepper becomes available
-      console.log('Stepper initialized:', route.name)
-    }
-  },
-  { immediate: true } // This will run the watcher immediately on component mount
-)
+// watch(
+//   () => api.store.global.steppers?.[route.name],
+//   (newStepper) => {
+//     if (newStepper) {
+//       // Force a component update when stepper becomes available
+//       console.log('Stepper initialized:', route.name)
+//     }
+//   },
+//   { immediate: true } // This will run the watcher immediately on component mount
+// )
 
-const stateMachine = computed(() => stepper.value?.smviz)
+const stateMachine = computed(() => vapi.smviz)
 
 // Update the path watcher to use stepper.value
 watch(
-  () => stepper.value?.path,
+  () => vapi.stepper?.path,
   (newPath) => {
     console.log('Path watcher triggered:', {
       newPath,
-      stepper: stepper.value,
+      stepper: vapi.stepper,
     })
   },
   { immediate: true }
@@ -41,13 +43,14 @@ watch(
 
 // Convert array path to string format (e.g., [1, 1] -> "1-1")
 const pathToString = (pathArray) => {
-  return Array.isArray(pathArray) ? pathArray.join('-') : ''
+  return Array.isArray(pathArray) ? pathArray.join('/') : ''
 }
 
 // Add computed property to check if a node is selected
 const isNodeSelected = (nodePath) => {
-  if (!stepper.value?.path) return false
-  const currentPathStr = pathToString(stepper.value.path)
+  if (!vapi.stepper?.path) return false
+  const currentPathStr = pathToString(vapi.stepper.path)
+  console.log('isNodeSelected', nodePath, currentPathStr)
   return nodePath === currentPathStr
 }
 
@@ -143,15 +146,15 @@ const handleReload = () => {
 }
 
 const isEndState = computed(() => {
-  if (!stepper.value) return false
-  return stepper.value.paths === 'SOS' || stepper.value.paths === 'EOS'
+  if (!vapi.stepper) return false
+  return vapi.stepper.paths === 'SOS' || vapi.stepper.paths === 'EOS'
 })
 
 // Add refs for container and selected node tracking
 const treeContainer = ref(null)
 
 const scrollToSelectedNode = () => {
-  if (!stepper.value?.path) return
+  if (!vapi.stepper?.path) return
 
   setTimeout(() => {
     // Use the component's scope to find the selected node
@@ -183,7 +186,7 @@ const scrollToSelectedNode = () => {
 
 // Add watcher for path changes to trigger scroll
 watch(
-  () => stepper.value?.path,
+  () => vapi.stepper?.path,
   (newPath) => {
     if (newPath) {
       scrollToSelectedNode()
@@ -196,29 +199,29 @@ watch(
   <div class="tree-viewer-container" v-if="stepper">
     <div class="path-display-container">
       <div class="path-info">
-        <div class="path-display">{{ stepper.paths }}</div>
+        <div class="path-display">{{ vapi.stepper.pathString }}</div>
 
         &nbsp;<FAIcon icon="fa-solid fa-ban" v-if="isEndState" />
       </div>
 
       <div class="field has-addons">
         <p class="control">
-          <button @click="stepper.goPrevStep()" class="button is-small nav-button">
+          <button @click="vapi.stepper.goPrevStep()" class="button is-small nav-button">
             <span><FAIcon icon="fa-solid fa-angle-left" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="stepper.goNextStep()" class="button is-small nav-button">
+          <button @click="vapi.stepper.goNextStep()" class="button is-small nav-button">
             <span><FAIcon icon="fa-solid fa-angle-right" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="stepper.reset()" class="button is-small nav-button">
+          <button @click="vapi.stepper.reset()" class="button is-small nav-button">
             <span><FAIcon icon="fa-solid fa-house-flag" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="stepper.clear()" class="button is-small nav-button">
+          <button @click="vapi.stepper.clear()" class="button is-small nav-button">
             <span><FAIcon icon="fa-solid fa-trash" /></span>
           </button>
         </p>
@@ -231,7 +234,7 @@ watch(
     </div>
 
     <div class="tree-container" ref="treeContainer">
-      <div class="index-display">{{ stepper.stepIndex }}/{{ stepper.nSteps }}</div>
+      <div class="index-display">{{ vapi.stepper.stepIndex }}/{{ vapi.stepper.nSteps }}</div>
 
       <ul class="tree-root">
         <li v-if="stateMachine" class="tree-node root-node">
@@ -259,26 +262,26 @@ watch(
         <span class="data-label">(.globals)</span>
 
         <button
-          @click="stepper.clearGlobals()"
+          @click="vapi.stepper.clearGlobals()"
           class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
           data-tooltip="Delete Global Variables"
         >
           <span><FAIcon icon="fa-solid fa-trash" /></span>
         </button>
-        <DataPathViewer :data="stepper.globals" />
+        <DataPathViewer :data="vapi.stepper.globals" />
       </div>
     </div>
     <div class="data-container">
       <div class="data-display">
         Table Data <span class="data-label">(.data)</span>
         <button
-          @click="stepper.clear()"
+          @click="vapi.stepper.clear()"
           class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
           data-tooltip="Delete Nodes"
         >
           <span><FAIcon icon="fa-solid fa-trash" /></span>
         </button>
-        <DataPathViewer :data="stepper.stepData" />
+        <DataPathViewer :data="vapi.stepper.stepData" />
       </div>
     </div>
   </div>
