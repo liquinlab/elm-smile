@@ -12,7 +12,6 @@ import generateQRCode from './plugins/generate-qr.js'
 // https://vitejs.dev/config/
 export default ({ mode }) => {
   process.env = {
-    ...process.env,
     ...loadEnv(mode, `${process.cwd()}/env/`, ''),
     ...loadEnv('deploy', `${process.cwd()}/env/`, ''),
     ...loadEnv('git', `${process.cwd()}/env/`, ''),
@@ -67,7 +66,6 @@ export default ({ mode }) => {
       },
     },
     define: {
-      'process.env': process.env,
       __BUILD_TIME__: JSON.stringify(new Date().toLocaleDateString()),
     },
   })
