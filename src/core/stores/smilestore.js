@@ -110,8 +110,8 @@ function removeFirestore(config) {
 
 const initDev = {
   // syncs with local storage
-  pageProvidesAutofill: null, // does current page offer autofil (transient)
-  pageProvidesTrialStepper: false, // does current page provide a trial stepper (transient)
+  viewProvidesAutofill: null, // does current page offer autofil (transient)
+  viewProvidesTrialStepper: false, // does current page provide a trial stepper (transient)
   showConsoleBar: false, // show/hide the data base bottom (transient)
   showSideBar: false,
   pinnedRoute: null,
@@ -120,7 +120,7 @@ const initDev = {
   searchParams: '', // search parameters (transient)
   logFilter: 'All', // what level of log messages to show (transient)
   notificationFilter: 'Errors only', // what level of notifications to show (transient)
-  lastPageLimit: false, // limits logs to the last page (transient)
+  lastViewLimit: false, // limits logs to the last page (transient)
   dataPath: null, // path to the data (transient)
   configPath: null, // path to the config (transient)
   // panel locations (transient)
@@ -136,7 +136,7 @@ const initLocal = {
   docRef: null,
   privateDocRef: null,
   completionCode: null,
-  currentPageDone: false,
+  currentViewDone: false,
   consented: false,
   withdrawn: false,
   done: false,
@@ -239,7 +239,7 @@ export default defineStore('smilestore', {
     isDone: (state) => state.local.done,
     lastRoute: (state) => state.local.lastRoute,
     isDBConnected: (state) => state.global.dbConnected,
-    hasAutofill: (state) => state.dev.pageProvidesAutofill,
+    hasAutofill: (state) => state.dev.viewProvidesAutofill,
     searchParams: (state) => state.dev.searchParams,
     recruitmentService: (state) => state.data.recruitmentService,
     isSeedSet: (state) => state.local.seedSet,
@@ -384,15 +384,21 @@ export default defineStore('smilestore', {
      * @returns {Stepper} The registered stepper instance
      */
     registerStepper(view, stepper) {
+
+      // allocate a new serialization space
       if (this.local.viewSteppers[view] === undefined) {
         this.local.viewSteppers[view] = {}
       }
+
+      // register the stepper in global state
       if (stepper) {
         if (!this.global.steppers) {
           this.global.steppers = {}
         }
         this.global.steppers[view] = stepper
       }
+
+      // return the active stepper
       return this.global.steppers?.[view]
     },
 
@@ -502,7 +508,7 @@ export default defineStore('smilestore', {
      * @description Sets the autofill status in the dev state.
      */
     setAutofill(fn) {
-      this.dev.pageProvidesAutofill = fn
+      this.dev.viewProvidesAutofill = fn
     },
 
     /**
@@ -510,7 +516,7 @@ export default defineStore('smilestore', {
      * @description Removes the autofill status in the dev state.
      */
     removeAutofill() {
-      this.dev.pageProvidesAutofill = null
+      this.dev.viewProvidesAutofill = null
     },
 
     /**
@@ -525,14 +531,14 @@ export default defineStore('smilestore', {
     },
 
     /**
-     * Autofills a page
-     * @description If the page provides autofill, this function will call the autofill function.
+     * Autofills a view
+     * @description If the view provides autofill, this function will call the autofill function.
      */
     autofill() {
-      if (this.dev.pageProvidesAutofill) {
-        this.dev.pageProvidesAutofill()
+      if (this.dev.viewProvidesAutofill) {
+        this.dev.viewProvidesAutofill()
         const log = useLog()
-        log.warn('DEV MODE: Page was autofilled by a user-provided component function')
+        log.warn('DEV MODE: View was autofilled by a user-provided component function')
       }
     },
 

@@ -15,6 +15,7 @@ const route = useRoute()
 // })
 const stepper = computed(() => vapi.stepper)
 
+
 // Add a watcher to handle stepper initialization
 // watch(
 //   () => api.store.global.steppers?.[route.name],
@@ -197,6 +198,7 @@ watch(
 
 <template>
   <div class="tree-viewer-container" v-if="stepper">
+    
     <div class="path-display-container">
       <div class="path-info">
         <div class="path-display">{{ vapi.stepper.pathString }}</div>

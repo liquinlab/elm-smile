@@ -167,7 +167,7 @@ export function addGuards(r, providedApi = null) {
     // }
 
     // if you're trying to go to the next route
-    if (from.meta !== undefined && from.meta.next === to.name && api.store.dev.currentPageDone) {
+    if (from.meta !== undefined && from.meta.next === to.name && api.store.dev.currentViewDone) {
       api.log.log(
         'ROUTER GUARD: You are trying to go to the next route from ' +
           from.name +
@@ -181,7 +181,7 @@ export function addGuards(r, providedApi = null) {
     }
 
     // if you're trying to go to the next route
-    if (from.meta !== undefined && from.meta.next === to.name && !api.store.dev.currentPageDone) {
+    if (from.meta !== undefined && from.meta.next === to.name && !api.store.dev.currentViewDone) {
       api.log.error(
         'ROUTER GUARD: You are trying to go to the next route from ' +
           from.name +
@@ -263,8 +263,8 @@ export function addGuards(r, providedApi = null) {
       api.log.log('ROUTER GUARD: Not using participant-specific seed; seed set randomly')
     }
     api.log.clearPageHistory()
-    api.store.dev.pageProvidesTrialStepper = false // by default
-    api.store.dev.currentPageDone = false // set the current page to done
+    api.store.dev.viewProvidesTrialStepper = false // by default
+    api.store.dev.currentViewDone = false // set the current page to done
     api.log.log('ROUTER GUARD: Router navigated to /' + to.name)
   })
 

@@ -19,7 +19,7 @@ const stepper = computed(() => {
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
         v-on:click="stepper?.goPrevStep()"
         data-tooltip="Step trial back"
-        :disabled="!stepper || api.store.dev.pageProvidesTrialStepper == false"
+        :disabled="!stepper || api.store.dev.viewProvidesTrialStepper == false"
       >
         <span>
           <FAIcon icon="fa-solid fa-angle-left" />
@@ -31,7 +31,7 @@ const stepper = computed(() => {
       <button
         class="button is-small is-jump-bar has-tooltip-arrow has-tooltip-bottom"
         data-tooltip="Current stepper path"
-        :disabled="!stepper || api.store.dev.pageProvidesTrialStepper == false"
+        :disabled="!stepper || api.store.dev.viewProvidesTrialStepper == false"
       >
         <span class="counter" v-if="stepper?.paths">{{ stepper?.paths }}</span>
         <FAIcon icon="fa-solid fa-circle-minus" v-else />
@@ -43,7 +43,7 @@ const stepper = computed(() => {
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
         v-on:click="stepper?.goNextStep()"
         data-tooltip="Step trial forward"
-        :disabled="!stepper || api.store.dev.pageProvidesTrialStepper == false"
+        :disabled="!stepper || api.store.dev.viewProvidesTrialStepper == false"
       >
         <span>
           <FAIcon icon="fa-solid fa-angle-right" />

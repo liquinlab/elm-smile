@@ -111,7 +111,7 @@ export default function useTimeline() {
    */
   const navigateTo = (goto) => {
     // sets the current page as done
-    smilestore.dev.currentPageDone = true
+    smilestore.dev.currentViewDone = true
 
     if (smilestore.config.autoSave) {
       log.log('TIMELINE STEPPER: Attempting auto saving on navigateTo() navigation')

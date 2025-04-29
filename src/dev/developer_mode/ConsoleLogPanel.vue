@@ -55,7 +55,7 @@ function getBgClass(msg) {
         <li>
           <label class="checkbox">
             <b>Since last page change:</b>&nbsp;
-            <input type="checkbox" v-model="api.store.dev.lastPageLimit" />
+            <input type="checkbox" v-model="api.store.dev.lastViewLimit" />
           </label>
         </li>
         <li>
@@ -98,7 +98,7 @@ function getBgClass(msg) {
 
     <div class="scrollablelog">
       <aside class="menu">
-        <ul class="menu-list" v-if="api.store.dev.lastPageLimit">
+        <ul class="menu-list" v-if="api.store.dev.lastViewLimit">
           <template v-for="msg in log.page_history">
             <li :class="getBgClass(msg)" v-if="filter_log(msg)">
               <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />

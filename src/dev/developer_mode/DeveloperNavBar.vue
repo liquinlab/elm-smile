@@ -1,7 +1,4 @@
 <script setup>
-import { onMounted, watch, ref, reactive, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-
 import DocsDropDown from '@/dev/developer_mode/DocsDropDown.vue'
 import Stepper from '@/dev/developer_mode/Stepper.vue'
 import RouteInfoButton from '@/dev/developer_mode/RouteInfoButton.vue'
@@ -13,7 +10,6 @@ import useAPI from '@/core/composables/useAPI'
 import { onKeyDown } from '@vueuse/core'
 
 const api = useAPI()
-const router = useRouter()
 
 /**
  * Developer mode keyboard shortcuts
