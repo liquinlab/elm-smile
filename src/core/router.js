@@ -1,13 +1,44 @@
-import seedrandom from 'seedrandom'
-import { createRouter, createWebHashHistory } from 'vue-router'
-import { getQueryParams } from '@/core/utils'
-//import timeline from '@/user/design'
-import useAPI from '@/core/composables/useAPI'
-// 3. add navigation guards
-//    currently these check if user is known
-//    and if they are, they redirect to last route
+/**
+ * @fileoverview Router configuration and setup for the SMILE application
+ * @module router
+ */
 
+/**
+ * Random number generator for seeding routes
+ * @external seedrandom
+ */
+import seedrandom from 'seedrandom'
+
+/**
+ * Vue Router factory functions for creating router instance
+ * @external vue-router
+ */
+import { createRouter, createWebHashHistory } from 'vue-router'
+
+/**
+ * Utility function for parsing URL query parameters
+ * @external utils
+ */
+import { getQueryParams } from '@/core/utils'
+
+/**
+ * Composable for accessing the SMILE API instance
+ * @external useAPI
+ */
+import useAPI from '@/core/composables/useAPI'
+
+/**
+ * Adds navigation guards to the Vue Router instance to control route access and behavior
+ * @param {import('vue-router').Router} r - Vue Router instance to add guards to
+ * @param {Object} [providedApi=null] - Optional API instance, will use default if not provided
+ */
 export function addGuards(r, providedApi = null) {
+  /**
+   * Navigation guard for route navigation
+   * @param {Object} to - The target route object
+   * @param {Object} from - The current route object
+   * @returns {boolean|Object} - True if navigation is allowed, or a redirect object if navigation is blocked
+   */
   r.beforeEach(async (to, from) => {
     const api = providedApi || useAPI()
     if (api.isResetApp()) {
@@ -66,7 +97,7 @@ export function addGuards(r, providedApi = null) {
 
     // if the database isn't connected and they're a known user, reload their data
     if (api.store.isKnownUser && !api.store.isDBConnected) {
-      const res = await api.store.loadData()
+      await api.store.loadData()
     }
 
     // if withdrew
@@ -158,14 +189,6 @@ export function addGuards(r, providedApi = null) {
       }
     }
 
-    // if you're trying to go to the welcome screen and you're not a known user, allow it
-    // if (to.name === 'welcome_anonymous' && from.name === undefined && !api.store.isKnownUser) {
-    //   api.log.log('ROUTER GUARD: We let anyone see ' + to.name + ' because the users is not known.')
-    //   api.store.setLastRoute(to.name)
-    //   api.store.recordRoute(to.name)
-    //   return true
-    // }
-
     // if you're trying to go to the next route
     if (from.meta !== undefined && from.meta.next === to.name && api.store.dev.currentViewDone) {
       api.log.log(
@@ -246,7 +269,11 @@ export function addGuards(r, providedApi = null) {
     return true // is this right? why is the default to allow the navigation?
   })
 
-  // add additional guard to set global seed before
+  /**
+   * Router guard that runs before route resolution to handle seeding and view state
+   * @param {import('vue-router').RouteLocationNormalized} to - Target route
+   * @returns {void}
+   */
   r.beforeResolve((to) => {
     const api = useAPI()
     api.removeAutofill()
@@ -268,7 +295,12 @@ export function addGuards(r, providedApi = null) {
     api.log.log('ROUTER GUARD: Router navigated to /' + to.name)
   })
 
-  // Check if the next route has a preload function, and if so, run it asynchronously
+  /**
+   * Router guard that runs after route navigation is complete to handle preloading of next route
+   * @param {import('vue-router').RouteLocationNormalized} to - Target route
+   * @param {import('vue-router').RouteLocationNormalized} from - Previous route
+   * @returns {Promise<void>} Promise that resolves when preloading is complete
+   */
   r.afterEach(async (to, from) => {
     if (to.meta !== undefined && to.meta.next !== undefined) {
       const fullTo = r.resolve({ name: to.meta.next })
@@ -280,6 +312,11 @@ export function addGuards(r, providedApi = null) {
   })
 }
 
+/**
+ * Creates and configures a Vue Router instance for the SMILE application
+ * @param {Timeline} timeline - Timeline instance containing route definitions
+ * @returns {import('vue-router').Router} Configured Vue Router instance
+ */
 export function useRouter(timeline) {
   const { routes } = timeline
 
@@ -296,7 +333,5 @@ export function useRouter(timeline) {
 
   return router
 }
-// they are defined in a function like this for the testing harness
-//export { routes, addGuards }
 
 export default useRouter

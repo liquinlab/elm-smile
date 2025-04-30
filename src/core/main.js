@@ -1,14 +1,70 @@
+/**
+ * @fileoverview Main entry point for the SMILE application that imports core dependencies
+ */
+
+/**
+ * Font Awesome icon component
+ * @external FontAwesomeIcon
+ */
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+/**
+ * FormKit form builder components and configuration
+ * @external FormKit
+ */
 import { plugin, defaultConfig } from '@formkit/vue'
-import { useRouter, addGuards } from '@/core/router' // import the router
+
+/**
+ * Router utilities for application routing
+ * @external router
+ */
+import { useRouter, addGuards } from '@/core/router'
+
+/**
+ * Pinia store instance for state management
+ * @external pinia
+ */
 import { pinia } from '@/core/createpinia'
-import { createNotivue } from 'notivue' // drag components
+
+/**
+ * Notification system factory
+ * @external notivue
+ */
+import { createNotivue } from 'notivue'
+
+/**
+ * User-defined timeline configuration
+ * @external timeline
+ */
 import timeline from '@/user/design'
+
+/**
+ * FormKit default theme styles
+ */
 import '@formkit/themes/genesis'
-import App from '@/core/App.vue' // import the main app component
+
+/**
+ * Main application component
+ * @external App
+ */
+import App from '@/core/App.vue'
+
+/**
+ * Vue application factory
+ * @external vue
+ */
 import { createApp } from 'vue'
-import VueGtag from 'vue-gtag' // google analytics
-import '@/core/icons' // configure fontawesome
+
+/**
+ * Google Analytics plugin for Vue
+ * @external vue-gtag
+ */
+import VueGtag from 'vue-gtag'
+
+/**
+ * Font Awesome icon configuration
+ */
+import '@/core/icons'
 
 /**
  * Initialize the Vue application and router

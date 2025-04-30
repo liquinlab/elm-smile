@@ -1,4 +1,14 @@
-import useSmileStore from '@/core/stores/smilestore' // get access to the global store
+/**
+ * @fileoverview Utility functions for URL parameter handling and recruitment service processing
+ * @module utils
+ */
+
+/**
+ * Import store composables
+ * @requires useSmileStore Global store composable for managing application state
+ * @requires useLog Logging store composable for application logging
+ */
+import useSmileStore from '@/core/stores/smilestore'
 import useLog from '@/core/stores/log'
 
 /**

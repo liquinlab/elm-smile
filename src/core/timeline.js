@@ -1,9 +1,42 @@
+/**
+ * @fileoverview Timeline module for managing application routing and view sequencing
+ * @module timeline
+ */
+
+/**
+ * Lodash utility library
+ * @external lodash
+ */
 import _ from 'lodash'
+
+/**
+ * Graph visualization and layout library
+ * @external dagre
+ */
 import * as dagre from '@dagrejs/dagre'
+
+/**
+ * Component for choosing recruitment service in developer mode
+ * @requires RecruitmentChooser
+ */
 import RecruitmentChooser from '@/dev/developer_mode/RecruitmentChooserView.vue'
+
+/**
+ * Component for presentation mode landing page
+ * @requires PresentationMode
+ */
 import PresentationMode from '@/dev/presentation_mode/PresentationModeView.vue'
 
+/**
+ * Timeline class for managing the sequence of routes in the application
+ * @class Timeline
+ * @param {Object} api - API instance
+ */
 class Timeline {
+  /**
+   * Constructor for the Timeline class
+   * @param {Object} api - API instance
+   */
   constructor(api) {
     this.api = api
     this.routes = [] // the actual routes given to VueRouter
@@ -42,6 +75,11 @@ class Timeline {
     }
   }
 
+  /**
+   * Clones a route and fills in default values
+   * @param {Object} route - The route to clone
+   * @returns {Object} The cloned route with default values
+   */
   cloneRouteAndFillDefaults(route) {
     const newroute = _.cloneDeep(route)
 
@@ -54,6 +92,11 @@ class Timeline {
     return newroute
   }
 
+  /**
+   * Pushes a route to the routes array
+   * @param {Object} route - The route to push
+   * @throws {Error} If a route with the same path or name already exists
+   */
   pushToRoutes(route) {
     for (let i = 0; i < this.routes.length; i += 1) {
       if (this.routes[i].path === route.path) {
@@ -68,6 +111,11 @@ class Timeline {
     this.routes.push(route)
   }
 
+  /**
+   * Pushes a route to the timeline array
+   * @param {Object} route - The route to push
+   * @throws {Error} If a route with the same path or name already exists
+   */
   pushToTimeline(route) {
     for (let i = 0; i < this.seqtimeline.length; i += 1) {
       if (this.seqtimeline[i].name === route.name) {
@@ -82,6 +130,11 @@ class Timeline {
     this.seqtimeline.push(route)
   }
 
+  /**
+   * Pushes a sequential route to the timeline array
+   * @param {Object} routeConfig - The route configuration
+   * @throws {Error} If a route with the same path or name already exists
+   */
   pushSeqView(routeConfig) {
     const newroute = this.cloneRouteAndFillDefaults(routeConfig)
     if (!newroute.meta) {
@@ -132,6 +185,11 @@ class Timeline {
     }
   }
 
+  /**
+   * Registers a view in the timeline
+   * @param {Object} routeConfig - The route configuration
+   * @throws {Error} If a route with the same path or name already exists
+   */
   registerView(routeConfig) {
     const newroute = this.cloneRouteAndFillDefaults(routeConfig)
     // should NOT allow meta next/prev to exist
@@ -167,6 +225,11 @@ class Timeline {
     }
   }
 
+  /**
+   * Pushes a randomized node to the timeline
+   * @param {Object} routeConfig - The route configuration
+   * @param {boolean} [push=true] - Whether to push the node to the timeline
+   */
   pushRandomizedNode(routeConfig, push = true) {
     const newroute = this.cloneRouteAndFillDefaults(routeConfig)
 
@@ -208,6 +271,12 @@ class Timeline {
     this._handleRandomizedOption(newroute, randomOption, push)
   }
 
+  /**
+   * Handles a randomized option
+   * @param {Object} newroute - The new route
+   * @param {Object} randomOption - The random option
+   * @param {boolean} push - Whether to push the option to the timeline
+   */
   _handleRandomizedOption(newroute, randomOption, push) {
     for (let i = 0; i < randomOption.length; i += 1) {
       const option = randomOption[i]
@@ -256,10 +325,19 @@ class Timeline {
     }
   }
 
+  /**
+   * Registers a randomized node
+   * @param {Object} routeConfig - The route configuration
+   */
   registerRandomizedNode(routeConfig) {
     this.pushRandomizedNode(routeConfig, false)
   }
 
+  /**
+   * Pushes a conditional node to the timeline
+   * @param {Object} routeConfig - The route configuration
+   * @param {boolean} [push=true] - Whether to push the node to the timeline
+   */
   pushConditionalNode(routeConfig, push = true) {
     // newroute should have name and a condition name (user specified, has to match something in data.conditions)
     const newroute = this.cloneRouteAndFillDefaults(routeConfig)
@@ -300,10 +378,17 @@ class Timeline {
     this._handleRandomizedOption(newroute, randomOption, push)
   }
 
+  /**
+   * Registers a conditional node
+   * @param {Object} routeConfig - The route configuration
+   */
   registerConditionalNode(routeConfig) {
     this.pushConditionalNode(routeConfig, false)
   }
 
+  /**
+   * Builds the timeline
+   */
   build() {
     if (!this.has_welcome_anonymous) {
       this.api.log.error('No welcome_anonymous route defined in src/user/design.js  This is required.')
@@ -329,6 +414,9 @@ class Timeline {
     }
   }
 
+  /**
+   * Builds the DAG
+   */
   buildDAG() {
     this.api.log.log('DEV MODE: building DAG')
     this.g = new dagre.graphlib.Graph().setGraph({ nodesep: 80, ranksep: 40 }).setDefaultEdgeLabel(function () {
@@ -367,7 +455,9 @@ class Timeline {
     }
   }
 
-  // buildGraph builds
+  /**
+   * Builds the graph
+   */
   buildGraph() {
     this.api.log.debug('DEV MODE: building DAG for timeline')
 
@@ -398,16 +488,6 @@ class Timeline {
       }
     }
   }
-
-  // this won't work with new system
-  // buildProgress assigns progrees meeter values to each route
-  // buildProgress() {
-  //   const seqTimelineLength = this.seqtimeline.length
-  //   for (let i = 0; i < seqTimelineLength; i++) {
-  //     this.seqtimeline[i].meta.routeIdx = i
-  //     this.seqtimeline[i].meta.progress = (100 * i) / (seqTimelineLength - 1)
-  //   }
-  // }
 }
 
 export default Timeline

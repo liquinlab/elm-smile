@@ -1,13 +1,17 @@
-// design.js
-// This file configures the overall logic of your experiment.
-// The critical part is the timeline, which is a list of phases
-// the experiment goes through.  This file configues which phase
-// occurs in the sequence.
+/**
+ * @file design.js
+ * @description Configures the overall logic and timeline of the experiment.
+ * The timeline defines the sequence of phases that the experiment goes through.
+ * This file configures which phases occur in what order.
+ *
+ * Key documentation:
+ * - Views: https://smile.gureckislab.org/views.html
+ * - Timeline: https://smile.gureckislab.org/timeline.html
+ * - Randomization: https://smile.gureckislab.org/randomization.html
+ *
+ * @module design
+ */
 
-// The key documentation for this file
-// Views: https://smile.gureckislab.org/views.html
-// Timeline: https://smile.gureckislab.org/timeline.html
-// Randomization: https://smile.gureckislab.org/randomization.html
 import { markRaw } from 'vue'
 import { processQuery } from '@/core/utils'
 
