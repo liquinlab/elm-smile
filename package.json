@@ -43,7 +43,6 @@
     "@codenamize/codenamize": "1.1.1",
     "@creativebulma/bulma-divider": "^1.1.0",
     "@creativebulma/bulma-tooltip": "^1.2.0",
-    "@dagrejs/dagre": "^1.1.4",
     "@formkit/themes": "1.6.9",
     "@formkit/vue": "1.6.9",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",

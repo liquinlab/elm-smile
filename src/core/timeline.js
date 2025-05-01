@@ -3,28 +3,8 @@
  * @module timeline
  */
 
-/**
- * Lodash utility library
- * @external lodash
- */
 import _ from 'lodash'
-
-/**
- * Graph visualization and layout library
- * @external dagre
- */
-import * as dagre from '@dagrejs/dagre'
-
-/**
- * Component for choosing recruitment service in developer mode
- * @requires RecruitmentChooser
- */
 import RecruitmentChooser from '@/dev/developer_mode/RecruitmentChooserView.vue'
-
-/**
- * Component for presentation mode landing page
- * @requires PresentationMode
- */
 import PresentationMode from '@/dev/presentation_mode/PresentationModeView.vue'
 
 /**
@@ -43,9 +23,7 @@ class Timeline {
     this.seqtimeline = [] // copies of routes that are sequential
     this.registered = {}
     this.type = 'timeline'
-    this.g = null
     this.has_welcome_anonymous = false
-    this.g_nonseq = null
     this._IS_ROOT_NODE = '_IS_ROOT_NODE'
     // add the recruitment chooser if in development mode
     if (api.config.mode === 'development') {
@@ -397,11 +375,6 @@ class Timeline {
 
     this.buildGraph()
     this.registerCounters()
-    if (this.api.store.config.mode === 'development') {
-      this.buildDAG()
-    }
-    // this.buildProgress()
-    // save built timeline to local
 
     this.api.store.local.seqtimeline = this.seqtimeline
     this.api.store.local.routes = this.routes
@@ -411,47 +384,6 @@ class Timeline {
     // for each route, register a counter based on the name
     for (let i = 0; i < this.routes.length; i += 1) {
       this.api.store.registerStepper(this.routes[i].name)
-    }
-  }
-
-  /**
-   * Builds the DAG
-   */
-  buildDAG() {
-    this.api.log.log('DEV MODE: building DAG')
-    this.g = new dagre.graphlib.Graph().setGraph({ nodesep: 80, ranksep: 40 }).setDefaultEdgeLabel(function () {
-      return {}
-    }) // Default to assigning a new object as a label for each new edge.
-    this.g_nonseq = new dagre.graphlib.Graph().setGraph({ nodesep: 80, ranksep: 40 }).setDefaultEdgeLabel(function () {
-      return {}
-    }) // Default to assigning a new object as a label for each new edge.
-
-    for (let i = 0; i < this.routes.length; i += 1) {
-      if (this.routes[i].meta.sequential == false) {
-        if (this.routes[i].component) {
-          this.g_nonseq.setNode(this.routes[i].name, {
-            name: this.routes[i].name,
-            label: this.routes[i].component.__name + '.vue',
-            class: 'node',
-            shape: 'circle',
-          })
-        }
-      }
-    }
-    /*  add a non sequential route
-      this.g_nonseq.setNode('recruit', { name: 'recruit', label: 'RecruitmentChooser.vue', class: 'node', shape: 'circle' })
-      */
-    for (let i = 0; i < this.seqtimeline.length; i += 1) {
-      if (this.seqtimeline[i].meta.type === 'random_node') {
-        // don't know whast to do about the random nodes
-      } else {
-        this.g.setNode(this.seqtimeline[i].name, {
-          name: this.seqtimeline[i].name,
-          label: this.seqtimeline[i].component.__name + '.vue',
-          class: 'node',
-          shape: 'circle',
-        })
-      }
     }
   }
 
