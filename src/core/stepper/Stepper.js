@@ -137,7 +137,7 @@ export class Stepper extends StepState {
     return state
   }
 
-  spec() {
+  steps() {
     return this._root
   }
 
