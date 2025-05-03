@@ -3,7 +3,7 @@
  * @description Manages stepper instances on a per-view basis.
  * Provides functionality for:
  * - Creating or retrieving a stepper instance for the current view
- * - Setting the viewProvidesTrialStepper flag in the dev store
+ * - Setting the viewProvidesStepper flag  in the dev store
  * - Storing the stepper instance in the global smilestore
  */
 import Stepper from '@/core/stepper/Stepper'
@@ -31,8 +31,8 @@ export function useStepper(view) {
   const smilestore = useSmileStore()
   //const view = route.name
 
-  // Set viewProvidesTrialStepper to true for the dev bar
-  smilestore.dev.viewProvidesTrialStepper = true
+  // Set viewProvidesStepper to true for the dev bar
+  smilestore.dev.viewProvidesStepper = true
 
   // Check if stepper already exists in global state
   let stepper = smilestore.global.steppers?.[view]

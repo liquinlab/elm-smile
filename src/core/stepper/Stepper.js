@@ -248,6 +248,11 @@ export class Stepper extends StepState {
    */
   forEach(callback) {
     this.states.forEach((item, index) => {
+      // Skip SOS and EOS states when at depth 0
+      if (this.depth === 0 && (index === 0 || index === this.states.length - 1)) {
+        return
+      }
+      
       // Call the callback and check if it returns a new value
       const result = callback(item, index)
       if (result !== undefined) {

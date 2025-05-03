@@ -111,7 +111,7 @@ function removeFirestore(config) {
 const initDev = {
   // syncs with local storage
   viewProvidesAutofill: null, // does current page offer autofil (transient)
-  viewProvidesTrialStepper: false, // does current page provide a trial stepper (transient)
+  viewProvidesStepper: false, // does current page provide a trial stepper (transient)
   showConsoleBar: false, // show/hide the data base bottom (transient)
   showSideBar: false,
   pinnedRoute: null,
@@ -384,7 +384,6 @@ export default defineStore('smilestore', {
      * @returns {Stepper} The registered stepper instance
      */
     registerStepper(view, stepper) {
-
       // allocate a new serialization space
       if (this.local.viewSteppers[view] === undefined) {
         this.local.viewSteppers[view] = {}

@@ -636,13 +636,13 @@ export class SmileAPI {
  * @returns {SmileAPI} A reactive SmileAPI instance with timeline, routing and store functionality
  */
 export default function useAPI() {
-  const { goNextView, goPrevView, goToView, nextView, prevView } = useTimeline()
+  const timeline = useTimeline()
   const route = useRoute()
   const router = useRouter()
   const store = useSmileStore()
   const logStore = useLog()
 
-  const timeline = { goNextView, goPrevView, goToView, nextView, prevView }
+  //const timeline = useTimeline()
   const api = new SmileAPI(store, logStore, route, router, timeline)
   return reactive(api)
 }

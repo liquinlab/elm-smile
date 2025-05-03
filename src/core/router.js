@@ -290,7 +290,7 @@ export function addGuards(r, providedApi = null) {
       api.log.log('ROUTER GUARD: Not using participant-specific seed; seed set randomly')
     }
     api.log.clearPageHistory()
-    api.store.dev.viewProvidesTrialStepper = false // by default
+    api.store.dev.viewProvidesStepper = false // by default
     api.store.dev.currentViewDone = false // set the current page to done
     api.log.log('ROUTER GUARD: Router navigated to /' + to.name)
   })

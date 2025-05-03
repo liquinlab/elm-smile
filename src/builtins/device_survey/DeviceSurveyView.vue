@@ -5,8 +5,8 @@ import { reactive, computed } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
-const pages = api.spec().append([{ path: 'device_page1' }, { path: 'device_page2' }])
-api.addSpec(pages)
+const pages = api.steps.append([{ path: 'device_page1' }, { path: 'device_page2' }])
+api.reset()
 
 if (!api.globals.forminfo) {
   api.globals.forminfo = reactive({
@@ -62,7 +62,7 @@ function finish() {
         to improve the quality of our experiments in the future.
       </p>
 
-      <div class="formstep" v-if="api.paths === 'device_page1'">
+      <div class="formstep" v-if="api.pathString === 'device_page1'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -168,7 +168,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-else-if="api.paths === 'device_page2'">
+      <div class="formstep" v-else-if="api.pathString === 'device_page2'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">

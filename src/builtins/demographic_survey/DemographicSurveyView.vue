@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, computed } from 'vue'
+import { reactive, computed, onMounted } from 'vue'
 
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
@@ -75,6 +75,10 @@ function finish() {
   api.recordForm('demographicForm', api.globals.forminfo)
   api.goNextView()
 }
+
+onMounted(() => {
+  api.goNextStep()
+})
 </script>
 
 <template>

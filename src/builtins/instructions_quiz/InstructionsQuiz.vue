@@ -27,21 +27,11 @@ function init() {
   qs = props.randomizeQandA ? getRandomizedQuestions() : props.questions
 
   console.log('qs', props.questions)
-  const pages = api
-    .spec()
-    .append({ path: 'pages' })
-    .forEach((row) => {
-      row.append(qs)
-    })
-  api.addSpec(pages, true)
+  const sections = api.steps.append([{ path: 'pages' }, { path: 'feedback' }])
 
-  const feedback = api
-    .spec()
-    .append({ path: 'feedback' })
-    .forEach((row) => {
-      row.append([{ path: 'success' }, { path: 'retry' }]) // add to additional pages
-    })
-  api.addSpec(feedback, true)
+  sections[0].append(qs)
+
+  sections[1].append([{ path: 'success' }, { path: 'retry' }]) // add to additional pages
 
   if (!api.globals.attempts) {
     api.globals.attempts = 1
@@ -79,8 +69,8 @@ function autofill() {
   }
 
   // Start from root state and traverse all states
-  console.log('api.sm', api.sm)
-  updateQuestionsInState(api.sm)
+  console.log('api.sm', api.steps)
+  updateQuestionsInState(api.steps)
 }
 
 api.setAutofill(autofill)
@@ -124,9 +114,9 @@ function submitQuiz() {
     globals: api.globals,
   })
   if (quizCorrect.value) {
-    api.goToStep('feedback-success')
+    api.goToStep('feedback/success')
   } else {
-    api.goToStep('feedback-retry')
+    api.goToStep('feedback/retry')
   }
 }
 
@@ -143,13 +133,17 @@ function finish() {
 }
 
 init()
+
+onMounted(() => {
+  api.goNextStep()
+})
 </script>
 
 <template>
   <div class="page prevent-select">
     <div class="formcontent">
       <!-- Replace the two quiz page sections with this single dynamic one -->
-      <div class="formstep" v-if="api.stepIndex <= qs.length && /^pages-pg\d+$/.test(api.paths)">
+      <div class="formstep" v-if="api.stepIndex <= qs.length && /^pages\/pg\d+$/.test(api.pathString)">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
@@ -209,7 +203,7 @@ init()
         </div>
       </div>
 
-      <div class="formstep" v-else-if="api.paths === 'feedback-success'">
+      <div class="formstep" v-else-if="api.pathString === 'feedback/success'">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold has-text-centered">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Congrats! You passed.
@@ -221,7 +215,7 @@ init()
         </div>
       </div>
 
-      <div class="formstep" v-else-if="api.paths === 'feedback-retry'">
+      <div class="formstep" v-else-if="api.pathString === 'feedback/retry'">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold has-text-centered">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Sorry! You did not get all the answers correct.

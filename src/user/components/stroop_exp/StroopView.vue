@@ -9,31 +9,31 @@ import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
 // define the trials for the experiment as a spec
-const trials = api
-  .spec()
-  .append({
+const trials = api.steps.append([
+  {
     path: 'stroop',
     rt: () => api.faker.rnorm(500, 50), // add the autofill/expected data fields
     hit: () => api.faker.rbinom(1, 0.8),
     response: () => api.faker.rchoice(['r', 'g', 'b']),
-  })
-  .forEach((row) => {
-    row
-      .append([
-        { path: 'a', word: 'SHIP', color: 'red', condition: 'unrelated' },
-        { path: 'b', word: 'MONKEY', color: 'green', condition: 'unrelated' },
-        { path: 'c', word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
-        { path: 'd', word: 'RED', color: 'red', condition: 'congruent' },
-        { path: 'e', word: 'GREEN', color: 'green', condition: 'congruent' },
-        { path: 'f', word: 'BLUE', color: 'blue', condition: 'congruent' },
-        { path: 'g', word: 'GREEN', color: 'red', condition: 'incongruent' },
-        { path: 'h', word: 'BLUE', color: 'green', condition: 'incongruent' },
-        { path: 'i', word: 'RED', color: 'blue', condition: 'incongruent' },
-      ])
-      .shuffle()
-  })
-  .append([{ path: 'summary' }])
-api.addSpec(trials, true)
+  },
+])
+
+trials[0].append([
+  { path: 'a', word: 'SHIP', color: 'red', condition: 'unrelated' },
+  { path: 'b', word: 'MONKEY', color: 'green', condition: 'unrelated' },
+  { path: 'c', word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
+  { path: 'd', word: 'RED', color: 'red', condition: 'congruent' },
+  { path: 'e', word: 'GREEN', color: 'green', condition: 'congruent' },
+  { path: 'f', word: 'BLUE', color: 'blue', condition: 'congruent' },
+  { path: 'g', word: 'GREEN', color: 'red', condition: 'incongruent' },
+  { path: 'h', word: 'BLUE', color: 'green', condition: 'incongruent' },
+  { path: 'i', word: 'RED', color: 'blue', condition: 'incongruent' },
+])
+//.shuffle()
+
+trials.append([{ path: 'summary' }])
+
+api.reset()
 
 if (!api.globals.hits) {
   api.globals.hits = 0
@@ -91,6 +91,7 @@ function finish() {
 }
 
 onMounted(() => {
+  //api.goNextStep()
   api.startTimer()
 })
 </script>

@@ -1,5 +1,5 @@
 <script setup>
-import { shallowRef, ref, computed } from 'vue'
+import { onMounted } from 'vue'
 
 import CaptchaInstructionsText_01 from '@/builtins/captcha/CaptchaInstructionsText_01.vue'
 import CaptchaInstructionsText_02 from '@/builtins/captcha/CaptchaInstructionsText_02.vue'
@@ -61,7 +61,7 @@ const api = useViewAPI()
 // 5 - human brain should show stroop interference
 // 6 -
 
-const trials = api.spec().append([
+const trials = api.steps.append([
   { path: 'instructions_01', component: CaptchaInstructionsText_01, props: { adjective: '' } },
   {
     path: 'rotate_image',
@@ -70,7 +70,6 @@ const trials = api.spec().append([
   },
   { path: 'maze', component: CaptchaTrialMaze, props: { timed_task: false } },
 ])
-api.addSpec(trials)
 
 // const currentTab = computed(() => {
 //   return stepppages[step.index()]
@@ -85,6 +84,10 @@ function next_trial() {
     api.goNextStep()
   }
 }
+
+onMounted(() => {
+  api.goNextStep()
+})
 </script>
 
 <template>

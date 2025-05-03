@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Icon configuration for Font Awesome icons used in the application
+ * @module icons
+ */
+
 /* eslint-disable import/no-duplicates */
 /* import the fontawesome core */
 import { library } from '@fortawesome/fontawesome-svg-core'

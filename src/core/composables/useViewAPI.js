@@ -80,7 +80,7 @@ class ViewAPI extends SmileAPI {
    * This allows advanced manipulation of the state machine when needed.
    */
   get steps() {
-    return this._stepper
+    return this._stepper.value
   }
 
   _visualizeStateMachine() {
@@ -115,6 +115,14 @@ class ViewAPI extends SmileAPI {
         },
       }
     }
+  }
+
+  hasNextStep() {
+    return this._stepper.value.hasNext()
+  }
+
+  hasPrevStep() {
+    return this._stepper.value.hasPrev()
   }
 
   goNextStep() {
@@ -245,7 +253,7 @@ class ViewAPI extends SmileAPI {
   }
 
   get stepIndex() {
-    const leafNodes = this.stepper.leafNodes
+    const leafNodes = this._stepper.value.leafNodes
     return leafNodes.indexOf(this._pathString.value)
   }
 
@@ -259,10 +267,6 @@ class ViewAPI extends SmileAPI {
 
   get smviz() {
     return this._stateMachine.value || this._visualizeStateMachine()
-  }
-
-  get steps() {
-    return this._stepper.value
   }
 
   get length() {
@@ -327,9 +331,9 @@ class ViewAPI extends SmileAPI {
       delete pageData.stepperState
       this.store.local.viewSteppers[this.page].data = pageData
 
-      this.stepper.clearTree()
-      this.stepper.push('SOS')
-      this.stepper.push('EOS')
+      this._stepper.value.clearSubTree()
+      this._stepper.value.push('SOS')
+      this._stepper.value.push('EOS')
 
       this._path.value = []
       this._pathString.value = ''
