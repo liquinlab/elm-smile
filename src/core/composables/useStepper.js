@@ -9,7 +9,6 @@
 import Stepper from '@/core/stepper/Stepper'
 import useSmileStore from '@/core/stores/smilestore'
 import { useRoute } from 'vue-router'
-import { ref } from 'vue'
 /**
  * @class StepperAPI
  * @description Wraps a Stepper instance to provide a consistent API for managing multi-step processes
@@ -28,10 +27,9 @@ import { ref } from 'vue'
  * tracking state within experiment views.
  */
 
-export function useStepper() {
+export function useStepper(view) {
   const smilestore = useSmileStore()
-  const route = useRoute()
-  const view = route.name
+  //const view = route.name
 
   // Set viewProvidesTrialStepper to true for the dev bar
   smilestore.dev.viewProvidesTrialStepper = true
@@ -49,15 +47,12 @@ export function useStepper() {
       console.log('STEPPER: Initializing state machine with SOS and EOS nodes')
       stepper = new Stepper({ id: '/', parent: null, data: { gvars: {} } }) // explicit init
     }
-
+    console.log('STEPPER: Setting name', view)
+    stepper.name = view
     // Register stepper if not already registered
-    smilestore.registerStepper(view, stepper)
+    stepper = smilestore.registerStepper(view, stepper)
   }
 
-
-
-  console.log('STEPPER: Setting name', view)
-  stepper.name = view
   // Return the StepperAPI instance
   return stepper
 }

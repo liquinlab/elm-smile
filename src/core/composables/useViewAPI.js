@@ -5,7 +5,7 @@
  * - All methods and properties from the core API
  * - All methods and properties from the stepper
  */
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { SmileAPI } from '@/core/composables/useAPI'
 import useSmileStore from '@/core/stores/smilestore'
 import { useStepper } from '@/core/composables/useStepper'
@@ -14,6 +14,9 @@ import useTimeline from '@/core/composables/useTimeline'
 import { useRoute, useRouter } from 'vue-router'
 import useLog from '@/core/stores/log'
 import config from '@/core/config'
+
+// Singleton instance
+let viewAPIInstance = null
 
 /**
  * ViewAPI class extends SmileAPI with view-specific functionality
@@ -27,10 +30,12 @@ import config from '@/core/config'
 class ViewAPI extends SmileAPI {
   constructor(store, logStore, route, router, timeline) {
     super(store, logStore, route, router, timeline)
-    this.stepper = useStepper()
+
+    // Make stepper reactive using computed
+    this._stepper = computed(() => useStepper(route.name))
 
     // Internal reactive refs
-    this._data = ref(null)
+    this._pathData = ref(null)
     this._path = ref(null)
     this._pathString = ref('')
     this._index = ref(null)
@@ -40,14 +45,20 @@ class ViewAPI extends SmileAPI {
     // Component registry
     this.componentRegistry = new Map()
 
-    // Initialize state
-    if (this.stepper.states.length > 0) {
-      this._data.value = this.stepper.pathData
-      this._pathString.value = this.stepper.currentPathString
-      this._path.value = this.stepper.currentPath || []
-      this._index.value = this.stepper.index
-      this._gvars.value = reactive(this.stepper.data.gvars || {})
-    }
+    // Watch for stepper changes and update internal state
+    watch(
+      this._stepper,
+      (newStepper) => {
+        if (newStepper?.states?.length > 0) {
+          this._pathData.value = newStepper.pathData
+          this._pathString.value = newStepper.currentPathString
+          this._path.value = newStepper.currentPath || []
+          this._index.value = newStepper.index
+          this._gvars.value = reactive(newStepper.data.gvars || {})
+        }
+      },
+      { immediate: true }
+    )
 
     // Add keyboard event handlers from VueUse
     this.onKeyDown = onKeyDown
@@ -69,7 +80,7 @@ class ViewAPI extends SmileAPI {
    * This allows advanced manipulation of the state machine when needed.
    */
   get steps() {
-    return this.stepper
+    return this._stepper
   }
 
   _visualizeStateMachine() {
@@ -84,31 +95,33 @@ class ViewAPI extends SmileAPI {
         rows: [],
       }
 
-      state.rows.forEach((childState) => {
-        cleanState.rows.push(processState(childState, level + 1))
-      })
+      if (state.rows) {
+        state.rows.forEach((childState) => {
+          cleanState.rows.push(processState(childState, level + 1))
+        })
+      }
 
       return cleanState
     }
 
-    return processState(this.stepper)
+    return processState(this._stepper.value)
   }
 
   _saveStepperState() {
     if (this.store.local.viewSteppers[this.page]) {
       this.store.local.viewSteppers[this.page] = {
         data: {
-          stepperState: this.stepper.json,
+          stepperState: this._stepper.json,
         },
       }
     }
   }
 
   goNextStep() {
-    let next = this.stepper.next()
+    let next = this._stepper.value.next()
     if (next !== null) {
       console.log('NEXT', this._pathString)
-      this._data.value = next.pathData
+      this._pathData.value = next.pathData
       this._pathString.value = next.currentPathString
       this._path.value = next.currentPath
       this._index.value = next.index
@@ -119,10 +132,10 @@ class ViewAPI extends SmileAPI {
   }
 
   goPrevStep() {
-    let prev = this.stepper.prev()
+    let prev = this._stepper.value.prev()
     if (prev !== null) {
       console.log('PREV', this._pathString)
-      this._data.value = prev.pathData
+      this._pathData.value = prev.pathData
       this._pathString.value = prev.currentPathString
       this._path.value = prev.currentPath
       this._index.value = prev.index
@@ -133,36 +146,36 @@ class ViewAPI extends SmileAPI {
   }
 
   reset() {
-    this.stepper.reset()
-    if (this.stepper.states.length > 0) {
-      this.stepper.next()
-      this._data.value = this.stepper.pathData
-      this._pathString.value = this.stepper.currentPathString
-      this._path.value = this.stepper.currentPath
+    this._stepper.value.reset()
+    if (this._stepper.value.states.length > 0) {
+      this._stepper.value.next()
+      this._pathData.value = this._stepper.value.pathData
+      this._pathString.value = this._stepper.value.currentPathString
+      this._path.value = this._stepper.value.currentPath
       this._stateMachine.value = this._visualizeStateMachine()
       this._saveStepperState()
     }
   }
 
   goToStep(path) {
-    this.stepper.goTo(path)
-    this._data.value = this.stepper.pathData
-    this._pathString.value = this.stepper.currentPathString
-    this._path.value = this.stepper.currentPath
+    this._stepper.value.goTo(path)
+    this._pathData.value = this._stepper.value.pathData
+    this._pathString.value = this._stepper.value.currentPathString
+    this._path.value = this._stepper.value.currentPath
     this._stateMachine.value = this._visualizeStateMachine()
     this._saveStepperState()
   }
 
   init() {
     this._stateMachine.value = this._visualizeStateMachine()
-    this.stepper.next()
+    this._stepper.value.next()
   }
 
   get stepData() {
-    if (!this.datapath) return null
+    if (!this._pathData.value) return null
 
     const mergedData = computed(() => {
-      return this.datapath.reduce((merged, item) => {
+      return this._pathData.value.reduce((merged, item) => {
         return { ...merged, ...item }
       }, {})
     })
@@ -183,8 +196,8 @@ class ViewAPI extends SmileAPI {
           },
           set: (target, prop, value) => {
             target[prop] = value
-            if (this.stepper.currentData) {
-              this.stepper.currentData[prop] = value
+            if (this._stepper.value.currentData) {
+              this._stepper.value.currentData[prop] = value
               this._saveStepperState()
             }
             return true
@@ -199,8 +212,8 @@ class ViewAPI extends SmileAPI {
         },
         set: (target, prop, value) => {
           target[prop] = value
-          if (this.stepper.currentData) {
-            this.stepper.currentData[prop] = value
+          if (this._stepper.value.currentData) {
+            this._stepper.value.currentData[prop] = value
             this._saveStepperState()
           }
           return true
@@ -216,7 +229,7 @@ class ViewAPI extends SmileAPI {
   }
 
   get datapath() {
-    if (this._data.value === null) return null
+    if (this._pathData.value === null) return null
 
     return this._data.value.map((item) => {
       if (item?.type?.__vueComponent) {
@@ -236,7 +249,7 @@ class ViewAPI extends SmileAPI {
     return leafNodes.indexOf(this._pathString.value)
   }
 
-  get paths() {
+  get pathString() {
     return this._pathString.value
   }
 
@@ -249,36 +262,36 @@ class ViewAPI extends SmileAPI {
   }
 
   get steps() {
-    return this.stepper
+    return this._stepper.value
   }
 
   get length() {
-    return this.stepper.countLeafNodes - 2
+    return this._stepper.value.countLeafNodes - 2
   }
 
   get nSteps() {
-    return this.stepper.countLeafNodes - 2
+    return this._stepper.value.countLeafNodes - 2
   }
 
   get nrows() {
-    return this.stepper.countLeafNodes
+    return this._stepper.value.countLeafNodes
   }
 
   // Timing methods
   startTimer(name = 'default') {
-    this.stepper.root.data.gvars[`startTime_${name}`] = Date.now()
+    this._stepper.value.root.data.gvars[`startTime_${name}`] = Date.now()
   }
 
   elapsedTime(name = 'default') {
-    return Date.now() - this.stepper.root.data.gvars[`startTime_${name}`]
+    return Date.now() - this._stepper.value.root.data.gvars[`startTime_${name}`]
   }
 
   elapsedTimeInSeconds(name = 'default') {
-    return (Date.now() - this.stepper.root.data.gvars[`startTime_${name}`]) / 1000
+    return (Date.now() - this._stepper.value.root.data.gvars[`startTime_${name}`]) / 1000
   }
 
   elapsedTimeInMinutes(name = 'default') {
-    return (Date.now() - this.stepper.root.data.gvars[`startTime_${name}`]) / 60000
+    return (Date.now() - this._stepper.value.root.data.gvars[`startTime_${name}`]) / 60000
   }
 
   // Data methods
@@ -305,7 +318,7 @@ class ViewAPI extends SmileAPI {
       return state.states.flatMap(getLeafData)
     }
 
-    return getLeafData(this.stepper)
+    return getLeafData(this._stepper.value)
   }
 
   clear() {
@@ -320,7 +333,7 @@ class ViewAPI extends SmileAPI {
 
       this._path.value = []
       this._pathString.value = ''
-      this._data.value = null
+      this._pathData.value = null
       this._index.value = null
       this._stateMachine.value = this._visualizeStateMachine()
 
@@ -369,6 +382,11 @@ class ViewAPI extends SmileAPI {
     console.log('recordStep', this.stepData)
     this.recordData(this.stepData)
   }
+
+  // Update getter to use computed stepper
+  get stepper() {
+    return this._stepper.value
+  }
 }
 
 /**
@@ -376,38 +394,40 @@ class ViewAPI extends SmileAPI {
  * @returns {ViewAPI} A reactive ViewAPI instance with all view-specific functionality
  */
 export default function useViewAPI() {
-  const { goNextView, goPrevView, goToView, nextView, prevView } = useTimeline()
-  const route = useRoute()
-  const router = useRouter()
-  const store = useSmileStore()
-  const logStore = useLog()
-  const timeline = { goNextView, goPrevView, goToView, nextView, prevView }
-  const viewAPI = new ViewAPI(store, logStore, route, router, timeline)
+  if (!viewAPIInstance) {
+    const { goNextView, goPrevView, goToView, nextView, prevView } = useTimeline()
+    const route = useRoute()
+    const router = useRouter()
+    const store = useSmileStore()
+    const logStore = useLog()
+    const timeline = { goNextView, goPrevView, goToView, nextView, prevView }
+    viewAPIInstance = new ViewAPI(store, logStore, route, router, timeline)
 
-  // Add shortcuts for arrow keys
-  if (config.mode == 'development') {
-    /**
-     * Handle right arrow key press to advance to next step
-     * @listens keydown.ArrowRight
-     * @param {KeyboardEvent} e - The keyboard event
-     */
-    onKeyDown(['ArrowRight'], (e) => {
-      e.preventDefault()
-      viewAPI.goNextStep()
-    })
+    // Add shortcuts for arrow keys
+    if (config.mode == 'development') {
+      /**
+       * Handle right arrow key press to advance to next step
+       * @listens keydown.ArrowRight
+       * @param {KeyboardEvent} e - The keyboard event
+       */
+      onKeyDown(['ArrowRight'], (e) => {
+        e.preventDefault()
+        viewAPIInstance.goNextStep()
+      })
 
-    /**
-     * Handle left arrow key press to go back to previous step
-     * @listens keydown.ArrowLeft
-     * @param {KeyboardEvent} e - The keyboard event
-     */
-    onKeyDown(['ArrowLeft'], (e) => {
-      e.preventDefault()
-      viewAPI.goPrevStep()
-    })
+      /**
+       * Handle left arrow key press to go back to previous step
+       * @listens keydown.ArrowLeft
+       * @param {KeyboardEvent} e - The keyboard event
+       */
+      onKeyDown(['ArrowLeft'], (e) => {
+        e.preventDefault()
+        viewAPIInstance.goPrevStep()
+      })
+    }
   }
 
-  return viewAPI
+  return viewAPIInstance
 }
 
 // class StepperAPI {

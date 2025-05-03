@@ -5,8 +5,8 @@ import { reactive, computed } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
-const pages = api.spec().append([{ path: 'survey_page1' }, { path: 'survey_page2' }, { path: 'survey_page3' }])
-api.addSpec(pages)
+api.steps.append([{ path: 'survey_page1' }, { path: 'survey_page2' }, { path: 'survey_page3' }])
+api.reset()
 
 // persists the form info in local storage, otherwise initialize
 if (!api.globals.forminfo) {
@@ -85,7 +85,7 @@ function finish() {
         We request some information about you which we can use to understand aggregate differences between individuals.
         Your privacy will be maintained and the data will not be linked to your online identity (e.g., email).
       </p>
-      <div class="formstep" v-if="api.paths === 'survey_page1'">
+      <div class="formstep" v-if="api.pathString === 'survey_page1'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -167,7 +167,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-else-if="api.paths === 'survey_page2'">
+      <div class="formstep" v-else-if="api.pathString === 'survey_page2'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -250,7 +250,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-else-if="api.paths === 'survey_page3'">
+      <div class="formstep" v-else-if="api.pathString === 'survey_page3'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -561,8 +561,12 @@ function finish() {
   margin-top: 40px;
 }
 
-:root {
+.formkit-input {
   --fk-bg-input: #fff;
+  --fk-max-width-input: 100%;
+}
+
+.formkit-wrapper {
   --fk-max-width-input: 100%;
 }
 

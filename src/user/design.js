@@ -44,8 +44,6 @@ import Timeline from '@/core/timeline'
 const timeline = new Timeline(api)
 
 import useSmileStore from '@/core/stores/smilestore'
-import { onBeforeRouteLeave } from 'vue-router'
-const smilestore = useSmileStore()
 
 // #4.  Set runtime configuration options
 //      See http://smile.gureckislab.org/configuration.html#experiment-options-env

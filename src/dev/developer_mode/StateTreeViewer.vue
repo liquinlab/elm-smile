@@ -2,41 +2,20 @@
 import { ref, computed, watch, onMounted, defineComponent, h } from 'vue'
 import TreeNode from './TreeNode.vue'
 import DataPathViewer from '@/dev/developer_mode/DataPathViewer.vue'
-import useAPI from '@/core/composables/useAPI'
 import { useRoute } from 'vue-router'
 import useViewAPI from '@/core/composables/useViewAPI'
-const api = useAPI()
-const vapi = useViewAPI()
+const api = useViewAPI()
 const route = useRoute()
 
-// Reactively get the stepper for the current page
-// const stepper = computed(() => {
-//   return api.store.global.steppers?.[route.name]
-// })
-const stepper = computed(() => vapi.stepper)
-
-
-// Add a watcher to handle stepper initialization
-// watch(
-//   () => api.store.global.steppers?.[route.name],
-//   (newStepper) => {
-//     if (newStepper) {
-//       // Force a component update when stepper becomes available
-//       console.log('Stepper initialized:', route.name)
-//     }
-//   },
-//   { immediate: true } // This will run the watcher immediately on component mount
-// )
-
-const stateMachine = computed(() => vapi.smviz)
+const stateMachine = computed(() => api.steps.visualize())
 
 // Update the path watcher to use stepper.value
 watch(
-  () => vapi.stepper?.path,
+  () => api.path,
   (newPath) => {
     console.log('Path watcher triggered:', {
       newPath,
-      stepper: vapi.stepper,
+      stepper: api.steps,
     })
   },
   { immediate: true }
@@ -49,8 +28,8 @@ const pathToString = (pathArray) => {
 
 // Add computed property to check if a node is selected
 const isNodeSelected = (nodePath) => {
-  if (!vapi.stepper?.path) return false
-  const currentPathStr = pathToString(vapi.stepper.path)
+  if (!api.path) return false
+  const currentPathStr = api.pathString
   console.log('isNodeSelected', nodePath, currentPathStr)
   return nodePath === currentPathStr
 }
@@ -133,8 +112,8 @@ const formatData = (data) => {
 
 const handleNodeClick = (path) => {
   console.log('Node clicked with path:', path)
-  if (stepper.value) {
-    stepper.value.goToStep(path)
+  if (api.steps) {
+    api.goToStep(path)
     // Scroll will happen via the watcher
   } else {
     console.warn('Stepper not available for path reset')
@@ -147,15 +126,15 @@ const handleReload = () => {
 }
 
 const isEndState = computed(() => {
-  if (!vapi.stepper) return false
-  return vapi.stepper.paths === 'SOS' || vapi.stepper.paths === 'EOS'
+  if (!api.steps) return false
+  return api.pathString === 'SOS' || api.pathString === 'EOS'
 })
 
 // Add refs for container and selected node tracking
 const treeContainer = ref(null)
 
 const scrollToSelectedNode = () => {
-  if (!vapi.stepper?.path) return
+  if (!api.path) return
 
   setTimeout(() => {
     // Use the component's scope to find the selected node
@@ -187,7 +166,7 @@ const scrollToSelectedNode = () => {
 
 // Add watcher for path changes to trigger scroll
 watch(
-  () => vapi.stepper?.path,
+  () => api.path,
   (newPath) => {
     if (newPath) {
       scrollToSelectedNode()
@@ -197,33 +176,32 @@ watch(
 </script>
 
 <template>
-  <div class="tree-viewer-container" v-if="stepper">
-    
+  <div class="tree-viewer-container" v-if="api.steps">
     <div class="path-display-container">
       <div class="path-info">
-        <div class="path-display">{{ vapi.stepper.pathString }}</div>
+        <div class="path-display">{{ api.pathString }}</div>
 
         &nbsp;<FAIcon icon="fa-solid fa-ban" v-if="isEndState" />
       </div>
 
       <div class="field has-addons">
         <p class="control">
-          <button @click="vapi.stepper.goPrevStep()" class="button is-small nav-button">
+          <button @click="api.goPrevStep()" class="button is-small nav-button">
             <span><FAIcon icon="fa-solid fa-angle-left" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="vapi.stepper.goNextStep()" class="button is-small nav-button">
+          <button @click="api.goNextStep()" class="button is-small nav-button">
             <span><FAIcon icon="fa-solid fa-angle-right" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="vapi.stepper.reset()" class="button is-small nav-button">
+          <button @click="api.reset()" class="button is-small nav-button">
             <span><FAIcon icon="fa-solid fa-house-flag" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="vapi.stepper.clear()" class="button is-small nav-button">
+          <button @click="api.clear()" class="button is-small nav-button">
             <span><FAIcon icon="fa-solid fa-trash" /></span>
           </button>
         </p>
@@ -236,7 +214,7 @@ watch(
     </div>
 
     <div class="tree-container" ref="treeContainer">
-      <div class="index-display">{{ vapi.stepper.stepIndex }}/{{ vapi.stepper.nSteps }}</div>
+      <div class="index-display">{{ api.stepIndex }}/{{ api.nSteps }}</div>
 
       <ul class="tree-root">
         <li v-if="stateMachine" class="tree-node root-node">
@@ -264,26 +242,26 @@ watch(
         <span class="data-label">(.globals)</span>
 
         <button
-          @click="vapi.stepper.clearGlobals()"
+          @click="api.clearGlobals()"
           class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
           data-tooltip="Delete Global Variables"
         >
           <span><FAIcon icon="fa-solid fa-trash" /></span>
         </button>
-        <DataPathViewer :data="vapi.stepper.globals" />
+        <DataPathViewer :data="api.globals" />
       </div>
     </div>
     <div class="data-container">
       <div class="data-display">
         Table Data <span class="data-label">(.data)</span>
         <button
-          @click="vapi.stepper.clear()"
+          @click="api.clearData()"
           class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
           data-tooltip="Delete Nodes"
         >
           <span><FAIcon icon="fa-solid fa-trash" /></span>
         </button>
-        <DataPathViewer :data="vapi.stepper.stepData" />
+        <DataPathViewer :data="api.stepData" />
       </div>
     </div>
   </div>
