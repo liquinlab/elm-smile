@@ -158,9 +158,10 @@ your project `{{config.projectname}}`):
 
 ## 2. Configure your project
 
-If your lab has already been [set up](/labconfig), then you simply need to decrypt 
-the files provided in the repository. You can find more information on the 
-configuration settings and options [here](/configuration), but this is optional.
+If your lab has already been [set up](/labconfig), then you simply need to
+decrypt the files provided in the repository. You can find more information on
+the configuration settings and options [here](/configuration), but this is
+optional.
 
 ::: danger Warning!
 
@@ -171,6 +172,7 @@ waited for them to push a change to the <SmileText/> repo. See instructions
 :::
 
 To decrypt the organization files, simply type:
+
 ```
 git secret reveal
 ```

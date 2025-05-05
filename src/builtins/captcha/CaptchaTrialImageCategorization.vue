@@ -7,8 +7,7 @@ const emit = defineEmits(['nextPageCaptcha'])
     <h1 class="title">Categorize an image!</h1>
     <p class="is-size-5 has-text-left">XXX</p>
     <hr />
-    <button class="button is-success" id="finish"
-      @click="$emit('nextPageCaptcha')">I'm ready</button>
+    <button class="button is-success" id="finish" @click="$emit('nextPageCaptcha')">I'm ready</button>
   </div>
 </template>
 

@@ -5,13 +5,13 @@ import inquirer from 'inquirer'
 import chalk from 'chalk'
 import figlet from 'figlet'
 // import shell from 'shelljs'
-import { initializeApp, cert } from 'firebase-admin/app';
-import { getFirestore } from "firebase-admin/firestore"
+import { initializeApp, cert } from 'firebase-admin/app'
+import { getFirestore } from 'firebase-admin/firestore'
 import * as dotenv from 'dotenv'
 import * as fs from 'fs'
 import { dirname, isAbsolute, extname, parse, format } from 'path'
 import { Command, Option } from 'commander'
-import { execSync } from 'child_process';
+import { execSync } from 'child_process'
 // import appconfig from '../src/core/config'
 
 const init = () => {
@@ -40,7 +40,7 @@ async function askQuestions() {
 
   program.parse()
   const options = program.opts()
-  const currentBranch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
+  const currentBranch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim()
 
   const questions = [
     {
@@ -94,7 +94,7 @@ const storeData = async (data, path, relativeDir = 'data/raw', ext = '.json') =>
   try {
     let filename = path
     if (extname(path) !== ext) {
-      filename = `${ path }${ ext }`
+      filename = `${path}${ext}`
     }
 
     if (!isAbsolute(filename)) {
@@ -117,35 +117,34 @@ const storeData = async (data, path, relativeDir = 'data/raw', ext = '.json') =>
 
 const getData = async (path, completeOnly, db, filename, saveRecruitmentInfo = false) => {
   try {
-    let querySnapshot = null;
+    let querySnapshot = null
 
     if (completeOnly === 'all') {
-      querySnapshot = await db.collection(path).get();
+      querySnapshot = await db.collection(path).get()
     } else {
-      querySnapshot = await db.collection(path).where("done", "==", true).get();
+      querySnapshot = await db.collection(path).where('done', '==', true).get()
     }
 
-    const data = [];
+    const data = []
     querySnapshot.forEach((doc) => {
-      const docData = doc.data();
+      const docData = doc.data()
       if (!docData.smile_config) {
-        docData.smile_config = {};
+        docData.smile_config = {}
       }
-      docData.smile_config.firebaseConfig = {};
+      docData.smile_config.firebaseConfig = {}
 
       if (!saveRecruitmentInfo) {
-        docData.recruitment_info = {};
+        docData.recruitment_info = {}
       }
 
-      data.push({ id: doc.id, data: docData });
-    });
+      data.push({ id: doc.id, data: docData })
+    })
 
-    return storeData(data, filename);
-
+    return storeData(data, filename)
   } catch (error) {
-    console.log('The read failed:', error);
+    console.log('The read failed:', error)
   }
-};
+}
 
 const success = (filename) => {
   console.log(chalk.green(`your data has been exported to '${filename}'.`))
@@ -162,7 +161,7 @@ const run = async () => {
   const answers = await askQuestions()
   const { TYPE, COMPLETE_ONLY, BRANCH_NAME, SAVE_RECRUITMENT_INFO, FILENAME, KEY_PATH } = answers
 
-  const project_ref = `${ env.parsed.VITE_GIT_OWNER }-${ env.parsed.VITE_PROJECT_NAME }-${ BRANCH_NAME }`
+  const project_ref = `${env.parsed.VITE_GIT_OWNER}-${env.parsed.VITE_PROJECT_NAME}-${BRANCH_NAME}`
 
   // connect to database
   const localenv = dotenv.config({ path: 'env/.env.local' })
@@ -173,18 +172,18 @@ const run = async () => {
     storageBucket: localenv.parsed.VITE_FIREBASE_STORAGEBUCKET,
     messagingSenderId: localenv.parsed.VITE_FIREBASE_MESSAGINGSENDERID,
     appId: localenv.parsed.VITE_FIREBASE_APPID,
-    credential: cert(KEY_PATH)
+    credential: cert(KEY_PATH),
   }
   const app = initializeApp(firebaseConfig)
   const db = getFirestore(app)
 
   // create the file
-  const path = `${ TYPE }/${project_ref}/data`
+  const path = `${TYPE}/${project_ref}/data`
 
   const formatFilename = (f) => {
-    const prefix = `${ TYPE }-${ COMPLETE_ONLY }-${ BRANCH_NAME }`
+    const prefix = `${TYPE}-${COMPLETE_ONLY}-${BRANCH_NAME}`
     if (!f.startsWith(prefix)) {
-      return `${ prefix }-${ f }`
+      return `${prefix}-${f}`
     }
 
     return f

@@ -126,17 +126,18 @@ Preloading refers to asking the browser to load an image or video before it is
 needed so that the user isn't stuck waiting for it to load. This can be critical
 in experiments where the stimuli must display quickly.
 
-<SmileText/> provides an easy way to preload images or videos that are stored in by calling
-`api.preloadAllImages()` or `api.preloadAllVideos()` at an appropriate time (say, after the consent form). For example:
+<SmileText/> provides an easy way to preload images or videos that are stored in
+by calling `api.preloadAllImages()` or `api.preloadAllVideos()` at an
+appropriate time (say, after the consent form). For example:
+
 ```
 function finish() {
   api.preloadAllImages() // <-- add this to preload images
-  api.stepNextView() 
+  api.stepNextView()
 }
 ```
 
 Note that <SmileText/> expects these files to be stored in `/src/user/assets`
-
 
 ## Dealing with large files
 
