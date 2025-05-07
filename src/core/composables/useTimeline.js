@@ -18,7 +18,7 @@ import { useRoute, useRouter } from 'vue-router'
 import _ from 'lodash'
 import useSmileStore from '@/core/stores/smilestore'
 import useLog from '@/core/stores/log'
-import { pinia } from '@/core/createpinia'
+import { pinia } from '@/core/stores/createPinia'
 /**
  * Timeline management composable for handling view navigation
  * @function useTimeline

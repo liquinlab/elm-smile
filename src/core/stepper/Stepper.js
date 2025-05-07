@@ -43,10 +43,12 @@ export class Stepper extends StepState {
 
     // If serialized state is provided, load it
     if (serializedState !== null) {
+      console.log('STEPSTATE:loading serialized state')
       this.loadFromJSON(serializedState)
     } else {
       // Initialize the state machine with SOS and EOS nodes
       if (this.depth === 0) {
+        console.log('STEPSTATE: initializing step state')
         this.push('SOS')
         this.push('EOS')
       }
@@ -148,7 +150,7 @@ export class Stepper extends StepState {
    * @throws {Error} If items is not an object or array, or if adding items would exceed maxStepperRows
    */
   append(items, options = {}) {
-    console.log('append', items)
+    //console.log('append', items)
     // Convert single item to array if needed
     const itemsToAdd = Array.isArray(items) ? items : [items]
 
@@ -162,8 +164,8 @@ export class Stepper extends StepState {
       throw new Error('Cannot append items: would create duplicate paths')
     }
 
-    console.log('itemsToAdd', itemsToAdd)
-    console.log('this.level', this.depth)
+    //console.log('itemsToAdd', itemsToAdd)
+    //console.log('this.level', this.depth)
     itemsToAdd.forEach((item) => {
       this._addState(item)
     })
@@ -252,7 +254,7 @@ export class Stepper extends StepState {
       if (this.depth === 0 && (index === 0 || index === this.states.length - 1)) {
         return
       }
-      
+
       // Call the callback and check if it returns a new value
       const result = callback(item, index)
       if (result !== undefined) {

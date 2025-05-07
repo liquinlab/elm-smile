@@ -13,7 +13,7 @@
  */
 
 import { markRaw } from 'vue'
-import { processQuery } from '@/core/utils'
+import { processQuery } from '@/core/utils/utils'
 
 // 1. Import main built-in View components
 import Advertisement from '@/builtins/advertisement/AdvertisementView.vue'
@@ -40,10 +40,8 @@ import StroopExp from '@/user/components/stroop_exp/StroopView.vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
-import Timeline from '@/core/timeline'
+import Timeline from '@/core/timeline/Timeline'
 const timeline = new Timeline(api)
-
-import useSmileStore from '@/core/stores/smilestore'
 
 // #4.  Set runtime configuration options
 //      See http://smile.gureckislab.org/configuration.html#experiment-options-env

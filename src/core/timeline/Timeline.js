@@ -63,7 +63,7 @@ class Timeline {
 
     if (newroute.path == null) {
       const nameAsPath = `/${encodeURIComponent(newroute.name.toLowerCase().replace(/\s/g, '_'))}`
-      this.api.log.debug(`Assigning path by name for route ${newroute.name}: ${nameAsPath}`)
+      //this.api.log.debug(`Assigning path by name for route ${newroute.name}: ${nameAsPath}`)
       newroute.path = nameAsPath
     }
 
@@ -391,7 +391,7 @@ class Timeline {
    * Builds the graph
    */
   buildGraph() {
-    this.api.log.debug('DEV MODE: building DAG for timeline')
+    //this.api.log.debug('DEV MODE: building DAG for timeline')
 
     for (let i = 0; i < this.seqtimeline.length; i += 1) {
       if (this.seqtimeline[i].meta.next === undefined) {

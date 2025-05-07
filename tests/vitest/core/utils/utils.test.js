@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import { createTestingPinia } from '@pinia/testing'
 import useSmileStore from '@/core/stores/smilestore' // get access to the global store
-import { processQuery } from '@/core/utils'
+import { processQuery } from '@/core/utils/utils'
 import { setActivePinia } from 'pinia'
 
 describe('processQuery tests', () => {

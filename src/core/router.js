@@ -19,7 +19,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
  * Utility function for parsing URL query parameters
  * @external utils
  */
-import { getQueryParams } from '@/core/utils'
+import { getQueryParams } from '@/core/utils/utils'
 
 /**
  * Composable for accessing the SMILE API instance

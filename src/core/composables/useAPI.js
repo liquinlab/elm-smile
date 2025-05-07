@@ -29,7 +29,7 @@ import {
   sampleWithReplacement,
   sampleWithoutReplacement,
   fakerDistributions,
-} from '@/core/randomization'
+} from '@/core/utils/randomization'
 
 /**
  * SmileAPI class provides core functionality for SMILE experiments

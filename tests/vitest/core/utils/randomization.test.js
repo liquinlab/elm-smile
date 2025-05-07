@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import * as random from '@/core/randomization'
+import * as random from '@/core/utils/randomization'
 
 describe('Randomization tests', () => {
   it('should generate random integers', () => {

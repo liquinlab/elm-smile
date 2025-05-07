@@ -55,7 +55,7 @@ vi.mock('axios', () => {
 })
 
 // Mock randomization functions
-vi.mock('@/core/randomization', () => {
+vi.mock('@/core/utils/randomization', () => {
   if (DEBUG) console.log('Mocking randomization...')
   return {
     randomInt: vi.fn(),

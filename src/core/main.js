@@ -24,7 +24,7 @@ import { useRouter, addGuards } from '@/core/router'
  * Pinia store instance for state management
  * @external pinia
  */
-import { pinia } from '@/core/createpinia'
+import { pinia } from '@/core/stores/createPinia'
 
 /**
  * Notification system factory
@@ -64,7 +64,7 @@ import VueGtag from 'vue-gtag'
 /**
  * Font Awesome icon configuration
  */
-import '@/core/icons'
+import '@/core/utils/icons'
 
 /**
  * Initialize the Vue application and router

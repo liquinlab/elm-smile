@@ -8,7 +8,7 @@ import { setupBrowserEnvironment } from '../setup/mocks'
 
 // Import the actual router (not mocked) after the timeline mock is set up
 import useAPI from '@/core/composables/useAPI'
-import Timeline from '@/core/timeline'
+import Timeline from '@/core/timeline/Timeline'
 import { useRouter, addGuards } from '@/core/router'
 import appconfig from '@/core/config'
 import StatusBar from '@/builtins/navbars/StatusBar.vue'

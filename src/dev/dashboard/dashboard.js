@@ -6,7 +6,7 @@ import '@formkit/themes/genesis'
 
 import Dashboard from '@/dev/dashboard/Dashboard.vue' // import the main app component
 import { router } from '@/core/router' // import the router
-import { pinia } from '@/core/createpinia'
+import { pinia } from '@/core/stores/createPinia'
 import '@/core/icons' // configure fontawesome
 
 // drag components
