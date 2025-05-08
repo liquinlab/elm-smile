@@ -381,7 +381,8 @@ npm run upload_config
 
 This configures your base repo to deploy to your configured webserver,
 configures your live experiments to use your Firebase database, and configures
-Slack.
+Slack. See more docs on
+[Github action secrets](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions).
 
 ## Making changes to the env files for your project
 
