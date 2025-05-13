@@ -20,84 +20,96 @@ const api = useAPI()
  * - ArrowDown: Go to next view
  *
  * Panel Controls:
- * - Alt+1: Toggle sidebar/console panels
- * - Alt+2: Cycle through console tabs (Browse -> Log -> Config)
- * - Alt+3: Reset local state
- * - Alt+4: Connect to database
+ * - Ctrl+1: Toggle sidebar/console panels
+ * - Ctrl+2: Cycle through console tabs (Browse -> Log -> Config)
+ * - Ctrl+3: Reset local state
+ * - Ctrl+4: Connect to database
  */
-onKeyDown(['ArrowUp'], (e) => {
-  e.preventDefault()
-  api.goToView(api.prevView()?.name, true)
-})
-
-onKeyDown(['ArrowDown'], (e) => {
-  e.preventDefault()
-  api.goToView(api.nextView()?.name, true)
-})
-
-// Modify Alt+1 handler
-onKeyDown(['Alt', '1'], (e) => {
-  e.preventDefault()
-
-  const sideBar = api.store.dev.showSideBar
-  const consoleBar = api.store.dev.showConsoleBar
-
-  if (!sideBar && !consoleBar) {
-    api.store.dev.showSideBar = true
-    api.store.dev.showConsoleBar = false
-    showTemporaryNotification('Alt + 1', 'Showing Sidebar')
-  } else if (sideBar && !consoleBar) {
-    api.store.dev.showSideBar = false
-    api.store.dev.showConsoleBar = true
-    showTemporaryNotification('Alt + 1', 'Showing Console')
-  } else if (!sideBar && consoleBar) {
-    api.store.dev.showSideBar = true
-    api.store.dev.showConsoleBar = true
-    showTemporaryNotification('Alt + 1', 'Showing Both Panels')
-  } else {
-    api.store.dev.showSideBar = false
-    api.store.dev.showConsoleBar = false
-    showTemporaryNotification('Alt + 1', 'Hiding All Panels')
+onKeyDown((e) => {
+  if (e.key === 'ArrowUp') {
+    e.preventDefault()
+    api.goToView(api.prevView()?.name, true)
   }
 })
 
-// Modify Alt+2 handler
-onKeyDown(['Alt', '2'], (e) => {
-  e.preventDefault()
+onKeyDown((e) => {
+  if (e.key === 'ArrowDown') {
+    e.preventDefault()
+    api.goToView(api.nextView()?.name, true)
+  }
+})
 
-  const currentTab = api.store.dev.consoleBarTab
+// Modify Ctrl+1 handler
+onKeyDown((e) => {
+  if (e.ctrlKey && e.key === '1') {
+    e.preventDefault()
 
-  if (currentTab === 'browse') {
-    api.store.dev.consoleBarTab = 'log'
-    if (api.store.dev.showConsoleBar) {
-      showTemporaryNotification('Alt + 2', 'Switched to Log Tab')
+    const sideBar = api.store.dev.showSideBar
+    const consoleBar = api.store.dev.showConsoleBar
+
+    if (!sideBar && !consoleBar) {
+      api.store.dev.showSideBar = true
+      api.store.dev.showConsoleBar = false
+      showTemporaryNotification('Ctrl + 1', 'Showing Sidebar')
+    } else if (sideBar && !consoleBar) {
+      api.store.dev.showSideBar = false
+      api.store.dev.showConsoleBar = true
+      showTemporaryNotification('Ctrl + 1', 'Showing Console')
+    } else if (!sideBar && consoleBar) {
+      api.store.dev.showSideBar = true
+      api.store.dev.showConsoleBar = true
+      showTemporaryNotification('Ctrl + 1', 'Showing Both Panels')
+    } else {
+      api.store.dev.showSideBar = false
+      api.store.dev.showConsoleBar = false
+      showTemporaryNotification('Ctrl + 1', 'Hiding All Panels')
     }
-  } else if (currentTab === 'log') {
-    api.store.dev.consoleBarTab = 'config'
-    if (api.store.dev.showConsoleBar) {
-      showTemporaryNotification('Alt + 2', 'Switched to Config Tab')
-    }
-  } else {
-    api.store.dev.consoleBarTab = 'browse'
-    if (api.store.dev.showConsoleBar) {
-      showTemporaryNotification('Alt + 2', 'Switched to Browse Tab')
+  }
+})
+
+// Modify Ctrl+2 handler
+onKeyDown((e) => {
+  if (e.ctrlKey && e.key === '2') {
+    e.preventDefault()
+
+    const currentTab = api.store.dev.consoleBarTab
+
+    if (currentTab === 'browse') {
+      api.store.dev.consoleBarTab = 'log'
+      if (api.store.dev.showConsoleBar) {
+        showTemporaryNotification('Ctrl + 2', 'Switched to Log Tab')
+      }
+    } else if (currentTab === 'log') {
+      api.store.dev.consoleBarTab = 'config'
+      if (api.store.dev.showConsoleBar) {
+        showTemporaryNotification('Ctrl + 2', 'Switched to Config Tab')
+      }
+    } else {
+      api.store.dev.consoleBarTab = 'browse'
+      if (api.store.dev.showConsoleBar) {
+        showTemporaryNotification('Ctrl + 2', 'Switched to Browse Tab')
+      }
     }
   }
 })
 
 // Add shortcut for resetting local state
-onKeyDown(['Alt', '3'], (e) => {
-  e.preventDefault()
-  api.resetLocalState()
+onKeyDown((e) => {
+  if (e.ctrlKey && e.key === '3') {
+    e.preventDefault()
+    api.resetLocalState()
+  }
 })
 
 // Add shortcut for connecting to database
-onKeyDown(['Alt', '4'], (e) => {
-  e.preventDefault()
-  if (!api.store.local.knownUser) {
-    api.setKnown()
-    api.setConsented()
-    showTemporaryNotification('Alt + 4', 'Connected to Database')
+onKeyDown((e) => {
+  if (e.ctrlKey && e.key === '4') {
+    e.preventDefault()
+    if (!api.store.local.knownUser) {
+      api.setKnown()
+      api.setConsented()
+      showTemporaryNotification('Ctrl + 4', 'Connected to Database')
+    }
   }
 })
 </script>
