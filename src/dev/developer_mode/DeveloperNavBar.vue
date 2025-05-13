@@ -101,7 +101,10 @@ onKeyDown((e) => {
 onKeyDown((e) => {
   if (e.ctrlKey && e.key === '3') {
     e.preventDefault()
-    api.resetLocalState()
+    showTemporaryNotification('Ctrl + 3', 'Resetting Local State')
+    setTimeout(() => {
+      api.resetLocalState()
+    }, 200)
   }
 })
 
