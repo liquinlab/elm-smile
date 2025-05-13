@@ -7,6 +7,10 @@ import DataBarButton from '@/dev/developer_mode/DataBarButton.vue'
 import ViewButton from '@/dev/developer_mode/ViewButton.vue'
 
 import useAPI from '@/core/composables/useAPI'
+import KeyCommandNotification from '@/dev/developer_mode/KeyCommandNotification.vue'
+
+import { ref } from 'vue'
+
 import { onKeyDown } from '@vueuse/core'
 
 const api = useAPI()
@@ -112,6 +116,33 @@ onKeyDown((e) => {
     }
   }
 })
+
+/**
+ * Shows a temporary notification with a command and action that automatically hides after 1.5 seconds
+ *
+ * @param {string} command - The command text to display in the notification
+ * @param {string} action - The action text to display in the notification
+ *
+ * Sets the notification content and shows it by updating reactive refs:
+ * - notificationCommand
+ * - notificationAction
+ * - showNotification
+ *
+ * Uses setTimeout to automatically hide the notification after 1.5 seconds
+ */
+const showTemporaryNotification = (command, action) => {
+  notificationCommand.value = command
+  notificationAction.value = action
+  showNotification.value = true
+  setTimeout(() => {
+    showNotification.value = false
+  }, 1500) // Hide after 1.5 seconds
+}
+
+// Add notification state
+const showNotification = ref(false)
+const notificationCommand = ref('')
+const notificationAction = ref('')
 </script>
 
 <template>
@@ -156,6 +187,7 @@ onKeyDown((e) => {
       </div>
     </div>
   </nav>
+  <KeyCommandNotification :show="showNotification" :command="notificationCommand" :action="notificationAction" />
 </template>
 
 <style>

@@ -32,10 +32,8 @@ import WindowSizerView from '@/builtins/window_sizer/WindowSizerView.vue'
 /**
  * Import API and notification components
  * @requires useAPI SMILE API composable
- * @requires KeyCommandNotification Notification component for keyboard commands
  */
 import useAPI from '@/core/composables/useAPI'
-import KeyCommandNotification from '@/dev/developer_mode/KeyCommandNotification.vue'
 
 /**
  * Initialize SMILE API instance
@@ -66,33 +64,6 @@ const height_pct = computed(() => `${api.store.dev.consoleBarHeight}px`)
 const showStatusBar = computed(() => {
   return api.currentRouteName() !== 'data' && api.currentRouteName() !== 'recruit' && api.config.mode != 'presentation'
 })
-
-// Add notification state
-const showNotification = ref(false)
-const notificationCommand = ref('')
-const notificationAction = ref('')
-
-/**
- * Shows a temporary notification with a command and action that automatically hides after 1.5 seconds
- *
- * @param {string} command - The command text to display in the notification
- * @param {string} action - The action text to display in the notification
- *
- * Sets the notification content and shows it by updating reactive refs:
- * - notificationCommand
- * - notificationAction
- * - showNotification
- *
- * Uses setTimeout to automatically hide the notification after 1.5 seconds
- */
-const showTemporaryNotification = (command, action) => {
-  notificationCommand.value = command
-  notificationAction.value = action
-  showNotification.value = true
-  setTimeout(() => {
-    showNotification.value = false
-  }, 1500) // Hide after 1.5 seconds
-}
 </script>
 <template>
   <div class="app-container">
@@ -129,8 +100,6 @@ const showTemporaryNotification = (command, action) => {
         </div>
       </Transition>
     </div>
-
-    <KeyCommandNotification :show="showNotification" :command="notificationCommand" :action="notificationAction" />
   </div>
 </template>
 
