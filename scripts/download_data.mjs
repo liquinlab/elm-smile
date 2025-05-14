@@ -4,7 +4,6 @@
 import inquirer from 'inquirer'
 import chalk from 'chalk'
 import figlet from 'figlet'
-// import shell from 'shelljs'
 import { initializeApp, cert } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
 import * as dotenv from 'dotenv'
@@ -12,7 +11,6 @@ import * as fs from 'fs'
 import { dirname, isAbsolute, extname, parse, format } from 'path'
 import { Command, Option } from 'commander'
 import { execSync } from 'child_process'
-// import appconfig from '../src/core/config'
 
 const init = () => {
   console.log(
@@ -163,10 +161,8 @@ const run = async () => {
   // show script introduction
   init()
   const env = dotenv.config({ path: 'env/.env.git.local' })
-  // const project_ref = `${env.parsed.VITE_GIT_OWNER}-${env.parsed.VITE_PROJECT_NAME}-${env.parsed.VITE_GIT_BRANCH_NAME}`
 
   // ask questions
-
   const answers = await askQuestions()
   const { TYPE, COMPLETE_ONLY, BRANCH_NAME, SAVE_RECRUITMENT_INFO, FILENAME, KEY_PATH } = answers
 
