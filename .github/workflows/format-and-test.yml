@@ -184,6 +184,9 @@ jobs:
             if (tests_failed) {
               summary += "❌ **Tests failed**\n\n";
               summary += "Please check the workflow logs for details on the failing tests.\n\n";
+              // Add direct link to the workflow run
+              const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+              summary += `🔍 [View detailed test results](${runUrl})\n\n`;
             } else {
               summary += "✅ **All tests passed!**\n\n";
             }
