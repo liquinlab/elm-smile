@@ -114,7 +114,10 @@ changes from the child and parent repositories when you want. This new forked
 repo will be your lab's "base" repo. All your individual projects will then fork
 from your lab's "base" repo. This allows you to share the
 lab/organization-specific configuration files with all the repos that fork from
-your base repo.
+your base repo. It is recommended you fork from your lab's base repo because you
+can then make common changes that should apply to all your experiments (e.g.,
+logos, branding, consent forms). Of course you can also fork from the main Smile
+repo as well.
 
 ![Inheriting between Github repos](/images/labconfig-github-inherit.png)
 
@@ -284,13 +287,7 @@ version (see above) your listing in that folder will look like this:
 
 ```
 .env
-.env.deploy.local.secret
-.env.docs.local.secret
-.env.local.secret
 ```
-
-You are going to first delete the files ending in `.secret`. You will regenerate
-those secret files in a later step.
 
 Next, you need to create a file called `.env.local` in the `env/` folder. The
 content of that file should look like this:
@@ -363,76 +360,8 @@ by the main NYUCCL repo.
 By default all of the `env/.env.*.local` files are ignored by github (using the
 `.gitignore` file). This is because they have sensitive information. However you
 need to distribute those files out to people working in your lab. To do that, we
-will encrypt the files and store the encrypted files in your github account.
-This works even for public github repositories ensuring that your content is not
-visible to others.
-
-## Encrypt your configuration files
-
-The final step of setting up your lab's base Smile repo is to encrypt your
-environment files. To do this you will use the well documented `git-secret`
-package ([here](https://sobolevn.me/git-secret/)). First install git-secret
-package using Homebrew:
-
-![Firebase project overview](/images/labconfig-gitsecret-brew.png)
-
-Next, remove the `.gitsecret` folder in your base repo:
-
-```
-rm -rf .gitsecret
-```
-
-Next run:
-
-```
-git secret init
-```
-
-to reinitialize your gitsecret setup.
-
-Next, create a `gpg` RSA key pair (see [here](https://git-secret.io/#using-gpg)
-for more info) for yourself (e.g., lab manager/pi) using the command:
-
-```
-gpg --full-generate-key
-```
-
-In the prompts, just choose the default options and make sure to remember the
-passphrase you use. You also will want to set the expiration of the key to 0
-(never expire) when prompted.
-
-Next, add the first user to your repo:
-
-```
-git secret tell you@email.com
-```
-
-(replacing you@email.com with your email address)
-
-Next, add the files:
-
-```
-git secret add env/.env.deploy.local
-git secret add env/.env.local
-```
-
-Finally, encrypt the files
-
-```
-git secret hide
-```
-
-Now commit everything that has changed to your github repo.
-
-## Making changes to the env files for your project
-
-You may update the env files for the entire lab at any point. Just make sure to
-re-encrypt the files and re-upload them to github using the following commands.
-
-```
-git secret hide
-npm run upload_config
-```
+recommend you store them in a save place accessible only by members of your lab
+such as a file server or slack channel.
 
 ## Configure your git secrets on Github
 
@@ -449,6 +378,22 @@ Then, upload the configuration settings
 ```
 npm run upload_config
 ```
+
+This configures your base repo to deploy to your configured webserver,
+configures your live experiments to use your Firebase database, and configures
+Slack. See more docs on
+[Github action secrets](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions).
+
+## Making changes to the env files for your project
+
+You may update the env files for the lab at any point. Just make sure to
+re-upload them to github using the following command.
+
+```
+npm run upload_config
+```
+
+Then be sure to redistribute the changed files to members of your lab.
 
 ## All done!
 

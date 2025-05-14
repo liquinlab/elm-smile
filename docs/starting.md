@@ -159,25 +159,17 @@ your project `{{config.projectname}}`):
 ## 2. Configure your project
 
 If your lab has already been [set up](/labconfig), then you simply need to
-decrypt the files provided in the repository. You can find more information on
-the configuration settings and options [here](/configuration), but this is
-optional.
-
-::: danger Warning!
-
-This will only work if you have first sent your lab coordinator your gpg key and
-waited for them to push a change to the <SmileText/> repo. See instructions
-[here](/adduser).
-
-:::
-
-To decrypt the organization files, simply type:
-
+obtain a copy of the base `env/` files for your repository. You specifically
+need the lab's copies of
 ```
-git secret reveal
+env/.env.deploy.local
+env/.env.docs.local
+env/.env.local
 ```
 
-This should create several `.env.*.local` files in your `env/` directory.
+and place them in your local `env/` directory. These will be ignored by git via
+the .gitignore and should be treated carefully (e.g., don't put them on github
+or in a publically accessible spot)
 
 **Only on first setup:** After all the necessary files are in the `env` folder
 run:
