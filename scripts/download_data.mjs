@@ -77,7 +77,7 @@ async function askQuestions() {
       type: 'input',
       name: 'KEY_PATH',
       message: 'What is the path to your service account key?',
-      default: 'env/.service-account-key.local',
+      default: 'firebase/.service-account-key.json',
     },
   ]
 
@@ -126,21 +126,31 @@ const getData = async (path, completeOnly, db, filename, saveRecruitmentInfo = f
     }
 
     const data = []
-    querySnapshot.forEach((doc) => {
+    for (const doc of querySnapshot.docs) {
       const docData = doc.data()
       if (!docData.smile_config) {
         docData.smile_config = {}
       }
       docData.smile_config.firebaseConfig = {}
 
-      if (!saveRecruitmentInfo) {
-        docData.recruitment_info = {}
+      if (saveRecruitmentInfo) {
+        const privateData = []
+        const privateQuerySnapshot = await db.collection(`${path}/${doc.id}/private`).get()
+        for (const privateDoc of privateQuerySnapshot.docs) {
+          privateData.push(privateDoc.data())
+        }
+        docData.private_data = privateData
       }
 
       data.push({ id: doc.id, data: docData })
-    })
+    }
 
-    return storeData(data, filename)
+    if (saveRecruitmentInfo) {
+      return storeData(data, filename, 'data/private')
+    } else {
+      return storeData(data, filename, 'data/raw')
+    }
+
   } catch (error) {
     console.log('The read failed:', error)
   }
