@@ -193,13 +193,14 @@ later:
 
 You need to setup the rules for your Firebase database. These rules are used to
 define the structure of the database and the permissions for accessing it. The
-`firebase.rules` file in the /firebase/ directory of your project has an example of the rules
-which work well for most Smile Experiments. These rules allow participants to
-write data to the database and read their own data, but not the data of other
-participants. In addition, private data (personally identifiable information) is
-more heavily protected and is write only. You can upload these rules to your
-Firestore database in the Firebase console. Read more about Firebase rules in
-the [Firebase rules documentation](https://firebase.google.com/docs/rules).
+`firebase.rules` file in the /firebase/ directory of your project has an example
+of the rules which work well for most Smile Experiments. These rules allow
+participants to write data to the database and read their own data, but not the
+data of other participants. In addition, private data (personally identifiable
+information) is more heavily protected and is write only. You can upload these
+rules to your Firestore database in the Firebase console. Read more about
+Firebase rules in the
+[Firebase rules documentation](https://firebase.google.com/docs/rules).
 
 Here is an example of the rules file that works well with Smile experiments (in
 `/firebase.rules` of the main Smile repo):

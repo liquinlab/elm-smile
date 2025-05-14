@@ -150,7 +150,6 @@ const getData = async (path, completeOnly, db, filename, saveRecruitmentInfo = f
     } else {
       return storeData(data, filename, 'data/raw')
     }
-
   } catch (error) {
     console.log('The read failed:', error)
   }

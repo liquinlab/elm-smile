@@ -25,7 +25,6 @@ lab copy the relevant .env files over.
 
 :::
 
-
 ## Testing access
 
 For a new user to test if they have the correct permissions to the organization,

@@ -161,6 +161,7 @@ your project `{{config.projectname}}`):
 If your lab has already been [set up](/labconfig), then you simply need to
 obtain a copy of the base `env/` files for your repository. You specifically
 need the lab's copies of
+
 ```
 env/.env.deploy.local
 env/.env.docs.local
