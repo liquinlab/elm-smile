@@ -24,6 +24,10 @@ jobs:
         with:
           node-version: 20.11.1 # this is what i'm using locally
 
+      # install node packages
+      - name: Install node dependencies
+        run: npm install
+
       # accesses some git variables and processes them to be lower case/short/escaped
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
@@ -136,10 +140,6 @@ jobs:
           echo "VITE_DEPLOY_URL = 'https://${{ secrets.EXP_DEPLOY_HOST }}${{ steps.dotenv_github.outputs.VITE_DEPLOY_BASE_PATH }}'" > $DEPLOY_ENV_FILE
           echo 'VITE_CODE_NAME_DEPLOY_URL         =  "https://${{ secrets.EXP_DEPLOY_HOST }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }}"' >> $DEPLOY_ENV_FILE
           cat $DEPLOY_ENV_FILE
-
-      # install node packages
-      - name: Install node dependencies
-        run: npm install
 
       # check code formatting
       - name: Check code formatting
