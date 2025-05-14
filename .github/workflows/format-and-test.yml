@@ -188,12 +188,18 @@ jobs:
               summary += "✅ **All tests passed!**\n\n";
             }
 
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: summary
-            });
+            // Only try to create a comment if we're in a pull request context
+            if (context.issue.number) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: summary
+              });
+            } else {
+              console.log("Not in a pull request context, skipping comment creation");
+              console.log(summary);
+            }
 
             if (tests_failed) {
               core.setFailed("Tests failed. Please fix the failing tests before merging.");
