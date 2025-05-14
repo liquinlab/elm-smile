@@ -8,8 +8,7 @@
     <div class="message-body has-text-left mr-7 pb-8">
       Report issue form goes here.
       <div class="has-text-right mt-5">
-        <button class="button" aria-label="close"
-          @click="$emit('toggleReport')">
+        <button class="button" aria-label="close" @click="$emit('toggleReport')">
           Nevermind, take me back to the study!
         </button>
       </div>
