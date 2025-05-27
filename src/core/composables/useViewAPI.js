@@ -32,7 +32,8 @@ class ViewAPI extends SmileAPI {
     super(store, logStore, route, router, timeline)
 
     // Make stepper reactive using computed
-    this._stepper = computed(() => useStepper(route.name))
+    this._page = ref(route.name)
+    this._stepper = computed(() => useStepper(route.name, this.updateDevMode))
 
     // Internal reactive refs
     this._pathData = ref(null)
@@ -44,6 +45,14 @@ class ViewAPI extends SmileAPI {
 
     // Component registry
     this.componentRegistry = new Map()
+
+    // Watch for route changes to update _page
+    watch(
+      () => route.name,
+      (newRouteName) => {
+        this._page.value = newRouteName
+      }
+    )
 
     // Watch for stepper changes and update internal state
     watch(
