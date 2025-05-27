@@ -157,7 +157,6 @@ const initLocal = {
 
 const initGlobal = {
   // ephemeral state, resets on browser refresh
-  progress: 0,
   forceNavigate: false,
   steppers: {}, // Store for HStepper instances
   dbConnected: false,
