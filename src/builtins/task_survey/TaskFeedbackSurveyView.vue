@@ -36,6 +36,7 @@ api.setAutofill(autofill)
 
 function finish() {
   api.recordForm('feedbackForm', api.globals.forminfo)
+  api.saveData(true) // force a data save
   api.goNextView()
 }
 </script>

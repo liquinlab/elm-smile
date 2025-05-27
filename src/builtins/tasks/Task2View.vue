@@ -45,7 +45,7 @@ function next() {
 }
 
 function prev() {
-  if (api.index > 0) {
+  if (api.stepIndex > 0) {
     api.goPrevStep()
   }
 }
