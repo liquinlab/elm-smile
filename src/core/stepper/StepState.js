@@ -44,8 +44,6 @@ export class StepState {
     this._parent = parent
     this._root = parent?._root || this
     this._data = {}
-
-    this._resetOnce = false
   }
 
   /**
@@ -361,14 +359,6 @@ export class StepState {
   reset() {
     this._currentIndex = 0
     this._states.forEach((state) => state.reset())
-  }
-
-  resetOnce() {
-    if (this._resetOnce) return false
-    this._resetOnce = true
-    this._currentIndex = 0
-    this._states.forEach((state) => state.reset())
-    return true
   }
 
   /**
