@@ -319,23 +319,25 @@ class ViewAPI extends SmileAPI {
   }
 
   clear() {
-    if (this.store.local.viewSteppers[this.page]) {
-      const pageData = this.store.local.viewSteppers[this.page].data || {}
+    if (this.store.local.viewSteppers[this._page.value]) {
+      const pageData = this.store.local.viewSteppers[this._page.value].data || {}
       delete pageData.stepperState
-      this.store.local.viewSteppers[this.page].data = pageData
+      this.store.local.viewSteppers[this._page.value].data = pageData
 
       this._stepper.value.clearSubTree()
       this._stepper.value.push('SOS')
       this._stepper.value.push('EOS')
+      this._stepper.value._currentIndex = 1
 
-      this._path.value = []
-      this._pathString.value = ''
-      this._pathData.value = null
-      this._index.value = null
-      this._stateMachine.value = this._visualizeStateMachine()
+      // this._path.value = []
+      // this._pathString.value = ''
+      // this._pathData.value = null
+      // this._index.value = null
+      // this._stateMachine.value = this._visualizeStateMachine()
 
       this.componentRegistry.clear()
     }
+    this._saveStepperState()
   }
 
   clearGlobals() {

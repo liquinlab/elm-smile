@@ -357,7 +357,11 @@ export class StepState {
    * then recursively resets all child nodes.
    */
   reset() {
-    this._currentIndex = 0
+    if (this._depth === 0) {
+      this._currentIndex = 1
+    } else {
+      this._currentIndex = 0
+    }
     this._states.forEach((state) => state.reset())
   }
 
