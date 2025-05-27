@@ -160,12 +160,6 @@ class ViewAPI extends SmileAPI {
 
   reset() {
     this._stepper.value.reset()
-    if (this._stepper.value.states.length > 0) {
-      const next = this._stepper.value.next()
-      if (next !== null) {
-        this._updateStepperState(next)
-      }
-    }
   }
 
   goToStep(path) {
