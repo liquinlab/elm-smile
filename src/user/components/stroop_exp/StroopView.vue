@@ -33,8 +33,6 @@ trials[0].append([
 
 trials.append([{ path: 'summary' }])
 
-api.reset()
-
 if (!api.globals.hits) {
   api.globals.hits = 0
   api.globals.attempts = 0

@@ -6,7 +6,6 @@ import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
 api.steps.append([{ path: 'survey_page1' }, { path: 'survey_page2' }, { path: 'survey_page3' }])
-api.reset()
 
 // persists the form info in local storage, otherwise initialize
 if (!api.globals.forminfo) {
@@ -76,9 +75,7 @@ function finish() {
   api.goNextView()
 }
 
-onMounted(() => {
-  api.goNextStep()
-})
+onMounted(() => {})
 </script>
 
 <template>
