@@ -4,27 +4,11 @@
  */
 
 /**
- * Random number generator for seeding routes
- * @external seedrandom
+ * External dependencies and internal imports for router functionality
  */
 import seedrandom from 'seedrandom'
-
-/**
- * Vue Router factory functions for creating router instance
- * @external vue-router
- */
 import { createRouter, createWebHashHistory } from 'vue-router'
-
-/**
- * Utility function for parsing URL query parameters
- * @external utils
- */
 import { getQueryParams } from '@/core/utils/utils'
-
-/**
- * Composable for accessing the SMILE API instance
- * @external useAPI
- */
 import useAPI from '@/core/composables/useAPI'
 
 /**
@@ -50,6 +34,7 @@ export function addGuards(r, providedApi = null) {
     if (from.meta !== undefined && from.meta.setConsented !== undefined && from.meta.setConsented) {
       api.completeConsent()
     }
+
     if (from.meta !== undefined && from.meta.setDone !== undefined && from.meta.setDone) {
       api.setDone()
     }

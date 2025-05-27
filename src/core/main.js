@@ -3,67 +3,21 @@
  */
 
 /**
- * Font Awesome icon component
- * @external FontAwesomeIcon
+ * Core imports for the SMILE application including:
+ * - Vue and Vue plugins (FormKit, Router, Pinia, Notivue, Google Analytics)
+ * - UI components and styling (FontAwesome, FormKit theme)
+ * - Application configuration (timeline, icons)
  */
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
-/**
- * FormKit form builder components and configuration
- * @external FormKit
- */
 import { plugin, defaultConfig } from '@formkit/vue'
-
-/**
- * Router utilities for application routing
- * @external router
- */
 import { useRouter, addGuards } from '@/core/router'
-
-/**
- * Pinia store instance for state management
- * @external pinia
- */
 import { pinia } from '@/core/stores/createPinia'
-
-/**
- * Notification system factory
- * @external notivue
- */
 import { createNotivue } from 'notivue'
-
-/**
- * User-defined timeline configuration
- * @external timeline
- */
 import timeline from '@/user/design'
-
-/**
- * FormKit default theme styles
- */
 import '@formkit/themes/genesis'
-
-/**
- * Main application component
- * @external App
- */
 import App from '@/core/App.vue'
-
-/**
- * Vue application factory
- * @external vue
- */
 import { createApp } from 'vue'
-
-/**
- * Google Analytics plugin for Vue
- * @external vue-gtag
- */
 import VueGtag from 'vue-gtag'
-
-/**
- * Font Awesome icon configuration
- */
 import '@/core/utils/icons'
 
 /**
