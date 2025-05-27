@@ -5,7 +5,6 @@ import DataPathViewer from '@/dev/developer_mode/DataPathViewer.vue'
 import { useRoute } from 'vue-router'
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
-const route = useRoute()
 
 const stateMachine = computed(() => api.steps.visualize())
 
@@ -30,7 +29,6 @@ const pathToString = (pathArray) => {
 const isNodeSelected = (nodePath) => {
   if (!api.path) return false
   const currentPathStr = api.pathString
-  console.log('isNodeSelected', nodePath, currentPathStr)
   return nodePath === currentPathStr
 }
 
