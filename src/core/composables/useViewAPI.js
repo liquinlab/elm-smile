@@ -33,7 +33,7 @@ class ViewAPI extends SmileAPI {
 
     // Make stepper reactive using computed
     this._page = ref(route.name)
-    this._stepper = computed(() => useStepper(route.name, this.updateDevMode))
+    this._stepper = computed(() => useStepper(route.name))
 
     // Internal reactive refs
     this._pathData = ref(null)
@@ -59,14 +59,12 @@ class ViewAPI extends SmileAPI {
       this._stepper,
       (newStepper) => {
         if (newStepper?.states?.length > 0) {
-          this._pathData.value = newStepper.pathData
-          this._pathString.value = newStepper.currentPathString
-          this._path.value = newStepper.currentPath || []
-          this._index.value = newStepper.index
-          this._gvars.value = reactive(newStepper.data.gvars || {})
+          console.log('newStepper.length', newStepper.states.length)
+          console.log('updating', newStepper.currentPathString, newStepper)
         }
+        this._updateStepperState(newStepper, false) // don't save because it will trigger recursive updates
       },
-      { immediate: true }
+      { immediate: true, deep: true }
     )
 
     // Add keyboard event handlers from VueUse
@@ -77,6 +75,18 @@ class ViewAPI extends SmileAPI {
     // Add mouse event handlers from VueUse
     this.useMouse = useMouse
     this.useMousePressed = useMousePressed
+  }
+
+  _updateStepperState(data, save = true) {
+    this._pathData.value = data.pathData
+    this._pathString.value = data.currentPathString
+    this._path.value = data.currentPath
+    this._index.value = data.index
+    this._gvars.value = reactive(data.data?.gvars || {})
+    this._stateMachine.value = this._visualizeStateMachine()
+    if (save) {
+      this._saveStepperState()
+    }
   }
 
   /**
@@ -117,12 +127,8 @@ class ViewAPI extends SmileAPI {
   }
 
   _saveStepperState() {
-    if (this.store.local.viewSteppers[this.page]) {
-      this.store.local.viewSteppers[this.page] = {
-        data: {
-          stepperState: this._stepper.json,
-        },
-      }
+    if (this._stepper.value) {
+      this._stepper.value.save(this._page.value)
     }
   }
 
@@ -138,12 +144,7 @@ class ViewAPI extends SmileAPI {
     let next = this._stepper.value.next()
     if (next !== null) {
       console.log('NEXT', this._pathString)
-      this._pathData.value = next.pathData
-      this._pathString.value = next.currentPathString
-      this._path.value = next.currentPath
-      this._index.value = next.index
-      this._stateMachine.value = this._visualizeStateMachine()
-      this._saveStepperState()
+      this._updateStepperState(next)
     }
     return next
   }
@@ -152,12 +153,7 @@ class ViewAPI extends SmileAPI {
     let prev = this._stepper.value.prev()
     if (prev !== null) {
       console.log('PREV', this._pathString)
-      this._pathData.value = prev.pathData
-      this._pathString.value = prev.currentPathString
-      this._path.value = prev.currentPath
-      this._index.value = prev.index
-      this._stateMachine.value = this._visualizeStateMachine()
-      this._saveStepperState()
+      this._updateStepperState(prev)
     }
     return prev
   }
@@ -165,22 +161,16 @@ class ViewAPI extends SmileAPI {
   reset() {
     this._stepper.value.reset()
     if (this._stepper.value.states.length > 0) {
-      this._stepper.value.next()
-      this._pathData.value = this._stepper.value.pathData
-      this._pathString.value = this._stepper.value.currentPathString
-      this._path.value = this._stepper.value.currentPath
-      this._stateMachine.value = this._visualizeStateMachine()
-      this._saveStepperState()
+      const next = this._stepper.value.next()
+      if (next !== null) {
+        this._updateStepperState(next)
+      }
     }
   }
 
   goToStep(path) {
     this._stepper.value.goTo(path)
-    this._pathData.value = this._stepper.value.pathData
-    this._pathString.value = this._stepper.value.currentPathString
-    this._path.value = this._stepper.value.currentPath
-    this._stateMachine.value = this._visualizeStateMachine()
-    this._saveStepperState()
+    this._updateStepperState(this._stepper.value)
   }
 
   init() {

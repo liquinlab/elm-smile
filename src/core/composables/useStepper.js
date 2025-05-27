@@ -17,6 +17,7 @@ import { useRoute } from 'vue-router'
 /**
  * Creates or retrieves a stepper instance for the current view
  * @function useStepper
+ * @param {string} view - The view name to create/retrieve the stepper for
  * @returns {Object} The stepper instance for the current view
  * @description This composable manages stepper instances on a per-view basis.
  * It ensures that:
@@ -38,19 +39,25 @@ export function useStepper(view) {
   let stepper = smilestore.global.steppers?.[view]
 
   if (!stepper) {
+    console.log('smilestore', smilestore)
+    console.log('view', view)
+    console.log('steppper', smilestore.getStepper(view))
+    console.log('stepper.data', smilestore.getStepper(view)?.data)
     // Create new stepper instance if none exists
     const savedState = smilestore.getStepper(view)?.data
     if (savedState) {
       console.log('STEPPER: Loading saved state from smilestore')
-      stepper = new Stepper({ serializedState: savedState.stepperState })
+      stepper = new Stepper({ serializedState: savedState.stepperState, store: smilestore })
     } else {
       console.log('STEPPER: Initializing state machine with SOS and EOS nodes')
-      stepper = new Stepper({ id: '/', parent: null, data: { gvars: {} } }) // explicit init
+      stepper = new Stepper({ id: '/', parent: null, data: { gvars: {} }, store: smilestore }) // explicit init
     }
     console.log('STEPPER: Setting name', view)
     stepper.name = view
     // Register stepper if not already registered
-    stepper = smilestore.registerStepper(view, stepper)
+    if (view) {
+      stepper = smilestore.registerStepper(view, stepper)
+    }
   }
 
   // Return the StepperAPI instance

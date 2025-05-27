@@ -36,10 +36,14 @@ export class Stepper extends StepState {
    * @param {*} [options.id] - The id for this node. If null, defaults to '/'
    * @param {StepState|null} [options.parent] - The parent node. If null, this is a root node
    * @param {string} [options.serializedState] - Optional serialized JSON state to load
+   * @param {Object} [options.store] - Optional reference to the store where this stepper is saved
    */
   constructor(options = {}) {
-    const { id = null, parent = null, data = null, serializedState = null } = options
+    const { id = null, parent = null, data = null, serializedState = null, store = null } = options
     super(id, parent, data)
+
+    // Store the store reference
+    this._store = store
 
     // If serialized state is provided, load it
     if (serializedState !== null) {
@@ -51,6 +55,7 @@ export class Stepper extends StepState {
         console.log('STEPSTATE: initializing step state')
         this.push('SOS')
         this.push('EOS')
+        this._currentIndex = 1 // start at EOS or whatever is first
       }
     }
 
@@ -150,25 +155,27 @@ export class Stepper extends StepState {
    * @throws {Error} If items is not an object or array, or if adding items would exceed maxStepperRows
    */
   append(items, options = {}) {
-    //console.log('append', items)
+    console.log('append', items)
     // Convert single item to array if needed
     const itemsToAdd = Array.isArray(items) ? items : [items]
 
     // Check if adding these items would exceed maxStepperRows
     if (this._states.length + itemsToAdd.length > config.maxStepperRows) {
-      throw new Error(`Cannot append ${itemsToAdd.length} items: would exceed maximum of ${config.maxStepperRows} rows`)
+      console.warn(
+        `Warning: Appending ${itemsToAdd.length} items would exceed maximum of ${config.maxStepperRows} rows`
+      )
     }
 
-    // Check for duplicates and throw error if found
+    // Check for duplicates and warn if found
     if (this._hasDuplicatePaths(itemsToAdd)) {
-      throw new Error('Cannot append items: would create duplicate paths')
+      console.warn('Warning: Appending these items will create duplicate paths')
+    } else {
+      //console.log('itemsToAdd', itemsToAdd)
+      //console.log('this.level', this.depth)
+      itemsToAdd.forEach((item) => {
+        this._addState(item)
+      })
     }
-
-    //console.log('itemsToAdd', itemsToAdd)
-    //console.log('this.level', this.depth)
-    itemsToAdd.forEach((item) => {
-      this._addState(item)
-    })
 
     return this
   }
@@ -336,6 +343,32 @@ export class Stepper extends StepState {
 
     // Process the root state
     return processState(this.root)
+  }
+
+  /**
+   * Saves the current stepper state to the store
+   * @param {string} [page] - Optional page name to save under. If not provided, uses the stepper's name
+   * @returns {boolean} True if save was successful, false otherwise
+   */
+  save(page = null) {
+    if (!this._store) {
+      console.warn('Stepper: Cannot save state - no store reference available')
+      return false
+    }
+
+    const targetPage = page || this.name
+    if (!targetPage) {
+      console.warn('Stepper: Cannot save state - no page name provided and stepper has no name')
+      return false
+    }
+
+    console.log('Stepper: Saving state for page', targetPage)
+    this._store.local.viewSteppers[targetPage] = {
+      data: {
+        stepperState: this.json,
+      },
+    }
+    return true
   }
 }
 
