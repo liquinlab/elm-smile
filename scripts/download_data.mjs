@@ -69,13 +69,12 @@ async function askQuestions() {
       type: 'input',
       name: 'FILENAME',
       message: 'What is the name of the file without extension?',
-      default: 'data',
-    },
-    {
-      type: 'input',
-      name: 'KEY_PATH',
-      message: 'What is the path to your service account key?',
-      default: 'firebase/.service-account-key.json',
+      default: (answers) => {
+        const type = answers.TYPE || options.TYPE || 'real'
+        const completeOnly = answers.COMPLETE_ONLY || options.COMPLETE_ONLY || 'all'
+        const branch = answers.BRANCH_NAME || options.BRANCH_NAME || currentBranch
+        return `${type}-${completeOnly}-${branch}-data`
+      },
     },
   ]
 
@@ -88,7 +87,7 @@ async function askQuestions() {
   }
 }
 
-const storeData = async (data, path, relativeDir = 'data/raw', ext = '.json') => {
+const storeData = async (data, path, relativeDir = 'data/anonymized', ext = '.json') => {
   try {
     let filename = path
     if (extname(path) !== ext) {
@@ -101,7 +100,6 @@ const storeData = async (data, path, relativeDir = 'data/raw', ext = '.json') =>
 
     const dir = dirname(filename)
     if (!fs.existsSync(dir)) {
-      console.log(`creating directory ${dir} since it does not exist`)
       fs.mkdirSync(dir, { recursive: true })
     }
     fs.writeFileSync(filename, JSON.stringify(data))
@@ -146,7 +144,7 @@ const getData = async (path, completeOnly, db, filename, saveRecruitmentInfo = f
     if (saveRecruitmentInfo) {
       return storeData(data, filename, 'data/private')
     } else {
-      return storeData(data, filename, 'data/raw')
+      return storeData(data, filename, 'data/anonymized')
     }
   } catch (error) {
     console.log('The read failed:', error)
@@ -164,8 +162,7 @@ const run = async () => {
 
   // ask questions
   const answers = await askQuestions()
-  const { TYPE, COMPLETE_ONLY, BRANCH_NAME, SAVE_RECRUITMENT_INFO, FILENAME, KEY_PATH } = answers
-
+  const { TYPE, COMPLETE_ONLY, BRANCH_NAME, SAVE_RECRUITMENT_INFO, FILENAME } = answers
   const project_ref = `${env.parsed.VITE_GIT_OWNER}-${env.parsed.VITE_PROJECT_NAME}-${BRANCH_NAME}`
 
   // connect to database
@@ -177,7 +174,7 @@ const run = async () => {
     storageBucket: localenv.parsed.VITE_FIREBASE_STORAGEBUCKET,
     messagingSenderId: localenv.parsed.VITE_FIREBASE_MESSAGINGSENDERID,
     appId: localenv.parsed.VITE_FIREBASE_APPID,
-    credential: cert(KEY_PATH),
+    credential: cert('firebase/.service-account-key.json'),
   }
   const app = initializeApp(firebaseConfig)
   const db = getFirestore(app)
@@ -185,22 +182,13 @@ const run = async () => {
   // create the file
   const path = `${TYPE}/${project_ref}/data`
 
-  const formatFilename = (f) => {
-    const prefix = `${TYPE}-${COMPLETE_ONLY}-${BRANCH_NAME}`
-    if (!f.startsWith(prefix)) {
-      return `${prefix}-${f}`
-    }
-
-    return f
-  }
-
   let filename = FILENAME
   if (isAbsolute(FILENAME)) {
     const parsedFile = parse(FILENAME)
-    parsedFile.base = formatFilename(parsedFile.base)
+    parsedFile.base = parsedFile.base
     filename = format(parsedFile)
   } else {
-    filename = formatFilename(filename)
+    filename = filename
   }
 
   const finalPath = await getData(path, COMPLETE_ONLY, db, filename, SAVE_RECRUITMENT_INFO)
