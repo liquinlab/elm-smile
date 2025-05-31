@@ -33,9 +33,18 @@ trials[0].append([
 
 trials.append([{ path: 'summary' }])
 
-if (!api.globals.hits) {
+// if hits not defined yet then initialize it and timer.
+if (!api.globals.isDefined('hits')) {
   api.globals.hits = 0
   api.globals.attempts = 0
+  api.globals.finalScore = 0
+}
+
+// this is the persistent timer
+// if you want to start timer since last reload then just
+// write api.startTimer()
+if (!api.timerStarted()) {
+  api.startTimer()
 }
 
 // autofill all the trials
@@ -73,9 +82,9 @@ const stop = api.onKeyDown(
       api.stepData.response = e.key
       api.recordStep()
       api.goNextStep()
-
       // if we are at the end of the trials, compute a final score
-      if (api.stepIndex >= api.nSteps) {
+      if (api.path[0] == 'summary') {
+        stop() // This removes the keydown listener
         updateScore()
       }
     }
@@ -84,14 +93,10 @@ const stop = api.onKeyDown(
 )
 
 function finish() {
-  stop() // This removes the keydown listener
   api.goNextView()
 }
 
-onMounted(() => {
-  //api.goNextStep()
-  api.startTimer()
-})
+onMounted(() => {})
 </script>
 
 <template>

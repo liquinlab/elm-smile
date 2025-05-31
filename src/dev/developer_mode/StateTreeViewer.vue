@@ -8,18 +8,6 @@ const api = useViewAPI()
 
 const stateMachine = computed(() => api.steps.visualize())
 
-// Update the path watcher to use stepper.value
-watch(
-  () => api.path,
-  (newPath) => {
-    console.log('Path watcher triggered:', {
-      newPath,
-      stepper: api.steps,
-    })
-  },
-  { immediate: true }
-)
-
 // Convert array path to string format (e.g., [1, 1] -> "1-1")
 const pathToString = (pathArray) => {
   return Array.isArray(pathArray) ? pathArray.join('/') : ''
