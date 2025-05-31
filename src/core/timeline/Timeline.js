@@ -374,17 +374,9 @@ class Timeline {
     }
 
     this.buildGraph()
-    this.registerCounters()
 
     this.api.store.local.seqtimeline = this.seqtimeline
     this.api.store.local.routes = this.routes
-  }
-
-  registerCounters() {
-    // for each route, register a counter based on the name
-    for (let i = 0; i < this.routes.length; i += 1) {
-      this.api.store.registerStepper(this.routes[i].name)
-    }
   }
 
   /**
