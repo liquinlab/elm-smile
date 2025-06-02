@@ -382,11 +382,9 @@ export default defineStore('smilestore', {
      * @description Adds a new stepper object to the local state's viewSteppers array and optionally registers a Stepper instance in global state.
      * @returns {Stepper} The registered stepper instance
      */
-    registerStepper(view, stepper) {
+    registerStepper(view, stepper = null) {
       // allocate a new serialization space
-      if (this.local.viewSteppers[view] === undefined) {
-        this.local.viewSteppers[view] = {}
-      }
+      this.local.viewSteppers[view] = {}
 
       // register the stepper in global state
       if (stepper) {
@@ -394,8 +392,10 @@ export default defineStore('smilestore', {
           this.global.steppers = {}
         }
         this.global.steppers[view] = stepper
-      }
 
+        // force a save
+        stepper.save(view)
+      }
       // return the active stepper
       return this.global.steppers?.[view]
     },
