@@ -367,11 +367,29 @@ export class Stepper extends StepState {
       return false
     }
 
+    // Get current localStorage data
+    const existingLocalStorage = JSON.parse(localStorage.getItem(this._store.config.localStorageKey) || '{}')
+
+    // Update the viewSteppers in the localStorage data
+    if (!existingLocalStorage.viewSteppers) {
+      existingLocalStorage.viewSteppers = {}
+    }
+    existingLocalStorage.viewSteppers[targetPage] = {
+      data: {
+        stepperState: this.json,
+      },
+    }
+
+    // Save back to localStorage
+    localStorage.setItem(this._store.config.localStorageKey, JSON.stringify(existingLocalStorage))
+
+    // Also update the store for consistency
     this._store.local.viewSteppers[targetPage] = {
       data: {
         stepperState: this.json,
       },
     }
+
     return true
   }
 }
