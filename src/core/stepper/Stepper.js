@@ -172,16 +172,15 @@ export class Stepper extends StepState {
       )
     }
 
-    // Check for duplicates and warn if found
-    if (this._hasDuplicatePaths(itemsToAdd)) {
-      console.warn('Warning: Appending these items will create duplicate paths')
-    } else {
-      //console.log('itemsToAdd', itemsToAdd)
-      //console.log('this.level', this.depth)
-      itemsToAdd.forEach((item) => {
+    // Try to add each item individually
+    itemsToAdd.forEach((item) => {
+      // Check if this specific item would create a duplicate path
+      if (this._hasDuplicatePaths(item)) {
+        this._log.warn(`Warning: Skipping item that would create duplicate path`)
+      } else {
         this._addState(item)
-      })
-    }
+      }
+    })
 
     return this
   }
@@ -239,14 +238,14 @@ export class Stepper extends StepState {
 
     const outerRows = generateCombinations(processedColumns)
 
-    // Check for duplicates and throw error if found
-    if (this._hasDuplicatePaths(outerRows)) {
-      throw new Error('Cannot create outer product: would create duplicate paths')
-    }
-
-    // Add each combination as a new state
+    // Try to add each combination individually
     outerRows.forEach((row) => {
-      this._addState(row)
+      // Check if this specific combination would create a duplicate path
+      if (this._hasDuplicatePaths(row)) {
+        this._log.warn(`Warning: Skipping combination that would create duplicate path`)
+      } else {
+        this._addState(row)
+      }
     })
 
     return this
