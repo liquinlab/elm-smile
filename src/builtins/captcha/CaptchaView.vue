@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref, markRaw } from 'vue'
 
 import CaptchaInstructionsText_01 from '@/builtins/captcha/CaptchaInstructionsText_01.vue'
 import CaptchaInstructionsText_02 from '@/builtins/captcha/CaptchaInstructionsText_02.vue'
@@ -61,14 +61,14 @@ const api = useViewAPI()
 // 5 - human brain should show stroop interference
 // 6 -
 
-const trials = api.steps.append([
-  { path: 'instructions_01', component: CaptchaInstructionsText_01, props: { adjective: '' } },
+api.steps.append([
+  { path: 'instructions_01', component: markRaw(CaptchaInstructionsText_01), props: { adjective: '' } },
   {
     path: 'rotate_image',
-    component: CaptchaTrialRotateImage,
+    component: markRaw(CaptchaTrialRotateImage),
     props: { timed_task: true, max_time: 50000 },
   },
-  { path: 'maze', component: CaptchaTrialMaze, props: { timed_task: false } },
+  //{ path: 'maze', component: markRaw(CaptchaTrialMaze), props: { timed_task: false } },
 ])
 
 // const currentTab = computed(() => {
@@ -85,8 +85,13 @@ function next_trial() {
   }
 }
 
+// Add loading state
+const isLoading = ref(true)
+
+// Initialize stepper on mount
 onMounted(() => {
-  api.goNextStep()
+  // Set loading to false after initialization
+  isLoading.value = false
 })
 </script>
 
