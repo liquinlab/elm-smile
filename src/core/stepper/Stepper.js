@@ -127,21 +127,25 @@ export class Stepper extends StepState {
    */
   _addState(item) {
     let state
-    // Create a new state with auto-incremented id
-    if (item.path !== undefined) {
-      // If at level 0, insert before EOS state
-      if (this.depth === 0) {
-        state = this.insert(item.path, -2, item)
+    try {
+      // Create a new state with auto-incremented id
+      if (item.path !== undefined) {
+        // If at level 0, insert before EOS state
+        if (this.depth === 0) {
+          state = this.insert(item.path, -2, item)
+        } else {
+          state = this.push(item.path, item)
+        }
       } else {
-        state = this.push(item.path, item)
+        // If at level 0, insert before EOS state
+        if (this.depth === 0) {
+          state = this.insert(null, -2, item)
+        } else {
+          state = this.push(null, item)
+        }
       }
-    } else {
-      // If at level 0, insert before EOS state
-      if (this.depth === 0) {
-        state = this.insert(null, -2, item)
-      } else {
-        state = this.push(null, item)
-      }
+    } catch (error) {
+      this._log.error(error.message)
     }
     return state
   }
