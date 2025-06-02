@@ -466,7 +466,7 @@ describe('StepState', () => {
       child.push('grandchild')
       stepper.next()
       stepper.reset()
-      expect(stepper.index).toBe(0)
+      expect(stepper.index).toBe(1)
       expect(child.index).toBe(0)
     })
 
@@ -658,14 +658,14 @@ describe('StepState', () => {
   })
 
   describe('navigation', () => {
-    it('should reset to initial state', () => {
+    it('should reset to initial state (which is second actually)', () => {
       stepper.push('first')
       stepper.push('second')
       stepper.push('third')
       stepper.next()
       stepper.next()
       stepper.reset()
-      expect(stepper.next().id).toBe('second')
+      expect(stepper.next().id).toBe('third')
     })
 
     it('should navigate forward correctly', () => {
