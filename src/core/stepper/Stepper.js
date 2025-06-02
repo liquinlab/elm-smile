@@ -2,6 +2,7 @@ import { StepState } from '@/core/stepper/StepState'
 import config from '@/core/config'
 import { StepperSerializer } from '@/core/stepper/StepperSerializer'
 import StepperProxy from '@/core/stepper/StepperProxy'
+import useLog from '@/core/stores/log'
 
 // to be implemented functions
 
@@ -40,19 +41,20 @@ export class Stepper extends StepState {
    */
   constructor(options = {}) {
     const { id = null, parent = null, data = null, serializedState = null, store = null } = options
+    const log = useLog()
     super(id, parent, data)
 
     // Store the store reference
     this._store = store
+    this._log = log
 
     // If serialized state is provided, load it
     if (serializedState !== null) {
-      console.log('STEPSTATE:loading serialized state')
+      this._log.debug('STEPSTATE:loading serialized state')
       this.loadFromJSON(serializedState)
     } else {
       // Initialize the state machine with SOS and EOS nodes
       if (this.depth === 0) {
-        console.log('STEPSTATE: initializing step state')
         this.push('SOS')
         this.push('EOS')
         this._currentIndex = 1 // start at EOS or whatever is first
@@ -155,13 +157,13 @@ export class Stepper extends StepState {
    * @throws {Error} If items is not an object or array, or if adding items would exceed maxStepperRows
    */
   append(items, options = {}) {
-    console.log('append', items)
+    this._log.debug('\tappend', items)
     // Convert single item to array if needed
     const itemsToAdd = Array.isArray(items) ? items : [items]
 
     // Check if adding these items would exceed maxStepperRows
     if (this._states.length + itemsToAdd.length > config.maxStepperRows) {
-      console.warn(
+      this._log.warn(
         `Warning: Appending ${itemsToAdd.length} items would exceed maximum of ${config.maxStepperRows} rows`
       )
     }
@@ -352,17 +354,16 @@ export class Stepper extends StepState {
    */
   save(page = null) {
     if (!this._store) {
-      console.warn('Stepper: Cannot save state - no store reference available')
+      this._log.warn('Stepper: Cannot save state - no store reference available')
       return false
     }
 
     const targetPage = page || this.name
     if (!targetPage) {
-      console.warn('Stepper: Cannot save state - no page name provided and stepper has no name')
+      this._log.warn('Stepper: Cannot save state - no page name provided and stepper has no name')
       return false
     }
 
-    console.log('Stepper: Saving state for page', targetPage)
     this._store.local.viewSteppers[targetPage] = {
       data: {
         stepperState: this.json,
