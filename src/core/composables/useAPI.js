@@ -423,7 +423,7 @@ export class SmileAPI {
    * @returns {void}
    */
   removeAutofill() {
-    this.logStore.debug('SMILEAPI: resetting autofill')
+    this.logStore.debug('SMILEAPI: removing autofill')
     if (this.store.config.mode === 'development') this.store.removeAutofill()
   }
 

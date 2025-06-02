@@ -13,12 +13,12 @@
  * - Managing query parameters between routes
  * - Providing navigation utilities for views
  */
-
 import { useRoute, useRouter } from 'vue-router'
 import _ from 'lodash'
 import useSmileStore from '@/core/stores/smilestore'
 import useLog from '@/core/stores/log'
 import { pinia } from '@/core/stores/createPinia'
+
 /**
  * Timeline management composable for handling view navigation
  * @function useTimeline
@@ -29,7 +29,6 @@ import { pinia } from '@/core/stores/createPinia'
  * - Checking navigation state and route metadata
  * The timeline ensures proper view sequencing and navigation guard handling.
  */
-
 export default function useTimeline() {
   const smilestore = useSmileStore(pinia)
   const route = useRoute()

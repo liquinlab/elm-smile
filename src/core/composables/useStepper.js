@@ -8,7 +8,7 @@
  */
 import Stepper from '@/core/stepper/Stepper'
 import useSmileStore from '@/core/stores/smilestore'
-import { useRoute } from 'vue-router'
+
 /**
  * @class StepperAPI
  * @description Wraps a Stepper instance to provide a consistent API for managing multi-step processes
@@ -27,10 +27,8 @@ import { useRoute } from 'vue-router'
  * The stepper provides functionality for managing multi-step processes and
  * tracking state within experiment views.
  */
-
 export function useStepper(view) {
   const smilestore = useSmileStore()
-  //const view = route.name
 
   // Set viewProvidesStepper to true for the dev bar
   smilestore.dev.viewProvidesStepper = true
@@ -39,22 +37,22 @@ export function useStepper(view) {
   let stepper = smilestore.global.steppers?.[view]
 
   if (!stepper) {
-    console.log('smilestore', smilestore)
-    console.log('view', view)
-    console.log('steppper', smilestore.getStepper(view))
-    console.log('stepper.data', smilestore.getStepper(view)?.data)
+    // console.log('smilestore', smilestore)
+    // console.log('view', view)
+    // console.log('steppper', smilestore.getStepper(view))
+    // console.log('stepper.data', smilestore.getStepper(view)?.data)
     // Create new stepper instance if none exists
     const savedState = smilestore.getStepper(view)?.data
     if (savedState) {
-      console.log('STEPPER: Loading saved state from smilestore')
+      console.log('STEPPER: Loading saved state from smilestore for view', view)
       stepper = new Stepper({ serializedState: savedState.stepperState, store: smilestore })
     } else {
-      console.log('STEPPER: Initializing state machine with SOS and EOS nodes')
+      console.log('STEPPER: Initializing state machine with SOS and EOS nodes for view', view)
       stepper = new Stepper({ id: '/', parent: null, data: { gvars: {} }, store: smilestore }) // explicit init
     }
-    console.log('STEPPER: Setting name', view)
     stepper.name = view
     // Register stepper if not already registered
+    console.log('STEPPER: Registering stepper for view', stepper.data)
     if (view) {
       stepper = smilestore.registerStepper(view, stepper)
     }
