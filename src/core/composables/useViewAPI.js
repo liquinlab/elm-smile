@@ -58,10 +58,6 @@ class ViewAPI extends SmileAPI {
     watch(
       this._stepper,
       (newStepper) => {
-        if (newStepper?.states?.length > 0) {
-          console.log('newStepper.length', newStepper.states.length)
-          console.log('updating', newStepper.currentPathString, newStepper)
-        }
         this._updateStepperState(newStepper, false) // don't save because it will trigger recursive updates
       },
       { immediate: true, deep: true }
@@ -167,11 +163,6 @@ class ViewAPI extends SmileAPI {
     this._updateStepperState(this._stepper.value)
   }
 
-  init() {
-    this._stateMachine.value = this._visualizeStateMachine()
-    this._stepper.value.next()
-  }
-
   get stepData() {
     if (!this._pathData.value) return null
 
@@ -274,9 +265,37 @@ class ViewAPI extends SmileAPI {
     return this._stepper.value.countLeafNodes
   }
 
+  // Getter for globals that provides access to gvars from stepper root data
+  get globals() {
+    if (!this._stepper.value.root.data.gvars) {
+      this._stepper.value.root.data.gvars = {}
+    }
+
+    const isDefined = (key) => key in this._stepper.value.root.data.gvars
+
+    return new Proxy(this._stepper.value.root.data.gvars, {
+      get: (target, prop) => {
+        if (prop === 'isDefined') {
+          return isDefined
+        }
+        return target[prop]
+      },
+      set: (target, prop, value) => {
+        target[prop] = value
+        this._saveStepperState()
+        return true
+      },
+    })
+  }
+
   // Timing methods
   startTimer(name = 'default') {
-    this._stepper.value.root.data.gvars[`startTime_${name}`] = Date.now()
+    this.globals[`startTime_${name}`] = Date.now()
+  }
+
+  timerStarted(name = 'default') {
+    const timerKey = `startTime_${name}`
+    return timerKey in this._stepper.value.root.data.gvars ? this._stepper.value.root.data.gvars[timerKey] : false
   }
 
   elapsedTime(name = 'default') {
@@ -346,28 +365,6 @@ class ViewAPI extends SmileAPI {
     this._saveStepperState()
   }
 
-  get globals() {
-    const createRecursiveProxy = (target) => {
-      if (target === null || typeof target !== 'object') {
-        return target
-      }
-
-      return new Proxy(target, {
-        get: (obj, prop) => {
-          const value = obj[prop]
-          return createRecursiveProxy(value)
-        },
-        set: (obj, prop, value) => {
-          obj[prop] = value
-          this.stepper.root.data.gvars = this._gvars.value
-          this._saveStepperState()
-          return true
-        },
-      })
-    }
-
-    return createRecursiveProxy(this._gvars.value)
-  }
 
   /**
    * Records the current step data to the experiment data store

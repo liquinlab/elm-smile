@@ -321,9 +321,9 @@ export class StepState {
   insert(id = null, index = 0, data = null) {
     const autoid = id === null ? this._states.length : id
 
-    // Check for existing state with same id
+    // Check for existing state with same id and warn if found
     if (this._states.some((state) => state.id === autoid)) {
-      throw new Error(`State id already exists in this node (id: "${autoid}")`)
+      throw new Error(`State id already exists in at this node (id: "${autoid}")`)
     }
 
     // Check for string in id
