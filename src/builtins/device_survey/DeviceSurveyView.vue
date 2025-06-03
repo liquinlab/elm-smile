@@ -5,10 +5,10 @@ import { reactive, computed } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
-const pages = api.steps.append([{ path: 'device_page1' }, { path: 'device_page2' }])
-api.reset()
+api.steps.append([{ path: 'device_page1' }, { path: 'device_page2' }])
 
-if (!api.globals.forminfo) {
+// persists the form info in local storage, otherwise initialize
+if (!api.globals.isDefined('forminfo')) {
   api.globals.forminfo = reactive({
     device_type: '', // type of device (e.g., desktop, laptop, tablet, phone)
     connection: '', // type of internet connection (e.g., wifi, ethernet, cellular)
@@ -240,19 +240,6 @@ function finish() {
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="formstep" v-else>
-        <article class="message is-danger">
-          <div class="message-header">
-            <p>Error</p>
-            <button class="delete" aria-label="delete"></button>
-          </div>
-          <div class="message-body">
-            Error, you shouldn't have been able to get this far! This happened because the stepper for this route has
-            been incremented too many times. There's no problem so long as your code doesn't allow this in live mode.
-          </div>
-        </article>
       </div>
     </div>
   </div>

@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, computed, onMounted } from 'vue'
+import { reactive, computed } from 'vue'
 
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
@@ -8,7 +8,7 @@ const api = useViewAPI()
 api.steps.append([{ path: 'survey_page1' }, { path: 'survey_page2' }, { path: 'survey_page3' }])
 
 // persists the form info in local storage, otherwise initialize
-if (!api.globals.forminfo) {
+if (!api.globals.isDefined('forminfo')) {
   api.globals.forminfo = reactive({
     dob: '',
     gender: '',
@@ -74,8 +74,6 @@ function finish() {
   api.recordForm('demographicForm', api.globals.forminfo)
   api.goNextView()
 }
-
-onMounted(() => {})
 </script>
 
 <template>
@@ -86,6 +84,7 @@ onMounted(() => {})
         We request some information about you which we can use to understand aggregate differences between individuals.
         Your privacy will be maintained and the data will not be linked to your online identity (e.g., email).
       </p>
+
       <div class="formstep" v-if="api.pathString === 'survey_page1'">
         <div class="columns">
           <div class="column is-one-third">
@@ -539,19 +538,6 @@ onMounted(() => {})
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="formstep" v-else>
-        <article class="message is-danger">
-          <div class="message-header">
-            <p>Error</p>
-            <button class="delete" aria-label="delete"></button>
-          </div>
-          <div class="message-body">
-            Error, you shouldn't have been able to get this far! This happened because the stepper for this route has
-            been incremented too many times. There's no problem so long as your code doesn't allow this in live mode.
-          </div>
-        </article>
       </div>
     </div>
   </div>

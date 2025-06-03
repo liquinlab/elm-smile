@@ -25,7 +25,7 @@ const trials = api.steps.append([
   },
 ])
 //.shuffle()
-api.reset()
+
 // const index = ref(0)
 // trials = shuffle(trials) // shuffle is not "in place"
 
@@ -34,9 +34,6 @@ api.reset()
 // set up the call backs that take you through the task
 
 function next() {
-  console.log('api.stepIndex', api.stepIndex)
-  console.log('trials.nSteps', api.nSteps)
-  console.log('called next')
   if (api.stepIndex < api.nSteps) {
     api.goNextStep()
   } else {

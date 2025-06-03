@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, computed, watch } from 'vue'
+import { reactive, computed } from 'vue'
 
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
@@ -8,7 +8,7 @@ const api = useViewAPI()
 // const pages = api.spec().append([{ path: 'feedback_page1' }])
 // api.addSpec(pages)
 
-if (!api.globals.forminfo) {
+if (!api.globals.isDefined('forminfo')) {
   api.globals.forminfo = reactive({
     difficulty_rating: '', // how difficulty
     enjoyment_rating: '', // how enjoyable

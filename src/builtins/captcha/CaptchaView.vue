@@ -84,15 +84,6 @@ function next_trial() {
     api.goNextStep()
   }
 }
-
-// Add loading state
-const isLoading = ref(true)
-
-// Initialize stepper on mount
-onMounted(() => {
-  // Set loading to false after initialization
-  isLoading.value = false
-})
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, computed, ref, onMounted } from 'vue'
+import { reactive, computed, ref, onMounted, nextTick } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
@@ -26,18 +26,15 @@ function init() {
   // randomize questions and add to stepper
   qs = props.randomizeQandA ? getRandomizedQuestions() : props.questions
 
-  console.log('qs', props.questions)
   const sections = api.steps.append([{ path: 'pages' }, { path: 'feedback' }])
 
   sections[0].append(qs)
 
   sections[1].append([{ path: 'success' }, { path: 'retry' }]) // add to additional pages
 
-  if (!api.globals.attempts) {
+  if (!api.globals.isDefined('attempts')) {
     api.globals.attempts = 1
   }
-
-  console.log('api.stepData.questions', api.stepData.questions)
 }
 
 function getRandomizedQuestions() {
@@ -132,8 +129,6 @@ function finish() {
 }
 
 init()
-
-onMounted(() => {})
 </script>
 
 <template>
