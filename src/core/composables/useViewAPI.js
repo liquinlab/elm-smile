@@ -31,9 +31,12 @@ class ViewAPI extends SmileAPI {
   constructor(store, logStore, route, router, timeline) {
     super(store, logStore, route, router, timeline)
 
-    // Make stepper reactive using computed
-    this._page = ref(route.name)
-    this._stepper = computed(() => useStepper(route.name))
+    // Store route as a class property
+    this._route = route
+
+    // Make page reactive using computed
+    this._page = computed(() => this._route.name)
+    this._stepper = computed(() => useStepper(this._route.name, this.update))
 
     // Internal reactive refs
     this._pathData = ref(null)
@@ -45,14 +48,6 @@ class ViewAPI extends SmileAPI {
 
     // Component registry
     this.componentRegistry = new Map()
-
-    // Watch for route changes to update _page
-    watch(
-      () => route.name,
-      (newRouteName) => {
-        this._page.value = newRouteName
-      }
-    )
 
     // Watch for stepper changes and update internal state
     watch(
@@ -95,7 +90,36 @@ class ViewAPI extends SmileAPI {
    * This allows advanced manipulation of the state machine when needed.
    */
   get steps() {
-    return this._stepper.value
+    const modifyingMethods = ['append', 'outer', 'forEach']
+    if (!this._stepper.value) return null
+
+    const self = this // capture the outer this context
+    return new Proxy(this._stepper.value, {
+      get(target, prop) {
+        const value = target[prop]
+        if (typeof value === 'function') {
+          return function (...args) {
+            const result = value.apply(target, args)
+            if (modifyingMethods.includes(prop)) {
+              setTimeout(() => {
+                self.updateStepper()
+              }, 2)
+            }
+            return result
+          }
+        }
+        return value
+      },
+      set(target, prop, value) {
+        target[prop] = value
+        return true
+      },
+    })
+  }
+
+  updateStepper() {
+    console.log('updating stepper', this._stepper.value)
+    this._updateStepperState(this._stepper.value)
   }
 
   _visualizeStateMachine() {
@@ -270,22 +294,33 @@ class ViewAPI extends SmileAPI {
     if (!this._stepper.value.root.data.gvars) {
       this._stepper.value.root.data.gvars = {}
     }
+    const self = this // capture the outer this context
 
     const isDefined = (key) => key in this._stepper.value.root.data.gvars
 
-    return new Proxy(this._stepper.value.root.data.gvars, {
-      get: (target, prop) => {
-        if (prop === 'isDefined') {
-          return isDefined
-        }
-        return target[prop]
-      },
-      set: (target, prop, value) => {
-        target[prop] = value
-        this._saveStepperState()
-        return true
-      },
-    })
+    const createRecursiveProxy = (target) => {
+      return new Proxy(target, {
+        get: (target, prop) => {
+          if (prop === 'isDefined') {
+            return isDefined
+          }
+          const value = target[prop]
+          if (value && typeof value === 'object' && !Array.isArray(value)) {
+            return createRecursiveProxy(value)
+          }
+          return value
+        },
+        set: (target, prop, value) => {
+          target[prop] = value
+          setTimeout(() => {
+            self.updateStepper()
+          }, 2)
+          return true
+        },
+      })
+    }
+
+    return createRecursiveProxy(this._stepper.value.root.data.gvars)
   }
 
   // Timing methods
@@ -364,7 +399,6 @@ class ViewAPI extends SmileAPI {
     this.stepper.root.data.gvars = {}
     this._saveStepperState()
   }
-
 
   /**
    * Records the current step data to the experiment data store
