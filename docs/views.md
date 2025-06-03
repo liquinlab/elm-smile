@@ -65,8 +65,11 @@ Below, we describe each built-in View, including the side-effects of each View.
 
 ### Metadata options
 
-Each View can also be defined with a set of metadata properties that control page access. These `meta` property will be configured in the `@/user/design.js`. Examples on all of the metadata properties will be shown in the below examples, and more information can be found [here](https://router.vuejs.org/guide/advanced/meta.html#Route-Meta-Fields).
-
+Each View can also be defined with a set of metadata properties that control
+page access. These `meta` property will be configured in the `@/user/design.js`.
+Examples on all of the metadata properties will be shown in the below examples,
+and more information can be found
+[here](https://router.vuejs.org/guide/advanced/meta.html#Route-Meta-Fields).
 
 ## Overview of Built-in Views
 
@@ -79,7 +82,7 @@ Each View can also be defined with a set of metadata properties that control pag
 | [Window Sizer](#window-sizer)                       | Yes               | Verifies a given area of the screen is visible (with a more aggressive option that hides page content if the window is resized too small) |
 | [Simple Instructions](#simple-instructions)         | No                | A simple sequence of pages for instructions                                                                                               |
 | [Instructions Quiz](#instructions-quiz)             | No                | A basic instructions quiz                                                                                                                 |
-| [Demographic Survey](#demographic-survey)           | No                | A survey which collects some demographic info                                                                                             |
+| [Demographic Survey](#demographic-survey)           | Yes               | A survey which collects some demographic info                                                                                             |
 | [Device Survey](#device-survey)                     | No                | A survey which collects some self-report about computer/device                                                                            |
 | [Withdraw](#withdraw)                               | Yes               | A survey which processes a participant's request to withdraw from study                                                                   |
 | [Debrief](#debrief)                                 | No                | A simple text View which describes the purpose of study                                                                                   |
@@ -321,16 +324,20 @@ timeline.pushSeqView({
 
 ### Simple Instructions
 
-This page presents the instructions for the experimental task to the participant. If the experiment contains multiple conditions and each requires a unique set of instructions, the participant may be randomly assigned a condition with custom weights so that the Instructions View displays the correct text. This page is also always accessible such that the user is able to return to it if they do not pass the instructions quiz. 
-
+This page presents the instructions for the experimental task to the
+participant. If the experiment contains multiple conditions and each requires a
+unique set of instructions, the participant may be randomly assigned a condition
+with custom weights so that the Instructions View displays the correct text.
+This page is also always accessible such that the user is able to return to it
+if they do not pass the instructions quiz.
 
 **Base Component**: `@/builtins/instructions/InstructionsView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/instructions/InstructionsView.vue)  
-**Side effects**: No  
-**Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/instructions/InstructionsView.vue)  
+**Side effects**: None **Typical accessibility**:
+`{requiresConsent: true, requiresDone: false}`
 
 [TO DO: Add info about instructions]
-
 
 ```js
 // put this at the top of the file
@@ -341,7 +348,7 @@ const api = useAPI()
 // assign instruction condition
 api.randomAssignCondition({
   instructionsVersion: ['1', '2', '3'],
-  weights: [2, 1, 1], 
+  weights: [2, 1, 1],
 })
 
 // instructions
@@ -511,7 +518,8 @@ timeline.pushSeqView({
 ### Withdraw
 
 **Component**: `@/builtins/withdraw/WithdrawView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/withdraw/WithdrawView.vue)  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/withdraw/WithdrawView.vue)  
 **Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
 **Typical accessibility**: `{ requiresWithdraw: true }`
 
@@ -533,7 +541,6 @@ return the task/HIT. It is the responsibility of the experimenter to monitor
 withdraws and to try to contact the participant if needed for partial
 compensation.
 
-
 ```js
 // put this at the top of the file
 import Withdraw from '@/builtins/withdraw/WithdrawView.vue'
@@ -548,14 +555,19 @@ timeline.registerView({
   component: Withdraw,
 })
 ```
+
 ### Debrief
 
 **Component**: `@/builtins/debrief/DebriefView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/debrief/DebriefView.vue)  
-**Side effects**: No  
-**Typical accessibility**: Always  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/debrief/DebriefView.vue)  
+**Side effects**: None **Typical accessibility**: Always
 
-The debrief page displays the text that explains the purpose of the experiment and provides the participant with any additional postfacto information about the task they just completed. The text can be customized in `@/user/components/DebriefText.vue`, and this page will transition the user to their post-experiment surveys. 
+The debrief page displays the text that explains the purpose of the experiment
+and provides the participant with any additional postfacto information about the
+task they just completed. The text can be customized in
+`@/user/components/DebriefText.vue`, and this page will transition the user to
+their post-experiment surveys.
 
 ```js
 // put this at the top of the file
@@ -570,19 +582,18 @@ timeline.pushSeqView({
     debriefText: markRaw(DebriefText),
   },
 })
-
 ```
 
 ### Thanks
 
 **Component**: `@/builtins/thanks/ThanksView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/thanks/ThanksView.vue)  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/thanks/ThanksView.vue)  
 **Side effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresDone: true}`
 
-
 ```js
-// put this at the top of the file 
+// put this at the top of the file
 import Thanks from '@/builtins/thanks/ThanksView.vue'
 
 // thanks
@@ -599,15 +610,18 @@ timeline.pushSeqView({
 ### Feedback Survey
 
 **Component**: `src/builtins/task_survey/TaskFeedbackSurveyView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/task_survey/TaskFeedbackSurveyView.vue)  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/task_survey/TaskFeedbackSurveyView.vue)  
 **Side effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The task survey asks some simple questions about the participant's experience in
-the task. The questions gauge how enjoyable and challenging the task was and offer a space for the participant to provide general feedback and comments on issues and improvements. 
+the task. The questions gauge how enjoyable and challenging the task was and
+offer a space for the participant to provide general feedback and comments on
+issues and improvements.
 
-If you want this to be the last view in the study, you can set the `setDone` meta
-field.
+If you want this to be the last view in the study, you can set the `setDone`
+meta field.
 
 ```js
 // put this at the top of the file

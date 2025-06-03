@@ -42,8 +42,8 @@
   --bulma-scheme-invert-bis-l: 7%;
   --bulma-scheme-invert-l: 4%;
   --bulma-family-primary: Inter, SF Pro, Segoe UI, Roboto, Oxygen, Ubuntu, Helvetica Neue, Helvetica, Arial, sans-serif;
-  --bulma-family-secondary: Inter, SF Pro, Segoe UI, Roboto, Oxygen, Ubuntu, Helvetica Neue, Helvetica, Arial,
-    sans-serif;
+  --bulma-family-secondary:
+    Inter, SF Pro, Segoe UI, Roboto, Oxygen, Ubuntu, Helvetica Neue, Helvetica, Arial, sans-serif;
   --bulma-family-code: Inconsolata, Hack, SF Mono, Roboto Mono, Source Code Pro, Ubuntu Mono, monospace;
   --bulma-size-small: 0.75rem;
   --bulma-size-normal: 1rem;
@@ -979,7 +979,8 @@
   --bulma-code-background: var(--bulma-background);
   --bulma-pre: var(--bulma-text);
   --bulma-pre-background: var(--bulma-background);
-  --bulma-shadow: 0 0.5em 1em -0.125em hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.1),
+  --bulma-shadow:
+    0 0.5em 1em -0.125em hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.1),
     0 0px 0 1px hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.02);
 }
 @media (prefers-color-scheme: light) {
@@ -1015,10 +1016,10 @@
     --bulma-scheme-invert-ter-l: 14%;
     --bulma-scheme-invert-bis-l: 7%;
     --bulma-scheme-invert-l: 4%;
-    --bulma-family-primary: Inter, SF Pro, Segoe UI, Roboto, Oxygen, Ubuntu, Helvetica Neue, Helvetica, Arial,
-      sans-serif;
-    --bulma-family-secondary: Inter, SF Pro, Segoe UI, Roboto, Oxygen, Ubuntu, Helvetica Neue, Helvetica, Arial,
-      sans-serif;
+    --bulma-family-primary:
+      Inter, SF Pro, Segoe UI, Roboto, Oxygen, Ubuntu, Helvetica Neue, Helvetica, Arial, sans-serif;
+    --bulma-family-secondary:
+      Inter, SF Pro, Segoe UI, Roboto, Oxygen, Ubuntu, Helvetica Neue, Helvetica, Arial, sans-serif;
     --bulma-family-code: Inconsolata, Hack, SF Mono, Roboto Mono, Source Code Pro, Ubuntu Mono, monospace;
     --bulma-size-small: 0.75rem;
     --bulma-size-normal: 1rem;
@@ -2319,8 +2320,8 @@
   --bulma-scheme-invert-bis-l: 7%;
   --bulma-scheme-invert-l: 4%;
   --bulma-family-primary: Inter, SF Pro, Segoe UI, Roboto, Oxygen, Ubuntu, Helvetica Neue, Helvetica, Arial, sans-serif;
-  --bulma-family-secondary: Inter, SF Pro, Segoe UI, Roboto, Oxygen, Ubuntu, Helvetica Neue, Helvetica, Arial,
-    sans-serif;
+  --bulma-family-secondary:
+    Inter, SF Pro, Segoe UI, Roboto, Oxygen, Ubuntu, Helvetica Neue, Helvetica, Arial, sans-serif;
   --bulma-family-code: Inconsolata, Hack, SF Mono, Roboto Mono, Source Code Pro, Ubuntu Mono, monospace;
   --bulma-size-small: 0.75rem;
   --bulma-size-normal: 1rem;
@@ -3256,7 +3257,8 @@
   --bulma-code-background: var(--bulma-background);
   --bulma-pre: var(--bulma-text);
   --bulma-pre-background: var(--bulma-background);
-  --bulma-shadow: 0 0.5em 1em -0.125em hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.1),
+  --bulma-shadow:
+    0 0.5em 1em -0.125em hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.1),
     0 0px 0 1px hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.02);
 }
 .bulma-theme-dark,
@@ -3363,7 +3365,8 @@
   --bulma-code-background: var(--bulma-background);
   --bulma-pre: var(--bulma-text);
   --bulma-pre-background: var(--bulma-background);
-  --bulma-shadow: 0 0.5em 1em -0.125em hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.1),
+  --bulma-shadow:
+    0 0.5em 1em -0.125em hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.1),
     0 0px 0 1px hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.02);
 }
 /*! minireset.css v0.0.6 | MIT License | github.com/jgthms/minireset.css */
@@ -3759,10 +3762,11 @@ fieldset[disabled] .bulma-textarea {
   --bulma-box-radius: var(--bulma-radius-large);
   --bulma-box-shadow: var(--bulma-shadow);
   --bulma-box-padding: 1.25rem;
-  --bulma-box-link-hover-shadow: 0 0.5em 1em -0.125em hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-invert-l), 0.1),
+  --bulma-box-link-hover-shadow:
+    0 0.5em 1em -0.125em hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-invert-l), 0.1),
     0 0 0 1px var(--bulma-link);
-  --bulma-box-link-active-shadow: inset 0 1px 2px
-      hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-invert-l), 0.2),
+  --bulma-box-link-active-shadow:
+    inset 0 1px 2px hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-invert-l), 0.2),
     0 0 0 1px var(--bulma-link);
   background-color: var(--bulma-box-background-color);
   border-radius: var(--bulma-box-radius);
@@ -7749,8 +7753,8 @@ button.bulma-dropdown-item.bulma-is-selected {
   --bulma-navbar-dropdown-radius: var(--bulma-radius-large);
   --bulma-navbar-dropdown-z: 20;
   --bulma-navbar-dropdown-boxed-radius: var(--bulma-radius-large);
-  --bulma-navbar-dropdown-boxed-shadow: 0 0.5em 0.5em
-      hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-invert-l), 0.1),
+  --bulma-navbar-dropdown-boxed-shadow:
+    0 0.5em 0.5em hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-invert-l), 0.1),
     0 0 0 1px hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-invert-l), 0.1);
   --bulma-navbar-dropdown-item-h: var(--bulma-scheme-h);
   --bulma-navbar-dropdown-item-s: var(--bulma-scheme-s);
@@ -8287,7 +8291,8 @@ a.bulma-navbar-item.bulma-is-selected {
     bottom: 0;
   }
   .bulma-navbar.bulma-is-fixed-bottom-touch.bulma-has-shadow {
-    box-shadow: 0 -0.125em 0.1875em hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-invert-l), 0.1);
+    box-shadow: 0 -0.125em 0.1875em
+      hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-invert-l), 0.1);
   }
   .bulma-navbar.bulma-is-fixed-top-touch {
     top: 0;
@@ -8473,7 +8478,8 @@ a.bulma-navbar-item.bulma-is-selected {
     bottom: 0;
   }
   .bulma-navbar.bulma-is-fixed-bottom-desktop.bulma-has-shadow {
-    box-shadow: 0 -0.125em 0.1875em hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-invert-l), 0.1);
+    box-shadow: 0 -0.125em 0.1875em
+      hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-invert-l), 0.1);
   }
   .bulma-navbar.bulma-is-fixed-top-desktop {
     top: 0;
