@@ -71,12 +71,16 @@ function submitWithdraw() {
       <div class="infobar-end">
         <div class="infobar-item" v-if="!appconfig.anonymousMode">
           <div class="buttons">
-            <button class="button is-info is-small is-light" v-if="api.store.local.consented" @click="toggleConsent()">
+            <button
+              class="button is-info is-small is-light"
+              v-if="api.store.browserPersisted.consented"
+              @click="toggleConsent()"
+            >
               <FAIcon icon="magnifying-glass" />&nbsp;&nbsp;View consent
             </button>
             <button
               class="button is-danger is-small is-light"
-              v-if="api.store.local.consented && !api.store.local.withdrawn"
+              v-if="api.store.browserPersisted.consented && !api.store.browserPersisted.withdrawn"
               @click="toggleWithdraw()"
             >
               <FAIcon icon="circle-xmark" />&nbsp;&nbsp;Withdraw

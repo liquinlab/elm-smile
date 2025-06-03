@@ -312,7 +312,7 @@ subject needs to "reconnect" to the Firebase database document that they were
 currently working from. To persist data like this, which is specific to the
 user, across page reloads or restarts of the browser we sync a few key values
 with the browser's local storage. The data which is synced to local storage is
-in `smilestore.local` (see `smilestore.js`).
+in `smilestore.browserPersisted` (see `smilestore.js`).
 
 ## Setting up Google Firestore
 

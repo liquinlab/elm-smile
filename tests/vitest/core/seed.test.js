@@ -47,7 +47,7 @@ describe('Seed tests', () => {
     expect(true).toBe(true)
   })
 
-  it('should save automatic seed to smilestore.local.seedID', async () => {
+  it('should save automatic seed to smilestore.browserPersisted.seedID', async () => {
     const MockComponent = { template: '<div>Mock Component</div>' }
 
     const timeline = new Timeline(api)
@@ -71,7 +71,7 @@ describe('Seed tests', () => {
 
     // expect seed to not be an empty string
     const smilestore = useSmileStore() // uses the testing pinia!
-    expect(smilestore.local.seedID).not.toEqual('')
+    expect(smilestore.browserPersisted.seedID).not.toEqual('')
   })
 
   it('should reproduce same random number when seed is reset', () => {

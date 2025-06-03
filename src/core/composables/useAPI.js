@@ -47,7 +47,7 @@ import {
  * @property {Object} data - Application data from store
  * @property {Object} private - Private data from store
  * @property {Object} all_data - Combined private and public data
- * @property {Object} all_config - Combined local, dev, github and main configs
+ * @property {Object} all_config - Combined bro, dev, github and main configs
  * @property {Object} urls - Global URL configurations
  * @property {Object} log - Logging methods interface
  */
@@ -73,12 +73,12 @@ export class SmileAPI {
     this.private = store.private
     this.all_data = { private: store.private, data: store.data }
     this.all_config = {
-      local: store.local,
+      browserPersisted: store.browserPersisted,
       dev: store.dev,
       code: store.config.github,
       config: store.config,
     }
-    this.urls = store.global.urls
+    this.urls = store.browserEphemeral.urls
   }
 
   // Logging methods
@@ -122,9 +122,9 @@ export class SmileAPI {
    */
   goToView = async (view, force = true) => {
     if (force) {
-      this.store.global.forceNavigate = true
+      this.store.browserEphemeral.forceNavigate = true
       await this.router.push({ name: view })
-      this.store.global.forceNavigate = false
+      this.store.browserEphemeral.forceNavigate = false
     } else {
       await this.router.push({ name: view })
     }
@@ -224,7 +224,7 @@ export class SmileAPI {
    * Check if the application is in reset state
    * @returns {boolean} True if app is reset, false otherwise
    */
-  isResetApp = () => this.store.local.reset
+  isResetApp = () => this.store.browserPersisted.reset
 
   /**
    * Reset just the store state
@@ -340,7 +340,7 @@ export class SmileAPI {
    * @returns {Promise<void>} A promise that resolves when the database connection is established
    */
   async connectDB() {
-    if (!this.store.local.knownUser) {
+    if (!this.store.browserPersisted.knownUser) {
       await this.store.setKnown()
       this.store.setConsented()
     }
@@ -561,7 +561,7 @@ export class SmileAPI {
     }
 
     const possibleConditions = conditionObject[name]
-    this.store.local.possibleConditions[name] = possibleConditions
+    this.store.browserPersisted.possibleConditions[name] = possibleConditions
 
     const hasWeights = keys.includes('weights')
     const weights = hasWeights ? conditionObject.weights : undefined
@@ -625,7 +625,7 @@ export class SmileAPI {
    */
   async completeConsent() {
     this.setConsented()
-    if (!this.store.local.knownUser) {
+    if (!this.store.browserPersisted.knownUser) {
       await this.setKnown()
     }
   }

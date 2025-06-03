@@ -116,8 +116,8 @@ describe('useAPI composable', () => {
     expect(api.config).toBeDefined()
     expect(api.data).toBeDefined()
     expect(api.private).toBeDefined()
-    // expect(api.store.local).toBeDefined()
-    // expect(api.store.global).toBeDefined()
+    // expect(api.store.browserPersisted).toBeDefined()
+    // expect(api.store.browserEphemeral).toBeDefined()
     // expect(api.store.dev).toBeDefined()
 
     // Check router related methods

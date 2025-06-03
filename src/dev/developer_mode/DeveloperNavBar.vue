@@ -112,7 +112,7 @@ onKeyDown((e) => {
 onKeyDown((e) => {
   if (e.ctrlKey && e.key === '4') {
     e.preventDefault()
-    if (!api.store.local.knownUser) {
+    if (!api.store.browserPersisted.knownUser) {
       api.setKnown()
       api.setConsented()
       showTemporaryNotification('Ctrl + 4', 'Connected to Database')

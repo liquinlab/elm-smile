@@ -13,7 +13,7 @@ var timer = ref(null)
 const firebase_url = computed(() => {
   const mode = api.config.mode == 'development' ? 'testing' : 'real'
 
-  return `https://console.firebase.google.com/u/0/project/${api.config.firebaseConfig.projectId}/firestore/data/~2F${mode}~2F${api.config.projectRef}~2Fdata~2F${api.store.local.docRef}`
+  return `https://console.firebase.google.com/u/0/project/${api.config.firebaseConfig.projectId}/firestore/data/~2F${mode}~2F${api.config.projectRef}~2Fdata~2F${api.store.browserPersisted.docRef}`
 })
 
 function open_firebase_console(url) {
@@ -21,9 +21,9 @@ function open_firebase_console(url) {
 }
 
 const sync_state = computed(() => {
-  if (api.store.global.dbChanges && api.store.global.dbConnected) {
+  if (api.store.browserEphemeral.dbChanges && api.store.browserEphemeral.dbConnected) {
     return 'is-warning is-completed'
-  } else if (!api.store.global.dbChanges && api.store.global.dbConnected) {
+  } else if (!api.store.browserEphemeral.dbChanges && api.store.browserEphemeral.dbConnected) {
     return 'is-success is-completed'
   } else {
     return ''
@@ -38,10 +38,10 @@ const stopTimer = () => {
 const startTimer = () => {
   timer.value = setInterval(() => {
     //api.debug("updating timer", api.store.dev.showConsoleBar)
-    if (!api.store.global.dbConnected) {
+    if (!api.store.browserEphemeral.dbConnected) {
       last_write_time_string.value = `Never happened`
     } else {
-      var time = ((Date.now() - api.store.local.lastWrite) / 1000).toFixed(1)
+      var time = ((Date.now() - api.store.browserPersisted.lastWrite) / 1000).toFixed(1)
       if (time < 60) {
         last_write_time_string.value = `${time} secs ago`
       } else if (time < 180) {
@@ -72,15 +72,15 @@ const showServiceSelect = ref(false)
   <!-- content of panel here -->
   <div class="database-info-sidebar-panel">
     <div class="steps is-hidden-small">
-      <div class="step-item" :class="{ 'is-success is-completed': api.store.local.knownUser }">
-        <div class="step-marker" v-if="!api.store.local.knownUser">1</div>
+      <div class="step-item" :class="{ 'is-success is-completed': api.store.browserPersisted.knownUser }">
+        <div class="step-marker" v-if="!api.store.browserPersisted.knownUser">1</div>
         <div class="step-marker" v-else><FAIcon icon="fa-solid fa-check" /></div>
-        <div class="step-details" :class="{ 'is-success is-completed': api.store.local.knownUser }">
+        <div class="step-details" :class="{ 'is-success is-completed': api.store.browserPersisted.knownUser }">
           <p class="step-title is-size-7">
-            <FAIcon icon="fa-solid fa-user-plus" v-if="api.store.local.knownUser" />
+            <FAIcon icon="fa-solid fa-user-plus" v-if="api.store.browserPersisted.knownUser" />
             <FAIcon icon="fa-solid fa-user-minus" v-else />
           </p>
-          <p v-if="!api.store.local.knownUser">Unknown user.</p>
+          <p v-if="!api.store.browserPersisted.knownUser">Unknown user.</p>
           <p v-else>Known user.</p>
 
           <!--
@@ -96,30 +96,30 @@ const showServiceSelect = ref(false)
 
       <div
         class="step-item"
-        :class="{ 'is-success is-completed': api.store.global.dbConnected }"
+        :class="{ 'is-success is-completed': api.store.browserEphemeral.dbConnected }"
         @click="api.connectDB()"
       >
-        <div class="step-marker" v-if="!api.store.global.dbConnected">2</div>
+        <div class="step-marker" v-if="!api.store.browserEphemeral.dbConnected">2</div>
         <div class="step-marker" v-else><FAIcon icon="fa-solid fa-check" /></div>
-        <div class="step-details" :class="{ 'is-success is-completed': api.store.global.dbConnected }">
+        <div class="step-details" :class="{ 'is-success is-completed': api.store.browserEphemeral.dbConnected }">
           <p class="step-title is-size-7">
             <img src="/src/assets/dev/logo_lockup_firebase_vertical.svg" width="15" />
           </p>
-          <p v-if="!api.store.global.dbConnected">Not connected.</p>
+          <p v-if="!api.store.browserEphemeral.dbConnected">Not connected.</p>
           <p v-else>Connected.</p>
           <br />
         </div>
       </div>
       <div class="step-item" :class="sync_state">
-        <div class="step-marker" v-if="!api.store.global.dbConnected">3</div>
-        <div class="step-marker" v-if="api.store.global.dbConnected && api.store.global.dbChanges">
+        <div class="step-marker" v-if="!api.store.browserEphemeral.dbConnected">3</div>
+        <div class="step-marker" v-if="api.store.browserEphemeral.dbConnected && api.store.browserEphemeral.dbChanges">
           <FAIcon icon="fa-solid fa-xmark" />
         </div>
         <div class="step-marker" v-else><FAIcon icon="fa-solid fa-check" /></div>
         <div class="step-details">
           <p class="step-title is-size-7" :class="sync_state"><FAIcon icon="fa-solid fa-rotate" /></p>
-          <p v-if="!api.store.global.dbConnected">Data never synced.</p>
-          <p v-else-if="api.store.global.dbChanges">Data out of sync.</p>
+          <p v-if="!api.store.browserEphemeral.dbConnected">Data never synced.</p>
+          <p v-else-if="api.store.browserEphemeral.dbChanges">Data out of sync.</p>
           <p v-else>Database is synced.</p>
         </div>
       </div>
@@ -141,7 +141,7 @@ const showServiceSelect = ref(false)
                 type="checkbox"
                 name="switchRoundedDefault1"
                 class="switch is-rounded is-rtl is-small"
-                v-model="smilestore.local.consented"
+                v-model="smilestore.browserPersisted.consented"
               />
               <label for="switchRoundedDefault1"></label>
             </div>
@@ -154,7 +154,7 @@ const showServiceSelect = ref(false)
                 type="checkbox"
                 name="switchRoundedDefault2"
                 class="switch is-rounded is-rtl is-small"
-                v-model="smilestore.local.knownUser"
+                v-model="smilestore.browserPersisted.knownUser"
               />
               <label for="switchRoundedDefault2"></label>
             </div>
@@ -167,7 +167,7 @@ const showServiceSelect = ref(false)
                 type="checkbox"
                 name="switchRoundedDefault3"
                 class="switch is-rounded is-rtl is-small"
-                v-model="smilestore.local.done"
+                v-model="smilestore.browserPersisted.done"
               />
               <label for="switchRoundedDefault3"></label>
             </div>
@@ -180,7 +180,7 @@ const showServiceSelect = ref(false)
                 type="checkbox"
                 name="switchRoundedDefault4"
                 class="switch is-rounded is-rtl is-small"
-                v-model="smilestore.local.withdrawn"
+                v-model="smilestore.browserPersisted.withdrawn"
               />
               <label for="switchRoundedDefault4"></label>
             </div>
@@ -211,7 +211,7 @@ const showServiceSelect = ref(false)
                   @change="showServiceSelect = false"
                   @blur="showServiceSelect = false"
                 >
-                  <option v-for="(cond, key) in smilestore.global.urls" :key="cond">
+                  <option v-for="(cond, key) in smilestore.browserEphemeral.urls" :key="cond">
                     {{ key }}
                   </option>
                 </select>
@@ -221,7 +221,7 @@ const showServiceSelect = ref(false)
         </tr>
         <tr class="is-hidden-small">
           <td class="has-text-left"><b>Last route:</b></td>
-          <td class="has-text-left is-family-code">{{ '/' + api.store.local.lastRoute }}</td>
+          <td class="has-text-left is-family-code">{{ '/' + api.store.browserPersisted.lastRoute }}</td>
         </tr>
         <tr class="is-hidden-small">
           <td class="has-text-left"><b>Mode:</b></td>
@@ -238,8 +238,8 @@ const showServiceSelect = ref(false)
         <tr>
           <td class="has-text-left"><b>DocRef:</b></td>
           <td class="has-text-left is-family-code">
-            {{ api.store.local.docRef }}&nbsp;&nbsp;<a
-              v-if="api.store.local.docRef"
+            {{ api.store.browserPersisted.docRef }}&nbsp;&nbsp;<a
+              v-if="api.store.browserPersisted.docRef"
               @click.prevent="open_firebase_console(firebase_url)"
               ><FAIcon icon="fa-solid fa-square-up-right"
             /></a>
@@ -248,7 +248,7 @@ const showServiceSelect = ref(false)
         <tr class="is-hidden-small">
           <td class="has-text-left"><b>Writes:</b></td>
           <td class="has-text-left is-family-code">
-            {{ api.store.local.totalWrites }} out of {{ api.config.maxWrites }} max
+            {{ api.store.browserPersisted.totalWrites }} out of {{ api.config.maxWrites }} max
           </td>
         </tr>
         <tr class="is-hidden-small">
@@ -266,8 +266,8 @@ const showServiceSelect = ref(false)
         <tr class="is-hidden-small">
           <td class="has-text-left"><b>Size:</b></td>
           <td class="has-text-left is-family-code">
-            {{ api.store.local.approxDataSize }} / 1,048,576 max ({{
-              Math.round((api.store.local.approxDataSize / 1048576) * 1000) / 1000
+            {{ api.store.browserPersisted.approxDataSize }} / 1,048,576 max ({{
+              Math.round((api.store.browserPersisted.approxDataSize / 1048576) * 1000) / 1000
             }}%)
           </td>
         </tr>

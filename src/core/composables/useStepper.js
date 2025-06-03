@@ -34,7 +34,7 @@ export function useStepper(view) {
   smilestore.dev.viewProvidesStepper = true
 
   // Check if stepper already exists in global state
-  let stepper = smilestore.global.steppers?.[view]
+  let stepper = smilestore.browserEphemeral.steppers?.[view]
 
   if (!stepper) {
     // console.log('smilestore', smilestore)

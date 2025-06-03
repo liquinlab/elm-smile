@@ -8,7 +8,7 @@ const browse_panels = reactive({ path: ['/', null, null] })
 
 onMounted(() => {
   if (api.store.dev.dataPath !== null) {
-    browse_panels.path = JSON.parse(api.store.dev.dataPath) // hydrate from api.store.localstorage
+    browse_panels.path = JSON.parse(api.store.dev.dataPath) // hydrate from api.store
   }
 })
 

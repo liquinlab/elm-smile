@@ -129,7 +129,7 @@ const initDev = {
   routePanel: { visible: false, x: -0, y: -3 },
 }
 
-const initLocal = {
+const initBrowserPersisted = {
   // syncs with local storage
   knownUser: false,
   lastRoute: initLastRoute(appconfig.mode),
@@ -155,7 +155,7 @@ const initLocal = {
   randomizedRoutes: {}, // tracking randomized route assignments both locally and remotely
 }
 
-const initGlobal = {
+const initBrowserEphemeral = {
   // ephemeral state, resets on browser refresh
   forceNavigate: false,
   steppers: {}, // Store for HStepper instances
@@ -185,8 +185,8 @@ const initGlobal = {
  * - Application configuration
  *
  * The store is divided into several namespaces:
- * - local: Persisted state synced with localStorage
- * - global: Ephemeral state that resets on refresh
+ * - browserPersisted: Persisted state synced with localStorage
+ * - browserEphemeral: Ephemeral state that resets on refresh
  * - dev: Development-only state and configuration
  * - private: Sensitive user data not synced to database
  * - data: Public experiment data synced to database
@@ -195,8 +195,10 @@ const initGlobal = {
 export default defineStore('smilestore', {
   // arrow function recommended for full type inference
   state: () => ({
-    local: useStorage(appconfig.localStorageKey, initLocal, localStorage, { mergeDefaults: true }),
-    global: initGlobal,
+    browserPersisted: useStorage(appconfig.localStorageKey, initBrowserPersisted, localStorage, {
+      mergeDefaults: true,
+    }),
+    browserEphemeral: initBrowserEphemeral,
     dev:
       appconfig.mode === 'development'
         ? useStorage(appconfig.devLocalStorageKey, initDev, localStorage, { mergeDefaults: true })
@@ -232,25 +234,25 @@ export default defineStore('smilestore', {
 
   getters: {
     isDataBarVisible: (state) => state.dev.showConsoleBar,
-    isKnownUser: (state) => state.local.knownUser,
-    isConsented: (state) => state.local.consented,
-    isWithdrawn: (state) => state.local.withdrawn,
-    isDone: (state) => state.local.done,
-    lastRoute: (state) => state.local.lastRoute,
-    isDBConnected: (state) => state.global.dbConnected,
+    isKnownUser: (state) => state.browserPersisted.knownUser,
+    isConsented: (state) => state.browserPersisted.consented,
+    isWithdrawn: (state) => state.browserPersisted.withdrawn,
+    isDone: (state) => state.browserPersisted.done,
+    lastRoute: (state) => state.browserPersisted.lastRoute,
+    isDBConnected: (state) => state.browserEphemeral.dbConnected,
     hasAutofill: (state) => state.dev.viewProvidesAutofill,
     searchParams: (state) => state.dev.searchParams,
     recruitmentService: (state) => state.data.recruitmentService,
-    isSeedSet: (state) => state.local.seedSet,
-    getSeedID: (state) => state.local.seedID,
-    getLocal: (state) => state.local,
-    getConditions: (state) => state.local.conditions,
-    getRandomizedRoutes: (state) => state.local.randomizedRoutes,
+    isSeedSet: (state) => state.browserPersisted.seedSet,
+    getSeedID: (state) => state.browserPersisted.seedID,
+    getLocal: (state) => state.browserPersisted,
+    getConditions: (state) => state.browserPersisted.conditions,
+    getRandomizedRoutes: (state) => state.browserPersisted.randomizedRoutes,
     verifiedVisibility: (state) => state.data.verifiedVisibility,
     getShortId: (state) => {
-      if (!state.local.docRef || typeof state.local.docRef !== 'string') return 'N/A'
-      //const lastDashIndex = state.local.docRef.lastIndexOf('-')
-      return `${state.local.docRef.substring(0, 10)}`
+      if (!state.browserPersisted.docRef || typeof state.browserPersisted.docRef !== 'string') return 'N/A'
+      //const lastDashIndex = state.browserPersisted.docRef.lastIndexOf('-')
+      return `${state.browserPersisted.docRef.substring(0, 10)}`
     },
   },
 
@@ -264,9 +266,9 @@ export default defineStore('smilestore', {
       // sync conditions to remote
       const log = useLog()
       log.debug('SMILESTORE: syncing conditions, randomized routes to remote')
-      this.data.conditions = this.local.conditions
-      this.data.randomizedRoutes = this.local.randomizedRoutes
-      this.data.seedID = this.local.seedID
+      this.data.conditions = this.browserPersisted.conditions
+      this.data.randomizedRoutes = this.browserPersisted.randomizedRoutes
+      this.data.seedID = this.browserPersisted.seedID
     },
 
     /**
@@ -277,10 +279,10 @@ export default defineStore('smilestore', {
      * reconnecting.
      */
     setDBConnected() {
-      if (this.global.dbConnected === false) {
+      if (this.browserEphemeral.dbConnected === false) {
         this.manualSyncLocalToData()
       }
-      this.global.dbConnected = true
+      this.browserEphemeral.dbConnected = true
     },
 
     /**
@@ -299,7 +301,7 @@ export default defineStore('smilestore', {
      * Also records the current timestamp as the experiment start time in the remote data store.
      */
     setConsented() {
-      this.local.consented = true
+      this.browserPersisted.consented = true
       this.data.consented = true
       this.data.starttime = fsnow()
     },
@@ -309,7 +311,7 @@ export default defineStore('smilestore', {
      * @description Updates both local and remote data stores to indicate participant has not consented.
      */
     setUnconsented() {
-      this.local.consented = false
+      this.browserPersisted.consented = false
       this.data.consented = false
     },
 
@@ -320,7 +322,7 @@ export default defineStore('smilestore', {
      * Also records the current timestamp as the withdrawal time in the remote data store.
      */
     setWithdrawn(forminfo) {
-      this.local.withdrawn = true
+      this.browserPersisted.withdrawn = true
       this.data.withdrawn = true
       this.private.withdrawData = forminfo
       this.data.endtime = fsnow()
@@ -332,7 +334,7 @@ export default defineStore('smilestore', {
      * Also records the current timestamp as the completion time in the remote data store.
      */
     setDone() {
-      this.local.done = true
+      this.browserPersisted.done = true
       this.data.done = true
       this.data.endtime = fsnow()
     },
@@ -343,7 +345,7 @@ export default defineStore('smilestore', {
      * @description Updates the local state with the provided completion code.
      */
     setCompletionCode(code) {
-      this.local.completionCode = code
+      this.browserPersisted.completionCode = code
     },
 
     /**
@@ -351,7 +353,7 @@ export default defineStore('smilestore', {
      * @description Resets the local state to its initial values.
      */
     resetApp() {
-      this.local.reset = true
+      this.browserPersisted.reset = true
     },
 
     /**
@@ -360,17 +362,17 @@ export default defineStore('smilestore', {
      * @description Updates the local state with the provided seed ID.
      */
     setSeedID(seed) {
-      if (seed === this.local.seedID) {
+      if (seed === this.browserPersisted.seedID) {
         console.debug('SMILESTORE: seed already set to', seed)
         return
       }
-      this.local.seedID = seed
+      this.browserPersisted.seedID = seed
       this.data.seedID = seed
-      this.local.seedSet = true
+      this.browserPersisted.seedSet = true
 
       // After setting a seed we should clear out randomized settings
-      this.local.conditions = {}
-      this.local.randomizedRoutes = {}
+      this.browserPersisted.conditions = {}
+      this.browserPersisted.randomizedRoutes = {}
       this.data.conditions = {}
       this.data.randomizedRoutes = {}
     },
@@ -384,20 +386,20 @@ export default defineStore('smilestore', {
      */
     registerStepper(view, stepper = null) {
       // allocate a new serialization space
-      this.local.viewSteppers[view] = {}
+      this.browserPersisted.viewSteppers[view] = {}
 
       // register the stepper in global state
       if (stepper) {
-        if (!this.global.steppers) {
-          this.global.steppers = {}
+        if (!this.browserEphemeral.steppers) {
+          this.browserEphemeral.steppers = {}
         }
-        this.global.steppers[view] = stepper
+        this.browserEphemeral.steppers[view] = stepper
 
         // force a save
         stepper.save(view)
       }
       // return the active stepper
-      return this.global.steppers?.[view]
+      return this.browserEphemeral.steppers?.[view]
     },
 
     /**
@@ -408,7 +410,7 @@ export default defineStore('smilestore', {
      */
 
     getStepper(view) {
-      return this.local.viewSteppers[view]
+      return this.browserPersisted.viewSteppers[view]
     },
 
     /**
@@ -417,8 +419,8 @@ export default defineStore('smilestore', {
      * @description Resets the stepper object for the specified view in the local state.
      */
     resetStepper(view) {
-      if (this.local.viewSteppers[view]) {
-        this.local.viewSteppers[view] = {}
+      if (this.browserPersisted.viewSteppers[view]) {
+        this.browserPersisted.viewSteppers[view] = {}
       }
     },
 
@@ -575,7 +577,7 @@ export default defineStore('smilestore', {
      * @description Sets the condition in the local and data states.
      */
     setCondition(name, cond) {
-      this.local.conditions[name] = cond
+      this.browserPersisted.conditions[name] = cond
       this.data.conditions[name] = cond
     },
 
@@ -586,7 +588,7 @@ export default defineStore('smilestore', {
      * @description Sets the randomized route in the local and data states.
      */
     setRandomizedRoute(name, route) {
-      this.local.randomizedRoutes[name] = route
+      this.browserPersisted.randomizedRoutes[name] = route
       this.data.randomizedRoutes[name] = route
     },
 
@@ -598,11 +600,11 @@ export default defineStore('smilestore', {
       const log = useLog()
       // TODO: this need to have an exception handler wrapping around it
       // because things go wrong
-      this.local.knownUser = true
-      this.data.seedID = this.local.seedID
-      this.local.docRef = await createDoc(this.data)
-      this.local.privateDocRef = await createPrivateDoc(this.private, this.local.docRef)
-      if (this.local.docRef) {
+      this.browserPersisted.knownUser = true
+      this.data.seedID = this.browserPersisted.seedID
+      this.browserPersisted.docRef = await createDoc(this.data)
+      this.browserPersisted.privateDocRef = await createPrivateDoc(this.private, this.browserPersisted.docRef)
+      if (this.browserPersisted.docRef) {
         this.setDBConnected()
       } else {
         log.error('SMILESTORE: could not create document in firebase')
@@ -615,13 +617,13 @@ export default defineStore('smilestore', {
      */
     async loadData() {
       let data
-      if (this.local.docRef) {
-        data = await loadDoc(this.local.docRef)
+      if (this.browserPersisted.docRef) {
+        data = await loadDoc(this.browserPersisted.docRef)
         // ALSO WHAT IF THIS FAILS?
       }
       if (data) {
         this.data = data
-        this.local.approxDataSize = sizeof(data)
+        this.browserPersisted.approxDataSize = sizeof(data)
         this.setDBConnected()
       }
     },
@@ -632,9 +634,9 @@ export default defineStore('smilestore', {
      * @description Sets the last route in the local state.
      */
     setLastRoute(route) {
-      this.local.lastRoute = route
+      this.browserPersisted.lastRoute = route
       // if (route !== 'config') {
-      //   this.local.lastRoute = route
+      //   this.browserPersisted.lastRoute = route
       // }
     },
 
@@ -674,33 +676,37 @@ export default defineStore('smilestore', {
     async saveData(force = false) {
       const log = useLog()
       if (this.isDBConnected) {
-        if (!force && this.local.totalWrites >= appconfig.maxWrites) {
+        if (!force && this.browserPersisted.totalWrites >= appconfig.maxWrites) {
           log.error(
             'SMILESTORE: max writes reached to firebase.  Data NOT saved.  Call saveData() less numerously to avoid problems/cost issues.'
           )
           return
         }
 
-        if (!force && this.local.lastWrite && Date.now() - this.local.lastWrite < appconfig.minWriteInterval) {
+        if (
+          !force &&
+          this.browserPersisted.lastWrite &&
+          Date.now() - this.browserPersisted.lastWrite < appconfig.minWriteInterval
+        ) {
           log.error(
             `SMILESTORE: write interval too short for firebase (${appconfig.minWriteInterval}).  \
             Data NOT saved. Call saveData() less frequently to avoid problems/cost issues. See env/.env \
             file to alter this setting.`
           )
-          // console.error(Date.now() - this.local.lastWrite)
+          // console.error(Date.now() - this.browserPersisted.lastWrite)
           return
         }
 
-        await updateSubjectDataRecord(this.data, this.local.docRef)
-        await updatePrivateSubjectDataRecord(this.private, this.local.docRef)
+        await updateSubjectDataRecord(this.data, this.browserPersisted.docRef)
+        await updatePrivateSubjectDataRecord(this.private, this.browserPersisted.docRef)
         //console.log('data size = ', sizeof(data))
-        this.local.approxDataSize = sizeof(this.data)
-        this.local.totalWrites += 1
-        this.local.lastWrite = Date.now()
-        //this.global.snapshot = { ...smilestore.$state.data }
-        this.global.dbChanges = false // reset the changes flag
+        this.browserPersisted.approxDataSize = sizeof(this.data)
+        this.browserPersisted.totalWrites += 1
+        this.browserPersisted.lastWrite = Date.now()
+        //this.browserEphemeral.snapshot = { ...smilestore.$state.data }
+        this.browserEphemeral.dbChanges = false // reset the changes flag
         log.success('SMILESTORE: saveData() Request to firebase successful (force = ' + force + ')')
-      } else if (!this.data.consented && !this.local.consented) {
+      } else if (!this.data.consented && !this.browserPersisted.consented) {
         log.log('SMILESTORE: not saving because not consented')
       } else {
         log.error("SMILESTORE: can't save data, not connected to firebase")
@@ -712,9 +718,9 @@ export default defineStore('smilestore', {
      * @description Resets the local state to its initial values.
      */
     resetLocal() {
-      // this.local.knownUser = false
-      // this.local.lastRoute = 'welcome'
-      // this.global.dbConnected = false
+      // this.browserPersisted.knownUser = false
+      // this.browserPersisted.lastRoute = 'welcome'
+      // this.browserEphemeral.dbConnected = false
       this.$reset()
     },
 
@@ -725,7 +731,7 @@ export default defineStore('smilestore', {
      * @description Returns the condition object for the specified name from the local state.
      */
     getConditionByName(name) {
-      return this.local.conditions[name]
+      return this.browserPersisted.conditions[name]
     },
 
     /**
@@ -735,7 +741,7 @@ export default defineStore('smilestore', {
      * @description Returns the route object for the specified name from the local state.
      */
     getRandomizedRouteByName(name) {
-      return this.local.randomizedRoutes[name]
+      return this.browserPersisted.randomizedRoutes[name]
     },
   },
 })

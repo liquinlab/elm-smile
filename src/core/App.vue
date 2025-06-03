@@ -56,7 +56,7 @@ const toosmall = ref(api.isBrowserTooSmall())
  * @type {Object} snapshot - Copy of current smilestore data state
  * @listens smilestore.$subscribe - Subscribes to store mutations
  * @fires api.log.log - Logs detected changes to store data
- * @mutates smilestore.global.dbChanges - Sets flag when changes detected
+ * @mutates smilestore.browserEphemeral.dbChanges - Sets flag when changes detected
  */
 var snapshot = { ...smilestore.$state.data }
 smilestore.$subscribe((mutation, newstate) => {
@@ -71,7 +71,7 @@ smilestore.$subscribe((mutation, newstate) => {
       }
 
       api.log.log(`SMILESTORE: smilestore.data value changed for ${key}: from ${oldv} to ${newv}`)
-      smilestore.global.dbChanges = true
+      smilestore.browserEphemeral.dbChanges = true
     }
   })
   snapshot = { ...newstate.data }

@@ -44,7 +44,7 @@ describe('Timeline tests', () => {
           setRandomizedRoute: vi.fn(),
           registerStepper: vi.fn(),
           config: { mode: 'production' },
-          local: {},
+          browserPersisted: {},
         }
         return { api }
       },

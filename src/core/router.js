@@ -87,7 +87,7 @@ export function addGuards(r, providedApi = null) {
 
     // if withdrew
     // this is leading to infinite redirects.
-    // if (api.store.isWithdrawn && !api.store.global.forceNavigate) {
+    // if (api.store.isWithdrawn && !api.store.browserEphemeral.forceNavigate) {
     //   log.debug("withdraw so can't go anywhere")
     //   return {
     //     name: 'withdraw',
@@ -124,7 +124,7 @@ export function addGuards(r, providedApi = null) {
     // if you're in jumping mode
     // or you're in presentation mode allow the new route
     if (
-      (api.store.config.mode === 'development' && api.store.global.forceNavigate) ||
+      (api.store.config.mode === 'development' && api.store.browserEphemeral.forceNavigate) ||
       api.store.config.mode === 'presentation'
     ) {
       api.log.warn(
@@ -139,7 +139,7 @@ export function addGuards(r, providedApi = null) {
     }
 
     // if this is forced
-    if (api.store.global.forceNavigate) {
+    if (api.store.browserEphemeral.forceNavigate) {
       api.log.warn(
         'ROUTER GUARD: Allowing direct, out-of-order navigation to /' +
           to.name +
@@ -263,7 +263,7 @@ export function addGuards(r, providedApi = null) {
     const api = useAPI()
     api.removeAutofill()
 
-    if (api.store.local.useSeed) {
+    if (api.store.browserPersisted.useSeed) {
       // if we're using a seed
       const seedID = api.store.getSeedID
       const seed = `${seedID}-${to.name}`

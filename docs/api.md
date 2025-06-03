@@ -135,8 +135,8 @@ The following functions are available in both `useAPI` and `useViewAPI`:
 - `private`: Accesses private data store.
 - `all_data`: Accesses combined private and data stores.
 - `all_config`: Accesses combined local, dev, github and main configs.
-- `local`: Accesses local storage.
-- `global`: Accesses global settings.
+- `browserPersisted`: Accesses browser persisted state.
+- `browserEphemeral`: Accesses browser ephemeral state.
 - `dev`: Accesses development-only settings.
 - `route`: Accesses the current route.
 - `router`: Accesses the router object.

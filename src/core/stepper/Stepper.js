@@ -514,7 +514,7 @@ export class Stepper extends StepState {
     localStorage.setItem(this._store.config.localStorageKey, JSON.stringify(existingLocalStorage))
 
     // Also update the store for consistency
-    this._store.local.viewSteppers[targetPage] = {
+    this._store.browserPersisted.viewSteppers[targetPage] = {
       data: {
         stepperState: this.json,
       },

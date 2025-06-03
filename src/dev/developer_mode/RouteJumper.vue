@@ -16,8 +16,8 @@ const route = useRoute()
 // construct routes in order we want to display them
 const routerRoutes = router.getRoutes()
 // get seqtimeline and routes from local storage
-const seqtimeline = api.store.local.seqtimeline
-const routes = api.store.local.routes
+const seqtimeline = api.store.browserPersisted.seqtimeline
+const routes = api.store.browserPersisted.routes
 
 // filter routes - only those that aren't in seqtimeline
 const filteredRoutes = routes.filter((r) => {

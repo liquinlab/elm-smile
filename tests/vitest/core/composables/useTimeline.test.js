@@ -8,7 +8,7 @@ import { vi, describe, beforeEach, afterEach, it, expect } from 'vitest'
 
 // Create mock stores
 const mockSmilestore = {
-  global: {
+  browserEphemeral: {
     forceNavigate: false,
   },
   dev: {
@@ -80,7 +80,7 @@ const routes = [
 describe('useTimeline composable', () => {
   beforeEach(() => {
     // Reset mock state
-    mockSmilestore.global.forceNavigate = false
+    mockSmilestore.browserEphemeral.forceNavigate = false
     mockSmilestore.dev.currentViewDone = false
     mockSmilestore.config.autoSave = false
     vi.clearAllMocks()
@@ -170,7 +170,7 @@ describe('useTimeline composable', () => {
     await timeline.goToView('about')
 
     expect(routerPushSpy).toHaveBeenCalledWith({ name: 'about' })
-    expect(mockSmilestore.global.forceNavigate).toBe(false) // Should be reset after navigation
+    expect(mockSmilestore.browserEphemeral.forceNavigate).toBe(false) // Should be reset after navigation
   })
 
   it('should navigate to a specific view with force=false', async () => {
@@ -180,7 +180,7 @@ describe('useTimeline composable', () => {
     await timeline.goToView('contact', false)
 
     expect(routerPushSpy).toHaveBeenCalledWith({ name: 'contact' })
-    expect(mockSmilestore.global.forceNavigate).toBe(false) // Should remain false
+    expect(mockSmilestore.browserEphemeral.forceNavigate).toBe(false) // Should remain false
   })
 
   it('should lookup the next route correctly', async () => {

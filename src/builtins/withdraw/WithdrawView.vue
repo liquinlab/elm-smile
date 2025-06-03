@@ -10,7 +10,7 @@ api.saveData(true) // force a data save
   <div class="page prevent-select">
     <div class="withdraw" v-if="api.getRecruitmentService() == 'prolific'">
       <h1 class="title is-3 has-text-danger">You have successfully withdrawn from the study.</h1>
-      <article class="message is-danger" v-if="api.store.local.withdrawn">
+      <article class="message is-danger" v-if="api.store.browserPersisted.withdrawn">
         <div class="message-header">
           <p>Notice about withdraw from our Prolific study</p>
         </div>
@@ -23,7 +23,7 @@ api.saveData(true) // force a data save
 
     <div class="withdraw" v-if="api.getRecruitmentService() == 'cloudresearch'">
       <h1 class="title is-3 has-text-danger">You have successfully withdrawn from the study.</h1>
-      <article class="message is-danger" v-if="api.store.local.withdrawn">
+      <article class="message is-danger" v-if="api.store.browserPersisted.withdrawn">
         <div class="message-header">
           <p>Notice about withdraw from our CloudResearch study</p>
         </div>
@@ -36,7 +36,7 @@ api.saveData(true) // force a data save
 
     <div class="withdraw" v-if="api.getRecruitmentService() == 'mturk'">
       <h1 class="title is-3 has-text-danger">You have successfully withdrawn from the study.</h1>
-      <article class="message is-danger" v-if="api.store.local.withdrawn">
+      <article class="message is-danger" v-if="api.store.browserPersisted.withdrawn">
         <div class="message-header">
           <p>Notice about withdraw from our Amazon Mechanical Turk study</p>
         </div>
@@ -49,7 +49,7 @@ api.saveData(true) // force a data save
 
     <div class="withdraw" v-if="api.getRecruitmentService() == 'citizensci'">
       <h1 class="title is-3 has-text-danger">You have successfully withdrawn from the study.</h1>
-      <article class="message is-danger" v-if="api.store.local.withdrawn">
+      <article class="message is-danger" v-if="api.store.browserPersisted.withdrawn">
         <div class="message-header">
           <p>Notice about withdraw from our study</p>
         </div>
@@ -62,7 +62,7 @@ api.saveData(true) // force a data save
 
     <div class="withdraw" v-if="api.getRecruitmentService() == 'web'">
       <h1 class="title is-3 has-text-danger">You have successfully withdrawn from the study.</h1>
-      <article class="message is-danger" v-if="api.store.local.withdrawn">
+      <article class="message is-danger" v-if="api.store.browserPersisted.withdrawn">
         <div class="message-header">
           <p>Notice about withdraw from our web study</p>
         </div>

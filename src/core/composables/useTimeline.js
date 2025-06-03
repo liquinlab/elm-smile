@@ -95,9 +95,9 @@ export default function useTimeline() {
     // directly to the router.push() function
     // although there's some plan about it in future
     if (force) {
-      smilestore.global.forceNavigate = true
+      smilestore.browserEphemeral.forceNavigate = true
       await router.push({ name: view })
-      smilestore.global.forceNavigate = false
+      smilestore.browserEphemeral.forceNavigate = false
     } else {
       await router.push({ name: view })
     }
