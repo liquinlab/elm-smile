@@ -375,8 +375,8 @@ class Timeline {
 
     this.buildGraph()
 
-    this.api.store.local.seqtimeline = this.seqtimeline
-    this.api.store.local.routes = this.routes
+    this.api.store.browserPersisted.seqtimeline = this.seqtimeline
+    this.api.store.browserPersisted.routes = this.routes
   }
 
   /**
