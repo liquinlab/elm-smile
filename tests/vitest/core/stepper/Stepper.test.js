@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { setActivePinia } from 'pinia'
 import { createTestingPinia } from '@pinia/testing'
 import { Stepper } from '@/core/stepper/Stepper'
-import seedrandom from 'seedrandom'
+import config from '@/core/config'
 
 describe('Stepper test', () => {
   let stepper
@@ -497,6 +497,208 @@ describe('Stepper test', () => {
 
       // Order should be the same as first shuffle
       expect(thirdShuffleOrder).toEqual(firstShuffleOrder)
+    })
+  })
+
+  describe('zip Operations', () => {
+    it('should zip columns with equal lengths', () => {
+      const trials = {
+        shape: ['circle', 'square', 'triangle'],
+        color: ['red', 'green', 'blue'],
+      }
+
+      stepper.zip(trials)
+
+      expect(stepper.states.length).toBe(5) // SOS + 3 trials + EOS
+      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'green' })
+      expect(stepper.states[3].data).toEqual({ shape: 'triangle', color: 'blue' })
+    })
+
+    it('should throw error by default when columns have different lengths', () => {
+      const trials = {
+        shape: ['circle', 'square'],
+        color: ['red', 'green', 'blue'],
+      }
+
+      expect(() => {
+        stepper.zip(trials)
+      }).toThrow(
+        'All columns must have the same length when using zip(). Specify a method (loop, pad, last) to handle different lengths.'
+      )
+    })
+
+    it('should pad with specified value when using pad method', () => {
+      const trials = {
+        shape: ['circle', 'square'],
+        color: ['red', 'green', 'blue'],
+      }
+
+      stepper.zip(trials, { method: 'pad', padValue: 'unknown' })
+
+      expect(stepper.states.length).toBe(5) // SOS + 3 trials + EOS
+      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'green' })
+      expect(stepper.states[3].data).toEqual({ shape: 'unknown', color: 'blue' })
+    })
+
+    it('should handle null padValue', () => {
+      const trials = {
+        shape: ['circle', 'square'],
+        color: ['red', 'green', 'blue'],
+      }
+
+      stepper.zip(trials, { method: 'pad', padValue: null })
+      expect(stepper.states.length).toBe(5) // SOS + 3 trials + EOS
+      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'green' })
+      expect(stepper.states[3].data).toEqual({ shape: null, color: 'blue' })
+    })
+
+    it('should throw error when padValue is undefined', () => {
+      const trials = {
+        shape: ['circle', 'square'],
+        color: ['red', 'green', 'blue'],
+      }
+
+      expect(() => {
+        stepper.zip(trials, { method: 'pad' })
+      }).toThrow('padValue is required when using the pad method')
+    })
+
+    it('should loop shorter columns', () => {
+      const trials = {
+        shape: ['circle', 'square'],
+        color: ['red', 'green', 'blue'],
+      }
+
+      stepper.zip(trials, { method: 'loop' })
+
+      expect(stepper.states.length).toBe(5) // SOS + 3 trials + EOS
+      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'green' })
+      expect(stepper.states[3].data).toEqual({ shape: 'circle', color: 'blue' })
+
+      // Test with more loops
+      stepper = new Stepper({ id: '/' })
+      const trials2 = {
+        shape: ['circle', 'square'],
+        color: ['red', 'green', 'blue', 'yellow', 'purple'],
+      }
+
+      stepper.zip(trials2, { method: 'loop' })
+
+      expect(stepper.states.length).toBe(7) // SOS + 5 trials + EOS
+      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'green' })
+      expect(stepper.states[3].data).toEqual({ shape: 'circle', color: 'blue' })
+      expect(stepper.states[4].data).toEqual({ shape: 'square', color: 'yellow' })
+      expect(stepper.states[5].data).toEqual({ shape: 'circle', color: 'purple' })
+
+      // Test with multiple columns of different lengths
+      stepper = new Stepper({ id: '/' })
+      const trials3 = {
+        shape: ['circle'],
+        color: ['red', 'green', 'blue'],
+        size: ['small', 'medium'],
+      }
+
+      stepper.zip(trials3, { method: 'loop' })
+
+      expect(stepper.states.length).toBe(5) // SOS + 3 trials + EOS
+      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red', size: 'small' })
+      expect(stepper.states[2].data).toEqual({ shape: 'circle', color: 'green', size: 'medium' })
+      expect(stepper.states[3].data).toEqual({ shape: 'circle', color: 'blue', size: 'small' })
+    })
+
+    it('should handle non-array values as single-element arrays', () => {
+      const trials = {
+        shape: 'circle',
+        color: ['red', 'green', 'blue'],
+      }
+
+      stepper.zip(trials, { method: 'loop' })
+
+      expect(stepper.states.length).toBe(5) // SOS + 3 trials + EOS
+      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[2].data).toEqual({ shape: 'circle', color: 'green' })
+      expect(stepper.states[3].data).toEqual({ shape: 'circle', color: 'blue' })
+    })
+
+    it('should handle multiple non-array values', () => {
+      const trials = {
+        shape: 'circle',
+        color: 'red',
+        size: ['small', 'medium'],
+      }
+
+      stepper.zip(trials, { method: 'loop' })
+
+      expect(stepper.states.length).toBe(4) // SOS + 2 trials + EOS
+      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red', size: 'small' })
+      expect(stepper.states[2].data).toEqual({ shape: 'circle', color: 'red', size: 'medium' })
+    })
+
+    it('should repeat last value when using last method', () => {
+      const trials = {
+        shape: ['circle', 'square'],
+        color: ['red', 'green', 'blue'],
+      }
+
+      stepper.zip(trials, { method: 'last' })
+
+      expect(stepper.states.length).toBe(5) // SOS + 3 trials + EOS
+      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'green' })
+      expect(stepper.states[3].data).toEqual({ shape: 'square', color: 'blue' })
+    })
+
+    it('should throw error for invalid method', () => {
+      const trials = {
+        shape: ['circle', 'square'],
+        color: ['red', 'green', 'blue'],
+      }
+
+      expect(() => {
+        stepper.zip(trials, { method: 'invalid' })
+      }).toThrow('Invalid method: invalid. Must be one of: loop, pad, last')
+    })
+
+    it('should throw error for invalid input', () => {
+      expect(() => {
+        stepper.zip(null)
+      }).toThrow('zip() requires an object with arrays as values')
+
+      expect(() => {
+        stepper.zip({})
+      }).toThrow('zip() requires at least one column')
+    })
+
+    it('should throw error when zip would exceed safety limit', () => {
+      // Create arrays that would exceed the limit when zipped
+      // Subtract 2 to account for SOS and EOS states
+      const trials = {
+        shape: Array(config.maxStepperRows - 1).fill('circle'),
+        color: Array(config.maxStepperRows - 1).fill('red'),
+      }
+
+      expect(() => {
+        stepper.zip(trials)
+      }).toThrow(/Cannot create \d+ combinations: would exceed maximum of \d+ rows/)
+    })
+
+    it('should be chainable with other methods', () => {
+      const trials = {
+        shape: ['circle', 'square'],
+        color: ['red', 'green'],
+      }
+
+      stepper.zip(trials).append([{ shape: 'triangle', color: 'blue' }])
+
+      expect(stepper.states.length).toBe(5) // SOS + 3 trials + EOS
+      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'green' })
+      expect(stepper.states[3].data).toEqual({ shape: 'triangle', color: 'blue' })
     })
   })
 })

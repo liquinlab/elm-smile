@@ -10,15 +10,16 @@ import seedrandom from 'seedrandom'
 // some write operations should be named and only go once
 // others should go repeatedly
 
-// append() - done
-// outer()  - done
-// forEach() - done/not tested fully
-// zip()  - added/not tests
-
-// sample()
-// range() mid
-// repeat()  tricky
 // shuffle() - done
+// append() - read tests
+// outer()  - read tests
+// forEach() - done/tests? - broken currently
+// zip()  - read tests
+
+// TO BE IMPLEMENTED IN THE FUTURE
+// sample() - mid priorty
+// range() - mid priorty
+// repeat()  tricky?
 // interleave()  low priority
 // print()  low priority
 // partition()  low priority
