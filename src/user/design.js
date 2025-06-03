@@ -21,7 +21,6 @@ import MTurk from '@/builtins/mturk/MTurkRecruitView.vue'
 import Consent from '@/builtins/simple_consent/InformedConsentView.vue'
 import DemographicSurvey from '@/builtins/demographic_survey/DemographicSurveyView.vue'
 import DeviceSurvey from '@/builtins/device_survey/DeviceSurveyView.vue'
-import Captcha from '@/builtins/captcha/CaptchaView.vue'
 import Instructions from '@/builtins/instructions/InstructionsView.vue'
 import InstructionsQuiz from '@/builtins/instructions_quiz/InstructionsQuiz.vue'
 import Debrief from '@/builtins/debrief/DebriefView.vue'
@@ -176,12 +175,6 @@ timeline.pushSeqView({
 timeline.pushSeqView({
   name: 'windowsizer',
   component: WindowSizer,
-})
-
-// captcha
-timeline.pushSeqView({
-  name: 'captcha',
-  component: Captcha,
 })
 
 // instructions
