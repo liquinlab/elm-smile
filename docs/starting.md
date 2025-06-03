@@ -158,6 +158,29 @@ your project `{{config.projectname}}`):
 
 ## 2. Configure your project
 
+### Google service account key
+
+To download data from firebase, you'll need a local copy of the Google Cloud
+service account key. You can either:
+
+- With a browser, log in to the firebase console for the project and download a
+  service account key. At time of writing, this involves clicking the following
+  sequence: project overview -> users and permissions -> service accounts ->
+  generate new private key (with node.js).
+- Use the Google Cloud CLI: first install it
+  ([link here](https://cloud.google.com/sdk/docs/install)), then run
+  - `gcloud init`
+  - `gcloud auth login`
+  - `gcloud iam service-accounts keys create service-account-key.json --iam-account=my-iam-account@my-project.iam.gserviceaccount.com`
+- Get a copy from a lab member directly
+
+However you acquire the key, name the file `.service-account-key.json`. Note the
+leading `.`, which will hide it by default (press command-shift-period to toggle
+the showing of hidden files) and place it in the `firebase/` directory of your
+project.
+
+### Deployment `env/` files
+
 If your lab has already been [set up](/labconfig), then you simply need to
 obtain a copy of the base `env/` files for your repository. You specifically
 need the lab's copies of
