@@ -13,12 +13,12 @@ import seedrandom from 'seedrandom'
 // append() - done
 // outer()  - done
 // forEach() - done/not tested fully
-// shuffle() - not tested
 // zip()  - added/not tests
 
 // sample()
 // range() mid
 // repeat()  tricky
+// shuffle() - done
 // interleave()  low priority
 // print()  low priority
 // partition()  low priority
@@ -46,6 +46,7 @@ export class Stepper extends StepState {
     // Store the store reference
     this._store = store
     this._log = log
+    this._shuffled = false // Add shuffled property
 
     // If serialized state is provided, load it
     if (serializedState !== null) {
@@ -357,26 +358,62 @@ export class Stepper extends StepState {
    * Shuffles the current states using the Fisher-Yates algorithm.
    * If a seed is provided, ensures deterministic shuffling.
    *
-   * @param {string} [seed] - Optional seed for deterministic shuffling
+   * @param {Object} options - Options for shuffling
+   * @param {string} [options.seed] - Optional seed for deterministic shuffling
+   * @param {boolean} [options.always=false] - If true, allows shuffling even if already shuffled
    * @returns {Stepper} Returns this instance for method chaining
    */
-  shuffle(seed) {
+  shuffle(options = {}) {
+    const { seed = null, always = false } = typeof options === 'string' ? { seed: options } : options
+
+    // Skip if already shuffled and always is false
+    if (this._shuffled && !always) {
+      return this
+    }
+
     // Skip if there's only one or zero states
     if (this._states.length <= 1) return this
 
-    // Only create a new RNG if a seed is provided
-    // Otherwise use the global Math.random
-    const rng = seed ? seedrandom(seed) : Math.random
+    // Create RNG function - either seeded or Math.random
+    let rng
+    if (seed) {
+      // Create a new seeded RNG instance
+      const seededRng = seedrandom(seed)
+      rng = () => seededRng()
+    } else {
+      rng = Math.random
+    }
 
     // Fisher-Yates shuffle algorithm
-    for (let i = this._states.length - 1; i > 0; i--) {
-      const j = Math.floor(rng() * (i + 1))
-      ;[this._states[i], this._states[j]] = [this._states[j], this._states[i]]
+    if (this.depth === 0) {
+      // At depth 0, we need to preserve SOS and EOS states
+      // Only shuffle the middle elements (excluding first and last)
+      const start = 1 // Skip SOS
+      const end = this._states.length - 1 // Skip EOS
 
-      // Update indices to reflect new positions
-      this._states[i].index = i
-      this._states[j].index = j
+      for (let i = end - 1; i > start; i--) {
+        // j can be between start and i (excluding SOS and EOS)
+        const j = start + Math.floor(rng() * (i - start + 1))
+        ;[this._states[i], this._states[j]] = [this._states[j], this._states[i]]
+
+        // Update indices for the swapped elements
+        this._states[i]._currentIndex = i - 1 // -1 because we skip SOS
+        this._states[j]._currentIndex = j - 1 // -1 because we skip SOS
+      }
+    } else {
+      // For other depths, shuffle all elements
+      for (let i = this._states.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1))
+        ;[this._states[i], this._states[j]] = [this._states[j], this._states[i]]
+
+        // Update indices for the swapped elements
+        this._states[i]._currentIndex = i
+        this._states[j]._currentIndex = j
+      }
     }
+
+    // Mark as shuffled
+    this._shuffled = true
 
     return this
   }
@@ -521,6 +558,23 @@ export class Stepper extends StepState {
     }
 
     return true
+  }
+
+  /**
+   * Completely clears all states and resets to initial condition
+   * Removes all child states and resets all internal properties
+   * does _not_ clear the data from the current node
+   */
+  clearSubTree() {
+    super.clearSubTree()
+    // Initialize the state machine with SOS and EOS nodes
+    if (this.depth === 0) {
+      this.push('SOS')
+      this.push('EOS')
+      this._currentIndex = 1 // start at EOS or whatever is first
+    }
+
+    this._shuffled = false
   }
 }
 

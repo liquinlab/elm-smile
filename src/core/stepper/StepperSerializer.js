@@ -84,6 +84,7 @@ export class StepperSerializer {
       id: Stepper.id,
       currentIndex: Stepper._currentIndex,
       depth: Stepper._depth,
+      shuffled: Stepper._shuffled,
       states: Stepper._states.map((state) => StepperSerializer.serialize(state)),
       data: cleanData(Stepper.data),
       // Note: We don't serialize _parent or _root as they are circular references
@@ -105,6 +106,7 @@ export class StepperSerializer {
       target._depth = data.depth
       target._data = StepperSerializer._reconstructData(data.data, root)
       target._states = []
+      target._shuffled = data.shuffled
       target._parent = null
       target._root = target
     }
@@ -116,6 +118,7 @@ export class StepperSerializer {
       state._currentIndex = stateData.currentIndex
       state._data = StepperSerializer._reconstructData(stateData.data, root)
       state._root = target._root
+      state._shuffled = stateData.shuffled
       state._parent = target
       return state
     })

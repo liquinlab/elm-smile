@@ -90,7 +90,7 @@ class ViewAPI extends SmileAPI {
    * This allows advanced manipulation of the state machine when needed.
    */
   get steps() {
-    const modifyingMethods = ['append', 'outer', 'forEach']
+    const modifyingMethods = ['append', 'outer', 'forEach', 'shuffle']
     if (!this._stepper.value) return null
 
     const self = this // capture the outer this context

@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { setActivePinia } from 'pinia'
 import { createTestingPinia } from '@pinia/testing'
 import { Stepper } from '@/core/stepper/Stepper'
+import seedrandom from 'seedrandom'
 
 describe('Stepper test', () => {
   let stepper
@@ -317,6 +318,185 @@ describe('Stepper test', () => {
       })
 
       expect(results).toEqual([1, 2]) // Should not include SOS or EOS
+    })
+  })
+
+  describe('shuffle Operations', () => {
+    it('should shuffle rows with a specific seed', () => {
+      stepper.append([{ value: 'a' }, { value: 'b' }, { value: 'c' }, { value: 'd' }, { value: 'e' }])
+
+      // Shuffle with a specific seed
+      stepper.shuffle('test-seed-123')
+      // The order should be deterministic with this seed
+      // Skip SOS and EOS states by using rowsData
+      expect(stepper.rowsData.map((r) => r.value).filter((v) => v !== undefined)).toEqual(['c', 'a', 'e', 'b', 'd'])
+    })
+
+    it('should produce consistent order with same seed', () => {
+      const data = [{ value: 'a' }, { value: 'b' }, { value: 'c' }, { value: 'd' }, { value: 'e' }]
+
+      // Create two steppers with same data
+      const stepper1 = new Stepper({ id: '/' })
+      const stepper2 = new Stepper({ id: '/' })
+      stepper1.append(data)
+      stepper2.append(data)
+
+      // Shuffle both with same seed
+      stepper1.shuffle('test-seed-123')
+      stepper2.shuffle('test-seed-123')
+
+      // They should have the same order
+      expect(stepper1.rowsData.map((r) => r.value).filter((v) => v !== undefined)).toEqual(
+        stepper2.rowsData.map((r) => r.value).filter((v) => v !== undefined)
+      )
+    })
+
+    it('should use Math.random when no seed is provided', () => {
+      stepper.append([{ value: 'a' }, { value: 'b' }, { value: 'c' }, { value: 'd' }, { value: 'e' }])
+
+      // Mock Math.random to return deterministic values
+      const originalRandom = Math.random
+      let randomValues = [0.1, 0.2, 0.3, 0.4, 0.5]
+      let randomIndex = 0
+      Math.random = () => randomValues[randomIndex++ % randomValues.length]
+
+      // Shuffle without a seed
+      stepper.shuffle()
+
+      // The order should be deterministic with our mocked Math.random
+      expect(stepper.rowsData.map((r) => r.value).filter((v) => v !== undefined)).toEqual(['b', 'c', 'd', 'e', 'a'])
+
+      // Restore Math.random
+      Math.random = originalRandom
+    })
+
+    it('should preserve all elements after shuffling', () => {
+      const originalData = [
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+        { id: 3, value: 'c' },
+        { id: 4, value: 'd' },
+        { id: 5, value: 'e' },
+      ]
+
+      stepper.append(originalData)
+      const originalIds = [...stepper.rowsData.map((r) => r.id)].sort()
+
+      // Shuffle with a specific seed
+      stepper.shuffle('test-seed-123')
+      const shuffledIds = [...stepper.rowsData.map((r) => r.id)].sort()
+
+      // All elements should still be present, just in different order
+      expect(shuffledIds).toEqual(originalIds)
+    })
+
+    it('should handle empty stepper', () => {
+      stepper.shuffle('test-seed-123')
+      expect(stepper.rowsData).toEqual([{}, {}])
+    })
+
+    it('should handle single element stepper', () => {
+      stepper.append([{ id: 1, value: 'a' }])
+      stepper.shuffle('test-seed-123')
+      expect(stepper.rowsData).toEqual([{}, { id: 1, value: 'a' }, {}])
+    })
+
+    it('should be chainable with other methods', () => {
+      stepper
+        .append([
+          { id: 1, value: 'a' },
+          { id: 2, value: 'b' },
+          { id: 3, value: 'c' },
+        ])
+        .shuffle('test-seed-123')
+        .append([{ id: 4, value: 'd' }])
+
+      expect(stepper.rowsData).toHaveLength(6)
+      expect(stepper.states[4].data).toEqual({ id: 4, value: 'd' })
+    })
+
+    it('should not shuffle again if already shuffled and always is false', () => {
+      stepper.append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+        { id: 3, value: 'c' },
+      ])
+
+      // First shuffle
+      stepper.shuffle('test-seed-123')
+      const firstShuffleOrder = [...stepper.rowsData.map((r) => r.id)]
+
+      // Second shuffle with same seed but always=false (default)
+      stepper.shuffle('test-seed-123')
+      const secondShuffleOrder = [...stepper.rowsData.map((r) => r.id)]
+
+      // Order should remain the same
+      expect(secondShuffleOrder).toEqual(firstShuffleOrder)
+    })
+
+    it('should shuffle again if always is true', () => {
+      stepper.append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+        { id: 3, value: 'c' },
+      ])
+
+      // First shuffle
+      stepper.shuffle('test-seed-123')
+      const firstShuffleOrder = [...stepper.rowsData.map((r) => r.id)]
+
+      // Second shuffle with always=true
+      stepper.shuffle({ seed: 'test-seed-123', always: true })
+      const secondShuffleOrder = [...stepper.rowsData.map((r) => r.id)]
+
+      // Order should be different
+      expect(secondShuffleOrder).not.toEqual(firstShuffleOrder)
+    })
+
+    it('should reset shuffled state when clearSubTree is called', () => {
+      stepper.append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+        { id: 3, value: 'c' },
+      ])
+
+      // First shuffle
+      stepper.shuffle('test-seed-123')
+      const firstShuffleOrder = [...stepper.rowsData.map((r) => r.value).filter((v) => v !== undefined)]
+
+      // Clear the subtree
+      stepper.clearSubTree()
+
+      // Add the same data again
+      stepper.append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+        { id: 3, value: 'c' },
+      ])
+
+      // Shuffle again with different
+      stepper.shuffle('test-seed-456')
+      const secondShuffleOrder = [...stepper.rowsData.map((r) => r.value).filter((v) => v !== undefined)]
+
+      // Order should be the same as first shuffle
+      expect(secondShuffleOrder).not.toEqual(firstShuffleOrder)
+
+      // Clear the subtree
+      stepper.clearSubTree()
+
+      // Add the same data again
+      stepper.append([
+        { id: 1, value: 'a' },
+        { id: 2, value: 'b' },
+        { id: 3, value: 'c' },
+      ])
+
+      // Shuffle again with different
+      stepper.shuffle('test-seed-123')
+      const thirdShuffleOrder = [...stepper.rowsData.map((r) => r.value).filter((v) => v !== undefined)]
+
+      // Order should be the same as first shuffle
+      expect(thirdShuffleOrder).toEqual(firstShuffleOrder)
     })
   })
 })

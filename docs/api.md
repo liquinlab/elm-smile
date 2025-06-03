@@ -169,13 +169,39 @@ The following functions are available in both `useAPI` and `useViewAPI`:
   in use until the next route.
 - `randomAssignCondition(conditionObject)`: Randomly assigns a condition based
   on the provided condition object. Supports weighted randomization.
-- `shuffle(array)`: Shuffles an array.
-- `randomInt(min, max)`: Generates a random integer.
-- `sampleWithReplacement(array, sampleSize, weights = undefined)`: Samples items
-  from an array with replacement.
-- `sampleWithoutReplacement(array, sampleSize)`: Samples items from an array
-  without replacement.
-- `faker`: Accesses faker distributions for generating random data.
+- `shuffle(options)`: Shuffles the current states using the Fisher-Yates
+  algorithm. If a seed is provided, ensures deterministic shuffling.
+
+**Parameters:**
+
+- `options` (Object|string): Either a string seed or an options object
+  - `seed` (string, optional): Seed for deterministic shuffling
+  - `always` (boolean, optional): If true, allows shuffling even if already
+    shuffled. Defaults to false.
+
+**Returns:**
+
+- Returns the Stepper instance for method chaining
+
+**Example:**
+
+```javascript
+// Shuffle with a seed (only shuffles if not already shuffled)
+stepper.shuffle('seed123')
+
+// Shuffle with options
+stepper.shuffle({ seed: 'seed123', always: false }) // Only shuffles if not already shuffled
+stepper.shuffle({ seed: 'seed123', always: true }) // Always shuffles
+stepper.shuffle({ always: true }) // Always shuffles without a seed
+```
+
+**Notes:**
+
+- The shuffle operation is tracked internally. Once shuffled, subsequent calls
+  to shuffle will be ignored unless `always` is set to true.
+- If there is only one or zero states, the shuffle operation is skipped.
+- At depth 0 (root level), the shuffle operation preserves the SOS and EOS
+  states at the beginning and end of the sequence.
 
 ## Logging and Debugging
 

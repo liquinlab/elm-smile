@@ -18,18 +18,19 @@ const trials = api.steps.append([
   },
 ])
 
-trials[0].append([
-  { path: 'a', word: 'SHIP', color: 'red', condition: 'unrelated' },
-  { path: 'b', word: 'MONKEY', color: 'green', condition: 'unrelated' },
-  { path: 'c', word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
-  { path: 'd', word: 'RED', color: 'red', condition: 'congruent' },
-  { path: 'e', word: 'GREEN', color: 'green', condition: 'congruent' },
-  { path: 'f', word: 'BLUE', color: 'blue', condition: 'congruent' },
-  { path: 'g', word: 'GREEN', color: 'red', condition: 'incongruent' },
-  { path: 'h', word: 'BLUE', color: 'green', condition: 'incongruent' },
-  { path: 'i', word: 'RED', color: 'blue', condition: 'incongruent' },
-])
-//.shuffle()
+trials[0]
+  .append([
+    { path: 'a', word: 'SHIP', color: 'red', condition: 'unrelated' },
+    { path: 'b', word: 'MONKEY', color: 'green', condition: 'unrelated' },
+    { path: 'c', word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
+    { path: 'd', word: 'RED', color: 'red', condition: 'congruent' },
+    { path: 'e', word: 'GREEN', color: 'green', condition: 'congruent' },
+    { path: 'f', word: 'BLUE', color: 'blue', condition: 'congruent' },
+    { path: 'g', word: 'GREEN', color: 'red', condition: 'incongruent' },
+    { path: 'h', word: 'BLUE', color: 'green', condition: 'incongruent' },
+    { path: 'i', word: 'RED', color: 'blue', condition: 'incongruent' },
+  ])
+  .shuffle()
 
 trials.append([{ path: 'summary' }])
 
