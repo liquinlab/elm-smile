@@ -334,8 +334,8 @@ if they do not pass the instructions quiz.
 **Base Component**: `@/builtins/instructions/InstructionsView.vue`  
 **Code**:
 [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/instructions/InstructionsView.vue)  
-**Side effects**: No  
-**Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
+**Side effects**: None **Typical accessibility**:
+`{requiresConsent: true, requiresDone: false}`
 
 [TO DO: Add info about instructions]
 
@@ -561,8 +561,7 @@ timeline.registerView({
 **Component**: `@/builtins/debrief/DebriefView.vue`  
 **Code**:
 [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/debrief/DebriefView.vue)  
-**Side effects**: No  
-**Typical accessibility**: Always
+**Side effects**: None **Typical accessibility**: Always
 
 The debrief page displays the text that explains the purpose of the experiment
 and provides the participant with any additional postfacto information about the
