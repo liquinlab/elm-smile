@@ -150,10 +150,6 @@ export class Stepper extends StepState {
     return state
   }
 
-  steps() {
-    return this._root
-  }
-
   /**
    * Appends one or more objects as new states to the current node
    * @param {Object|Array<Object>} items - Single object or array of objects to append as new states
