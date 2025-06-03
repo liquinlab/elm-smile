@@ -82,7 +82,7 @@ and more information can be found
 | [Window Sizer](#window-sizer)                       | Yes               | Verifies a given area of the screen is visible (with a more aggressive option that hides page content if the window is resized too small) |
 | [Simple Instructions](#simple-instructions)         | No                | A simple sequence of pages for instructions                                                                                               |
 | [Instructions Quiz](#instructions-quiz)             | No                | A basic instructions quiz                                                                                                                 |
-| [Demographic Survey](#demographic-survey)           | No                | A survey which collects some demographic info                                                                                             |
+| [Demographic Survey](#demographic-survey)           | Yes               | A survey which collects some demographic info                                                                                             |
 | [Device Survey](#device-survey)                     | No                | A survey which collects some self-report about computer/device                                                                            |
 | [Withdraw](#withdraw)                               | Yes               | A survey which processes a participant's request to withdraw from study                                                                   |
 | [Debrief](#debrief)                                 | No                | A simple text View which describes the purpose of study                                                                                   |
@@ -99,9 +99,9 @@ short-hand for the src folder is '@' so for instance '@/builtins' refers to the
 ### Recruitment Advertisement
 
 **Base Component**: `@/builtins/recruitment/AdvertisementView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/recruitment/AdvertisementView.vue)  
-**Side
-effects**: None  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/recruitment/AdvertisementView.vue)  
+**Side effects**: None  
 **Typical accessibility**: `{allowAlways: true}`
 
 Before a participant can begin a study, they must first be recruited. The
@@ -168,9 +168,9 @@ and CloudResearch.
 ### MTurk Recruitment
 
 **Base Component**: `@/builtins/mturk/MTurkRecruitView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/mturk/MTurkRecruitView.vue)  
-**Side
-effects**: None  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/mturk/MTurkRecruitView.vue)  
+**Side effects**: None  
 **Typical accessibility**: `{allowAlways: true}`
 
 On the Mechanical Turk, the platform lists possible HITs (Human Intelligence
@@ -209,9 +209,9 @@ this.registerView({
 ### Simple Informed Consent
 
 **Base Component**: `@/builtins/simple_consent/InformedConsentView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/simple_consent/InformedConsentView.vue)  
-**Side
-effects**: Sets the `consent` key in the `localStorage` to `true.`  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/simple_consent/InformedConsentView.vue)  
+**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
 **Typical accessibility**: `{requiresConsent: false, requiresDone: false}`
 
 Most studies require some type of informed consent from participants. This is
@@ -249,9 +249,9 @@ timeline.pushSeqView({
 ### The Smile CAPTCHA
 
 **Base Component**: `@/builtins/captcha/CaptchaView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/captcha/CaptchaView.vue)  
-**Side
-effects**: Yes, saves the data from the tasks.  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/captcha/CaptchaView.vue)  
+**Side effects**: Yes, saves the data from the tasks.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 CAPTHCAs (Completely Automated Public Turing test to tell Computers and Humans
@@ -283,9 +283,10 @@ timeline.pushSeqView({
 ### Window Sizer
 
 **Base Component**: `@/builtins/window_sizer/WindowSizerView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/window_sizer/WindowSizerView.vue)  
-**Side
-effects**: Yes, sets the is verifiedVisibility key in the [API](/api) to true.  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/window_sizer/WindowSizerView.vue)  
+**Side effects**: Yes, sets the is verifiedVisibility key in the [API](/api) to
+true.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The window sizer is a small component `src/components/pages/WindowSizerView.vue`
@@ -331,9 +332,9 @@ This page is also always accessible such that the user is able to return to it
 if they do not pass the instructions quiz.
 
 **Base Component**: `@/builtins/instructions/InstructionsView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/instructions/InstructionsView.vue)  
-**Side
-effects**: No  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/instructions/InstructionsView.vue)  
+**Side effects**: No  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 [TO DO: Add info about instructions]
@@ -448,9 +449,9 @@ timeline.pushSeqView({
 ### Demographic Survey
 
 **Base Component**: `@/builtins/demographic_survey/DemographicSurveyView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/demographic_survey/DemographicSurveyView.vue)  
-**Side
-effects**: Yes, saves the data from the form.  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/demographic_survey/DemographicSurveyView.vue)  
+**Side effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The demographic survey is a simple survey that asks participants to provide some
@@ -474,9 +475,9 @@ timeline.pushSeqView({
 ### Device Survey
 
 **Base Component**: `@/builtins/device_survey/DeviceSurveyView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/device_survey/DeviceSurveyView.vue)  
-**Side
-effects**: Yes, saves the data from the form.  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/device_survey/DeviceSurveyView.vue)  
+**Side effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The device survey askes participants to provide some information about their
@@ -517,9 +518,9 @@ timeline.pushSeqView({
 ### Withdraw
 
 **Component**: `@/builtins/withdraw/WithdrawView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/withdraw/WithdrawView.vue)  
-**Side
-effects**: Sets the `consent` key in the `localStorage` to `true.`  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/withdraw/WithdrawView.vue)  
+**Side effects**: Sets the `consent` key in the `localStorage` to `true.`  
 **Typical accessibility**: `{ requiresWithdraw: true }`
 
 As part of most IRB protocols, participants should be able to withdraw from a
@@ -558,9 +559,9 @@ timeline.registerView({
 ### Debrief
 
 **Component**: `@/builtins/debrief/DebriefView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/debrief/DebriefView.vue)  
-**Side
-effects**: No  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/debrief/DebriefView.vue)  
+**Side effects**: No  
 **Typical accessibility**: Always
 
 The debrief page displays the text that explains the purpose of the experiment
@@ -587,9 +588,9 @@ timeline.pushSeqView({
 ### Thanks
 
 **Component**: `@/builtins/thanks/ThanksView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/thanks/ThanksView.vue)  
-**Side
-effects**: Yes, saves the data from the form.  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/thanks/ThanksView.vue)  
+**Side effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresDone: true}`
 
 ```js
@@ -610,9 +611,9 @@ timeline.pushSeqView({
 ### Feedback Survey
 
 **Component**: `src/builtins/task_survey/TaskFeedbackSurveyView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/task_survey/TaskFeedbackSurveyView.vue)  
-**Side
-effects**: Yes, saves the data from the form.  
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/task_survey/TaskFeedbackSurveyView.vue)  
+**Side effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The task survey asks some simple questions about the participant's experience in
@@ -658,18 +659,20 @@ them as needed for your study.
 ### Status Bar
 
 **Base Component**: `@/builtins/navbars/StatusBar.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/navbars/StatusBar.vue)
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/navbars/StatusBar.vue)
 
 ### Progress Bar
 
 **Base Component**: `@/builtins/navbars/ProgressBar.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/navbars/ProgressBar.vue)
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/navbars/ProgressBar.vue)
 
 Not implemented fully.
 
 ### Withdraw Modal
 
 **Base Component**: `@/builtins/withdraw/WithdrawFormModal.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/withdraw/WithdrawFormModal)  
-**Side
-effects**: Yes
+**Code**:
+[source](https://github.com/NYUCCL/smile/blob/main/src/builtins/withdraw/WithdrawFormModal)  
+**Side effects**: Yes
