@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setActivePinia } from 'pinia'
 import { createTestingPinia } from '@pinia/testing'
 import { Stepper } from '@/core/stepper/Stepper'
@@ -243,6 +243,92 @@ describe('Stepper test', () => {
       expect(stepper.states.length).toBe(4) // SOS, appended1, appended2, EOS
       expect(stepper.states[1].data).toEqual({ test: 'value1' })
       expect(stepper.states[2].data).toEqual({ test: 'value2' })
+    })
+
+    it('should allow building complex tables through multiple chained append operations', () => {
+      // Create a stepper with multiple append operations
+      const s1 = stepper
+        .append([{ color: 'red', shape: 'triangle' }])
+        .append([{ color: 'blue', shape: 'square' }])
+        .append([{ color: 'green', shape: 'circle' }])
+        .append([{ color: 'yellow', shape: 'star' }])
+
+      // Test the final state
+      expect(s1.states.length).toBe(6) // SOS + 4 items + EOS
+      expect(s1.rowsData).toEqual([
+        {}, // SOS
+        { color: 'red', shape: 'triangle' },
+        { color: 'blue', shape: 'square' },
+        { color: 'green', shape: 'circle' },
+        { color: 'yellow', shape: 'star' },
+        {}, // EOS
+      ])
+
+      // Test array-like access still works
+      expect(s1.states.length - 2).toBe(4) // Excluding SOS and EOS
+      expect(s1.states[1].data).toEqual({ color: 'red', shape: 'triangle' })
+      expect(s1.states[4].data).toEqual({ color: 'yellow', shape: 'star' })
+
+      // Test iteration (excluding SOS and EOS)
+      const items = [...s1.states].slice(1, -1)
+      expect(items).toHaveLength(4)
+
+      // Test slice operation
+      const slicedItems = s1.states.slice(2, 4).map((s) => s.data)
+      expect(slicedItems).toEqual([
+        { color: 'blue', shape: 'square' },
+        { color: 'green', shape: 'circle' },
+      ])
+    })
+
+    it('should append sequentially to the stepper when stored in a local variable', () => {
+      const el = stepper.append(1)
+      el.append(2)
+      el.append(3)
+
+      // check original stepper was modified
+      expect(stepper.states.length).toBe(5) // SOS + 3 items + EOS
+      expect(stepper.states[1].data).toBe(1)
+      expect(stepper.states[2].data).toBe(2)
+      expect(stepper.states[3].data).toBe(3)
+
+      // check el was modified
+      expect(el.states.length).toBe(5) // SOS + 3 items + EOS
+      expect(el.states[1].data).toBe(1)
+      expect(el.states[2].data).toBe(2)
+      expect(el.states[3].data).toBe(3)
+
+      // verify they are the same object
+      expect(el).toBe(stepper)
+    })
+
+    it('should throw error when appending would exceed safety limit', () => {
+      const maxRows = Number(config.maxStepperRows)
+      const items = Array(maxRows + 1).fill({ color: 'red', shape: 'circle' })
+      expect(() => {
+        stepper.append(items)
+      }).toThrow(/Cannot append \d+ rows as it exceeds the safety limit of \d+/)
+    })
+
+    it('should be chainable with other methods', () => {
+      const trials = [
+        { color: 'red', shape: 'triangle' },
+        { color: 'blue', shape: 'square' },
+      ]
+
+      const s1 = stepper
+        .append(trials)
+        .shuffle({ seed: 'test-seed-123' })
+        .append([{ color: 'green', shape: 'circle' }])
+
+      expect(s1.states.length).toBe(5) // SOS + 3 items + EOS
+      expect(s1.rowsData).toEqual([
+        {}, // SOS
+        { color: 'red', shape: 'triangle' }, // Shuffled order
+        { color: 'blue', shape: 'square' }, // Shuffled order
+        { color: 'green', shape: 'circle' },
+        {}, // EOS
+      ])
     })
 
     it('should skip items that would create duplicate paths', () => {

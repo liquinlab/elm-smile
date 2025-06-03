@@ -163,9 +163,13 @@ export class Stepper extends StepState {
     const itemsToAdd = Array.isArray(items) ? items : [items]
 
     // Check if adding these items would exceed maxStepperRows
-    if (this._states.length + itemsToAdd.length > config.maxStepperRows) {
-      this._log.warn(
-        `Warning: Appending ${itemsToAdd.length} items would exceed maximum of ${config.maxStepperRows} rows`
+    // Subtract 2 to account for SOS and EOS states
+    if (this._states.length - 2 + itemsToAdd.length > config.maxStepperRows) {
+      this._log.error(
+        `Cannot append ${itemsToAdd.length} rows as it exceeds the safety limit of ${config.maxStepperRows}`
+      )
+      throw new Error(
+        `Cannot append ${itemsToAdd.length} rows as it exceeds the safety limit of ${config.maxStepperRows}`
       )
     }
 
