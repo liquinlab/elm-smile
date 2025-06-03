@@ -3,6 +3,7 @@ import config from '@/core/config'
 import { StepperSerializer } from '@/core/stepper/StepperSerializer'
 import StepperProxy from '@/core/stepper/StepperProxy'
 import useLog from '@/core/stores/log'
+import seedrandom from 'seedrandom'
 
 // to be implemented functions
 
@@ -11,14 +12,12 @@ import useLog from '@/core/stores/log'
 
 // append() - done
 // outer()  - done
-// forEach()
+// forEach() - done/not tested fully
+// shuffle() - not tested
+// zip()  - added/not tests
 
-// shuffle() important
 // sample()
-
-// zip()  helpful
 // range() mid
-
 // repeat()  tricky
 // interleave()  low priority
 // print()  low priority
@@ -248,6 +247,141 @@ export class Stepper extends StepState {
   }
 
   /**
+   * Combines multiple arrays into a single table by matching elements at corresponding indices.
+   * Supports different methods for handling arrays of different lengths.
+   *
+   * @param {Object} trials - Object with arrays as values
+   * @param {Object} options - Options for handling arrays of different lengths
+   * @param {string} options.method - Method to use: 'loop', 'pad', or 'last'
+   * @param {*} options.padValue - Value to use for padding when method is 'pad'
+   * @returns {Stepper} Returns this instance for method chaining
+   * @throws {Error} If trials is not an object or if operation would exceed maxStepperRows
+   */
+  zip(trials, options = {}) {
+    if (typeof trials !== 'object' || trials === null) {
+      throw new Error('zip() requires an object with arrays as values')
+    }
+
+    const columns = Object.entries(trials)
+    if (columns.length === 0) {
+      throw new Error('zip() requires at least one column')
+    }
+
+    // Convert non-array values to single-element arrays
+    const processedColumns = columns.map(([key, value]) => {
+      if (Array.isArray(value)) return [key, value]
+      return [key, [value]]
+    })
+
+    // Get the maximum length of any column
+    const maxLength = Math.max(...processedColumns.map(([_, arr]) => arr.length))
+
+    // Check if adding these combinations would exceed maxStepperRows
+    if (this._states.length + maxLength > config.maxStepperRows) {
+      throw new Error(`Cannot create ${maxLength} combinations: would exceed maximum of ${config.maxStepperRows} rows`)
+    }
+
+    // Check if any column has a different length
+    const hasDifferentLengths = processedColumns.some(([_, arr]) => arr.length !== maxLength)
+
+    // By default, throw error if lengths are different
+    if (hasDifferentLengths && !options.method) {
+      throw new Error(
+        'All columns must have the same length when using zip(). Specify a method (loop, pad, last) to handle different lengths.'
+      )
+    }
+
+    // Helper function to adjust array length
+    const adjustArrayLength = (arr, targetLength, method, padValue) => {
+      if (arr.length === targetLength) return arr
+
+      if (method === 'loop') {
+        const result = []
+        for (let i = 0; i < targetLength; i++) {
+          result.push(arr[i % arr.length])
+        }
+        return result
+      } else if (method === 'pad' || method === 'last') {
+        const value = method === 'last' ? arr[arr.length - 1] : padValue
+        return [...arr, ...Array(targetLength - arr.length).fill(value)]
+      }
+      return arr
+    }
+
+    // Process each column according to the specified method
+    const processedArrays = processedColumns.map(([key, arr]) => {
+      if (arr.length === maxLength) return arr
+
+      const method = options.method
+      const padValue = options.padValue
+
+      if (method === 'loop') {
+        return adjustArrayLength(arr, maxLength, 'loop')
+      } else if (method === 'pad') {
+        if (padValue === undefined) {
+          throw new Error('padValue is required when using the pad method')
+        }
+        return adjustArrayLength(arr, maxLength, 'pad', padValue)
+      } else if (method === 'last') {
+        return adjustArrayLength(arr, maxLength, 'pad', arr[arr.length - 1])
+      } else {
+        throw new Error(`Invalid method: ${method}. Must be one of: loop, pad, last`)
+      }
+    })
+
+    // Create the zipped rows
+    const zippedRows = Array(maxLength)
+      .fill(null)
+      .map((_, i) => {
+        const row = {}
+        processedColumns.forEach(([key], colIndex) => {
+          row[key] = processedArrays[colIndex][i]
+        })
+        return row
+      })
+
+    // Try to add each combination individually
+    zippedRows.forEach((row) => {
+      // Check if this specific combination would create a duplicate path
+      if (this._hasDuplicatePaths(row)) {
+        this._log.warn(`Warning: Skipping combination that would create duplicate path`)
+      } else {
+        this._addState(row)
+      }
+    })
+
+    return this
+  }
+
+  /**
+   * Shuffles the current states using the Fisher-Yates algorithm.
+   * If a seed is provided, ensures deterministic shuffling.
+   *
+   * @param {string} [seed] - Optional seed for deterministic shuffling
+   * @returns {Stepper} Returns this instance for method chaining
+   */
+  shuffle(seed) {
+    // Skip if there's only one or zero states
+    if (this._states.length <= 1) return this
+
+    // Only create a new RNG if a seed is provided
+    // Otherwise use the global Math.random
+    const rng = seed ? seedrandom(seed) : Math.random
+
+    // Fisher-Yates shuffle algorithm
+    for (let i = this._states.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1))
+      ;[this._states[i], this._states[j]] = [this._states[j], this._states[i]]
+
+      // Update indices to reflect new positions
+      this._states[i].index = i
+      this._states[j].index = j
+    }
+
+    return this
+  }
+
+  /**
    * Executes a function once for each item in the table.
    * Returns the table for chaining.
    *
@@ -288,7 +422,7 @@ export class Stepper extends StepState {
           })
 
           // Check for duplicate paths before updating
-          if (this._hasDuplicatePaths([newData])) {
+          if (this._hasDuplicatePaths(newData)) {
             throw new Error('Cannot update item: would create duplicate paths')
           }
 
