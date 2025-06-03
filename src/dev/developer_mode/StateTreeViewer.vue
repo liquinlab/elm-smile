@@ -224,17 +224,17 @@ watch(
     </div>
     <div class="data-container-global">
       <div class="global-data-display">
-        Global Vars
-        <span class="data-label">(.globals)</span>
+        Persisted Vars
+        <span class="data-label">(.persist)</span>
 
         <button
-          @click="api.clearGlobals()"
+          @click="api.clearPersist()"
           class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
           data-tooltip="Delete Global Variables"
         >
           <span><FAIcon icon="fa-solid fa-trash" /></span>
         </button>
-        <DataPathViewer :data="api.globals" />
+        <DataPathViewer :data="api.persist" />
       </div>
     </div>
     <div class="data-container">

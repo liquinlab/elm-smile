@@ -34,10 +34,10 @@ trials[0].append([
 trials.append([{ path: 'summary' }])
 
 // if hits not defined yet then initialize it and timer.
-if (!api.globals.isDefined('hits')) {
-  api.globals.hits = 0
-  api.globals.attempts = 0
-  api.globals.finalScore = 0
+if (!api.persist.isDefined('hits')) {
+  api.persist.hits = 0
+  api.persist.attempts = 0
+  api.persist.finalScore = 0
 }
 
 // this is the persistent timer
@@ -53,8 +53,8 @@ function autofill() {
     // api.faker.render() will autofill the trial with the expected data
     // if the trial has already been filled by user it will not be changed
     api.faker.render(api.stepData)
-    api.globals.hits = api.globals.hits + api.stepData.hit.val
-    api.globals.attempts = api.globals.attempts + 1
+    api.persist.hits = api.persist.hits + api.stepData.hit.val
+    api.persist.attempts = api.persist.attempts + 1
     api.recordStep()
     api.goNextStep()
   }
@@ -64,7 +64,7 @@ function autofill() {
 api.setAutofill(autofill)
 
 function updateScore() {
-  api.globals.finalScore = (api.globals.hits / api.globals.attempts) * 100
+  api.persist.finalScore = (api.persist.hits / api.persist.attempts) * 100
 }
 
 // Handle the key presses for the task
@@ -76,8 +76,8 @@ const stop = api.onKeyDown(
       const reactionTime = api.elapsedTime()
       const hit = api.stepData.color[0] === e.key ? 1 : 0
       api.stepData.hit = hit
-      api.globals.hits += hit
-      api.globals.attempts = api.globals.attempts + 1
+      api.persist.hits += hit
+      api.persist.attempts = api.persist.attempts + 1
       api.stepData.rt = reactionTime
       api.stepData.response = e.key
       api.recordStep()
@@ -110,7 +110,7 @@ function finish() {
     <div class="endoftask" v-else>
       <p id="prompt">Thanks! You are finished with this task and can move on.</p>
       <!-- display the final score -->
-      <p>Your score was {{ api.globals.finalScore.toFixed(2) }}%</p>
+      <p>Your score was {{ api.persist.finalScore.toFixed(2) }}%</p>
       <button class="button is-success" id="finish" @click="finish()">
         Continue &nbsp;
         <FAIcon icon="fa-solid fa-arrow-right" />

@@ -32,8 +32,8 @@ function init() {
 
   sections[1].append([{ path: 'success' }, { path: 'retry' }]) // add to additional pages
 
-  if (!api.globals.isDefined('attempts')) {
-    api.globals.attempts = 1
+  if (!api.persist.isDefined('attempts')) {
+    api.persist.attempts = 1
   }
 }
 
@@ -108,7 +108,7 @@ function submitQuiz() {
   api.recordData({
     phase: 'INSTRUCTIONS_QUIZ',
     questions: api.stepperData('pages*'), // Update to use randomized questions
-    globals: api.globals,
+    persist: api.persist,
   })
   if (quizCorrect.value) {
     api.goToStep('feedback/success')
@@ -120,7 +120,7 @@ function submitQuiz() {
 function returnInstructions() {
   api.reset() // reset the quiz
   api.clear() // don't remember across reloads
-  api.globals.attempts = api.globals.attempts + 1 // increment attempts
+  api.persist.attempts = api.persist.attempts + 1 // increment attempts
   api.goToView(props.returnTo) // go back to instructions
 }
 

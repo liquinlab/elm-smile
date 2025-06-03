@@ -289,8 +289,8 @@ class ViewAPI extends SmileAPI {
     return this._stepper.value.countLeafNodes
   }
 
-  // Getter for globals that provides access to gvars from stepper root data
-  get globals() {
+  // Getter for persisted variable that provides access to gvars from stepper root data
+  get persist() {
     if (!this._stepper.value.root.data.gvars) {
       this._stepper.value.root.data.gvars = {}
     }
@@ -325,7 +325,7 @@ class ViewAPI extends SmileAPI {
 
   // Timing methods
   startTimer(name = 'default') {
-    this.globals[`startTime_${name}`] = Date.now()
+    this.persist[`startTime_${name}`] = Date.now()
   }
 
   timerStarted(name = 'default') {
@@ -394,7 +394,7 @@ class ViewAPI extends SmileAPI {
     this._saveStepperState()
   }
 
-  clearGlobals() {
+  clearPersist() {
     this._gvars.value = reactive({})
     this.stepper.root.data.gvars = {}
     this._saveStepperState()

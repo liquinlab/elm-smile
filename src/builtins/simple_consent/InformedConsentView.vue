@@ -24,26 +24,26 @@ if (appconfig.anonymousMode) {
 }
 
 function wiggle() {
-  if (api.globals.agree) {
+  if (api.persist.agree) {
     animate(button.value, { rotate: [0, 5, -5, 5, -5, 0] }, { duration: 1.25 }).finished.then(() => {
       timer = setTimeout(wiggle, 2000) // Reinitialize the timer after animation
     })
   }
 }
 
-// if (!api.globals.agree?.value) {
-//   api.globals.agree = ref(false)
+// if (!api.persist.agree?.value) {
+//   api.persist.agree = ref(false)
 // }
 const name = ref('enter your name')
 const button = ref(null)
 let timer
 
-if (!('agree' in api.globals)) {
-  api.globals.agree = ref(false)
+if (!('agree' in api.persist)) {
+  api.persist.agree = ref(false)
 }
 
-if (api.globals.agree) {
-  watch(api.globals.agree, (newVal) => {
+if (api.persist.agree) {
+  watch(api.persist.agree, (newVal) => {
     if (newVal) {
       console.log('agree changed')
       //button.value.focus()
@@ -76,7 +76,7 @@ onBeforeUnmount(() => {
               <hr />
 
               <FormKit
-                v-model="api.globals.agree"
+                v-model="api.persist.agree"
                 type="checkbox"
                 name="consent_toggle"
                 label="I consent and am over 18 years old."
@@ -95,7 +95,7 @@ onBeforeUnmount(() => {
                 ref="button"
                 class="button is-warning is-fullwidth"
                 id="finish"
-                v-if="api.globals.agree"
+                v-if="api.persist.agree"
                 @click="finish()"
               >
                 Let's start &nbsp;

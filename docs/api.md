@@ -68,8 +68,8 @@ The following functions are available when using `useViewAPI`:
 
 ### Global Variables
 
-- `globals`: Access and modify global variables.
-- `clearGlobals()`: Clears all global variables.
+- `persist`: Access and modify view-specific persisted variables.
+- `clearPersist()`: Clears all view-specific persisted variables.
 
 ### State Management
 
