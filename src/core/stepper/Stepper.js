@@ -11,10 +11,10 @@ import seedrandom from 'seedrandom'
 // others should go repeatedly
 
 // shuffle() - done
-// append() - read tests
-// outer()  - read tests
+// append() - done
+// outer()  - done
 // forEach() - done/tests? - broken currently
-// zip()  - read tests
+// zip()  - done
 
 // TO BE IMPLEMENTED IN THE FUTURE
 // sample() - mid priorty

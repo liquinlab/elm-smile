@@ -339,7 +339,39 @@ describe('Stepper test', () => {
   })
 
   describe('outer Operations', () => {
-    it('should create factorial combinations from arrays', () => {
+    it('should create factorial combinations of columns', () => {
+      const trials = {
+        shape: ['circle', 'square'],
+        color: ['red', 'green'],
+      }
+
+      const s1 = stepper.outer(trials)
+
+      expect(s1.states.length).toBe(6) // SOS + 4 combinations + EOS
+      expect(s1.rowsData).toEqual([
+        {}, // SOS
+        { shape: 'circle', color: 'red' },
+        { shape: 'circle', color: 'green' },
+        { shape: 'square', color: 'red' },
+        { shape: 'square', color: 'green' },
+        {}, // EOS
+      ])
+    })
+
+    it('should throw error when outer would exceed safety limit', () => {
+      const maxRows = Number(config.maxStepperRows)
+      // Create arrays that would generate more combinations than maxStepperRows
+      const trials = {
+        x: Array(100).fill('x'),
+        y: Array(100).fill('y'),
+      }
+      // This would generate 100 * 100 = 10000 combinations, which exceeds maxStepperRows (5000)
+      expect(() => {
+        stepper.outer(trials)
+      }).toThrow(/Cannot create \d+ combinations: would exceed maximum of \d+ rows/)
+    })
+
+    it('should handle three or more columns', () => {
       stepper.outer({
         color: ['red', 'blue'],
         size: ['small', 'large'],
@@ -361,14 +393,55 @@ describe('Stepper test', () => {
       expect(stepper.states[2].data).toEqual({ color: 'red', size: 'large' })
     })
 
+    it('should handle multiple non-array values', () => {
+      stepper.outer({
+        shape: 'circle',
+        color: 'red',
+        size: ['small', 'medium'],
+      })
+
+      expect(stepper.states.length).toBe(4)
+      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red', size: 'small' })
+    })
+
+    it('should throw error for invalid input', () => {
+      expect(() => {
+        stepper.outer(null)
+      }).toThrow('outer() requires an object with arrays as values')
+
+      expect(() => {
+        stepper.outer({})
+      }).toThrow('outer() requires at least one column')
+    })
+
     it('should throw error for non-object input', () => {
-      expect(() => stepper.outer(null)).toThrow('outer() requires an object with arrays as values')
-      expect(() => stepper.outer({})).toThrow('outer() requires at least one column')
-      expect(() => stepper.outer('test')).toThrow('outer() requires an object with arrays as values')
+      expect(() => {
+        stepper.outer('test')
+      }).toThrow('outer() requires an object with arrays as values')
     })
 
     it('should throw error for empty object input', () => {
       expect(() => stepper.outer({})).toThrow('outer() requires at least one column')
+    })
+
+    it('should be chainable with other methods', () => {
+      const trials = {
+        shape: ['circle', 'square'],
+        color: ['red', 'green'],
+      }
+
+      const s1 = stepper.outer(trials).append([{ shape: 'triangle', color: 'blue' }])
+
+      expect(s1.states.length).toBe(7) // SOS + 4 combinations + 1 append + EOS
+      expect(s1.rowsData).toEqual([
+        {},
+        { shape: 'circle', color: 'red' },
+        { shape: 'circle', color: 'green' },
+        { shape: 'square', color: 'red' },
+        { shape: 'square', color: 'green' },
+        { shape: 'triangle', color: 'blue' },
+        {}, // EOS
+      ])
     })
   })
 
