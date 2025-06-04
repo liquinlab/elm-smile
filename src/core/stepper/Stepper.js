@@ -86,6 +86,7 @@ export class Stepper extends StepState {
    * This method checks for duplicates in two ways:
    * 1. Checks for duplicate paths among the input items themselves
    * 2. Checks if any new items would create paths that already exist in the tree
+   * 3. Checks if any new items have the same data content as existing items
    */
   _hasDuplicatePaths(items) {
     // Convert single item to array if needed
@@ -93,17 +94,27 @@ export class Stepper extends StepState {
 
     // First check for duplicates among the input items
     const seenPaths = new Set()
+    const seenData = new Set()
     for (const item of itemsToCheck) {
+      // Check for explicit path duplicates
       if (item.path !== undefined) {
         if (seenPaths.has(item.path)) {
           return true
         }
         seenPaths.add(item.path)
       }
+
+      // Check for data content duplicates
+      const dataStr = JSON.stringify(item)
+      if (seenData.has(dataStr)) {
+        return true
+      }
+      seenData.add(dataStr)
     }
 
     // Get all existing paths in the tree
     const existingPaths = this.existingPaths
+    const existingData = new Set(this._states.map((state) => JSON.stringify(state.data)))
 
     // Check if any new items would create duplicate paths with existing ones
     return itemsToCheck.some((item) => {
@@ -116,7 +127,9 @@ export class Stepper extends StepState {
       }
       state.data = item
       const newPath = state.pathString
-      return existingPaths.has(newPath)
+
+      // Check both path and data content
+      return existingPaths.has(newPath) || existingData.has(JSON.stringify(item))
     })
   }
 
@@ -433,7 +446,7 @@ export class Stepper extends StepState {
    * @returns {Stepper} The current instance for chaining
    */
   forEach(callback) {
-    this.states.forEach((item, index) => {
+    this._states.forEach((item, index) => {
       // Skip SOS and EOS states when at depth 0
       if (this.depth === 0 && (index === 0 || index === this.states.length - 1)) {
         return
