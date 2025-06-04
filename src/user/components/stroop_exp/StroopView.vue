@@ -1,9 +1,6 @@
 <script setup>
 // A Basic Stroop Experiment
 
-// first import from basic functions from Vue
-import { onMounted } from 'vue'
-
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
