@@ -66,22 +66,6 @@ vi.mock('@/core/utils/randomization', () => {
   }
 })
 
-// Mock useStepper
-vi.mock('@/core/composables/useStepper', () => {
-  if (DEBUG) console.log('Mocking useStepper...')
-  return {
-    useStepper: vi.fn().mockReturnValue({
-      currentStep: ref(1),
-      totalSteps: ref(5),
-      nextStep: vi.fn(),
-      prevStep: vi.fn(),
-      goToStep: vi.fn(),
-      isFirstStep: computed(() => true),
-      isLastStep: computed(() => false),
-    }),
-  }
-})
-
 // Mock meta.env
 // vi.mock('@/core/config', () => {
 //   if (DEBUG) console.log('Mocking config...')

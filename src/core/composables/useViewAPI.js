@@ -273,10 +273,6 @@ class ViewAPI extends SmileAPI {
     return this._path.value
   }
 
-  get smviz() {
-    return this._stateMachine.value || this._visualizeStateMachine()
-  }
-
   get length() {
     return this._stepper.value.countLeafNodes - 2
   }
