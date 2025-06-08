@@ -20,6 +20,7 @@ class StepperProxy {
    * @returns {*} The value of the property
    */
   get(target, prop) {
+    console.log('get', prop)
     // Handle array/object access
     if (typeof prop === 'string' || typeof prop === 'number') {
       // Convert string numbers to actual numbers
@@ -27,17 +28,16 @@ class StepperProxy {
         prop = parseInt(prop)
       }
 
-      // Handle negative indices
+      // Handle negative indices first
       if (typeof prop === 'number') {
-        // Adjust index for SOS/EOS states at depth 0
-        prop = this.adjustIndex(prop)
-
-        // Handle negative indices
         if (prop < 0) {
           prop = target._states.length + prop
           // If still negative after adjustment, return undefined
           if (prop < 0) return undefined
         }
+
+        // Then adjust for SOS/EOS states at the root level
+        prop = this.adjustIndex(prop, target)
       }
 
       // IMPORTANT: We first try to get a child node by id before checking properties/methods
@@ -57,13 +57,14 @@ class StepperProxy {
   }
 
   /**
-   * Adjusts the index to account for SOS/EOS states at depth 0
+   * Adjusts the index to account for SOS/EOS states at the root level
    * @param {number} index - The index to adjust
+   * @param {StepState} node - The node being accessed
    * @returns {number} The adjusted index
    */
-  adjustIndex(index) {
-    // If at depth 0, adjust indices to account for SOS/EOS states
-    if (this.target.depth === 0) {
+  adjustIndex(index, node) {
+    // If this is the root node (depth 0), adjust indices to skip SOS/EOS states
+    if (node.depth === 0) {
       if (index >= 0) {
         // Add 1 to skip SOS state
         return index + 1
