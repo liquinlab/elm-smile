@@ -37,22 +37,23 @@ export function useStepper(view) {
   let stepper = smilestore.browserEphemeral.steppers?.[view]
 
   if (!stepper) {
-    // console.log('smilestore', smilestore)
-    // console.log('view', view)
-    // console.log('steppper', smilestore.getStepper(view))
-    // console.log('stepper.data', smilestore.getStepper(view)?.data)
     // Create new stepper instance if none exists
     const savedState = smilestore.getStepper(view)?.data
     if (savedState) {
-      console.log('STEPPER: Loading saved state from smilestore for view', view)
-      stepper = new Stepper({ serializedState: savedState.stepperState, store: smilestore })
+      try {
+        console.log('STEPPER: Loading saved state from smilestore for view', view)
+        stepper = new Stepper({ serializedState: savedState.stepperState, store: smilestore })
+      } catch (error) {
+        console.error('STEPPER: Failed to load saved state, creating new stepper:', error.message)
+        stepper = new Stepper({ id: '/', parent: null, data: { gvars: {} }, store: smilestore })
+      }
     } else {
       console.log('STEPPER: Initializing state machine with SOS and EOS nodes for view', view)
-      stepper = new Stepper({ id: '/', parent: null, data: { gvars: {} }, store: smilestore }) // explicit init
+      stepper = new Stepper({ id: '/', parent: null, data: { gvars: {} }, store: smilestore })
     }
     stepper.name = view
     // Register stepper if not already registered
-    console.log('STEPPER: Registering stepper for view', stepper.data)
+    console.log('STEPPER: Registering stepper for view', stepper.name)
     if (view) {
       stepper = smilestore.registerStepper(view, stepper)
     }
