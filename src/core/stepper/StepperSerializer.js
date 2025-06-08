@@ -130,14 +130,16 @@ export class StepperSerializer {
     }
 
     try {
-      // Only reset root-level properties if this is the root node
+      // Set basic properties for all nodes
+      target._id = data.id
+      target._currentIndex = data.currentIndex
+      target._depth = data.depth
+      target._shuffled = data.shuffled
+      target._data = StepperSerializer._reconstructData(data.data, root)
+
+      // Only set root-specific properties if this is the root node
       if (target._parent === null) {
-        target._id = data.id
-        target._currentIndex = data.currentIndex
-        target._depth = data.depth
-        target._data = StepperSerializer._reconstructData(data.data, root)
         target._states = []
-        target._shuffled = data.shuffled
         target._parent = null
         target._root = target
       }
@@ -147,11 +149,7 @@ export class StepperSerializer {
         try {
           const state = target._createNew(stateData.id, target) // Pass target as parent
           StepperSerializer.deserialize(stateData, state, root) // Load child data while preserving parent reference
-          state._depth = stateData.depth
-          state._currentIndex = stateData.currentIndex
-          state._data = StepperSerializer._reconstructData(stateData.data, root)
           state._root = target._root
-          state._shuffled = stateData.shuffled
           state._parent = target
           return state
         } catch (error) {
@@ -191,7 +189,15 @@ export class StepperSerializer {
                 console.warn(`Faker function ${value.name} not found during reconstruction`)
                 return null
               }
-              return fakerFunc(...value.params)
+              // Convert string parameters to appropriate types
+              const convertedParams = value.params.map((param) => {
+                // Convert empty string to undefined
+                if (param === '') return undefined
+                // Try to convert to number if it looks like a number
+                const num = Number(param)
+                return isNaN(num) ? param : num
+              })
+              return fakerFunc(...convertedParams)
             }
             continue
           }
