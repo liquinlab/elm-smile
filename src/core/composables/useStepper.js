@@ -8,7 +8,7 @@
  */
 import Stepper from '@/core/stepper/Stepper'
 import useSmileStore from '@/core/stores/smilestore'
-
+import useLog from '@/core/stores/log'
 /**
  * @class StepperAPI
  * @description Wraps a Stepper instance to provide a consistent API for managing multi-step processes
@@ -29,6 +29,7 @@ import useSmileStore from '@/core/stores/smilestore'
  */
 export function useStepper(view) {
   const smilestore = useSmileStore()
+  const log = useLog()
 
   // Set viewProvidesStepper to true for the dev bar
   smilestore.dev.viewProvidesStepper = true
@@ -41,19 +42,19 @@ export function useStepper(view) {
     const savedState = smilestore.getStepper(view)?.data
     if (savedState) {
       try {
-        console.log('STEPPER: Loading saved state from smilestore for view', view)
+        //console.log('STEPPER: Loading saved state from smilestore for view', view)
         stepper = new Stepper({ serializedState: savedState.stepperState, store: smilestore })
       } catch (error) {
-        console.error('STEPPER: Failed to load saved state, creating new stepper:', error.message)
+        log.error('STEPPER: Failed to load saved state, creating new stepper:', error.message)
         stepper = new Stepper({ id: '/', parent: null, data: { gvars: {} }, store: smilestore })
       }
     } else {
-      console.log('STEPPER: Initializing state machine with SOS and EOS nodes for view', view)
+      //console.log('STEPPER: Initializing state machine for view', view)
       stepper = new Stepper({ id: '/', parent: null, data: { gvars: {} }, store: smilestore })
     }
     stepper.name = view
     // Register stepper if not already registered
-    console.log('STEPPER: Registering stepper for view', stepper.name)
+    //console.log('STEPPER: Registering stepper for view', stepper.name)
     if (view) {
       stepper = smilestore.registerStepper(view, stepper)
     }

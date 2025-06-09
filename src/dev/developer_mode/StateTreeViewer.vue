@@ -111,10 +111,6 @@ const handleReload = () => {
   window.location.reload()
 }
 
-const isEndState = computed(() => {
-  if (!api.steps) return false
-  return api.pathString === 'SOS' || api.pathString === 'EOS'
-})
 
 // Add refs for container and selected node tracking
 const treeContainer = ref(null)
@@ -167,7 +163,7 @@ watch(
       <div class="path-info">
         <div class="path-display">{{ api.pathString }}</div>
 
-        &nbsp;<FAIcon icon="fa-solid fa-ban" v-if="isEndState" />
+        
       </div>
 
       <div class="field has-addons">

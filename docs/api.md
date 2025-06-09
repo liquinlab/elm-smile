@@ -49,9 +49,9 @@ The following functions are available when using `useViewAPI`:
 - `stepIndex`: Returns the current step index.
 - `paths`: Returns the current paths.
 - `path`: Returns the current path.
-- `length`: Returns the number of steps (excluding SOS/EOS).
+- `length`: Returns the number of steps
 - `nSteps`: Alias for `length`.
-- `nrows`: Returns the total number of rows including SOS/EOS.
+- `nrows`: Returns the total number of rows.
 
 ### Table Management
 
@@ -200,8 +200,6 @@ stepper.shuffle({ always: true }) // Always shuffles without a seed
 - The shuffle operation is tracked internally. Once shuffled, subsequent calls
   to shuffle will be ignored unless `always` is set to true.
 - If there is only one or zero states, the shuffle operation is skipped.
-- At depth 0 (root level), the shuffle operation preserves the SOS and EOS
-  states at the beginning and end of the sequence.
 
 ## Logging and Debugging
 

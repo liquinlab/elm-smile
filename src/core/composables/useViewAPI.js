@@ -274,15 +274,15 @@ class ViewAPI extends SmileAPI {
   }
 
   get length() {
-    return this._stepper.value.countLeafNodes - 2
+    return this._stepper.value.countLeafNodes
   }
 
   get nSteps() {
-    return this._stepper.value.countLeafNodes - 2
+    return this._stepper.value.countLeafNodes
   }
 
   get nrows() {
-    return this._stepper.value.countLeafNodes
+    return this.nSteps
   }
 
   // Getter for persisted variable that provides access to gvars from stepper root data
@@ -354,9 +354,6 @@ class ViewAPI extends SmileAPI {
 
     const getLeafData = (state) => {
       if (state.isLeaf) {
-        if (state.id === 'SOS' || state.id === 'EOS') {
-          return []
-        }
         if (matchesFilter(state.pathString, pathFilter)) {
           return state.data
         }
@@ -375,9 +372,6 @@ class ViewAPI extends SmileAPI {
       this.store.browserPersisted.viewSteppers[this._page.value].data = pageData
 
       this._stepper.value.clearSubTree()
-      this._stepper.value.push('SOS')
-      this._stepper.value.push('EOS')
-      this._stepper.value._currentIndex = 1
 
       // this._path.value = []
       // this._pathString.value = ''

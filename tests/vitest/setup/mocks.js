@@ -23,9 +23,18 @@ vi.mock('@/core/stores/log', () => {
   const mockLogFn =
     (type) =>
     (...args) => {
-      // Only log if DEBUG is true
-      if (DEBUG) {
-        console.log(`[${type}]`, ...args)
+      // Always call the appropriate console method
+      switch (type) {
+        case 'error':
+          console.error(...args)
+          break
+        case 'warn':
+          console.warn(...args)
+          break
+        default:
+          if (DEBUG) {
+            console.log(`[${type}]`, ...args)
+          }
       }
     }
 

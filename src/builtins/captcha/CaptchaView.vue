@@ -88,7 +88,7 @@ function next_trial() {
 
 <template>
   <div class="page">
-    <div class="instructions" v-if="api.paths == 'EOS'">
+    <div class="instructions" v-if="api.stepIndex >= api.nSteps">
       <div class="formstep">
         <article class="message is-danger">
           <div class="message-header">

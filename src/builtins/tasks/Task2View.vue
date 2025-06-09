@@ -34,7 +34,7 @@ const trials = api.steps.append([
 // set up the call backs that take you through the task
 
 function next() {
-  if (api.stepIndex < api.nSteps) {
+  if (api.stepIndex < api.nSteps - 1) {
     api.goNextStep()
   } else {
     api.goNextView()

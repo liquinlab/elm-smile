@@ -53,13 +53,6 @@ export class Stepper extends StepState {
     if (serializedState !== null) {
       this._log.debug('STEPSTATE:loading serialized state')
       this.loadFromJSON(serializedState)
-    } else {
-      // Initialize the state machine with SOS and EOS nodes
-      if (this.depth === 0) {
-        this.push('SOS')
-        this.push('EOS')
-        this._currentIndex = 1 // start at EOS or whatever is first
-      }
     }
 
     return new StepperProxy(this)
@@ -144,19 +137,9 @@ export class Stepper extends StepState {
     try {
       // Create a new state with auto-incremented id
       if (item.path !== undefined) {
-        // If at level 0, insert before EOS state
-        if (this.depth === 0) {
-          state = this.insert(item.path, -2, item)
-        } else {
-          state = this.push(item.path, item)
-        }
+        state = this.push(item.path, item)
       } else {
-        // If at level 0, insert before EOS state
-        if (this.depth === 0) {
-          state = this.insert(null, -2, item)
-        } else {
-          state = this.push(null, item)
-        }
+        state = this.push(null, item)
       }
     } catch (error) {
       this._log.error(error.message)
@@ -176,8 +159,7 @@ export class Stepper extends StepState {
     const itemsToAdd = Array.isArray(items) ? items : [items]
 
     // Check if adding these items would exceed maxStepperRows
-    // Subtract 2 to account for SOS and EOS states
-    if (this._states.length - 2 + itemsToAdd.length > config.maxStepperRows) {
+    if (this._states.length + itemsToAdd.length > config.maxStepperRows) {
       this._log.error(
         `Cannot append ${itemsToAdd.length} rows as it exceeds the safety limit of ${config.maxStepperRows}`
       )
@@ -402,32 +384,14 @@ export class Stepper extends StepState {
       rng = Math.random
     }
 
-    // Fisher-Yates shuffle algorithm
-    if (this.depth === 0) {
-      // At depth 0, we need to preserve SOS and EOS states
-      // Only shuffle the middle elements (excluding first and last)
-      const start = 1 // Skip SOS
-      const end = this._states.length - 1 // Skip EOS
+    // For other depths, shuffle all elements
+    for (let i = this._states.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1))
+      ;[this._states[i], this._states[j]] = [this._states[j], this._states[i]]
 
-      for (let i = end - 1; i > start; i--) {
-        // j can be between start and i (excluding SOS and EOS)
-        const j = start + Math.floor(rng() * (i - start + 1))
-        ;[this._states[i], this._states[j]] = [this._states[j], this._states[i]]
-
-        // Update indices for the swapped elements
-        this._states[i]._currentIndex = i - 1 // -1 because we skip SOS
-        this._states[j]._currentIndex = j - 1 // -1 because we skip SOS
-      }
-    } else {
-      // For other depths, shuffle all elements
-      for (let i = this._states.length - 1; i > 0; i--) {
-        const j = Math.floor(rng() * (i + 1))
-        ;[this._states[i], this._states[j]] = [this._states[j], this._states[i]]
-
-        // Update indices for the swapped elements
-        this._states[i]._currentIndex = i
-        this._states[j]._currentIndex = j
-      }
+      // Update indices for the swapped elements
+      this._states[i]._currentIndex = i
+      this._states[j]._currentIndex = j
     }
 
     // Mark as shuffled
@@ -447,11 +411,6 @@ export class Stepper extends StepState {
    */
   forEach(callback) {
     this._states.forEach((item, index) => {
-      // Skip SOS and EOS states when at depth 0
-      if (this.depth === 0 && (index === 0 || index === this.states.length - 1)) {
-        return
-      }
-
       // Call the callback and check if it returns a new value
       const result = callback(item, index)
       if (result !== undefined) {
@@ -585,12 +544,6 @@ export class Stepper extends StepState {
    */
   clearSubTree() {
     super.clearSubTree()
-    // Initialize the state machine with SOS and EOS nodes
-    if (this.depth === 0) {
-      this.push('SOS')
-      this.push('EOS')
-      this._currentIndex = 1 // start at EOS or whatever is first
-    }
 
     this._shuffled = false
   }

@@ -19,24 +19,17 @@ describe('Stepper test', () => {
   describe('Initialization', () => {
     it('should create a root state with correct initial values', () => {
       expect(stepper.id).toBe('/')
-      expect(stepper.states.length).toBe(2) // SOS and EOS states
-      expect(stepper.index).toBe(1) // starts at EOS so that new pushes are at index 1
+      expect(stepper.states.length).toBe(0)
+      expect(stepper.index).toBe(0) // initially -1
       expect(stepper.parent).toBeNull()
       expect(stepper.depth).toBe(0)
-      expect(stepper.states[0].id).toBe('SOS')
-      expect(stepper.states[1].id).toBe('EOS')
-    })
-
-    it('should not initialize SOS and EOS nodes at deeper levels', () => {
-      const child = stepper.push('child')
-      expect(child.states.length).toBe(0)
     })
   })
 
   describe('Basic Operations', () => {
     it('should push new named states correctly', () => {
       const child = stepper.push('child')
-      expect(stepper.states.length).toBe(3) // SOS, child, EOS
+      expect(stepper.states.length).toBe(1) // child
       expect(child.id).toBe('child')
       expect(child.parent).toBe(stepper)
       expect(stepper.depth).toBe(0)
@@ -53,20 +46,20 @@ describe('Stepper test', () => {
 
       stepper.append(trials)
 
-      // Test length (excluding SOS and EOS)
-      expect(stepper.states.length).toBe(4) // SOS, 2 trials, EOS
+      // Test length
+      expect(stepper.states.length).toBe(2) // 2 trials
 
-      // Test array indexing (skipping SOS and EOS)
-      expect(stepper.states[1].data).toEqual(trials[0])
-      expect(stepper.states[2].data).toEqual(trials[1])
+      // Test array indexing
+      expect(stepper.states[0].data).toEqual(trials[0])
+      expect(stepper.states[1].data).toEqual(trials[1])
 
       // Test iteration
-      const items = [...stepper.states].slice(1, -1) // Skip SOS and EOS
+      const items = [...stepper.states]
       expect(items.map((s) => s.data)).toEqual(trials)
 
       // Test array methods
       expect(stepper.states.indexOf(stepper.states[1])).toBe(1)
-      expect(stepper.states.slice(1, 3).map((s) => s.data)).toEqual(trials)
+      expect(stepper.states.map((s) => s.data)).toEqual(trials)
     })
 
     it('should allow iterating on the states', () => {
@@ -77,19 +70,14 @@ describe('Stepper test', () => {
       // Test forEach
       const results = []
       stepper.states.forEach((state, index) => {
-        if (index > 0 && index < stepper.states.length - 1) {
-          // Skip SOS and EOS
-          results.push(state.data)
-        }
+        results.push(state.data)
       })
       expect(results).toEqual([1, 2, 3])
 
       // Test for...of loop
       const loopResults = []
       for (const state of stepper.states) {
-        if (state.id !== 'SOS' && state.id !== 'EOS') {
-          loopResults.push(state.data)
-        }
+        loopResults.push(state.data)
       }
       expect(loopResults).toEqual([1, 2, 3])
     })
@@ -113,10 +101,8 @@ describe('Stepper test', () => {
 
     it('should create an empty stepper with correct initial state', () => {
       // Test empty state
-      expect(stepper.states.length).toBe(2) // SOS and EOS
-      expect(stepper.states[0].id).toBe('SOS')
-      expect(stepper.states[1].id).toBe('EOS')
-      expect(stepper.index).toBe(1) // starts at EOS
+      expect(stepper.states.length).toBe(0)
+      expect(stepper.index).toBe(0)
 
       // Test array-like properties
       expect(stepper.states[2]).toBeUndefined()
@@ -142,12 +128,12 @@ describe('Stepper test', () => {
 
     it('should push new auto-numbered states correctly', () => {
       const child = stepper.push()
-      expect(stepper.states.length).toBe(3) // SOS, child, EOS
+      expect(stepper.states.length).toBe(1) // child
       const child2 = stepper.push()
-      expect(stepper.states.length).toBe(4) // SOS, child, child2, EOS
-      expect(child.id).toBe(2) // Auto-numbered states start after SOS and EOS
+      expect(stepper.states.length).toBe(2) // child, child2
+      expect(child.id).toBe(0) // Auto-numbered states start at 0
       expect(child.parent).toBe(stepper)
-      expect(child2.id).toBe(3)
+      expect(child2.id).toBe(1)
       expect(child2.parent).toBe(stepper)
     })
   })
@@ -200,13 +186,12 @@ describe('Stepper test', () => {
       const grandchild = child.push('grandchild')
 
       // Verify indices are sequential
-      expect(stepper.states.indexOf(child)).toBe(2) // After SOS and EOS
+      expect(stepper.states.indexOf(child)).toBe(0)
       expect(child.states.indexOf(grandchild)).toBe(0) // First child
 
       // Add another child and verify indices update
       const child2 = stepper.push('child2')
-      expect(stepper.states.indexOf(child2)).toBe(3) // After first child
-      expect(stepper.states.indexOf(stepper.states[stepper.states.length - 1])).toBe(3) // EOS at end
+      expect(stepper.states.indexOf(child2)).toBe(1) // After first child
     })
 
     it('should maintain correct tree structure after modifications', () => {
@@ -234,15 +219,15 @@ describe('Stepper test', () => {
   describe('append Operations', () => {
     it('should append a single item', () => {
       stepper.append({ test: 'value' })
-      expect(stepper.states.length).toBe(3) // SOS, appended, EOS
-      expect(stepper.states[1].data).toEqual({ test: 'value' })
+      expect(stepper.states.length).toBe(1) // appended
+      expect(stepper.states[0].data).toEqual({ test: 'value' })
     })
 
     it('should append multiple items', () => {
       stepper.append([{ test: 'value1' }, { test: 'value2' }])
-      expect(stepper.states.length).toBe(4) // SOS, appended1, appended2, EOS
-      expect(stepper.states[1].data).toEqual({ test: 'value1' })
-      expect(stepper.states[2].data).toEqual({ test: 'value2' })
+      expect(stepper.states.length).toBe(2) // appended1, appended2
+      expect(stepper.states[0].data).toEqual({ test: 'value1' })
+      expect(stepper.states[1].data).toEqual({ test: 'value2' })
     })
 
     it('should allow building complex tables through multiple chained append operations', () => {
@@ -254,27 +239,25 @@ describe('Stepper test', () => {
         .append([{ color: 'yellow', shape: 'star' }])
 
       // Test the final state
-      expect(s1.states.length).toBe(6) // SOS + 4 items + EOS
+      expect(s1.states.length).toBe(4) // 4 items
       expect(s1.rowsData).toEqual([
-        {}, // SOS
         { color: 'red', shape: 'triangle' },
         { color: 'blue', shape: 'square' },
         { color: 'green', shape: 'circle' },
         { color: 'yellow', shape: 'star' },
-        {}, // EOS
       ])
 
       // Test array-like access still works
-      expect(s1.states.length - 2).toBe(4) // Excluding SOS and EOS
-      expect(s1.states[1].data).toEqual({ color: 'red', shape: 'triangle' })
-      expect(s1.states[4].data).toEqual({ color: 'yellow', shape: 'star' })
+      expect(s1.states.length).toBe(4)
+      expect(s1.states[0].data).toEqual({ color: 'red', shape: 'triangle' })
+      expect(s1.states[3].data).toEqual({ color: 'yellow', shape: 'star' })
 
-      // Test iteration (excluding SOS and EOS)
+      // Test iteration
       const items = [...s1.states].slice(1, -1)
-      expect(items).toHaveLength(4)
+      expect(items).toHaveLength(2)
 
       // Test slice operation
-      const slicedItems = s1.states.slice(2, 4).map((s) => s.data)
+      const slicedItems = s1.states.slice(1, 3).map((s) => s.data)
       expect(slicedItems).toEqual([
         { color: 'blue', shape: 'square' },
         { color: 'green', shape: 'circle' },
@@ -287,16 +270,16 @@ describe('Stepper test', () => {
       el.append(3)
 
       // check original stepper was modified
-      expect(stepper.states.length).toBe(5) // SOS + 3 items + EOS
-      expect(stepper.states[1].data).toBe(1)
-      expect(stepper.states[2].data).toBe(2)
-      expect(stepper.states[3].data).toBe(3)
+      expect(stepper.states.length).toBe(3) // 3 items
+      expect(stepper.states[0].data).toBe(1)
+      expect(stepper.states[1].data).toBe(2)
+      expect(stepper.states[2].data).toBe(3)
 
       // check el was modified
-      expect(el.states.length).toBe(5) // SOS + 3 items + EOS
-      expect(el.states[1].data).toBe(1)
-      expect(el.states[2].data).toBe(2)
-      expect(el.states[3].data).toBe(3)
+      expect(el.states.length).toBe(3) // 3 items
+      expect(el.states[0].data).toBe(1)
+      expect(el.states[1].data).toBe(2)
+      expect(el.states[2].data).toBe(3)
 
       // verify they are the same object
       expect(el).toBe(stepper)
@@ -321,20 +304,18 @@ describe('Stepper test', () => {
         .shuffle({ seed: 'test-seed-123' })
         .append([{ color: 'green', shape: 'circle' }])
 
-      expect(s1.states.length).toBe(5) // SOS + 3 items + EOS
+      expect(s1.states.length).toBe(3) // 3 items
       expect(s1.rowsData).toEqual([
-        {}, // SOS
         { color: 'red', shape: 'triangle' }, // Shuffled order
         { color: 'blue', shape: 'square' }, // Shuffled order
-        { color: 'green', shape: 'circle' },
-        {}, // EOS
+        { color: 'green', shape: 'circle' }, // appended
       ])
     })
 
     it('should skip items that would create duplicate paths', () => {
       stepper.append({ path: 'test' })
       stepper.append({ path: 'test' }) // Should be skipped
-      expect(stepper.states.length).toBe(3) // SOS, test, EOS
+      expect(stepper.states.length).toBe(1) // test
     })
   })
 
@@ -347,14 +328,12 @@ describe('Stepper test', () => {
 
       const s1 = stepper.outer(trials)
 
-      expect(s1.states.length).toBe(6) // SOS + 4 combinations + EOS
+      expect(s1.states.length).toBe(4) // 4 combinations
       expect(s1.rowsData).toEqual([
-        {}, // SOS
         { shape: 'circle', color: 'red' },
         { shape: 'circle', color: 'green' },
         { shape: 'square', color: 'red' },
         { shape: 'square', color: 'green' },
-        {}, // EOS
       ])
     })
 
@@ -376,11 +355,11 @@ describe('Stepper test', () => {
         color: ['red', 'blue'],
         size: ['small', 'large'],
       })
-      expect(stepper.states.length).toBe(6) // SOS + 4 combinations + EOS
-      expect(stepper.states[1].data).toEqual({ color: 'red', size: 'small' })
-      expect(stepper.states[2].data).toEqual({ color: 'red', size: 'large' })
-      expect(stepper.states[3].data).toEqual({ color: 'blue', size: 'small' })
-      expect(stepper.states[4].data).toEqual({ color: 'blue', size: 'large' })
+      expect(stepper.states.length).toBe(4) // 4 combinations
+      expect(stepper.states[0].data).toEqual({ color: 'red', size: 'small' })
+      expect(stepper.states[1].data).toEqual({ color: 'red', size: 'large' })
+      expect(stepper.states[2].data).toEqual({ color: 'blue', size: 'small' })
+      expect(stepper.states[3].data).toEqual({ color: 'blue', size: 'large' })
     })
 
     it('should handle single values by converting to arrays', () => {
@@ -388,9 +367,9 @@ describe('Stepper test', () => {
         color: 'red',
         size: ['small', 'large'],
       })
-      expect(stepper.states.length).toBe(4) // SOS + 2 combinations + EOS
-      expect(stepper.states[1].data).toEqual({ color: 'red', size: 'small' })
-      expect(stepper.states[2].data).toEqual({ color: 'red', size: 'large' })
+      expect(stepper.states.length).toBe(2) // 2 combinations
+      expect(stepper.states[0].data).toEqual({ color: 'red', size: 'small' })
+      expect(stepper.states[1].data).toEqual({ color: 'red', size: 'large' })
     })
 
     it('should handle multiple non-array values', () => {
@@ -400,8 +379,8 @@ describe('Stepper test', () => {
         size: ['small', 'medium'],
       })
 
-      expect(stepper.states.length).toBe(4)
-      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red', size: 'small' })
+      expect(stepper.states.length).toBe(2)
+      expect(stepper.states[0].data).toEqual({ shape: 'circle', color: 'red', size: 'small' })
     })
 
     it('should throw error for invalid input', () => {
@@ -432,12 +411,12 @@ describe('Stepper test', () => {
 
       stepper.outer(trials).append([{ shape: 'triangle', color: 'blue' }])
 
-      expect(stepper.states.length).toBe(7) // SOS + 4 combinations + 1 append + EOS
-      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
-      expect(stepper.states[2].data).toEqual({ shape: 'circle', color: 'green' })
-      expect(stepper.states[3].data).toEqual({ shape: 'square', color: 'red' })
-      expect(stepper.states[4].data).toEqual({ shape: 'square', color: 'green' })
-      expect(stepper.states[5].data).toEqual({ shape: 'triangle', color: 'blue' })
+      expect(stepper.states.length).toBe(5) // 4 combinations + 1 append
+      expect(stepper.states[0].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'green' })
+      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'red' })
+      expect(stepper.states[3].data).toEqual({ shape: 'square', color: 'green' })
+      expect(stepper.states[4].data).toEqual({ shape: 'triangle', color: 'blue' })
     })
 
     it('should prevent duplicate paths from being added', () => {
@@ -453,19 +432,17 @@ describe('Stepper test', () => {
       stepper.outer(trials)
 
       // Should have 4 states total:
-      // - SOS
       // - Initial test1 state
       // - test2/a combination
-      // - EOS
-      expect(stepper.states.length).toBe(4)
+      expect(stepper.states.length).toBe(2)
 
       // Verify the initial state is preserved
-      expect(stepper.states[1].data).toEqual({ path: 'test1', value: 'initial' })
+      expect(stepper.states[0].data).toEqual({ path: 'test1', value: 'initial' })
 
       // Verify only the non-duplicate combinations were added
-      const addedStates = stepper.states.slice(2, -1) // Skip SOS, initial state, and EOS
-      expect(addedStates).toHaveLength(1)
-      expect(addedStates[0].data).toEqual({ path: 'test2', value: 'a' })
+      const addedStates = stepper.states
+      expect(stepper.states).toHaveLength(2)
+      expect(stepper.states[1].data).toEqual({ path: 'test2', value: 'a' })
     })
   })
 
@@ -490,17 +467,6 @@ describe('Stepper test', () => {
 
       expect(stepper.states[1].data).toEqual({ value: 2 })
       expect(stepper.states[2].data).toEqual({ value: 4 })
-    })
-
-    it('should skip SOS and EOS states at depth 0', () => {
-      stepper.append([{ value: 1 }, { value: 2 }])
-
-      const results = []
-      stepper.forEach((item, index) => {
-        results.push(item.data.value)
-      })
-
-      expect(results).toEqual([1, 2]) // Should not include SOS or EOS
     })
 
     it('should prevent duplicate paths created by forEach transformations', () => {
@@ -553,8 +519,7 @@ describe('Stepper test', () => {
       // Shuffle with a specific seed
       stepper.shuffle('test-seed-123')
       // The order should be deterministic with this seed
-      // Skip SOS and EOS states by using rowsData
-      expect(stepper.rowsData.map((r) => r.value).filter((v) => v !== undefined)).toEqual(['c', 'a', 'e', 'b', 'd'])
+      expect(stepper.rowsData.map((r) => r.value)).toEqual(['c', 'a', 'e', 'b', 'd'])
     })
 
     it('should produce consistent order with same seed', () => {
@@ -617,13 +582,13 @@ describe('Stepper test', () => {
 
     it('should handle empty stepper', () => {
       stepper.shuffle('test-seed-123')
-      expect(stepper.rowsData).toEqual([{}, {}])
+      expect(stepper.rowsData).toEqual([])
     })
 
     it('should handle single element stepper', () => {
       stepper.append([{ id: 1, value: 'a' }])
       stepper.shuffle('test-seed-123')
-      expect(stepper.rowsData).toEqual([{}, { id: 1, value: 'a' }, {}])
+      expect(stepper.rowsData).toEqual([{ id: 1, value: 'a' }])
     })
 
     it('should be chainable with other methods', () => {
@@ -636,8 +601,8 @@ describe('Stepper test', () => {
         .shuffle('test-seed-123')
         .append([{ id: 4, value: 'd' }])
 
-      expect(stepper.rowsData).toHaveLength(6)
-      expect(stepper.states[4].data).toEqual({ id: 4, value: 'd' })
+      expect(stepper.rowsData).toHaveLength(4)
+      expect(stepper.states[3].data).toEqual({ id: 4, value: 'd' })
     })
 
     it('should not shuffle again if already shuffled and always is false', () => {
@@ -734,10 +699,10 @@ describe('Stepper test', () => {
 
       stepper.zip(trials)
 
-      expect(stepper.states.length).toBe(5) // SOS + 3 trials + EOS
-      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
-      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'green' })
-      expect(stepper.states[3].data).toEqual({ shape: 'triangle', color: 'blue' })
+      expect(stepper.states.length).toBe(3)
+      expect(stepper.states[0].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[1].data).toEqual({ shape: 'square', color: 'green' })
+      expect(stepper.states[2].data).toEqual({ shape: 'triangle', color: 'blue' })
     })
 
     it('should throw error by default when columns have different lengths', () => {
@@ -761,10 +726,10 @@ describe('Stepper test', () => {
 
       stepper.zip(trials, { method: 'pad', padValue: 'unknown' })
 
-      expect(stepper.states.length).toBe(5) // SOS + 3 trials + EOS
-      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
-      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'green' })
-      expect(stepper.states[3].data).toEqual({ shape: 'unknown', color: 'blue' })
+      expect(stepper.states.length).toBe(3) //  3 trials
+      expect(stepper.states[0].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[1].data).toEqual({ shape: 'square', color: 'green' })
+      expect(stepper.states[2].data).toEqual({ shape: 'unknown', color: 'blue' })
     })
 
     it('should handle null padValue', () => {
@@ -774,10 +739,10 @@ describe('Stepper test', () => {
       }
 
       stepper.zip(trials, { method: 'pad', padValue: null })
-      expect(stepper.states.length).toBe(5) // SOS + 3 trials + EOS
-      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
-      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'green' })
-      expect(stepper.states[3].data).toEqual({ shape: null, color: 'blue' })
+      expect(stepper.states.length).toBe(3) //  3 trials
+      expect(stepper.states[0].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[1].data).toEqual({ shape: 'square', color: 'green' })
+      expect(stepper.states[2].data).toEqual({ shape: null, color: 'blue' })
     })
 
     it('should throw error when padValue is undefined', () => {
@@ -799,10 +764,10 @@ describe('Stepper test', () => {
 
       stepper.zip(trials, { method: 'loop' })
 
-      expect(stepper.states.length).toBe(5) // SOS + 3 trials + EOS
-      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
-      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'green' })
-      expect(stepper.states[3].data).toEqual({ shape: 'circle', color: 'blue' })
+      expect(stepper.states.length).toBe(3) // 3 trials
+      expect(stepper.states[0].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[1].data).toEqual({ shape: 'square', color: 'green' })
+      expect(stepper.states[2].data).toEqual({ shape: 'circle', color: 'blue' })
 
       // Test with more loops
       stepper = new Stepper({ id: '/' })
@@ -813,12 +778,12 @@ describe('Stepper test', () => {
 
       stepper.zip(trials2, { method: 'loop' })
 
-      expect(stepper.states.length).toBe(7) // SOS + 5 trials + EOS
-      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
-      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'green' })
-      expect(stepper.states[3].data).toEqual({ shape: 'circle', color: 'blue' })
-      expect(stepper.states[4].data).toEqual({ shape: 'square', color: 'yellow' })
-      expect(stepper.states[5].data).toEqual({ shape: 'circle', color: 'purple' })
+      expect(stepper.states.length).toBe(5) //  5 trials 
+      expect(stepper.states[0].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[1].data).toEqual({ shape: 'square', color: 'green' })
+      expect(stepper.states[2].data).toEqual({ shape: 'circle', color: 'blue' })
+      expect(stepper.states[3].data).toEqual({ shape: 'square', color: 'yellow' })
+      expect(stepper.states[4].data).toEqual({ shape: 'circle', color: 'purple' })
 
       // Test with multiple columns of different lengths
       stepper = new Stepper({ id: '/' })
@@ -830,10 +795,10 @@ describe('Stepper test', () => {
 
       stepper.zip(trials3, { method: 'loop' })
 
-      expect(stepper.states.length).toBe(5) // SOS + 3 trials + EOS
-      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red', size: 'small' })
-      expect(stepper.states[2].data).toEqual({ shape: 'circle', color: 'green', size: 'medium' })
-      expect(stepper.states[3].data).toEqual({ shape: 'circle', color: 'blue', size: 'small' })
+      expect(stepper.states.length).toBe(3) // 3 trials
+      expect(stepper.states[0].data).toEqual({ shape: 'circle', color: 'red', size: 'small' })
+      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'green', size: 'medium' })
+      expect(stepper.states[2].data).toEqual({ shape: 'circle', color: 'blue', size: 'small' })
     })
 
     it('should handle non-array values as single-element arrays', () => {
@@ -844,10 +809,10 @@ describe('Stepper test', () => {
 
       stepper.zip(trials, { method: 'loop' })
 
-      expect(stepper.states.length).toBe(5) // SOS + 3 trials + EOS
-      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
-      expect(stepper.states[2].data).toEqual({ shape: 'circle', color: 'green' })
-      expect(stepper.states[3].data).toEqual({ shape: 'circle', color: 'blue' })
+      expect(stepper.states.length).toBe(3) // 3 trials
+      expect(stepper.states[0].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'green' })
+      expect(stepper.states[2].data).toEqual({ shape: 'circle', color: 'blue' })
     })
 
     it('should handle multiple non-array values', () => {
@@ -859,9 +824,9 @@ describe('Stepper test', () => {
 
       stepper.zip(trials, { method: 'loop' })
 
-      expect(stepper.states.length).toBe(4) // SOS + 2 trials + EOS
-      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red', size: 'small' })
-      expect(stepper.states[2].data).toEqual({ shape: 'circle', color: 'red', size: 'medium' })
+      expect(stepper.states.length).toBe(2) // 2 trials
+      expect(stepper.states[0].data).toEqual({ shape: 'circle', color: 'red', size: 'small' })
+      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red', size: 'medium' })
     })
 
     it('should repeat last value when using last method', () => {
@@ -872,10 +837,10 @@ describe('Stepper test', () => {
 
       stepper.zip(trials, { method: 'last' })
 
-      expect(stepper.states.length).toBe(5) // SOS + 3 trials + EOS
-      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
-      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'green' })
-      expect(stepper.states[3].data).toEqual({ shape: 'square', color: 'blue' })
+      expect(stepper.states.length).toBe(3) //  3 trials
+      expect(stepper.states[0].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[1].data).toEqual({ shape: 'square', color: 'green' })
+      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'blue' })
     })
 
     it('should throw error for invalid method', () => {
@@ -900,12 +865,13 @@ describe('Stepper test', () => {
     })
 
     it('should throw error when zip would exceed safety limit', () => {
+      const maxRows = Number(config.maxStepperRows)
+
       // Create arrays that would exceed the limit when zipped
-      // Subtract 2 to account for SOS and EOS states
       const trials = {
-        shape: Array(config.maxStepperRows - 1).fill('circle'),
-        color: Array(config.maxStepperRows - 1).fill('red'),
-      }
+        shape: Array(maxRows + 1).fill('circle'),
+        color: Array(maxRows + 1).fill('red'),
+      }q
 
       expect(() => {
         stepper.zip(trials)
@@ -920,10 +886,10 @@ describe('Stepper test', () => {
 
       stepper.zip(trials).append([{ shape: 'triangle', color: 'blue' }])
 
-      expect(stepper.states.length).toBe(5) // SOS + 2 zipped combinations + 1 append + EOS
-      expect(stepper.states[1].data).toEqual({ shape: 'circle', color: 'red' })
-      expect(stepper.states[2].data).toEqual({ shape: 'square', color: 'green' })
-      expect(stepper.states[3].data).toEqual({ shape: 'triangle', color: 'blue' })
+      expect(stepper.states.length).toBe(3) // 2 zipped combinations + 1 append
+      expect(stepper.states[0].data).toEqual({ shape: 'circle', color: 'red' })
+      expect(stepper.states[1].data).toEqual({ shape: 'square', color: 'green' })
+      expect(stepper.states[2].data).toEqual({ shape: 'triangle', color: 'blue' })
     })
   })
 })

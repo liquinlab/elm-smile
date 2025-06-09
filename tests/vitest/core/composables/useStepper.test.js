@@ -69,18 +69,10 @@ const routes = [
 const mockSerializedState = {
   stepperState: {
     id: '/',
-    currentIndex: 1,
+    currentIndex: 0,
     depth: 0,
     shuffled: false,
     states: [
-      {
-        id: 'SOS',
-        currentIndex: 0,
-        depth: 1,
-        shuffled: false,
-        states: [],
-        data: {},
-      },
       {
         id: 'survey_page1',
         currentIndex: 0,
@@ -110,14 +102,6 @@ const mockSerializedState = {
         data: {
           path: 'survey_page3',
         },
-      },
-      {
-        id: 'EOS',
-        currentIndex: 0,
-        depth: 1,
-        shuffled: false,
-        states: [],
-        data: {},
       },
     ],
     data: {
@@ -151,10 +135,8 @@ const mockInvalidSerializedState = {
     depth: 0,
     shuffled: false,
     nodes: [
-      { id: 'SOS', next: '1' },
       { id: '1', data: { type: 'trial', id: 1 }, next: '2' },
-      { id: '2', data: { type: 'trial', id: 2 }, next: 'EOS' },
-      { id: 'EOS' },
+      { id: '2', data: { type: 'trial', id: 2 } },
     ],
     data: {},
   },
@@ -331,12 +313,12 @@ describe('useStepper composable', () => {
 
       // Verify stepper loaded the serialized state
       expect(stepper.pathData).toEqual([{ path: 'survey_page1' }])
-      expect(stepper.index).toBe(1)
+      expect(stepper.index).toBe(0)
 
       // Verify navigation works
       stepper.next()
       expect(stepper.pathData).toEqual([{ path: 'survey_page2' }])
-      expect(stepper.index).toBe(2)
+      expect(stepper.index).toBe(1)
     })
 
     it('should create new stepper when serialized state is invalid', async () => {
@@ -355,7 +337,7 @@ describe('useStepper composable', () => {
         expect(stepper).toBeDefined()
         expect(stepper.name).toBe('welcome_anonymous')
         expect(stepper.pathData).toEqual([])
-        expect(stepper.index).toBe(1)
+        expect(stepper.index).toBe(0)
 
         // Verify error was logged with the correct message
         expect(console.error).toHaveBeenCalledWith(
@@ -390,7 +372,7 @@ describe('useStepper composable', () => {
 
       // Verify state was preserved
       expect(newStepper.pathData).toEqual([{ path: 'survey_page2' }])
-      expect(newStepper.index).toBe(2)
+      expect(newStepper.index).toBe(1)
     })
   })
 })

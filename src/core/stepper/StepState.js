@@ -201,7 +201,7 @@ export class StepState {
    *
    * A leaf node is considered "first" if:
    * 1. It is a leaf node (has no children)
-   * 2. It is the leftmost leaf node when traversing the tree that is not marked as 'SOS' or 'EOS'
+   * 2. It is the leftmost leaf node when traversing the tree
    *
    * @returns {boolean} True if this is the first non-special leaf node, false otherwise
    */
@@ -219,13 +219,11 @@ export class StepState {
       return findLeftmostLeaf(state._states[0])
     }
 
-    // Find first non-SOS leaf by checking each branch from left
+    // Find first  leaf by checking each branch from left
     for (let i = 0; i < this._root._states.length; i++) {
       const leftmostLeaf = findLeftmostLeaf(this._root._states[i])
-      if (leftmostLeaf.id !== 'SOS' && leftmostLeaf.id !== 'EOS') {
-        // Return true if this is that first non-SOS leaf
-        return leftmostLeaf.pathString === this.pathString
-      }
+      // Return true if this is that first  leaf
+      return leftmostLeaf.pathString === this.pathString
     }
 
     return false
@@ -357,11 +355,7 @@ export class StepState {
    * then recursively resets all child nodes.
    */
   reset() {
-    if (this._depth === 0) {
-      this._currentIndex = 1
-    } else {
-      this._currentIndex = 0
-    }
+    this._currentIndex = 0
     this._states.forEach((state) => state.reset())
   }
 
