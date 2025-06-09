@@ -21,6 +21,7 @@ vi.mock('@/core/config', () => ({
 // import the composable
 import useStepper from '@/core/composables/useStepper'
 import useSmileStore from '@/core/stores/smilestore'
+import useLog from '@/core/stores/log'
 
 // Create a test component that uses the composable
 const TestComponent = defineComponent({
@@ -322,32 +323,24 @@ describe('useStepper composable', () => {
     })
 
     it('should create new stepper when serialized state is invalid', async () => {
-      // Mock console.error to prevent error output in tests
-      const originalConsoleError = console.error
-      console.error = vi.fn()
+      const log = useLog()
+      testEnv = await setupTestEnvironmentWithSerializedState(pinia, mockInvalidSerializedState)
+      const { getCurrentRouteStepper } = testEnv
 
-      try {
-        testEnv = await setupTestEnvironmentWithSerializedState(pinia, mockInvalidSerializedState)
-        const { getCurrentRouteStepper } = testEnv
+      // Get stepper instance
+      const stepper = getCurrentRouteStepper()
 
-        // Get stepper instance
-        const stepper = getCurrentRouteStepper()
+      // Verify new stepper was created with default state
+      expect(stepper).toBeDefined()
+      expect(stepper.name).toBe('welcome_anonymous')
+      expect(stepper.pathData).toEqual([])
+      expect(stepper.index).toBe(0)
 
-        // Verify new stepper was created with default state
-        expect(stepper).toBeDefined()
-        expect(stepper.name).toBe('welcome_anonymous')
-        expect(stepper.pathData).toEqual([])
-        expect(stepper.index).toBe(0)
-
-        // Verify error was logged with the correct message
-        expect(console.error).toHaveBeenCalledWith(
-          expect.stringContaining('STEPPER: Failed to load saved state'),
-          expect.stringContaining('Missing required fields in data')
-        )
-      } finally {
-        // Restore console.error
-        console.error = originalConsoleError
-      }
+      // Verify error was logged with the correct message
+      expect(log.error).toHaveBeenCalledWith(
+        expect.stringContaining('STEPPER: Failed to load saved state'),
+        expect.stringContaining('Missing required fields in data')
+      )
     })
 
     it('should preserve stepper state across route changes', async () => {
