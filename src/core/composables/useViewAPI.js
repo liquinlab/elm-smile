@@ -118,7 +118,6 @@ class ViewAPI extends SmileAPI {
   }
 
   updateStepper() {
-    console.log('updating stepper', this._stepper.value)
     this._updateStepperState(this._stepper.value)
   }
 
@@ -184,7 +183,7 @@ class ViewAPI extends SmileAPI {
     return prev
   }
 
-  reset() {
+  goFirstStep() {
     this._stepper.value.reset()
   }
 

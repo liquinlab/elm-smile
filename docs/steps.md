@@ -94,7 +94,7 @@ console.log(stepper.current) // [{ shape: 'circle', color: 'red' }]
 console.log(stepper.index) // "0"
 
 // Reset always goes to the first trial
-stepper.reset()
+stepper.goFirstStep()
 console.log(stepper.current) // [{ shape: 'circle', color: 'red' }]
 console.log(stepper.index) // "0"
 ```

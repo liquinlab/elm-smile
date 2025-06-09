@@ -255,6 +255,10 @@ export class StepState {
     return false
   }
 
+  /**
+   * Checks if this state has any child states.
+   * @returns {boolean} True if this state has child states, false otherwise
+   */
   hasSteps() {
     return this._states.length > 0
   }

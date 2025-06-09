@@ -175,7 +175,7 @@ watch(
           </button>
         </p>
         <p class="control">
-          <button @click="api.reset()" class="button is-small nav-button" :disabled="!api.hasSteps()">
+          <button @click="api.goFirstStep()" class="button is-small nav-button" :disabled="!api.hasSteps()">
             <span><FAIcon icon="fa-solid fa-house-flag" /></span>
           </button>
         </p>

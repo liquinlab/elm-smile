@@ -118,7 +118,7 @@ function submitQuiz() {
 }
 
 function returnInstructions() {
-  api.reset() // reset the quiz
+  api.goToFirstStep() // reset the quiz
   api.clear() // don't remember across reloads
   api.persist.attempts = api.persist.attempts + 1 // increment attempts
   api.goToView(props.returnTo) // go back to instructions
