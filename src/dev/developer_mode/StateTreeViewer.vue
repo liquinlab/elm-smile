@@ -184,11 +184,6 @@ watch(
             <span><FAIcon icon="fa-solid fa-trash" /></span>
           </button>
         </p>
-        <p class="control">
-          <button @click="handleReload" class="button is-small nav-button">
-            <span><FAIcon icon="fa-solid fa-arrow-rotate-left" /></span>
-          </button>
-        </p>
       </div>
     </div>
 

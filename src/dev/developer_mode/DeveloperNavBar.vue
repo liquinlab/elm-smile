@@ -3,6 +3,7 @@ import DocsDropDown from '@/dev/developer_mode/DocsDropDown.vue'
 import Stepper from '@/dev/developer_mode/Stepper.vue'
 import RouteInfoButton from '@/dev/developer_mode/RouteInfoButton.vue'
 import ResetButton from '@/dev/developer_mode/ResetButton.vue'
+import ReloadButton from '@/dev/developer_mode/ReloadButton.vue'
 import DataBarButton from '@/dev/developer_mode/DataBarButton.vue'
 import ViewButton from '@/dev/developer_mode/ViewButton.vue'
 
@@ -167,6 +168,11 @@ const notificationAction = ref('')
       <div class="devbar-end">
         <div class="devbar-item devbar-buttonpanel">
           <div class="buttons">
+            <!-- reload button -->
+            <div class="devbar-resetbutton">
+              <ReloadButton></ReloadButton>
+            </div>
+
             <!-- reset button -->
             <div class="devbar-resetbutton">
               <ResetButton></ResetButton>
