@@ -26,10 +26,14 @@ vi.mock('@/core/stores/log', () => {
       // Always call the appropriate console method
       switch (type) {
         case 'error':
-          console.error(...args)
+          if (DEBUG) {
+            console.error(...args)
+          }
           break
         case 'warn':
-          console.warn(...args)
+          if (DEBUG) {
+            console.warn(...args)
+          }
           break
         default:
           if (DEBUG) {
