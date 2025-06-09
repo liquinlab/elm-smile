@@ -22,7 +22,7 @@ const api = useViewAPI()
       <button
         class="button is-small is-jump-bar has-tooltip-arrow has-tooltip-bottom"
         data-tooltip="Current stepper path"
-        :disabled="!api.store.dev.viewProvidesStepper || !api.steps"
+        :disabled="!api.store.dev.viewProvidesStepper || !api.hasSteps()"
       >
         <span class="counter" v-if="api.store.dev.viewProvidesStepper">{{ api.pathString }}</span>
         <FAIcon icon="fa-solid fa-circle-minus" v-else />

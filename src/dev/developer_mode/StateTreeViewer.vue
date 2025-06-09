@@ -165,22 +165,22 @@ watch(
 
       <div class="field has-addons">
         <p class="control">
-          <button @click="api.goPrevStep()" class="button is-small nav-button" :disabled="api.nSteps === 0">
+          <button @click="api.goPrevStep()" class="button is-small nav-button" :disabled="!api.hasSteps()">
             <span><FAIcon icon="fa-solid fa-angle-left" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="api.goNextStep()" class="button is-small nav-button" :disabled="api.nSteps === 0">
+          <button @click="api.goNextStep()" class="button is-small nav-button" :disabled="!api.hasSteps()">
             <span><FAIcon icon="fa-solid fa-angle-right" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="api.reset()" class="button is-small nav-button" :disabled="api.nSteps === 0">
+          <button @click="api.reset()" class="button is-small nav-button" :disabled="!api.hasSteps()">
             <span><FAIcon icon="fa-solid fa-house-flag" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="api.clear()" class="button is-small nav-button" :disabled="api.nSteps === 0">
+          <button @click="api.clear()" class="button is-small nav-button" :disabled="!api.hasSteps()">
             <span><FAIcon icon="fa-solid fa-trash" /></span>
           </button>
         </p>

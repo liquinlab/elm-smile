@@ -160,6 +160,12 @@ class ViewAPI extends SmileAPI {
     return this._stepper.value.hasPrev()
   }
 
+  hasSteps() {
+    // has steps calls on the root to find if it has steps
+    // if not then no need to check for leafs
+    return this._stepper.value.hasSteps()
+  }
+
   goNextStep() {
     let next = this._stepper.value.next()
     if (next !== null) {

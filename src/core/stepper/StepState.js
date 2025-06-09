@@ -255,6 +255,10 @@ export class StepState {
     return false
   }
 
+  hasSteps() {
+    return this._states.length > 0
+  }
+
   /**
    * Peeks at the next state without moving the current position.
    * @returns {StepState|null} The next state or null if no next state exists
