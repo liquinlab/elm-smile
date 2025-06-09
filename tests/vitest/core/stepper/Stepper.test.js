@@ -778,7 +778,7 @@ describe('Stepper test', () => {
 
       stepper.zip(trials2, { method: 'loop' })
 
-      expect(stepper.states.length).toBe(5) //  5 trials 
+      expect(stepper.states.length).toBe(5) //  5 trials
       expect(stepper.states[0].data).toEqual({ shape: 'circle', color: 'red' })
       expect(stepper.states[1].data).toEqual({ shape: 'square', color: 'green' })
       expect(stepper.states[2].data).toEqual({ shape: 'circle', color: 'blue' })
@@ -871,7 +871,7 @@ describe('Stepper test', () => {
       const trials = {
         shape: Array(maxRows + 1).fill('circle'),
         color: Array(maxRows + 1).fill('red'),
-      }q
+      }
 
       expect(() => {
         stepper.zip(trials)
