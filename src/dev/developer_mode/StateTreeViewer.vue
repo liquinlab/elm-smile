@@ -165,27 +165,27 @@ watch(
 
       <div class="field has-addons">
         <p class="control">
-          <button @click="api.goPrevStep()" class="button is-small nav-button" :disabled="!api.hasPrevStep()">
+          <button @click="api.goPrevStep()" class="button is-small nav-button" :disabled="api.nSteps === 0">
             <span><FAIcon icon="fa-solid fa-angle-left" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="api.goNextStep()" class="button is-small nav-button" :disabled="!api.hasNextStep()">
+          <button @click="api.goNextStep()" class="button is-small nav-button" :disabled="api.nSteps === 0">
             <span><FAIcon icon="fa-solid fa-angle-right" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="api.reset()" class="button is-small nav-button" :disabled="!api.hasPrevStep()">
+          <button @click="api.reset()" class="button is-small nav-button" :disabled="api.nSteps === 0">
             <span><FAIcon icon="fa-solid fa-house-flag" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="api.clear()" class="button is-small nav-button" :disabled="!api.hasPrevStep()">
+          <button @click="api.clear()" class="button is-small nav-button" :disabled="api.nSteps === 0">
             <span><FAIcon icon="fa-solid fa-trash" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="handleReload" class="button is-small nav-button" :disabled="!api.hasPrevStep()">
+          <button @click="handleReload" class="button is-small nav-button">
             <span><FAIcon icon="fa-solid fa-arrow-rotate-left" /></span>
           </button>
         </p>
@@ -269,7 +269,7 @@ watch(
   font-size: 0.75rem;
   font-family: monospace;
   font-weight: 800;
-  color: #9ca7a6;
+  color: #9fa0a0;
   border-top: 1px solid #cacaca;
   text-align: left;
 }
