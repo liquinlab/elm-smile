@@ -244,6 +244,15 @@ export class SmileAPI {
     window.location.href = url.substring(0, url.lastIndexOf('#/'))
   }
 
+  /**
+   * Reloads the current browser window/page
+   * Forces a fresh reload of the current page by calling window.location.reload()
+   * @returns {void}
+   */
+  reloadBrowser() {
+    window.location.reload()
+  }
+
   // App component management
   /**
    * Set a global app component that can be accessed throughout the application
