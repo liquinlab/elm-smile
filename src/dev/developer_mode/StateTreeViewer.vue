@@ -111,7 +111,6 @@ const handleReload = () => {
   window.location.reload()
 }
 
-
 // Add refs for container and selected node tracking
 const treeContainer = ref(null)
 
@@ -162,33 +161,31 @@ watch(
     <div class="path-display-container">
       <div class="path-info">
         <div class="path-display">{{ api.pathString }}</div>
-
-        
       </div>
 
       <div class="field has-addons">
         <p class="control">
-          <button @click="api.goPrevStep()" class="button is-small nav-button">
+          <button @click="api.goPrevStep()" class="button is-small nav-button" :disabled="!api.hasPrevStep()">
             <span><FAIcon icon="fa-solid fa-angle-left" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="api.goNextStep()" class="button is-small nav-button">
+          <button @click="api.goNextStep()" class="button is-small nav-button" :disabled="!api.hasNextStep()">
             <span><FAIcon icon="fa-solid fa-angle-right" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="api.reset()" class="button is-small nav-button">
+          <button @click="api.reset()" class="button is-small nav-button" :disabled="!api.hasPrevStep()">
             <span><FAIcon icon="fa-solid fa-house-flag" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="api.clear()" class="button is-small nav-button">
+          <button @click="api.clear()" class="button is-small nav-button" :disabled="!api.hasPrevStep()">
             <span><FAIcon icon="fa-solid fa-trash" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="handleReload" class="button is-small nav-button">
+          <button @click="handleReload" class="button is-small nav-button" :disabled="!api.hasPrevStep()">
             <span><FAIcon icon="fa-solid fa-arrow-rotate-left" /></span>
           </button>
         </p>
@@ -196,27 +193,30 @@ watch(
     </div>
 
     <div class="tree-container" ref="treeContainer">
-      <div class="index-display">{{ api.stepIndex }}/{{ api.nSteps }}</div>
+      <div v-if="api.nSteps > 0">
+        <div class="index-display" v-if="api.nSteps > 0">{{ api.stepIndex }}/{{ api.nSteps }}</div>
 
-      <ul class="tree-root">
-        <li v-if="stateMachine" class="tree-node root-node">
-          <ul v-if="stateMachine.rows && stateMachine.rows.length > 0" class="children">
-            <TreeNode
-              v-for="(state, index) in stateMachine.rows"
-              :key="index"
-              :state="state"
-              :index="index"
-              :total="stateMachine.rows.length"
-              :is-node-selected="isNodeSelected"
-              :format-data="formatData"
-              :depth="1"
-              :max-depth="5"
-              :vertical-lines="[]"
-              @node-click="handleNodeClick"
-            />
-          </ul>
-        </li>
-      </ul>
+        <ul class="tree-root">
+          <li v-if="stateMachine" class="tree-node root-node">
+            <ul v-if="stateMachine.rows && stateMachine.rows.length > 0" class="children">
+              <TreeNode
+                v-for="(state, index) in stateMachine.rows"
+                :key="index"
+                :state="state"
+                :index="index"
+                :total="stateMachine.rows.length"
+                :is-node-selected="isNodeSelected"
+                :format-data="formatData"
+                :depth="1"
+                :max-depth="5"
+                :vertical-lines="[]"
+                @node-click="handleNodeClick"
+              />
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="tree-viewer-container-empty" v-else>No steps available</div>
     </div>
     <div class="data-container-global">
       <div class="global-data-display">
@@ -263,16 +263,14 @@ watch(
 .tree-viewer-container-empty {
   flex: 1;
   height: 100%;
-  padding-top: 15px;
+  padding-top: 5px;
   padding-left: 10px;
   padding-right: 10px;
-  padding-bottom: 15px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-family: monospace;
   font-weight: 800;
-  color: #3e7974;
+  color: #9ca7a6;
   border-top: 1px solid #cacaca;
-  background-color: #f1f3f3;
   text-align: left;
 }
 
