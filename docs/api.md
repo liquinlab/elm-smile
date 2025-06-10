@@ -28,6 +28,8 @@ additional methods for:
 - Keyboard event handling
 - Mouse event handling
 - Step data recording
+- Timing utilities
+- State visualization
 
 ## Stepper Functions
 
@@ -38,44 +40,45 @@ The following functions are available when using `useViewAPI`:
 - `goNextStep()`: Advances to the next step in the stepper.
 - `goPrevStep()`: Returns to the previous step in the stepper.
 - `goToStep(path)`: Navigates to a specific step by path.
-- `reset()`: Resets the stepper to its initial state.
-- `init()`: Initializes the stepper.
+- `goFirstStep()`: Resets the stepper to its first step.
+- `hasNextStep()`: Checks if there's a next step available.
+- `hasPrevStep()`: Checks if there's a previous step available.
+- `hasSteps()`: Checks if the stepper has any steps.
 
 ### Data Access
 
 - `stepData`: Returns the current step's data as a reactive proxy.
 - `d`: Alias for `stepData`.
-- `datapath`: Returns the current data path.
-- `stepIndex`: Returns the current step index.
-- `paths`: Returns the current paths.
-- `path`: Returns the current path.
-- `length`: Returns the number of steps
+- `datapath`: Returns the current data path with component resolution.
+- `stepIndex`: Returns the current step index among leaf nodes.
+- `pathString`: Returns the current path as a string.
+- `path`: Returns the current path array.
+- `length`: Returns the number of steps.
 - `nSteps`: Alias for `length`.
-- `nrows`: Returns the total number of rows.
-
-### Table Management
-
-- `spec()`: Creates a new table specification.
-- `addSpec(table, ignoreContent = false)`: Adds a table specification to the
-  stepper.
+- `steps`: Provides direct access to the underlying Stepper state machine
+  instance.
 
 ### Timing
 
 - `startTimer(name = 'default')`: Starts a timer with the given name.
+- `timerStarted(name = 'default')`: Checks if a timer has been started.
 - `elapsedTime(name = 'default')`: Returns elapsed time in milliseconds.
 - `elapsedTimeInSeconds(name = 'default')`: Returns elapsed time in seconds.
 - `elapsedTimeInMinutes(name = 'default')`: Returns elapsed time in minutes.
 
 ### Global Variables
 
-- `persist`: Access and modify view-specific persisted variables.
+- `persist`: Access and modify view-specific persisted variables (gvars).
 - `clearPersist()`: Clears all view-specific persisted variables.
 
 ### State Management
 
-- `clear()`: Clears the stepper state.
+- `clear()`: Clears the stepper state and component registry.
 - `stepperData(pathFilter = null)`: Returns data from leaf nodes, optionally
-  filtered by path.
+  filtered by path pattern.
+- `updateStepper()`: Updates the internal stepper state.
+- `_visualizeStateMachine()`: Returns a visualization of the current state
+  machine.
 
 ### Event Handling
 
@@ -84,6 +87,10 @@ The following functions are available when using `useViewAPI`:
 - `onKeyUp`: Handler for key up events.
 - `useMouse`: Hook for tracking mouse position and state.
 - `useMousePressed`: Hook for tracking mouse button press state.
+
+### Component Management
+
+- `componentRegistry`: Map for storing and retrieving component definitions.
 
 ## Base API Functions
 
