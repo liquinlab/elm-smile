@@ -101,9 +101,8 @@ class ViewAPI extends SmileAPI {
           return function (...args) {
             const result = value.apply(target, args)
             if (modifyingMethods.includes(prop)) {
-              setTimeout(() => {
-                self.updateStepper()
-              }, 2)
+              self.updateStepper()
+              setTimeout(() => {}, 100) // needs to time write
             }
             return result
           }
@@ -168,7 +167,6 @@ class ViewAPI extends SmileAPI {
   goNextStep() {
     let next = this._stepper.value.next()
     if (next !== null) {
-      console.log('NEXT', this._pathString)
       this._updateStepperState(next)
     }
     return next
@@ -177,7 +175,6 @@ class ViewAPI extends SmileAPI {
   goPrevStep() {
     let prev = this._stepper.value.prev()
     if (prev !== null) {
-      console.log('PREV', this._pathString)
       this._updateStepperState(prev)
     }
     return prev
@@ -185,6 +182,7 @@ class ViewAPI extends SmileAPI {
 
   goFirstStep() {
     this._stepper.value.reset()
+    this._updateStepperState(this._stepper.value)
   }
 
   goToStep(path) {
@@ -284,10 +282,6 @@ class ViewAPI extends SmileAPI {
 
   get nSteps() {
     return this._stepper.value.countLeafNodes
-  }
-
-  get nrows() {
-    return this.nSteps
   }
 
   // Getter for persisted variable that provides access to gvars from stepper root data
