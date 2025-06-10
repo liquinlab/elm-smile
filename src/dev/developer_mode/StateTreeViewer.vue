@@ -211,7 +211,7 @@ watch(
           </li>
         </ul>
       </div>
-      <div class="tree-viewer-container-empty" v-else>No steps available</div>
+      <div class="tree-viewer-container-empty" v-else>No steps defined</div>
     </div>
     <div class="data-container-global">
       <div class="global-data-display">
