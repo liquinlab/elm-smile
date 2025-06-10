@@ -31,6 +31,15 @@ const setupPinia = () => {
   return pinia
 }
 
+// Helper function to get mock component and its API
+const getMockComponentAndAPI = (wrapper) => {
+  const mockComponent = wrapper.findComponent({ name: 'MockComponent' })
+  return {
+    component: mockComponent,
+    api: mockComponent.vm.api,
+  }
+}
+
 // Create a test component that uses the composable
 const TestComponent = defineComponent({
   template: `
@@ -74,34 +83,23 @@ const routes = [
 ]
 
 describe('useViewAPI composable in development mode', () => {
-  let router
   let wrapper
-  let api
-  let pinia
-
-  // Helper function to set up Pinia
-  const setupPinia = () => {
-    const pinia = createTestingPinia({
-      stubActions: false,
-      createSpy: vi.fn,
-    })
-    setActivePinia(pinia)
-    return pinia
-  }
 
   beforeAll(() => {
     setupBrowserEnvironment()
   })
 
   beforeEach(async () => {
+    // Reset the ViewAPI instance
+    useViewAPI._reset()
     // Reset mock state
     vi.clearAllMocks()
 
     // Create pinia instance
-    pinia = setupPinia()
+    const pinia = setupPinia()
 
     // Create a fresh router for each test
-    router = createRouter({
+    const router = createRouter({
       history: createWebHashHistory(),
       routes,
     })
@@ -120,17 +118,21 @@ describe('useViewAPI composable in development mode', () => {
     await router.push('/')
     await router.isReady()
     await flushPromises()
-
-    // Get API from the MockComponent instance
-    const mockComponent = wrapper.findComponent({ name: 'MockComponent' })
-    api = mockComponent.vm.api
   })
 
   afterEach(() => {
+    // Clear any persisted state
+    const { api } = getMockComponentAndAPI(wrapper)
+    if (api) {
+      api.clear()
+      api.clearPersist()
+    }
     wrapper.unmount()
   })
 
   it('should handle keyboard navigation in development mode', async () => {
+    const { api } = getMockComponentAndAPI(wrapper)
+
     // Add steps using api.steps
     api.steps.append([
       { path: 'step1', test: 'value' },
@@ -141,8 +143,6 @@ describe('useViewAPI composable in development mode', () => {
     // Verify initial state
     expect(api.pathString).toBe('step1')
     expect(api.stepData).toEqual({ path: 'step1', test: 'value' })
-
-    // Check that keyboard handler is registered
 
     // Simulate right arrow key press
     const rightEvent = new KeyboardEvent('keydown', {

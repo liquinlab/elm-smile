@@ -90,7 +90,7 @@ class ViewAPI extends SmileAPI {
    * This allows advanced manipulation of the state machine when needed.
    */
   get steps() {
-    const modifyingMethods = ['append', 'outer', 'forEach', 'shuffle']
+    const modifyingMethods = ['append', 'outer', 'forEach', 'zip', 'shuffle']
     if (!this._stepper.value) return null
 
     const self = this // capture the outer this context
@@ -447,4 +447,14 @@ export default function useViewAPI() {
   }
 
   return viewAPIInstance
+}
+
+/**
+ * Resets the ViewAPI instance to null. Used for testing purposes.
+ * @private
+ * @function _reset
+ * @memberof useViewAPI
+ */
+useViewAPI._reset = () => {
+  viewAPIInstance = null
 }

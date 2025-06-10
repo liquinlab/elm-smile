@@ -31,6 +31,15 @@ const setupPinia = () => {
   return pinia
 }
 
+// Helper function to get mock component and its API
+const getMockComponentAndAPI = (wrapper) => {
+  const mockComponent = wrapper.findComponent({ name: 'MockComponent' })
+  return {
+    component: mockComponent,
+    api: mockComponent.vm.api,
+  }
+}
+
 // Create a test component that uses the composable
 const TestComponent = defineComponent({
   template: `
@@ -74,24 +83,23 @@ const routes = [
 ]
 
 describe('useViewAPI composable', () => {
-  let router
   let wrapper
-  let api
-  let pinia
 
   beforeAll(() => {
     setupBrowserEnvironment()
   })
 
   beforeEach(async () => {
+    // Reset the ViewAPI instance
+    useViewAPI._reset()
     // Reset mock state
     vi.clearAllMocks()
 
     // Create pinia instance
-    pinia = setupPinia()
+    const pinia = setupPinia()
 
     // Create a fresh router for each test
-    router = createRouter({
+    const router = createRouter({
       history: createWebHashHistory(),
       routes,
     })
@@ -110,17 +118,23 @@ describe('useViewAPI composable', () => {
     await router.push('/')
     await router.isReady()
     await flushPromises()
-
-    // Get API from the MockComponent instance
-    const mockComponent = wrapper.findComponent({ name: 'MockComponent' })
-    api = mockComponent.vm.api
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    // Clear any persisted state
+    const mockComponent = wrapper.findComponent({ name: 'MockComponent' })
+    if (mockComponent && mockComponent.vm.api) {
+      mockComponent.vm.api.clear()
+      mockComponent.vm.api.clearPersist()
+    }
+
     wrapper.unmount()
   })
 
   it('should provide all core API functionality plus view-specific features', () => {
+    // Get API from the MockComponent instance
+    const { api } = getMockComponentAndAPI(wrapper)
+    console.log('api', api._page.value)
     // Check core API functionality
     expect(api.store).toBeDefined()
     expect(api.config).toBeDefined()
@@ -160,6 +174,8 @@ describe('useViewAPI composable', () => {
   })
 
   it('should handle stepper navigation correctly', async () => {
+    const { api } = getMockComponentAndAPI(wrapper)
+    console.log('api', api._page.value)
     // Add steps directly using api.steps
     api.steps.append([
       { path: 'step1', test: 'value' },
@@ -189,7 +205,210 @@ describe('useViewAPI composable', () => {
     expect(api.pathString).toBe('step1')
   })
 
+  it('should handle stepIndex and boundary conditions correctly', async () => {
+    const { api } = getMockComponentAndAPI(wrapper)
+
+    // Add a sequence of steps
+    api.steps.append([
+      { path: 'start', test: 'start' },
+      { path: 'middle1', test: 'middle1' },
+      { path: 'middle2', test: 'middle2' },
+      { path: 'end', test: 'end' },
+    ])
+
+    // Verify initial state
+    expect(api.nSteps).toBe(4)
+    expect(api.stepIndex).toBe(0)
+    expect(api.pathString).toBe('start')
+    expect(api.hasPrevStep()).toBe(false)
+    expect(api.hasNextStep()).toBe(true)
+
+    // Walk through the sequence
+    api.goNextStep()
+    expect(api.stepIndex).toBe(1)
+    expect(api.pathString).toBe('middle1')
+    expect(api.hasPrevStep()).toBe(true)
+    expect(api.hasNextStep()).toBe(true)
+
+    api.goNextStep()
+    expect(api.stepIndex).toBe(2)
+    expect(api.pathString).toBe('middle2')
+    expect(api.hasPrevStep()).toBe(true)
+    expect(api.hasNextStep()).toBe(true)
+
+    api.goNextStep()
+    expect(api.stepIndex).toBe(3)
+    expect(api.pathString).toBe('end')
+    expect(api.hasPrevStep()).toBe(true)
+    expect(api.hasNextStep()).toBe(false)
+
+    // Walk backwards
+    api.goPrevStep()
+    expect(api.stepIndex).toBe(2)
+    expect(api.pathString).toBe('middle2')
+    expect(api.hasPrevStep()).toBe(true)
+    expect(api.hasNextStep()).toBe(true)
+
+    api.goPrevStep()
+    expect(api.stepIndex).toBe(1)
+    expect(api.pathString).toBe('middle1')
+    expect(api.hasPrevStep()).toBe(true)
+    expect(api.hasNextStep()).toBe(true)
+
+    api.goPrevStep()
+    expect(api.stepIndex).toBe(0)
+    expect(api.pathString).toBe('start')
+    expect(api.hasPrevStep()).toBe(false)
+    expect(api.hasNextStep()).toBe(true)
+
+    // Test jumping to specific indices
+    api.goToStep('end')
+    expect(api.stepIndex).toBe(3)
+    expect(api.pathString).toBe('end')
+
+    api.goToStep('start')
+    expect(api.stepIndex).toBe(0)
+    expect(api.pathString).toBe('start')
+  })
+
+  it.skip('should handle complex nested state construction and navigation', async () => {
+    const { api } = getMockComponentAndAPI(wrapper)
+
+    // Create initial trial structure
+    const trials = api.steps.append([
+      {
+        path: 'trial',
+        rt: 0,
+        hit: 0,
+        response: '',
+      },
+      { path: 'summary' },
+    ])
+
+    // Create a factorial design with multiple dimensions
+    trials[0]
+      .outer({
+        color: ['red', 'blue'],
+        size: ['small', 'large'],
+        shape: ['square', 'circle'],
+      })
+      .forEach((row) => {
+        // Create a unique identifier for each combination
+        const pathString =
+          (row.data.color === 'red' ? 'r' : 'b') +
+          (row.data.size === 'small' ? 's' : 'l') +
+          (row.data.shape === 'square' ? 's' : 'c')
+        row.id = pathString
+      })
+      .shuffle()
+
+    // Verify the structure was created correctly
+    expect(api.nSteps).toBe(9) // 8 factorial combinations + 1 summary step
+    expect(api.pathString).toBe('trial')
+
+    // Verify we can access the data for each combination
+    const allData = api.stepperData()
+    console.log('All data:', allData) // Debug log
+    expect(allData.length).toBe(9) // 8 factorial combinations + 1 summary step
+
+    // Verify each combination has the correct structure
+    const combinations = allData.filter((d) => d.path === 'trial')
+    expect(combinations.length).toBe(8) // Should have exactly 8 factorial combinations
+
+    // Check that each combination has all required properties
+    combinations.forEach((combo) => {
+      expect(combo).toHaveProperty('color')
+      expect(combo).toHaveProperty('size')
+      expect(combo).toHaveProperty('shape')
+      expect(combo).toHaveProperty('rt')
+      expect(combo).toHaveProperty('hit')
+      expect(combo).toHaveProperty('response')
+      expect(combo).toHaveProperty('id')
+    })
+
+    // Verify we can navigate through all combinations
+    let visitedPaths = new Set()
+    while (api.hasNextStep()) {
+      const currentData = api.stepData
+      expect(currentData).toHaveProperty('id')
+      visitedPaths.add(currentData.id)
+      api.goNextStep()
+    }
+
+    // Verify we visited all combinations
+    expect(visitedPaths.size).toBe(8)
+
+    // Verify we end up at the summary step
+    expect(api.pathString).toBe('summary')
+
+    // Verify we can go back through all combinations
+    while (api.hasPrevStep()) {
+      api.goPrevStep()
+      const currentData = api.stepData
+      expect(currentData).toHaveProperty('id')
+    }
+
+    // Verify we're back at the start
+    expect(api.pathString).toBe('trial')
+    expect(api.stepIndex).toBe(0)
+  })
+
+  it('should handle dynamic state addition and navigation', async () => {
+    const { api } = getMockComponentAndAPI(wrapper)
+
+    await flushPromises()
+    api.clear()
+
+    console.log('api._page', api._page.value, api.nSteps)
+    // Add initial states
+    api.steps.append([
+      { path: 'initial1', test: 'value1' },
+      { path: 'initial2', test: 'value2' },
+    ])
+
+    //console.log('api.steps', api.steps._states)
+
+    // Verify initial state
+    expect(api.nSteps).toBe(2)
+    expect(api.pathString).toBe('initial1')
+    expect(api.stepData).toEqual({ path: 'initial1', test: 'value1' })
+
+    // Navigate to the end of initial states
+    api.goNextStep()
+    expect(api.pathString).toBe('initial2')
+    expect(api.stepData).toEqual({ path: 'initial2', test: 'value2' })
+
+    // Add more states while at the end
+    api.steps.append([
+      { path: 'dynamic1', test: 'value3' },
+      { path: 'dynamic2', test: 'value4' },
+    ])
+
+    // Verify we can now navigate to the new states
+    expect(api.nSteps).toBe(4)
+    expect(api.hasNextStep()).toBe(true)
+
+    api.goNextStep()
+    expect(api.pathString).toBe('dynamic1')
+    expect(api.stepData).toEqual({ path: 'dynamic1', test: 'value3' })
+
+    api.goNextStep()
+    expect(api.pathString).toBe('dynamic2')
+    expect(api.stepData).toEqual({ path: 'dynamic2', test: 'value4' })
+
+    // Verify we can go back through all states
+    api.goPrevStep()
+    expect(api.pathString).toBe('dynamic1')
+
+    api.goPrevStep()
+    expect(api.pathString).toBe('initial2')
+
+    api.goPrevStep()
+    expect(api.pathString).toBe('initial1')
+  })
+
   it('should handle timing methods correctly', async () => {
+    const { api } = getMockComponentAndAPI(wrapper)
     // Add steps using api.steps
     api.steps.append([
       { path: 'step1', data: { value: 1 } },
@@ -218,6 +437,7 @@ describe('useViewAPI composable', () => {
   })
 
   it('should handle data recording and persistence correctly', async () => {
+    const { api } = getMockComponentAndAPI(wrapper)
     // Add steps using api.steps
     api.steps.append([
       { path: 'step1', test: 'value' },
@@ -251,6 +471,7 @@ describe('useViewAPI composable', () => {
   })
 
   it('should ignore keyboard navigation in live', async () => {
+    const { api } = getMockComponentAndAPI(wrapper)
     // Add steps using api.steps
     api.steps.append([
       { path: 'step1', test: 'value' },
