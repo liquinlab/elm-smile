@@ -1,3 +1,9 @@
+/**
+ * Removes all occurrences of a specified HTML tag and its contents from a string
+ * @param {string} html - The HTML string to process
+ * @param {string} tagName - The name of the tag to remove
+ * @returns {string} The HTML string with all instances of the specified tag removed
+ */
 function removetag(html, tagName) {
   const pattern = new RegExp(`<${tagName}\\b[^>]*>([\\s\\S]*?)</${tagName}>`, 'gi')
   // Repeatedly apply the regex until no more tags are found
@@ -7,6 +13,12 @@ function removetag(html, tagName) {
   return html
 }
 
+/**
+ * Removes all lines containing a specified string from a source text
+ * @param {string} src - The source text to process
+ * @param {string} tagName - The string to search for in each line
+ * @returns {string} The source text with all lines containing the search string removed
+ */
 function removeline(src, tagName) {
   // Create a regular expression that matches any line containing the specified word
   const regex = new RegExp(`^.*${tagName}.*(?:\\r?\\n|\\r)?`, 'gim')
@@ -14,6 +26,10 @@ function removeline(src, tagName) {
   return src.replace(regex, '')
 }
 
+/**
+ * Creates a Vite plugin that strips development tools and components based on build mode
+ * @returns {import('vite').Plugin} A Vite plugin object that transforms App.vue and SmileApp.vue files
+ */
 export default function stripDevToolPlugin() {
   let config
   const loaderMatch = /(App\.vue|SmileApp\.vue)$/
@@ -26,6 +42,7 @@ export default function stripDevToolPlugin() {
 
     transform(src, id) {
       if (loaderMatch.test(id)) {
+        console.log('  ➜  stripping dev/present mode components from', id.split('/').slice(-3).join('/'))
         let clean_src = src
 
         // Handle App.vue specific removals
