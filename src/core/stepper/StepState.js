@@ -115,6 +115,47 @@ export class StepState {
   }
 
   /**
+   * Gets the index of the parent node of the current leaf.
+   * @returns {number|null} The index of the parent node, or null if there is no parent
+   */
+  get parentIndex() {
+    // If this is the root node, return null
+    if (!this._parent) {
+      return null
+    }
+
+    // Return the current index of the parent node
+    return this._parent._currentIndex
+  }
+
+  /**
+   * Gets the index of the parent node of the current leaf in the state tree.
+   * Traverses down from root to find the current leaf node, then returns its parent's index.
+   * @returns {number|null} The index of the parent node of the current leaf, or null if there is no parent
+   */
+  get blockIndex() {
+    // Get the current leaf node
+    let current = this._root
+    while (current._states.length > 0) {
+      current = current._states[current._currentIndex]
+    }
+
+    // Return the parent's index
+    return current._parent ? current._parent._currentIndex : null
+  }
+
+  get blockLength() {
+    // Get the current leaf node
+    let current = this._root
+    while (current._states.length > 0) {
+      current = current._states[current._currentIndex]
+    }
+
+    // Return the number of states in the parent node, or 0 if no parent
+    return current._parent ? current._parent._states.length : 0
+  }
+
+  /**
    * Setter for data property
    * @param {*} data - The data to store in this node
    */

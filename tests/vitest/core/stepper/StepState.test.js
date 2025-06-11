@@ -137,6 +137,109 @@ describe('StepState', () => {
         stepper.index = 0
       }).toThrow('Invalid index: 0. Index must be -1 or between 0 and -1')
     })
+
+    it('should correctly track index with nested structure', () => {
+      // Create a nested structure
+      const child1 = stepper.push('child1')
+      const grandchild1 = child1.push('grandchild1')
+      const grandchild2 = child1.push('grandchild2')
+
+      const child2 = stepper.push('child2')
+      const grandchild3 = child2.push('grandchild3')
+
+      // Initially at root
+      expect(stepper.currentPathString).toBe('child1/grandchild1')
+      expect(stepper.index).toBe(0)
+      expect(child1.index).toBe(0)
+      expect(grandchild1.index).toBe(0)
+
+      stepper.next() // moves to grandchild2
+      expect(stepper.currentPathString).toBe('child1/grandchild2')
+      expect(stepper.index).toBe(0)
+      expect(child1.index).toBe(1)
+      expect(grandchild2.index).toBe(0)
+
+      stepper.next() // moves to grandchild1
+      expect(stepper.currentPathString).toBe('child2/grandchild3')
+      expect(stepper.index).toBe(1)
+      expect(child2.index).toBe(0)
+      expect(grandchild3.index).toBe(0)
+
+      // shouldn't advance because we're at the end of the tree
+      stepper.next() // moves to grandchild2
+      expect(stepper.currentPathString).toBe('child2/grandchild3')
+      expect(stepper.index).toBe(1)
+      expect(child2.index).toBe(0)
+      expect(grandchild3.index).toBe(0)
+
+      // Navigate backward
+      stepper.prev() // moves back to child2
+      expect(stepper.currentPathString).toBe('child1/grandchild2')
+      expect(stepper.index).toBe(0)
+      expect(child1.index).toBe(1)
+      expect(grandchild2.index).toBe(0)
+
+      stepper.prev() // moves back to grandchild2
+      expect(stepper.currentPathString).toBe('child1/grandchild1')
+      expect(stepper.index).toBe(0)
+      expect(child1.index).toBe(0)
+      expect(grandchild1.index).toBe(0)
+
+      // shouldn't advance because we're at the beginning of the tree
+      stepper.prev() // moves back to grandchild1
+      expect(stepper.currentPathString).toBe('child1/grandchild1')
+      expect(stepper.index).toBe(0)
+      expect(child1.index).toBe(0)
+      expect(grandchild1.index).toBe(0)
+    })
+
+    it('should correctly track blockIndex and blockLength with nested structure', () => {
+      // Create a nested structure
+      const child1 = stepper.push('child1')
+      const grandchild1 = child1.push('grandchild1')
+      const grandchild2 = child1.push('grandchild2')
+
+      const child2 = stepper.push('child2')
+      const grandchild3 = child2.push('grandchild3')
+
+      // Initially at root, blockIndex should be 0 (root's index)
+      expect(stepper.currentPathString).toBe('child1/grandchild1')
+      expect(stepper.blockIndex).toBe(0)
+      expect(stepper.blockLength).toBe(2) // root has 2 children (child1, child2)
+
+      stepper.next() // moves to grandchild2
+      expect(stepper.currentPathString).toBe('child1/grandchild2')
+      expect(stepper.blockIndex).toBe(1) // child1's index is 0
+      expect(stepper.blockLength).toBe(2) // child1 has 2 children (grandchild1, grandchild2)
+
+      stepper.next() // moves to child2/grandchild3
+      expect(stepper.currentPathString).toBe('child2/grandchild3')
+      expect(stepper.blockIndex).toBe(0) // child2's index is 1
+      expect(stepper.blockLength).toBe(1) // child2 has 1 child (grandchild3)
+
+      // shouldn't advance because we're at the end of the tree
+      stepper.next()
+      expect(stepper.currentPathString).toBe('child2/grandchild3')
+      expect(stepper.blockIndex).toBe(0) // child2's index stays 1
+      expect(stepper.blockLength).toBe(1) // child2 still has 1 child
+
+      // Navigate backward
+      stepper.prev() // moves back to child1/grandchild2
+      expect(stepper.currentPathString).toBe('child1/grandchild2')
+      expect(stepper.blockIndex).toBe(1) // child1's index is 0
+      expect(stepper.blockLength).toBe(2) // child1 has 2 children
+
+      stepper.prev() // moves back to child1/grandchild1
+      expect(stepper.currentPathString).toBe('child1/grandchild1')
+      expect(stepper.blockIndex).toBe(0) // child1's index is 0
+      expect(stepper.blockLength).toBe(2) // child1 has 2 children
+
+      // shouldn't advance because we're at the beginning of the tree
+      stepper.prev()
+      expect(stepper.currentPathString).toBe('child1/grandchild1')
+      expect(stepper.blockIndex).toBe(0) // child1's index stays 0
+      expect(stepper.blockLength).toBe(2) // child1 still has 2 children
+    })
   })
 
   describe('insert operations', () => {

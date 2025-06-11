@@ -436,6 +436,120 @@ describe('useViewAPI composable', () => {
     expect(api.elapsedTimeInMinutes('test')).toBe(5 / 60)
   })
 
+  it('should correctly track hierarchical indices and lengths', async () => {
+    const { api } = getMockComponentAndAPI(wrapper)
+
+    // Create a hierarchical structure with blocks and steps
+    const trials = api.steps.append([
+      {
+        path: 'practice',
+        type: 'block',
+        data: { blockType: 'practice' },
+      },
+      {
+        path: 'main',
+        type: 'block',
+        data: { blockType: 'main' },
+      },
+    ])
+
+    // Add practice trials
+    trials[0].append([
+      { path: 'trial1', data: { trialType: 'practice1' } },
+      { path: 'trial2', data: { trialType: 'practice2' } },
+    ])
+
+    // Add main trials with factorial design
+    trials[1]
+      .outer({
+        condition: ['A', 'B'],
+        difficulty: ['easy', 'hard'],
+      })
+      .forEach((row) => {
+        row.id = `${row.data.condition}_${row.data.difficulty}`
+      })
+
+    api.updateStepper()
+    // Initially at first practice trial
+    expect(api.pathString).toBe('practice/trial1')
+    expect(api.stepIndex).toBe(0) // First step overall
+    expect(api.blockIndex).toBe(0) // First trial in practice block
+    expect(api.blockLength).toBe(2) // Two trials in practice block
+    expect(api.nSteps).toBe(6) // Total steps: 2 practice + 4 main trials
+
+    // Move to second practice trial
+    api.goNextStep()
+    expect(api.pathString).toBe('practice/trial2')
+    expect(api.stepIndex).toBe(1) // Second step overall
+    expect(api.blockIndex).toBe(1) // Second trial in practice block
+    expect(api.blockLength).toBe(2) // Two trials in practice block
+    expect(api.nSteps).toBe(6) // Total steps unchanged
+
+    // Move to first main trial
+    api.goNextStep()
+    expect(api.pathString).toBe('main/A_easy')
+    expect(api.stepIndex).toBe(2) // Third step overall
+    expect(api.blockIndex).toBe(0) // First trial in main block
+    expect(api.blockLength).toBe(4) // Four trials in main block
+    expect(api.nSteps).toBe(6) // Total steps unchanged
+
+    // Move through main trials
+    api.goNextStep()
+    expect(api.pathString).toBe('main/A_hard')
+    expect(api.stepIndex).toBe(3)
+    expect(api.blockIndex).toBe(1)
+    expect(api.blockLength).toBe(4)
+
+    api.goNextStep()
+    expect(api.pathString).toBe('main/B_easy')
+    expect(api.stepIndex).toBe(4)
+    expect(api.blockIndex).toBe(2)
+    expect(api.blockLength).toBe(4)
+
+    api.goNextStep()
+    expect(api.pathString).toBe('main/B_hard')
+    expect(api.stepIndex).toBe(5)
+    expect(api.blockIndex).toBe(3)
+    expect(api.blockLength).toBe(4)
+
+    // Verify we can't go further
+    expect(api.hasNextStep()).toBe(false)
+
+    // Go back through the trials
+    api.goPrevStep()
+    expect(api.pathString).toBe('main/B_easy')
+    expect(api.stepIndex).toBe(4)
+    expect(api.blockIndex).toBe(2)
+    expect(api.blockLength).toBe(4)
+
+    api.goPrevStep()
+    expect(api.pathString).toBe('main/A_hard')
+    expect(api.stepIndex).toBe(3)
+    expect(api.blockIndex).toBe(1)
+    expect(api.blockLength).toBe(4)
+
+    api.goPrevStep()
+    expect(api.pathString).toBe('main/A_easy')
+    expect(api.stepIndex).toBe(2)
+    expect(api.blockIndex).toBe(0)
+    expect(api.blockLength).toBe(4)
+
+    api.goPrevStep()
+    expect(api.pathString).toBe('practice/trial2')
+    expect(api.stepIndex).toBe(1)
+    expect(api.blockIndex).toBe(1)
+    expect(api.blockLength).toBe(2)
+
+    api.goPrevStep()
+    expect(api.pathString).toBe('practice/trial1')
+    expect(api.stepIndex).toBe(0)
+    expect(api.blockIndex).toBe(0)
+    expect(api.blockLength).toBe(2)
+
+    // Verify we can't go back further
+    expect(api.hasPrevStep()).toBe(false)
+  })
+
   it('should handle data recording and persistence correctly', async () => {
     const { api } = getMockComponentAndAPI(wrapper)
     // Add steps using api.steps

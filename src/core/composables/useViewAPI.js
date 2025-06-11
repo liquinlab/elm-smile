@@ -268,6 +268,10 @@ class ViewAPI extends SmileAPI {
     return leafNodes.indexOf(this._pathString.value)
   }
 
+  get blockIndex() {
+    return this._stepper.value.blockIndex
+  }
+
   get pathString() {
     return this._pathString.value
   }
@@ -277,6 +281,14 @@ class ViewAPI extends SmileAPI {
   }
 
   get length() {
+    return this._stepper.value.countLeafNodes
+  }
+
+  get blockLength() {
+    return this._stepper.value.blockLength
+  }
+
+  get stepLength() {
     return this._stepper.value.countLeafNodes
   }
 
