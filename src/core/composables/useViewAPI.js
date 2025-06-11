@@ -94,26 +94,73 @@ class ViewAPI extends SmileAPI {
     if (!this._stepper.value) return null
 
     const self = this // capture the outer this context
-    return new Proxy(this._stepper.value, {
-      get(target, prop) {
-        const value = target[prop]
-        if (typeof value === 'function') {
-          return function (...args) {
-            const result = value.apply(target, args)
-            if (modifyingMethods.includes(prop)) {
+
+    // Create a proxy for array elements
+    const createArrayElementProxy = (target) => {
+      return new Proxy(target, {
+        get(target, prop) {
+          const value = target[prop]
+          if (typeof value === 'function') {
+            return function (...args) {
+              const result = value.apply(target, args)
               self.updateStepper()
-              setTimeout(() => {}, 100) // needs to time write
+              return result
             }
-            return result
           }
-        }
-        return value
-      },
-      set(target, prop, value) {
-        target[prop] = value
-        return true
-      },
-    })
+          return value
+        },
+        set(target, prop, value) {
+          target[prop] = value
+          self.updateStepper()
+          return true
+        },
+      })
+    }
+
+    // Create a proxy for Stepper instances
+    const createStepperProxy = (target) => {
+      return new Proxy(target, {
+        get(target, prop) {
+          const value = target[prop]
+
+          // Handle array access
+          if (typeof prop === 'string' && !isNaN(prop)) {
+            return createArrayElementProxy(value)
+          }
+
+          // Handle method calls
+          if (typeof value === 'function') {
+            return function (...args) {
+              const result = value.apply(target, args)
+              if (modifyingMethods.includes(prop)) {
+                self.updateStepper()
+                // If the result is a Stepper instance, wrap it in our proxy
+                if (result && result.constructor && result.constructor.name === 'Stepper') {
+                  return createStepperProxy(result)
+                }
+                setTimeout(() => {}, 100) // needs to time write
+              }
+              return result
+            }
+          }
+
+          // Handle array-like properties
+          if (Array.isArray(value)) {
+            return createArrayElementProxy(value)
+          }
+
+          return value
+        },
+        set(target, prop, value) {
+          target[prop] = value
+          self.updateStepper()
+          return true
+        },
+      })
+    }
+
+    // Create the main proxy
+    return createStepperProxy(this._stepper.value)
   }
 
   updateStepper() {
