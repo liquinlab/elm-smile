@@ -134,7 +134,6 @@ describe('useViewAPI composable', () => {
   it('should provide all core API functionality plus view-specific features', () => {
     // Get API from the MockComponent instance
     const { api } = getMockComponentAndAPI(wrapper)
-    console.log('api', api._page.value)
     // Check core API functionality
     expect(api.store).toBeDefined()
     expect(api.config).toBeDefined()
@@ -149,6 +148,8 @@ describe('useViewAPI composable', () => {
     expect(api.length).toBeDefined()
     expect(api.nSteps).toBeDefined()
     expect(api.persist).toBeDefined()
+    expect(api.blockIndex).toBeDefined()
+    expect(api.blockLength).toBeDefined()
 
     // Check stepper control methods
     expect(api.goNextStep).toBeInstanceOf(Function)
@@ -175,7 +176,6 @@ describe('useViewAPI composable', () => {
 
   it('should handle stepper navigation correctly', async () => {
     const { api } = getMockComponentAndAPI(wrapper)
-    console.log('api', api._page.value)
     // Add steps directly using api.steps
     api.steps.append([
       { path: 'step1', test: 'value' },
@@ -359,7 +359,6 @@ describe('useViewAPI composable', () => {
     await flushPromises()
     api.clear()
 
-    console.log('api._page', api._page.value, api.nSteps)
     // Add initial states
     api.steps.append([
       { path: 'initial1', test: 'value1' },
@@ -469,7 +468,6 @@ describe('useViewAPI composable', () => {
         row.id = `${row.data.condition}_${row.data.difficulty}`
       })
 
-    api.updateStepper()
     // Initially at first practice trial
     expect(api.pathString).toBe('practice/trial1')
     expect(api.stepIndex).toBe(0) // First step overall
