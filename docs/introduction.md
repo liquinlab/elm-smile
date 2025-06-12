@@ -63,6 +63,6 @@ The current development is happening at
 
 Ready to get started? Continue [here](/requirements).
 
-Not sure? Let us walk you through an [example](/example).
+Not sure? Let us walk you through some [key concepts](/concepts).
 
 Need help? Go [here](/help).
