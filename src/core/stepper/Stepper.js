@@ -48,6 +48,8 @@ export class Stepper extends StepState {
     this._store = store
     this._log = log
     this._shuffled = false // Add shuffled property
+    this._onModify = null // Add callback property
+    this._needsWrite = false // Track if we need to write
 
     // If serialized state is provided, load it
     if (serializedState !== null) {
@@ -58,6 +60,24 @@ export class Stepper extends StepState {
     return new StepperProxy(this)
   }
 
+  /**
+   * Sets a callback to be called when the stepper is modified
+   * @param {Function} callback - The callback function to call on modification
+   */
+  setOnModify(callback) {
+    this._onModify = callback
+  }
+
+  /**
+   * Marks the stepper as needing a write and triggers the modify callback
+   * @private
+   */
+  _markForWrite() {
+    this._needsWrite = true
+    if (this._onModify) {
+      this._onModify()
+    }
+  }
   /**
    * Creates a new state instance. Overridden to return Stepper instances.
    * @protected
@@ -178,6 +198,7 @@ export class Stepper extends StepState {
       }
     })
 
+    this._markForWrite()
     return this
   }
 
@@ -244,6 +265,7 @@ export class Stepper extends StepState {
       }
     })
 
+    this._markForWrite()
     return this
   }
 
@@ -351,6 +373,7 @@ export class Stepper extends StepState {
       }
     })
 
+    this._markForWrite()
     return this
   }
 
@@ -397,6 +420,7 @@ export class Stepper extends StepState {
     // Mark as shuffled
     this._shuffled = true
 
+    this._markForWrite()
     return this
   }
 
@@ -444,6 +468,7 @@ export class Stepper extends StepState {
         }
       }
     })
+    this._markForWrite()
     return this
   }
 
