@@ -21,6 +21,8 @@ event that occurs _within_ a view. For example, a view might have a step that
 presents a question to the participant, a step that collects a response, and a
 step that displays the results.
 
+<img src="/images/steps.png" width="600" alt="steps example" style="margin: auto;">
+
 A useful way to think about it is the Views are like slides in a presentation
 software like Powerpoint/Keynote and steps are like "builds" or "animations
 steps" that occur within a slide.
