@@ -150,6 +150,8 @@ describe('useViewAPI composable', () => {
     expect(api.persist).toBeDefined()
     expect(api.blockIndex).toBeDefined()
     expect(api.blockLength).toBeDefined()
+    expect(api.isLastStep).toBeDefined()
+    expect(api.isLastBlockStep).toBeDefined()
 
     // Check stepper control methods
     expect(api.goNextStep).toBeInstanceOf(Function)
@@ -618,5 +620,141 @@ describe('useViewAPI composable', () => {
     // Verify we did not move back to previous step
     expect(api.pathString).toBe('step1')
     expect(api.stepData).toEqual({ path: 'step1', test: 'value' })
+  })
+
+  it('should handle faker functions as data properties', async () => {
+    const { api } = getMockComponentAndAPI(wrapper)
+
+    // Mock faker functions
+    const mockRnorm = vi.fn().mockReturnValue(450)
+    const mockRbinom = vi.fn().mockReturnValue(1)
+    const mockRchoice = vi.fn().mockReturnValue('test')
+
+    // Add mock faker to api
+    api.faker = {
+      rnorm: mockRnorm,
+      rbinom: mockRbinom,
+      rchoice: mockRchoice,
+    }
+
+    // Add steps with faker functions as data properties
+    api.steps.append([
+      {
+        path: 'trial1',
+        rt: () => api.faker.rnorm(500, 50),
+        hit: () => api.faker.rbinom(1, 0.8),
+        response: () => api.faker.rchoice(['a', 'b', 'c']),
+      },
+      {
+        path: 'trial2',
+        rt: () => api.faker.rnorm(500, 50),
+        hit: () => api.faker.rbinom(1, 0.8),
+        response: () => api.faker.rchoice(['a', 'b', 'c']),
+      },
+    ])
+
+    // Verify initial state
+    expect(api.nSteps).toBe(2)
+    expect(api.pathString).toBe('trial1')
+
+    // Access and verify faker functions are called
+    expect(api.stepData.rt()).toBe(450)
+    expect(mockRnorm).toHaveBeenCalledWith(500, 50)
+
+    expect(api.stepData.hit()).toBe(1)
+    expect(mockRbinom).toHaveBeenCalledWith(1, 0.8)
+
+    expect(api.stepData.response()).toBe('test')
+    expect(mockRchoice).toHaveBeenCalledWith(['a', 'b', 'c'])
+
+    // Step to next trial and verify faker functions are called again
+    api.goNextStep()
+    expect(api.pathString).toBe('trial2')
+
+    expect(api.stepData.rt()).toBe(450)
+    expect(mockRnorm).toHaveBeenCalledTimes(2)
+
+    expect(api.stepData.hit()).toBe(1)
+    expect(mockRbinom).toHaveBeenCalledTimes(2)
+
+    expect(api.stepData.response()).toBe('test')
+    expect(mockRchoice).toHaveBeenCalledTimes(2)
+  })
+
+  it('should handle autofill functionality', async () => {
+    const { api } = getMockComponentAndAPI(wrapper)
+
+    // Mock faker functions
+    const mockRnorm = vi.fn().mockReturnValue(450)
+    const mockRbinom = vi.fn().mockReturnValue(1)
+    const mockRchoice = vi.fn().mockReturnValue('test')
+
+    // Add mock faker to api
+    api.faker = {
+      rnorm: mockRnorm,
+      rbinom: mockRbinom,
+      rchoice: mockRchoice,
+      render: vi.fn().mockImplementation((data) => {
+        // Simulate filling in the data
+        data.rt = { val: mockRnorm() }
+        data.hit = { val: mockRbinom() }
+        data.response = { val: mockRchoice() }
+      }),
+    }
+
+    // Add steps with faker functions as data properties
+    api.steps.append([
+      {
+        path: 'trial1',
+        rt: () => api.faker.rnorm(500, 50),
+        hit: () => api.faker.rbinom(1, 0.8),
+        response: () => api.faker.rchoice(['a', 'b', 'c']),
+      },
+      {
+        path: 'trial2',
+        rt: () => api.faker.rnorm(500, 50),
+        hit: () => api.faker.rbinom(1, 0.8),
+        response: () => api.faker.rchoice(['a', 'b', 'c']),
+      },
+      { path: 'summary' },
+    ])
+
+    // Define autofill function similar to StroopView
+    function autofill() {
+      while (!api.isLastStep()) {
+        // Changed condition to nSteps - 1
+        if (api.pathString.includes('trial')) {
+          api.faker.render(api.stepData)
+          api.goNextStep()
+        }
+      }
+    }
+
+    // Verify initial state
+    expect(api.nSteps).toBe(3)
+    expect(api.pathString).toBe('trial1')
+
+    // Wait for any pending updates
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
+    // Run autofill
+    autofill()
+
+    // Verify final state
+    expect(api.pathString).toBe('summary')
+    expect(api.stepIndex).toBe(api.nSteps - 1) // Changed to nSteps - 1
+
+    // Verify faker was called correctly
+    expect(api.faker.render).toHaveBeenCalledTimes(2) // Called for each trial + summary
+    expect(mockRnorm).toHaveBeenCalledTimes(2)
+    expect(mockRbinom).toHaveBeenCalledTimes(2)
+    expect(mockRchoice).toHaveBeenCalledTimes(2)
+
+    // Verify data was recorded
+    const recordedData = api.allStepData()
+    expect(recordedData).toHaveLength(3) // 2 trials + summary
+    expect(recordedData[0].rt.val).toBe(450)
+    expect(recordedData[0].hit.val).toBe(1)
+    expect(recordedData[0].response.val).toBe('test')
   })
 })
