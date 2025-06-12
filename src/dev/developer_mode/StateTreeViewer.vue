@@ -189,7 +189,9 @@ watch(
 
     <div class="tree-container" ref="treeContainer">
       <div v-if="api.nSteps > 0">
-        <div class="index-display" v-if="api.nSteps > 0">{{ api.stepIndex }}/{{ api.nSteps }}</div>
+        <div class="index-display">
+          {{ api.stepIndex }}/{{ api.nSteps }} ({{ api.blockIndex }}/{{ api.blockLength }})
+        </div>
 
         <ul class="tree-root">
           <li v-if="stateMachine" class="tree-node root-node">
