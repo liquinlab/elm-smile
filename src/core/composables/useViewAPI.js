@@ -136,16 +136,36 @@ class ViewAPI extends SmileAPI {
     return this._stepper.value.hasNext()
   }
 
+  /**
+   * Checks if there is a previous step available in the stepper.
+   * @returns {boolean} True if there is a previous step available, false otherwise.
+   * @memberof ViewAPI
+   * @instance
+   */
   hasPrevStep() {
     return this._stepper.value.hasPrev()
   }
 
+  /**
+   * Checks if there are any steps in the stepper.
+   * Calls on the root stepper to check for steps, avoiding leaf node checks if none exist.
+   * @returns {boolean} True if there are steps in the stepper, false otherwise.
+   * @memberof ViewAPI
+   * @instance
+   */
   hasSteps() {
     // has steps calls on the root to find if it has steps
     // if not then no need to check for leafs
     return this._stepper.value.hasSteps()
   }
 
+  /**
+   * Advances to the next step in the stepper.
+   * Updates the stepper state if a next step exists.
+   * @returns {Object|null} The next state object if one exists, null otherwise
+   * @memberof ViewAPI
+   * @instance
+   */
   goNextStep() {
     let next = this._stepper.value.next()
     if (next !== null) {
@@ -154,6 +174,13 @@ class ViewAPI extends SmileAPI {
     return next
   }
 
+  /**
+   * Returns to the previous step in the stepper.
+   * Updates the stepper state if a previous step exists.
+   * @returns {Object|null} The previous state object if one exists, null otherwise
+   * @memberof ViewAPI
+   * @instance
+   */
   goPrevStep() {
     let prev = this._stepper.value.prev()
     if (prev !== null) {
@@ -162,11 +189,26 @@ class ViewAPI extends SmileAPI {
     return prev
   }
 
+  /**
+   * Resets the stepper to its first step.
+   * Updates the stepper state after resetting to the initial position.
+   * @returns {void}
+   * @memberof ViewAPI
+   * @instance
+   */
   goFirstStep() {
     this._stepper.value.reset()
     this._updateStepperState(this._stepper.value)
   }
 
+  /**
+   * Navigates to a specific step by path.
+   * Updates the stepper state after navigating to the specified path.
+   * @param {string} path - The path of the step to navigate to
+   * @returns {void}
+   * @memberof ViewAPI
+   * @instance
+   */
   goToStep(path) {
     this._stepper.value.goTo(path)
     this._updateStepperState(this._stepper.value)
@@ -241,31 +283,83 @@ class ViewAPI extends SmileAPI {
     })
   }
 
+  /**
+   * Gets the current step index among leaf nodes in the stepper.
+   * The step index represents the position of the current path string
+   * within the flattened array of leaf nodes.
+   * @returns {number} The zero-based index of the current step, or -1 if not found
+   * @memberof ViewAPI
+   * @instance
+   */
   get stepIndex() {
     const leafNodes = this._stepper.value.leafNodes
     return leafNodes.indexOf(this._pathString.value)
   }
 
+  /**
+   * Gets the current block index in the stepper.
+   * The block index represents the position within the current block of steps.
+   * @returns {number} The zero-based index within the current block
+   * @memberof ViewAPI
+   * @instance
+   */
   get blockIndex() {
     return this._stepper.value.blockIndex
   }
 
+  /**
+   * Gets the current path as a string representation.
+   * The path string is a forward-slash delimited string of step names representing
+   * the current location in the stepper (e.g. "trial/block1/step2").
+   * @returns {string} The current path string
+   * @memberof ViewAPI
+   * @instance
+   */
   get pathString() {
     return this._pathString.value
   }
 
+  /**
+   * Gets the current path as an array.
+   * The path array contains the sequence of step names representing the current
+   * location in the stepper (e.g. ['trial', 'block1', 'step2']).
+   * @returns {string[]} The current path array
+   * @memberof ViewAPI
+   * @instance
+   */
   get path() {
     return this._path.value
   }
 
+  /**
+   * Gets the total number of leaf nodes in the stepper.
+   * This represents the total number of steps in the sequence, excluding any parent/container nodes.
+   * @returns {number} The total number of leaf nodes
+   * @memberof ViewAPI
+   * @instance
+   */
   get length() {
     return this._stepper.value.countLeafNodes
   }
 
+  /**
+   * Checks if the current step is the last step in the sequence.
+   * This compares the current step index against the total number of steps.
+   * @returns {boolean} True if this is the last step, false otherwise
+   * @memberof ViewAPI
+   * @instance
+   */
   isLastStep() {
     return this.stepIndex === this.nSteps - 1
   }
 
+  /**
+   * Checks if the current step is the last step in the current block.
+   * This compares the current block index against the total length of the block.
+   * @returns {boolean} True if this is the last step in the block, false otherwise
+   * @memberof ViewAPI
+   * @instance
+   */
   isLastBlockStep() {
     return this.blockIndex === this.blockLength - 1
   }
