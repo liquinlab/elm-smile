@@ -53,8 +53,6 @@ function navigate(route) {
         @click="navigate(r.name)"
       >
         <span class="is-size-7">
-          <!-- fa icon arrow down -->
-
           <div class="routename">
             <span v-if="r.meta.level > 0" v-for="i in r.meta.level" style="margin-left: 5px">&nbsp;</span>
             <FAIcon v-if="r.meta.sequential" icon="fa-solid fa-arrow-down" />
@@ -71,6 +69,7 @@ function navigate(route) {
 .dropdown-content {
   padding-left: 10px;
   padding-right: 5px;
+  z-index: 9999;
 }
 .dropdown-content hr {
   margin: 0;

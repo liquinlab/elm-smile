@@ -417,7 +417,6 @@ watch(
   font-size: 0.8rem;
   font-weight: 800;
   font-family: monospace;
-  z-index: 2000;
 }
 
 .data-display {
