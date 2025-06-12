@@ -1,6 +1,4 @@
 <script setup>
-import { computed } from 'vue'
-
 const props = defineProps({
   state: Object,
   index: Number,
@@ -118,7 +116,7 @@ const getChildVerticalLines = (verticalLines, index, total) => {
   background-color: rgb(146, 249, 224);
   color: black;
   border-radius: 10px;
-  margin-right: 35px;
+  margin-right: 70px;
 }
 
 .vertical-lines {

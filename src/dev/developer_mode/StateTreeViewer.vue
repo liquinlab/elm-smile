@@ -232,7 +232,7 @@ watch(
     </div>
     <div class="data-container">
       <div class="data-display">
-        Table Data <span class="data-label">(.data)</span>
+        Step Data <span class="data-label">(.stepData)</span>
         <button
           @click="api.clearData()"
           class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
