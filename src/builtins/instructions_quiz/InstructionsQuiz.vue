@@ -138,7 +138,7 @@ init()
   <div class="page prevent-select">
     <div class="formcontent">
       <!-- Replace the two quiz page sections with this single dynamic one -->
-      <div class="formstep" v-if="api.stepIndex <= qs.length && /^pages\/pg\d+$/.test(api.pathString)">
+      <div class="formstep" v-if="api.stepIndex < qs.length && /^pages\/pg\d+$/.test(api.pathString)">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
@@ -173,7 +173,7 @@ init()
               <div class="columns">
                 <div class="column">
                   <div class="has-text-left">
-                    <button v-if="api.stepIndex > 1" class="button is-warning" @click="api.goPrevStep()">
+                    <button v-if="api.stepIndex >= 1" class="button is-warning" @click="api.goPrevStep()">
                       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous page
                     </button>
                   </div>
@@ -182,11 +182,11 @@ init()
                   <div class="has-text-right">
                     <button
                       v-if="currentPageComplete"
-                      :class="['button', api.stepIndex === qs.length ? 'is-success' : 'is-warning']"
-                      @click="api.stepIndex === qs.length ? submitQuiz() : api.goNextStep()"
+                      :class="['button', api.isLastBlockStep() ? 'is-success' : 'is-warning']"
+                      @click="api.isLastBlockStep() ? submitQuiz() : api.goNextStep()"
                     >
-                      {{ api.stepIndex === qs.length ? 'Submit' : 'Next page' }}
-                      <template v-if="api.stepIndex !== qs.length">
+                      {{ api.isLastBlockStep() ? 'Submit' : 'Next page' }}
+                      <template v-if="!api.isLastBlockStep()">
                         &nbsp;<FAIcon icon="fa-solid fa-arrow-right" />
                       </template>
                     </button>

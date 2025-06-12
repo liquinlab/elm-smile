@@ -331,6 +331,14 @@ class ViewAPI extends SmileAPI {
     return this._stepper.value.countLeafNodes
   }
 
+  isLastStep() {
+    return this.stepIndex === this.nSteps - 1
+  }
+
+  isLastBlockStep() {
+    return this.blockIndex === this.blockLength - 1
+  }
+
   get blockLength() {
     return this._stepper.value.blockLength
   }

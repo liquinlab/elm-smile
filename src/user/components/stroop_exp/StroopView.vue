@@ -99,6 +99,7 @@ function finish() {
   <div class="page prevent-select">
     <!-- Show this for each trial -->
     <div class="strooptrial" v-if="api.path[0] == 'stroop'">
+      {{ api.blockIndex }} / {{ api.blockLength }}, {{ api.stepIndex }} / {{ api.nSteps }}
       <h1 class="title is-1 is-huge" :class="api.stepData.color">{{ api.stepData.word }}</h1>
       <p id="prompt">Type "R" for Red, "B" for blue, "G" for green.</p>
     </div>

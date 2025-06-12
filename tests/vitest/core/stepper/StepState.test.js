@@ -676,7 +676,7 @@ describe('StepState', () => {
       expect(stepper.currentPath).toEqual(['child1', 'grandchild1'])
     })
 
-    it('should handle hyphen-separated string paths', () => {
+    it('should handle slash-separated string paths', () => {
       const child1 = stepper.push('child1')
       const child2 = stepper.push('child2')
       const grandchild1 = child1.push('grandchild1')

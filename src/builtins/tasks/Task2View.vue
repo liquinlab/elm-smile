@@ -34,7 +34,7 @@ const trials = api.steps.append([
 // set up the call backs that take you through the task
 
 function next() {
-  if (api.stepIndex < api.nSteps - 1) {
+  if (!api.isLastStep()) {
     api.goNextStep()
   } else {
     api.goNextView()
@@ -60,7 +60,7 @@ function prev() {
   <div class="page prevent-select">
     <h1 class="title is-3">Task 2</h1>
     {{ api.stepData.sentence }}/{{ api.stepIndex }}<br /><br />
-    <button class="button is-success is-light" id="finish" @click="prev()" v-if="api.stepIndex > 1">
+    <button class="button is-success is-light" id="finish" @click="prev()" v-if="api.stepIndex > 0">
       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; prev
     </button>
     &nbsp;&nbsp;&nbsp;
