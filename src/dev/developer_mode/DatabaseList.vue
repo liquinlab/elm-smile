@@ -10,8 +10,9 @@ const height_pct = computed(() => `${api.store.dev.consoleBarHeight - 90}px`)
 
 function truncateText(text, maxLength = 20) {
   if (!text) return text
-  if (text.length <= maxLength) return text
-  return text.substring(0, maxLength) + '...'
+  const textStr = String(text)
+  if (textStr.length <= maxLength) return textStr
+  return textStr.substring(0, maxLength) + '...'
 }
 
 const header = computed(() => {
