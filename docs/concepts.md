@@ -2,15 +2,15 @@
 
 Smile introduces a new way to build behavioral experiments which promotes
 modularity and reusability. Smile leverages existing open source libraries to
-provide a robust framework for building experiments including Vite, Vue, Bulma,
-and Google Firebase. However it also provide a new API/framework for building
-experiments quickly and with fewer bugs.
+including Vite, Vue, Bulma, and Google Firebase. However it also provide an
+**entirely new interface** for specifying and debugging interactive experiments
+that goes beyond basic Vue components.
 
-The first concept to intoduce is the notion of a [View](./views.md). A view is a
-component that is used to display a single phase of part of an experiments. For
-example the part of your experiment that collects informed constent might be one
-view. Another view might be the debriefing form. Below we will describe how you
-determine how to sequence Views using the Timeline.
+The first concept to introduce is the notion of a [View](./views.md). A View is
+a component that represents a single "phase" or part of an experiment. For
+example, the part of your experiment that collects informed consent might be one
+View. Another View might be the debriefing form. Below we will describe how you
+define the sequence of Views in your experiment.
 
 <img src="/images/viewstimeline.png" width="800" alt="timeline example" style="margin: auto;">
 
@@ -44,8 +44,8 @@ A default Vue component has three parts:
 - A template (HTML + Vue syntax)
 - A style (CSS)
 
-The template is the HTML that is displayed to the user. The script is the
-JavaScript that is used to control the behavior of the component. The style is
+The script is the JavaScript that is used to control the behavior of the
+component. The template is the HTML that is displayed to the user. The style is
 the CSS that is used to style the component.
 
 ```vue
@@ -60,8 +60,8 @@ the CSS that is used to style the component.
 <style scoped></style>
 ```
 
-This View does nothing. It just displays the text "My Experiment" in a large
-font.
+This example View component does nothing. It just displays the text "My
+Experiment" in a large (h1) font.
 
 To begin using Smile, we need to import the Smile API and use it to define the
 steps in the experiment.
@@ -160,26 +160,30 @@ This uses the `api.stepData` object to access the data for the current step. The
 `.word` property is defined because we added it to the step data in the
 `api.steps.append` method.
 
-We we advance to the next step using the `api.goNextStep()` method, it
+When we advance to the next step using the `api.goNextStep()` method, it
 automatically changes the `api.stepData` to refer to the next step and
 [reactively](components.html#declarative-rendering-and-reactivity) updates the
 template to display the new word.
 
-This is already a working View. On first load it will show the word "HELLO"
-since that is the first step. Then if the user presses the spacebar, it will
-advance to the next step and show the word "WORLD" and so on. When it get to the
-last step, subseqent presses of the spacebar will do nothing since there are no
-more steps to advance to.
+This is already a working View! On first load it will show the word "THIS" since
+that is the first step. Then if the user presses the spacebar, it will advance
+to the next step and show the word "IS" and so on. When it get to the last step,
+subseqent presses of the spacebar will do nothing since there are no more steps
+to advance to.
 
-This covers only part of the Smile API and development approach but we hope is
-illustrates how Smile makes it easy to build experiments.
+**This covers only part of the Smile API and development approach but we hope is
+illustrates how Smile makes it easy to build experiments.**
 
 ### Adding a timer to the experiment
 
-This is fine but we might want to record some information about the user. One
-might be the amount of time it took them to press each spacebar.
+The examples so far could be easily done in raw Vue syntax using reactive
+properties e.g., `ref()`. Let's go a little bit deeper to explore some unique
+functionality provided by Smile's API.
 
-We can add a timer to the experiment to measure the reaction time of the user.
+We usually want to record some information about the user. In this example, it
+might make sense to record the amount of time it took them to press each
+spacebar. We can use Smile's API to add a timer to the View to measure the
+reaction time of the user.
 
 ```vue{13-16,19-21}
 <script setup>
@@ -216,14 +220,14 @@ api.onKeyDown(' ', () => {
 <style scoped></style>
 ```
 
-First we start the timer if it is not already started. You might as why we need
-to check if it is already started since the `<script setup>` section only runs
-once. The reason is that Smile _persists_ information across page reloads. This
-way if you participant reloads the page in their browser, Smile will detect the
-timer was already started and continue measuring time with respect to first time
-it was started. Of course, if you don't want that more fancy behavior you can
-just call `api.startTimer()` without checking if it was already started, which
-will restart it to measure "from the last page load."
+First we start the timer if it is not already started. You might wonder why we
+need to check if it is already started since the `<script setup>` section only
+runs once. The reason is that Smile _persists_ information across page reloads.
+This way if your participant reloads the page in their browser, Smile will
+detect the timer was already started and continue measuring time with respect to
+first time it was started. Of course, if you don't want that more fancy behavior
+you can just call `api.startTimer()` without checking if it was already started,
+which will restart it to measure "from the last page load."
 
 This example shows another aspect of Smile's API. We use `api.elapsedTime()` to
 measure the time it took the user to press the spacebar. Then we _write_ the
@@ -239,6 +243,11 @@ documents but rest assured `api.recordStep()` will buffer your participants
 trial data so that on the next opportunity it is safely written to the database.
 In addition even if the subject reloads the browser at this point the data for
 that trial will be restored for later syncing to Firebase, limiting data loss.
+
+**What this section reveals it that Smile's API goes beyond basic Vue components
+to provide ways to save data to a database, persist data across page loads, and
+provides convenient ways to record data typically needed in behavioral
+experiments.**
 
 ### Transitioning to the next View
 
@@ -295,10 +304,12 @@ can help avoid typos or errors in logic. If it is, we exit to the next View with
 
 The use of `api.goNextView()` means that even if we change the order of our
 Views in the overall flow of our experiment we don't need to update our code.
+This means it's easy to share your Views with others and to reuse them in
+different experiments.
 
-Hopefully this gives you a sense of how Smile's API can be used to build
+**Hopefully this gives you a sense of how Smile's API can be used to build
 experiments. Smile's API provides many more complex features which is introduced
-in the rest of the documentation. But before we get into these advanced
+in the rest of the documentation.** But before we get into these advanced
 features, we will now walk through the process of placing this View in the
 Timeline.
 
@@ -374,9 +385,6 @@ Here we imported our new View (you should do that up at the top of the
 to add it to the timeline. The `name` property is used to identify the View. The
 `component` property is the Vue component that is used to display the View.
 
-That's it! You can now run the experiment and see your new View appear after the
-windowsizer View.
-
 You'll notice that there are many other Views in the default timeline including
 `WindowSizer`, `Instructions`, and `Consent`. These are all
 [built in Views](views.html#built-in-views-1) that are provided by Smile which
@@ -385,10 +393,13 @@ them to your liking. Some are quite sophisticated and can save you a lot of time
 such as the `InstructionsQuiz` View which can be used to quickly build
 comprehension check quizes.
 
+That's it! You can now run the experiment and see your new View appear after the
+windowsizer View. Let's see how to test it out.
+
 ## Developing and debugging your experiment
 
-Another key feature of Smile is the ability to develop and debug your experiment
-in the browser. You can read more about [development](/developing) in the
+A final key concept of Smile is the advanced tools which help you develop and
+debug your experiment. You can read more about [development](/developing) in the
 remainder of the documentation. However, most simply you type
 
 ```sh
