@@ -73,8 +73,11 @@ function autofill() {
 api.setAutofill(autofill)
 
 // Update quizCorrect to handle multiple answers
-const quizCorrect = computed(() =>
-  api.stepData?.questions?.every((question) => {
+const quizCorrect = computed(() => {
+  // Get all questions from all pages using stepperData with a path filter
+  const allQuestions = api.stepperData('pages*').flatMap((page) => page.questions || [])
+
+  return allQuestions.every((question) => {
     if (Array.isArray(question.correctAnswer)) {
       // For multiselect, check if arrays have same values regardless of order
       const selectedAnswers = Array.isArray(question.answer) ? question.answer : [question.answer]
@@ -86,7 +89,7 @@ const quizCorrect = computed(() =>
     // For single select, keep existing behavior
     return question.answer === question.correctAnswer[0]
   })
-)
+})
 
 const currentPageComplete = computed(() => {
   if (!api.stepData?.questions || !Array.isArray(api.stepData.questions)) {
