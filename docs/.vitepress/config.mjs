@@ -47,7 +47,7 @@ export default defineConfig({
         text: 'Overview',
         items: [
           { text: '👋 Introduction', link: '/introduction' },
-          { text: '🚶‍♂️ Walk through', link: '/example' },
+          { text: '🚶‍♂️ Key Concepts', link: '/concepts' },
           { text: '👾 Required software', link: '/requirements' },
           { text: '🧪 Setup a new lab', link: '/labconfig' },
           { text: '👫 Adding a new user', link: '/adduser' },
