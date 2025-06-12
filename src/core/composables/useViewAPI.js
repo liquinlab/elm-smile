@@ -225,10 +225,6 @@ class ViewAPI extends SmileAPI {
     return createRecursiveProxy(mergedData.value)
   }
 
-  get d() {
-    return this.stepData
-  }
-
   get datapath() {
     if (this._pathData.value === null) return null
 
@@ -373,13 +369,6 @@ class ViewAPI extends SmileAPI {
       this.store.browserPersisted.viewSteppers[this._page.value].data = pageData
 
       this._stepper.value.clearSubTree()
-
-      // this._path.value = []
-      // this._pathString.value = ''
-      // this._pathData.value = null
-      // this._index.value = null
-      // this._stateMachine.value = this._visualizeStateMachine()
-
       this.componentRegistry.clear()
     }
     this._saveStepperState()
@@ -400,7 +389,6 @@ class ViewAPI extends SmileAPI {
    * @returns {void}
    */
   recordStep() {
-    console.log('recordStep', this.stepData)
     this.recordData(this.stepData)
   }
 
