@@ -7,19 +7,20 @@ including Vite, Vue, Bulma, and Google Firebase. However it also provide an
 that goes beyond basic Vue components.
 
 The first concept to introduce is the notion of a [View](./views.md). A View is
-a component that represents a single "phase" or part of an experiment. For
-example, the part of your experiment that collects informed consent might be one
-View. Another View might be the debriefing form. Below we will describe how you
-define the sequence of Views in your experiment.
+a self-contained bit of code that represents a single "phase" or part of an
+experiment. For example, the part of your experiment that collects informed
+consent might be one View. Another View might be the debriefing form. Below we
+will describe how you define the sequence of Views in your experiment.
 
 <img src="/images/viewstimeline.png" width="800" alt="timeline example" style="margin: auto;">
 
-Each View is minimally a Vue component which can be written in whatever way you
-please. However, Smile provides a custom API for building views. The key idea
-behind this API is the concept of 'steps'. A [step](./steps.md) is a sequenced
-event that occurs _within_ a view. For example, a view might have a step that
-presents a question to the participant, a step that collects a response, and a
-step that displays the results.
+Each View is minimally a Vue component (a special type of web development file)
+which can be written in whatever way you please. However, Smile provides a
+custom API for building Views. The key idea behind this API is the concept of
+'steps'. A [step](./steps.md) is a sequenced event that occurs _within_ a view.
+For example, a View might have a step that presents a question to the
+participant, a step that collects a response, and a step that displays the
+results.
 
 <img src="/images/steps.png" width="600" alt="steps example" style="margin: auto;">
 
@@ -123,10 +124,10 @@ api.onKeyDown(' ', () => {
 <style scoped></style>
 ```
 
-This uses on the `api.onKeyDown` method to listen for the spacebar key press and
+This uses the `api.onKeyDown` method to listen for the spacebar key press and
 advance to the next step. You can also go to the previous step with
 `api.goPrevStep()` or jump to a specific step with `api.goToStep(pathname)`. We
-will talk about paths later.
+will talk about paths in a later section of the documentation.
 
 Now we actually need to display the word to the user. We can do this by updating
 the template part of the component.
@@ -227,9 +228,9 @@ need to check if it is already started since the `<script setup>` section only
 runs once. The reason is that Smile _persists_ information across page reloads.
 This way if your participant reloads the page in their browser, Smile will
 detect the timer was already started and continue measuring time with respect to
-first time it was started. Of course, if you don't want that more fancy behavior
-you can just call `api.startTimer()` without checking if it was already started,
-which will restart it to measure "from the last page load."
+the first time it was started. Of course, if you don't want that more fancy
+behavior you can just call `api.startTimer()` without checking if it was already
+started, which will restart it to measure "from the last page load."
 
 This example shows another aspect of Smile's API. We use `api.elapsedTime()` to
 measure the time it took the user to press the spacebar. Then we _write_ the
@@ -240,16 +241,22 @@ resulting data to a new property in the `api.stepData` object called
 Then we called `api.recordStep()` to record the step data. This persists the
 data so that it will be written to the database record for this participant.
 It's worth mentioning here that this doesn't mean the data will be immediately
-stored in Firebase -- firebase limits the frequency by which we can write to
-documents but rest assured `api.recordStep()` will buffer your participants
-trial data so that on the next opportunity it is safely written to the database.
-In addition even if the subject reloads the browser at this point the data for
-that trial will be restored for later syncing to Firebase, limiting data loss.
+stored in our database -- for example Firebase (the recommended database for
+Smile) limits the frequency by which we can write to documents but rest assured
+`api.recordStep()` will buffer your participants trial data so that on the next
+opportunity it is safely written to the database. In addition even if the
+subject reloads the browser at this point, the data for that trial will be
+restored for later syncing, limiting data loss.
 
 **What this section reveals it that Smile's API goes beyond basic Vue components
-to provide ways to save data to a database, persist data across page loads, and
-provides convenient ways to record data typically needed in behavioral
-experiments.**
+to provide ways to define steps or trials in an experiment, save data to a
+database, persist data across page loads, and provides convenient ways to record
+data typically needed in behavioral experiments.**
+
+It gets much more fancy and powerful from there. For example
+[here](https://github.com/NYUCCL/smile/blob/main/src/user/components/stroop_exp/StroopView.vue)
+is a more complex example of a Stroop experiment which uses heriachically nested
+steps, randomization, and more.
 
 ### Transitioning to the next View
 
