@@ -51,10 +51,17 @@ The following functions are available when using `useViewAPI`:
 - `d`: Alias for `stepData`.
 - `datapath`: Returns the current data path with component resolution.
 - `stepIndex`: Returns the current step index among leaf nodes.
+- `blockIndex`: Returns the current block index.
 - `pathString`: Returns the current path as a string.
 - `path`: Returns the current path array.
 - `length`: Returns the number of steps.
 - `nSteps`: Alias for `length`.
+- `blockLength`: Returns the number of steps in the current block.
+- `stepLength`: Returns the total number of leaf nodes.
+- `isLastStep()`: Returns true if the current step is the last step in the
+  sequence.
+- `isLastBlockStep()`: Returns true if the current step is the last step in the
+  current block.
 - `steps`: Provides direct access to the underlying Stepper state machine
   instance.
 
