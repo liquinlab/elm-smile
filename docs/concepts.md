@@ -73,10 +73,10 @@ import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
 api.steps.append([
-  { word: 'THIS' },
-  { word: 'IS' },
-  { word: 'A' },
-  { word: 'TEST' },
+  { word: 'THIS' }, // step 1
+  { word: 'IS' },   // step 2
+  { word: 'A' },    // step 3
+  { word: 'TEST' }, // step 4
 ])
 </script>
 
@@ -296,11 +296,11 @@ api.onKeyDown(' ', () => {
 
 Here the `api.isLastStep()` method is used to check if the current step is the
 last step. There are several equivalent ways to do that as well for example
-`api.hasNextStep()` or `api.stepIndex >= api.nSteps`, but part of Smile's API
+`!api.hasNextStep()` or `api.stepIndex >= api.nSteps`, but part of Smile's API
 design principal is to give you very clear, commonly used function names which
-can help avoid typos or errors in logic. If it is, we exit to the next View with
-`api.goNextView()`. If it is not, we advance to the next step with
-`api.goNextStep()`.
+can help avoid typos or errors in logic. If it is the last step, we exit to the
+next View with `api.goNextView()`. If it is not, we advance to the next step
+with `api.goNextStep()`.
 
 The use of `api.goNextView()` means that even if we change the order of our
 Views in the overall flow of our experiment we don't need to update our code.
@@ -393,14 +393,29 @@ them to your liking. Some are quite sophisticated and can save you a lot of time
 such as the `InstructionsQuiz` View which can be used to quickly build
 comprehension check quizes.
 
-That's it! You can now run the experiment and see your new View appear after the
-windowsizer View. Let's see how to test it out.
+With this change there is a new sequence to the experiment
+
+... -> demographic survey -> windowsizer -> myview -> instructions -> ...
+
+If we had pasted the `myview` View before the `windowsizer` View, the sequence
+would have been:
+
+... -> myview -> demographic survey -> windowsizer -> instructions -> ...
+
+Smile's timeline API also allow randomized flows for showing different sequences
+depending on what condition a participant is assigned to.
+
+**Now that we have defined a simple View and placed it in the design/timeline,
+we are ready to test it out.**
 
 ## Developing and debugging your experiment
 
 A final key concept of Smile is the advanced tools which help you develop and
-debug your experiment. You can read more about [development](/developing) in the
-remainder of the documentation. However, most simply you type
+debug your experiment. We think of it as enabling "brain surgery" on your
+experiment. You can use these tools to bounce around, inspect various elements
+of your interface, and check the format of your data. You can read more about
+[development](/developing) in the remainder of the documentation. However, most
+simply you type
 
 ```sh
 npm run dev
