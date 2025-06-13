@@ -1316,7 +1316,7 @@ describe('StepState', () => {
       expect(first.data).toEqual({})
     })
 
-    describe('datapath', () => {
+    describe('pathData', () => {
       it('should collect data from all nodes along current path', () => {
         // Set up a path with data
         const child1 = stepper.push('child1')

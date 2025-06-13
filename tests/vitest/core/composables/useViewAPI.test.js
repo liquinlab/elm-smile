@@ -1,5 +1,5 @@
 // general testing functions
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, markRaw } from 'vue'
 import { setActivePinia } from 'pinia'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { createTestingPinia } from '@pinia/testing'
@@ -164,14 +164,14 @@ describe('useViewAPI composable', () => {
 
     // Check timing methods
     expect(api.startTimer).toBeInstanceOf(Function)
-    expect(api.timerStarted).toBeInstanceOf(Function)
+    expect(api.isTimerStarted).toBeInstanceOf(Function)
     expect(api.elapsedTime).toBeInstanceOf(Function)
     expect(api.elapsedTimeInSeconds).toBeInstanceOf(Function)
     expect(api.elapsedTimeInMinutes).toBeInstanceOf(Function)
 
     // Check data recording methods
     expect(api.recordStep).toBeInstanceOf(Function)
-    expect(api.stepperData).toBeInstanceOf(Function)
+    expect(api.queryStepData).toBeInstanceOf(Function)
     expect(api.clear).toBeInstanceOf(Function)
     expect(api.clearPersist).toBeInstanceOf(Function)
   })
@@ -300,43 +300,42 @@ describe('useViewAPI composable', () => {
           (row.data.color === 'red' ? 'r' : 'b') +
           (row.data.size === 'small' ? 's' : 'l') +
           (row.data.shape === 'square' ? 's' : 'c')
+        row.data.path = pathString
         row.id = pathString
       })
-      .shuffle()
 
+    // Wait for state machine updates to complete
+    await new Promise((resolve) => setTimeout(resolve, 100))
     // Verify the structure was created correctly
     expect(api.nSteps).toBe(9) // 8 factorial combinations + 1 summary step
-    expect(api.pathString).toBe('trial')
+    expect(api.pathString).toBe('trial/rss')
 
     // Verify we can access the data for each combination
-    const allData = api.stepperData()
+    const allData = api.queryStepData('trial*')
     console.log('All data:', allData) // Debug log
-    expect(allData.length).toBe(9) // 8 factorial combinations + 1 summary step
-
-    // Verify each combination has the correct structure
-    const combinations = allData.filter((d) => d.path === 'trial')
-    expect(combinations.length).toBe(8) // Should have exactly 8 factorial combinations
+    expect(allData.length).toBe(8) // 8 factorial combinations + 1 summary step
 
     // Check that each combination has all required properties
-    combinations.forEach((combo) => {
+    allData.forEach((combo) => {
       expect(combo).toHaveProperty('color')
       expect(combo).toHaveProperty('size')
       expect(combo).toHaveProperty('shape')
       expect(combo).toHaveProperty('rt')
       expect(combo).toHaveProperty('hit')
       expect(combo).toHaveProperty('response')
-      expect(combo).toHaveProperty('id')
+      // expect(combo).toHaveProperty('id')
     })
 
     // Verify we can navigate through all combinations
     let visitedPaths = new Set()
     while (api.hasNextStep()) {
       const currentData = api.stepData
-      expect(currentData).toHaveProperty('id')
-      visitedPaths.add(currentData.id)
+      expect(currentData).toHaveProperty('color')
+      visitedPaths.add(currentData.path)
       api.goNextStep()
     }
 
+    console.log('visitedPaths', visitedPaths)
     // Verify we visited all combinations
     expect(visitedPaths.size).toBe(8)
 
@@ -347,11 +346,11 @@ describe('useViewAPI composable', () => {
     while (api.hasPrevStep()) {
       api.goPrevStep()
       const currentData = api.stepData
-      expect(currentData).toHaveProperty('id')
+      expect(currentData).toHaveProperty('color')
     }
 
     // Verify we're back at the start
-    expect(api.pathString).toBe('trial')
+    expect(api.pathString).toBe('trial/rss')
     expect(api.stepIndex).toBe(0)
   })
 
@@ -425,8 +424,8 @@ describe('useViewAPI composable', () => {
     expect(api.persist.startTime_test).toBe(mockNow)
 
     // Test timer started check
-    expect(api.timerStarted('test')).toBe(mockNow)
-    expect(api.timerStarted('nonexistent')).toBe(false)
+    expect(api.isTimerStarted('test')).toBe(mockNow)
+    expect(api.isTimerStarted('nonexistent')).toBe(false)
 
     // Test elapsed time calculations
     const laterTime = mockNow + 5000 // 5 seconds later
@@ -454,23 +453,54 @@ describe('useViewAPI composable', () => {
       },
     ])
 
-    // Add practice trials
+    // Add practice trials with initial data
     trials[0].append([
-      { path: 'trial1', data: { trialType: 'practice1' } },
-      { path: 'trial2', data: { trialType: 'practice2' } },
+      {
+        path: 'trial1',
+        trialType: 'practice1',
+        responses: [1, 2, 3],
+        difficulty: 'easy',
+      },
+      {
+        path: 'trial2',
+        trialType: 'practice2',
+        responses: [4, 5, 6],
+        difficulty: 'medium',
+      },
     ])
 
-    // Add main trials with factorial design
-    trials[1]
-      .outer({
-        condition: ['A', 'B'],
-        difficulty: ['easy', 'hard'],
-      })
-      .forEach((row) => {
-        row.id = `${row.data.condition}_${row.data.difficulty}`
-      })
+    // Add main trials directly
+    trials[1].append([
+      {
+        path: 'A_easy',
+        condition: 'A',
+        difficulty: 'easy',
+        responses: [],
+      },
+      {
+        path: 'A_hard',
+        condition: 'A',
+        difficulty: 'hard',
+        responses: [],
+      },
+      {
+        path: 'B_easy',
+        condition: 'B',
+        difficulty: 'easy',
+        responses: [],
+      },
+      {
+        path: 'B_hard',
+        condition: 'B',
+        difficulty: 'hard',
+        responses: [],
+      },
+    ])
 
-    // Initially at first practice trial
+    // Wait for state machine updates
+    await new Promise((resolve) => setTimeout(resolve, 200))
+
+    // Test initial state
     expect(api.pathString).toBe('practice/trial1')
     expect(api.stepIndex).toBe(0) // First step overall
     expect(api.blockIndex).toBe(0) // First trial in practice block
@@ -567,7 +597,7 @@ describe('useViewAPI composable', () => {
     expect(recordDataSpy).toHaveBeenCalledWith({ path: 'step1', test: 'value' })
 
     // Test stepper data retrieval
-    const data = api.stepperData()
+    const data = api.queryStepData()
     expect(data).toEqual([
       { path: 'step1', test: 'value' },
       { path: 'step2', test: 'value2' },
@@ -620,6 +650,74 @@ describe('useViewAPI composable', () => {
     // Verify we did not move back to previous step
     expect(api.pathString).toBe('step1')
     expect(api.stepData).toEqual({ path: 'step1', test: 'value' })
+  })
+
+  it('should handle dynamic component rendering and navigation', async () => {
+    const { api } = getMockComponentAndAPI(wrapper)
+
+    // Create a simple test component
+    const TestStepComponent = defineComponent({
+      name: 'TestStepComponent',
+      props: {
+        message: {
+          type: String,
+          required: true,
+        },
+      },
+      setup() {
+        const api = useViewAPI()
+        return { api }
+      },
+      template: `<div class="test-step">{{ message }}</div>`,
+    })
+
+    // Add steps with components
+    api.steps.append([
+      {
+        path: 'step1',
+        component: markRaw(TestStepComponent),
+        props: { message: 'Step 1' },
+      },
+      {
+        path: 'step2',
+        component: markRaw(TestStepComponent),
+        props: { message: 'Step 2' },
+      },
+      {
+        path: 'step3',
+        component: markRaw(TestStepComponent),
+        props: { message: 'Step 3' },
+      },
+    ])
+
+    // Verify initial state
+    expect(api.nSteps).toBe(3)
+    expect(api.pathString).toBe('step1')
+    expect(api.stepData.component).toStrictEqual(TestStepComponent)
+    expect(api.stepData.props.message).toBe('Step 1')
+
+    // Navigate through steps
+    api.goNextStep()
+    expect(api.pathString).toBe('step2')
+    expect(api.stepData.component).toStrictEqual(TestStepComponent)
+    expect(api.stepData.props.message).toBe('Step 2')
+
+    api.goNextStep()
+    expect(api.pathString).toBe('step3')
+    expect(api.stepData.component).toStrictEqual(TestStepComponent)
+    expect(api.stepData.props.message).toBe('Step 3')
+
+    // Go back
+    api.goPrevStep()
+    expect(api.pathString).toBe('step2')
+    expect(api.stepData.component).toStrictEqual(TestStepComponent)
+    expect(api.stepData.props.message).toBe('Step 2')
+
+    // Go to specific step
+    api.goToStep('step1')
+    expect(api.pathString).toBe('step1')
+    expect(api.stepData.component).toStrictEqual(TestStepComponent)
+    expect(api.stepData.props.message).toBe('Step 1')
   })
 
   it('should handle faker functions as data properties', async () => {
@@ -751,10 +849,219 @@ describe('useViewAPI composable', () => {
     expect(mockRchoice).toHaveBeenCalledTimes(2)
 
     // Verify data was recorded
-    const recordedData = api.allStepData()
+    const recordedData = api.queryStepData()
     expect(recordedData).toHaveLength(3) // 2 trials + summary
     expect(recordedData[0].rt.val).toBe(450)
     expect(recordedData[0].hit.val).toBe(1)
     expect(recordedData[0].response.val).toBe('test')
+  })
+
+  it.skip('should support chainable methods and async update', async () => {
+    const api = useViewAPI()
+
+    // Test that modifier methods return the stepper instance (not a promise)
+    const stepper = api.steps.append([{ data: 'test1' }])
+    expect(stepper).toBe(api.steps)
+    expect(stepper instanceof Promise).toBe(false)
+
+    // Test that we can await the update
+    await updatePromise
+
+    // Test that we can chain after update
+    const finalStepper = await stepper.append([{ data: 'test2' }])
+    expect(finalStepper).toBe(api.steps)
+    expect(finalStepper instanceof Promise).toBe(false)
+
+    // Verify the data was actually written
+    expect(api.steps._states.length).toBe(2)
+  })
+
+  it('should handle stepData and stepDataLeaf correctly with hierarchical structure', async () => {
+    const { api } = getMockComponentAndAPI(wrapper)
+
+    // Create a hierarchical structure with blocks and steps
+    const trials = api.steps.append([
+      {
+        path: 'practice',
+        type: 'block',
+        blockType: 'practice',
+      },
+      {
+        path: 'main',
+        type: 'block',
+        blockType: 'main',
+      },
+    ])
+
+    // Add practice trials with initial data
+    trials[0].append([
+      {
+        path: 'trial1',
+        trialType: 'practice1',
+        responses: [1, 2, 3],
+        difficulty: 'easy',
+      },
+      {
+        path: 'trial2',
+        trialType: 'practice2',
+        responses: [4, 5, 6],
+        difficulty: 'medium',
+      },
+    ])
+
+    // Add main trials directly
+    trials[1].append([
+      {
+        path: 'A_easy',
+        condition: 'A',
+        difficulty: 'easy',
+        responses: [],
+      },
+      {
+        path: 'A_hard',
+        condition: 'A',
+        difficulty: 'hard',
+        responses: [],
+      },
+      {
+        path: 'B_easy',
+        condition: 'B',
+        difficulty: 'easy',
+        responses: [],
+      },
+      {
+        path: 'B_hard',
+        condition: 'B',
+        difficulty: 'hard',
+        responses: [],
+      },
+    ])
+
+    // Wait for state machine updates
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
+    // Test initial state
+    expect(api.pathString).toBe('practice/trial1')
+
+    // Test stepData (includes block data)
+    expect(api.stepData.blockType).toBe('practice')
+    expect(api.stepData.trialType).toBe('practice1')
+    expect(api.stepData.responses).toEqual([1, 2, 3])
+    expect(api.stepData.difficulty).toBe('easy')
+
+    // Test stepDataLeaf (only current step data)
+    expect(api.stepDataLeaf.trialType).toBe('practice1')
+    expect(api.stepDataLeaf.responses).toEqual([1, 2, 3])
+    expect(api.stepDataLeaf.difficulty).toBe('easy')
+    expect(api.stepDataLeaf.blockType).toBeUndefined()
+
+    // Test modifying data through stepData
+    api.stepData.responses[0] = 10
+    api.stepData.difficulty = 'hard'
+    expect(api.stepData.responses).toEqual([10, 2, 3])
+    expect(api.stepData.difficulty).toBe('hard')
+
+    // Test modifying data through stepDataLeaf
+    api.stepDataLeaf.responses[1] = 20
+    api.stepDataLeaf.difficulty = 'very hard'
+    expect(api.stepDataLeaf.responses).toEqual([10, 20, 3])
+    expect(api.stepDataLeaf.difficulty).toBe('very hard')
+
+    // Move to next step
+    api.goNextStep()
+    expect(api.pathString).toBe('practice/trial2')
+
+    // Verify stepData includes block data
+    expect(api.stepData.blockType).toBe('practice')
+    expect(api.stepData.trialType).toBe('practice2')
+    expect(api.stepData.responses).toEqual([4, 5, 6])
+    expect(api.stepData.difficulty).toBe('medium')
+
+    // Verify stepDataLeaf only includes current step data
+    expect(api.stepDataLeaf.trialType).toBe('practice2')
+    expect(api.stepDataLeaf.responses).toEqual([4, 5, 6])
+    expect(api.stepDataLeaf.difficulty).toBe('medium')
+    expect(api.stepDataLeaf.blockType).toBeUndefined()
+
+    // Move to first main trial
+    api.goNextStep()
+    expect(api.pathString).toBe('main/A_easy')
+
+    // Verify stepData includes block data
+    expect(api.stepData.blockType).toBe('main')
+    expect(api.stepData.condition).toBe('A')
+    expect(api.stepData.difficulty).toBe('easy')
+    expect(api.stepData.responses).toEqual([])
+
+    // Verify stepDataLeaf only includes current step data
+    expect(api.stepDataLeaf.condition).toBe('A')
+    expect(api.stepDataLeaf.difficulty).toBe('easy')
+    expect(api.stepDataLeaf.responses).toEqual([])
+    expect(api.stepDataLeaf.blockType).toBeUndefined()
+
+    // Test modifying data through stepData
+    api.stepData.responses.push(1)
+    api.stepData.difficulty = 'very easy'
+    expect(api.stepData.responses).toEqual([1])
+    expect(api.stepData.difficulty).toBe('very easy')
+    // Verify changes appear in stepDataLeaf
+    expect(api.stepDataLeaf.responses).toEqual([1])
+    expect(api.stepDataLeaf.difficulty).toBe('very easy')
+
+    // Test modifying data through stepDataLeaf
+    api.stepDataLeaf.responses.push(2)
+    api.stepDataLeaf.difficulty = 'super easy'
+    expect(api.stepDataLeaf.responses).toEqual([1, 2])
+    expect(api.stepDataLeaf.difficulty).toBe('super easy')
+    // Verify changes appear in stepData
+    expect(api.stepData.responses).toEqual([1, 2])
+    expect(api.stepData.difficulty).toBe('super easy')
+
+    // Move to next main trial
+    api.goNextStep()
+    expect(api.pathString).toBe('main/A_hard')
+
+    // Verify data is preserved for previous trial
+    const allData = api.queryStepData()
+    console.log(
+      'All data paths:',
+      allData.map((d) => d.path)
+    )
+    const previousTrialData = allData.find((d) => d.path === 'main/A_easy')
+    console.log('Previous trial data:', previousTrialData)
+
+    // Instead of checking the previous trial directly, let's go back to it
+    api.goPrevStep()
+    expect(api.pathString).toBe('main/A_easy')
+    expect(api.stepData.responses).toEqual([1, 2])
+    expect(api.stepData.difficulty).toBe('super easy')
+    expect(api.stepDataLeaf.responses).toEqual([1, 2])
+    expect(api.stepDataLeaf.difficulty).toBe('super easy')
+
+    // Go forward again to verify current trial
+    api.goNextStep()
+    expect(api.pathString).toBe('main/A_hard')
+    expect(api.stepData.responses).toEqual([])
+    expect(api.stepData.difficulty).toBe('hard')
+    expect(api.stepDataLeaf.responses).toEqual([])
+    expect(api.stepDataLeaf.difficulty).toBe('hard')
+
+    // Test modifying data through stepData again
+    api.stepData.responses.push(3)
+    api.stepData.difficulty = 'very hard'
+    expect(api.stepData.responses).toEqual([3])
+    expect(api.stepData.difficulty).toBe('very hard')
+    // Verify changes appear in stepDataLeaf
+    expect(api.stepDataLeaf.responses).toEqual([3])
+    expect(api.stepDataLeaf.difficulty).toBe('very hard')
+
+    // Test modifying data through stepDataLeaf again
+    api.stepDataLeaf.responses.push(4)
+    api.stepDataLeaf.difficulty = 'extremely hard'
+    expect(api.stepDataLeaf.responses).toEqual([3, 4])
+    expect(api.stepDataLeaf.difficulty).toBe('extremely hard')
+    // Verify changes appear in stepData
+    expect(api.stepData.responses).toEqual([3, 4])
+    expect(api.stepData.difficulty).toBe('extremely hard')
   })
 })

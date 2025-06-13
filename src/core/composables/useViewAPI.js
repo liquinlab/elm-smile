@@ -72,18 +72,6 @@ class ViewAPI extends SmileAPI {
     this.useMousePressed = useMousePressed
   }
 
-  _updateStepperState(data, save = true) {
-    this._pathData.value = data.pathData
-    this._pathString.value = data.currentPathString
-    this._path.value = data.currentPath
-    this._index.value = data.index
-    this._gvars.value = reactive(data.data?.gvars || {})
-    this._stateMachine.value = this._visualizeStateMachine()
-    if (save) {
-      this._saveStepperState()
-    }
-  }
-
   /**
    * The underlying state machine instance
    * @name steps
@@ -98,40 +86,12 @@ class ViewAPI extends SmileAPI {
     return this._stepper.value
   }
 
-  updateStepper() {
-    this._updateStepperState(this._stepper.value)
-  }
-
-  _visualizeStateMachine() {
-    const processState = (state, level = 0) => {
-      const cleanState = {
-        data: state.data,
-        pathdata: state.pathData,
-        path: state.pathString,
-        index: state.index,
-        isLeaf: state.isLeaf,
-        isFirstLeaf: state.isFirstLeaf,
-        rows: [],
-      }
-
-      if (state.rows) {
-        state.rows.forEach((childState) => {
-          cleanState.rows.push(processState(childState, level + 1))
-        })
-      }
-
-      return cleanState
-    }
-
-    return processState(this._stepper.value)
-  }
-
-  _saveStepperState() {
-    if (this._stepper.value) {
-      this._stepper.value.save(this._page.value)
-    }
-  }
-
+  /**
+   * Checks if there is a next step available in the stepper.
+   * @returns {boolean} True if there is a next step available, false otherwise.
+   * @memberof ViewAPI
+   * @instance
+   */
   hasNextStep() {
     return this._stepper.value.hasNext()
   }
@@ -212,75 +172,6 @@ class ViewAPI extends SmileAPI {
   goToStep(path) {
     this._stepper.value.goTo(path)
     this._updateStepperState(this._stepper.value)
-  }
-
-  get stepData() {
-    if (!this._pathData.value) return null
-
-    const mergedData = computed(() => {
-      return this._pathData.value.reduce((merged, item) => {
-        return { ...merged, ...item }
-      }, {})
-    })
-
-    const createRecursiveProxy = (obj) => {
-      if (obj === null || typeof obj !== 'object') {
-        return obj
-      }
-
-      if (Array.isArray(obj)) {
-        return new Proxy(obj, {
-          get: (target, prop) => {
-            const value = target[prop]
-            if (typeof prop === 'string' && !isNaN(prop)) {
-              return createRecursiveProxy(value)
-            }
-            return value
-          },
-          set: (target, prop, value) => {
-            target[prop] = value
-            if (this._stepper.value.currentData) {
-              this._stepper.value.currentData[prop] = value
-              this._saveStepperState()
-            }
-            return true
-          },
-        })
-      }
-
-      return new Proxy(obj, {
-        get: (target, prop) => {
-          const value = target[prop]
-          return createRecursiveProxy(value)
-        },
-        set: (target, prop, value) => {
-          target[prop] = value
-          if (this._stepper.value.currentData) {
-            this._stepper.value.currentData[prop] = value
-            this._saveStepperState()
-          }
-          return true
-        },
-      })
-    }
-
-    return createRecursiveProxy(mergedData.value)
-  }
-
-  get datapath() {
-    if (this._pathData.value === null) return null
-
-    return this._data.value.map((item) => {
-      if (item?.type?.__vueComponent) {
-        return {
-          ...item,
-          type: this.componentRegistry.get(item.type.componentName) || {
-            template: `<div>Component ${item.type.componentName} not found</div>`,
-          },
-        }
-      }
-      return item
-    })
   }
 
   /**
@@ -364,19 +255,90 @@ class ViewAPI extends SmileAPI {
     return this.blockIndex === this.blockLength - 1
   }
 
+  /**
+   * Gets the number of steps in the current block.
+   * This represents the total number of steps at the current level in the stepper hierarchy.
+   * @returns {number} The number of steps in the current block
+   * @memberof ViewAPI
+   * @instance
+   */
   get blockLength() {
     return this._stepper.value.blockLength
   }
 
+  /**
+   * Gets the total number of leaf nodes in the stepper.
+   * This is an alias for nSteps that represents the total number of steps in the sequence.
+   * @returns {number} The total number of leaf nodes
+   * @memberof ViewAPI
+   * @instance
+   * @see nSteps
+   */
   get stepLength() {
     return this._stepper.value.countLeafNodes
   }
 
+  /**
+   * Alias for stepLength.
+   * Returns the total number of leaf nodes in the stepper.
+   * @returns {number} The total number of leaf nodes
+   * @memberof ViewAPI
+   * @instance
+   * @see stepLength
+   */
   get nSteps() {
-    return this._stepper.value.countLeafNodes
+    return this.stepLength
   }
 
+  /**
+   * Persistence Methods
+   *
+   * These methods provide functionality for storing and accessing variables that persist across browser reloads.
+   * Persistence is handled through the stepper's root data store and variables are accessible via the `persist` getter.
+   *
+   * Available persistence methods:
+   * - persist: Getter that provides access to persisted variables stored in stepper root data
+   * - persist.isDefined(key): Checks if a persisted variable exists
+   * - clearPersist(): Clears all persisted variables
+   *
+   * Example usage:
+   * ```js
+   * // Set a persisted value
+   * api.persist.myVar = 'some value'
+   *
+   * // Check if variable exists
+   * if (api.persist.isDefined('myVar')) {
+   *   // Access persisted value
+   *   console.log(api.persist.myVar)
+   * }
+   *
+   * // Clear all persisted values
+   * api.clearPersist()
+   * ```
+   */
   // Getter for persisted variable that provides access to gvars from stepper root data
+  /**
+   * Getter that provides access to persisted variables stored in the stepper's root data.
+   * Creates a recursive proxy to handle nested object access and updates.
+   *
+   * @returns {Proxy} A proxy object that provides access to persisted variables with:
+   *   - get: Returns persisted values and the isDefined() helper method
+   *   - set: Updates persisted values and triggers stepper update
+   * @memberof ViewAPI
+   * @instance
+   *
+   * @example
+   * // Set a persisted value
+   * api.persist.myVar = 'value'
+   *
+   * // Get a persisted value
+   * const value = api.persist.myVar
+   *
+   * // Check if variable exists
+   * if (api.persist.isDefined('myVar')) {
+   *   // Variable exists
+   * }
+   */
   get persist() {
     if (!this._stepper.value.root.data.gvars) {
       this._stepper.value.root.data.gvars = {}
@@ -410,30 +372,295 @@ class ViewAPI extends SmileAPI {
     return createRecursiveProxy(this._stepper.value.root.data.gvars)
   }
 
-  // Timing methods
+  /**
+   * Clears all persisted variables stored in the stepper's root data.
+   * This resets both the internal gvars ref and the stepper's root data gvars to empty objects.
+   * @method clearPersist
+   * @memberof ViewAPI
+   * @instance
+   * @returns {void}
+   * @example
+   * // Clear all persisted variables
+   * api.clearPersist()
+   */
+  clearPersist() {
+    this._gvars.value = reactive({})
+    this.stepper.root.data.gvars = {}
+    this._saveStepperState()
+  }
+
+  /**
+   * Timing Methods
+   *
+   * These methods provide functionality for tracking elapsed time during the experiment.
+   * Times are stored in the persisted variables (gvars) and can be accessed across steps.
+   * Multiple named timers can be running simultaneously.
+   *
+   * Available timing methods:
+   * - startTimer(name): Starts a named timer
+   * - isTimerStarted(name): Checks if a timer exists
+   * - elapsedTime(name): Gets elapsed time in milliseconds
+   * - elapsedTimeInSeconds(name): Gets elapsed time in seconds
+   * - elapsedTimeInMinutes(name): Gets elapsed time in minutes
+   *
+   * @memberof ViewAPI
+   */
+
+  /**
+   * Starts a named timer by storing the current timestamp in persisted variables
+   * @param {string} [name='default'] - The name of the timer to start
+   * @returns {void}
+   * @memberof ViewAPI
+   * @instance
+   */
   startTimer(name = 'default') {
     this.persist[`startTime_${name}`] = Date.now()
   }
 
-  timerStarted(name = 'default') {
+  /**
+   * Checks if a named timer has been started
+   * @param {string} [name='default'] - The name of the timer to check
+   * @returns {boolean} True if the timer exists and has been started, false otherwise
+   * @memberof ViewAPI
+   * @instance
+   */
+  isTimerStarted(name = 'default') {
     const timerKey = `startTime_${name}`
-    return timerKey in this._stepper.value.root.data.gvars ? this._stepper.value.root.data.gvars[timerKey] : false
+    return this.persist.isDefined(timerKey) ? this.persist[timerKey] : false
   }
 
+  /**
+   * Gets the elapsed time in milliseconds since a named timer was started
+   * @param {string} [name='default'] - The name of the timer to check
+   * @returns {number} Elapsed time in milliseconds
+   * @memberof ViewAPI
+   * @instance
+   */
   elapsedTime(name = 'default') {
-    return Date.now() - this._stepper.value.root.data.gvars[`startTime_${name}`]
+    return Date.now() - this.persist[`startTime_${name}`]
   }
 
+  /**
+   * Gets the elapsed time in seconds since a named timer was started
+   * @param {string} [name='default'] - The name of the timer to check
+   * @returns {number} Elapsed time in seconds
+   * @memberof ViewAPI
+   * @instance
+   */
   elapsedTimeInSeconds(name = 'default') {
-    return (Date.now() - this._stepper.value.root.data.gvars[`startTime_${name}`]) / 1000
+    return (Date.now() - this.persist[`startTime_${name}`]) / 1000
   }
 
+  /**
+   * Gets the elapsed time in minutes since a named timer was started
+   * @param {string} [name='default'] - The name of the timer to check
+   * @returns {number} Elapsed time in minutes
+   * @memberof ViewAPI
+   * @instance
+   */
   elapsedTimeInMinutes(name = 'default') {
-    return (Date.now() - this._stepper.value.root.data.gvars[`startTime_${name}`]) / 60000
+    return (Date.now() - this.persist[`startTime_${name}`]) / 60000
   }
 
-  // Data methods
-  stepperData(pathFilter = null) {
+  /**
+   * Data Methods
+   *
+   * These methods provide functionality for storing and retrieving data associated with each step in a view.
+   * Data is persisted with each step and can be accessed later when revisiting steps.
+   *
+   * The data methods include:
+   * - stepData: Gets/sets merged data from all steps in the current path (parent blocks + current step)
+   * - stepDataLeaf: Gets/sets data for only the current step (leaf node)
+   * - pathData: Gets raw data array for all steps in the current path
+   * - queryStepData(): Gets data for all steps, optionally filtered by path pattern
+   * - clearCurrentStepData(): Clears data for the current step
+   * - clear(): Clears all step data for the current view
+   *
+   * Data can be accessed and modified through stepData (merged) or stepDataLeaf (current step only):
+   * @example
+   * // Get merged data from current path (includes parent block data)
+   * const data = api.stepData
+   *
+   * // Get data from only current step
+   * const leafData = api.stepDataLeaf
+   *
+   * // Set data on current step
+   * api.stepDataLeaf.response = 'some value'
+   *
+   * // Get data from all steps matching a path pattern
+   * const allData = api.queryStepData('trial/block*')
+   *
+   * // Clear current step data
+   * api.clearCurrentStepData()
+   *
+   * @memberof ViewAPI
+   */
+
+  /**
+   * Gets merged data from all steps in the current path (parent blocks + current step)
+   * @returns {Object|null} Merged data object containing properties from all steps in current path, or null if no path data exists
+   * @memberof ViewAPI
+   * @instance
+   * @example
+   * // Get merged data including parent block data
+   * const data = api.stepData
+   * console.log(data.blockType) // Access block-level property
+   * console.log(data.response) // Access step-level property
+   *
+   * // Modify data (changes are saved to current step)
+   * api.stepData.response = 'new value'
+   */
+  get stepData() {
+    if (!this._pathData.value) return null
+
+    const mergedData = computed(() => {
+      return this._pathData.value.reduce((merged, item) => {
+        return { ...merged, ...item }
+      }, {})
+    })
+
+    const createRecursiveProxy = (obj) => {
+      if (obj === null || typeof obj !== 'object') {
+        return obj
+      }
+
+      if (Array.isArray(obj)) {
+        return new Proxy(obj, {
+          get: (target, prop) => {
+            const value = target[prop]
+            if (typeof prop === 'string' && !isNaN(prop)) {
+              return createRecursiveProxy(value)
+            }
+            return value
+          },
+          set: (target, prop, value) => {
+            target[prop] = value
+            if (this._stepper.value.currentData) {
+              this._stepper.value.currentData[prop] = value
+              this._saveStepperState()
+            }
+            return true
+          },
+        })
+      }
+
+      return new Proxy(obj, {
+        get: (target, prop) => {
+          const value = target[prop]
+          return createRecursiveProxy(value)
+        },
+        set: (target, prop, value) => {
+          target[prop] = value
+          if (this._stepper.value.currentData) {
+            this._stepper.value.currentData[prop] = value
+            this._saveStepperState()
+          }
+          return true
+        },
+      })
+    }
+
+    return createRecursiveProxy(mergedData.value)
+  }
+
+  /**
+   * Gets the data only from the current leaf node of the current path.
+   * This is similar to stepData but only includes data from the current leaf node,
+   * not the entire path. Works with nested objects and arrays through a proxy.
+   * @returns {Proxy|null} A proxy object for the current leaf node's data, or null if no data exists
+   * @memberof ViewAPI
+   * @instance
+   * @example
+   * // Get a value from the current leaf node
+   * const value = api.stepDataLeaf.myVariable
+   *
+   * // Set a value in the current leaf node
+   * api.stepDataLeaf.myVariable = 'new value'
+   *
+   * // Work with nested objects
+   * api.stepDataLeaf.nested.obj.prop = 123
+   *
+   * // Work with arrays
+   * api.stepDataLeaf.myArray[0] = 'first item'
+   */
+  get stepDataLeaf() {
+    if (!this._stepper.value?.currentData) return null
+
+    const createRecursiveProxy = (obj) => {
+      if (obj === null || typeof obj !== 'object') {
+        return obj
+      }
+
+      if (Array.isArray(obj)) {
+        return new Proxy(obj, {
+          get: (target, prop) => {
+            const value = target[prop]
+            if (typeof prop === 'string' && !isNaN(prop)) {
+              return createRecursiveProxy(value)
+            }
+            return value
+          },
+          set: (target, prop, value) => {
+            target[prop] = value
+            this._stepper.value.currentData[prop] = value
+            this._saveStepperState()
+            return true
+          },
+        })
+      }
+
+      return new Proxy(obj, {
+        get: (target, prop) => {
+          const value = target[prop]
+          return createRecursiveProxy(value)
+        },
+        set: (target, prop, value) => {
+          target[prop] = value
+          this._stepper.value.currentData[prop] = value
+          this._saveStepperState()
+          return true
+        },
+      })
+    }
+
+    return createRecursiveProxy(this._stepper.value.currentData)
+  }
+
+  /**
+   * Gets the path data for the current step, with component types resolved from the registry
+   * @returns {Array|null} Array of path data objects with resolved component types, or null if no path data exists
+   */
+  get pathData() {
+    if (this._pathData.value === null) return null
+
+    return this._pathData.value.map((item) => {
+      if (item?.type?.__vueComponent) {
+        return {
+          ...item,
+          type: this.componentRegistry.get(item.type.componentName) || {
+            template: `<div>Component ${item.type.componentName} not found</div>`,
+          },
+        }
+      }
+      return item
+    })
+  }
+
+  /**
+   * Gets data for all leaf nodes in the stepper, optionally filtered by path pattern.
+   * Returns only the data directly associated with each leaf node, without merging parent block data.
+   * @param {string|null} pathFilter - Optional path pattern to filter nodes (e.g. 'trial/block*')
+   * @returns {Array} Array of data objects for each matching leaf node
+   * @memberof ViewAPI
+   * @instance
+   * @example
+   * // Get data for all leaf nodes
+   * const allLeafData = api.queryStepDataLeaf()
+   *
+   * // Get data for nodes matching a pattern
+   * const trialData = api.queryStepDataLeaf('trial/block*')
+   */
+  queryStepDataLeaf(pathFilter = null) {
     const matchesFilter = (path, filter) => {
       if (!filter) return true
 
@@ -456,6 +683,45 @@ class ViewAPI extends SmileAPI {
     return getLeafData(this._stepper.value)
   }
 
+  /**
+   * Gets merged data for all leaf nodes in the stepper, optionally filtered by path pattern.
+   * Similar to queryStepData but returns the merged data for each leaf node (including parent block data).
+   * @param {string|null} pathFilter - Optional path pattern to filter nodes (e.g. 'trial/block*')
+   * @returns {Array} Array of merged data objects for each matching leaf node
+   * @memberof ViewAPI
+   * @instance
+   * @example
+   * // Get merged data for all leaf nodes
+   * const allMergedData = api.queryStepDataMerge()
+   *
+   * // Get merged data for nodes matching a pattern
+   * const trialData = api.queryStepDataMerge('trial/block*')
+   */
+  queryStepData(pathFilter = null) {
+    const matchesFilter = (path, filter) => {
+      if (!filter) return true
+
+      let pattern = filter.replace(/\*/g, '.*')
+      pattern = pattern.replace(/[+?^${}()|[\]\\]/g, '\\$&')
+      const regex = new RegExp(`^${pattern}`)
+      return regex.test(path)
+    }
+
+    const getLeafData = (state) => {
+      if (state.isLeaf) {
+        if (matchesFilter(state.pathString, pathFilter)) {
+          // Only return the node's own data, not including root properties
+          const { gvars, ...nodeData } = state.data
+          return nodeData
+        }
+        return []
+      }
+      return state.states.flatMap(getLeafData)
+    }
+
+    return getLeafData(this._stepper.value)
+  }
+
   clear() {
     if (this.store.browserPersisted.viewSteppers[this._page.value]) {
       const pageData = this.store.browserPersisted.viewSteppers[this._page.value].data || {}
@@ -468,9 +734,8 @@ class ViewAPI extends SmileAPI {
     this._saveStepperState()
   }
 
-  clearPersist() {
-    this._gvars.value = reactive({})
-    this.stepper.root.data.gvars = {}
+  clearCurrentStepData() {
+    this._stepper.value.clearCurrentStepData()
     this._saveStepperState()
   }
 
@@ -486,9 +751,70 @@ class ViewAPI extends SmileAPI {
     this.recordData(this.stepData)
   }
 
+  /**
+   * Utility Functions
+   *
+   * These methods handle updating and saving the reactive state properties of the view:
+   * - _updateStepperState: Updates internal reactive refs from stepper data
+   * - updateStepper: Public method to trigger stepper state update
+   * - _visualizeStateMachine: Creates clean visualization of state machine
+   * - _saveStepperState: Persists current stepper state to store
+   *
+   * The utility functions maintain consistency between the stepper state machine
+   * and the reactive view properties that components depend on.
+   *
+   * @memberof ViewAPI
+   */
+
   // Update getter to use computed stepper
   get stepper() {
     return this._stepper.value
+  }
+
+  _updateStepperState(data, save = true) {
+    this._pathData.value = data.pathData
+    this._pathString.value = data.currentPathString
+    this._path.value = data.currentPath
+    this._index.value = data.index
+    this._gvars.value = reactive(data.data?.gvars || {})
+    this._stateMachine.value = this._visualizeStateMachine()
+    if (save) {
+      this._saveStepperState()
+    }
+  }
+
+  updateStepper() {
+    this._updateStepperState(this._stepper.value)
+  }
+
+  _visualizeStateMachine() {
+    const processState = (state, level = 0) => {
+      const cleanState = {
+        data: state.data,
+        pathdata: state.pathData,
+        path: state.pathString,
+        index: state.index,
+        isLeaf: state.isLeaf,
+        isFirstLeaf: state.isFirstLeaf,
+        rows: [],
+      }
+
+      if (state.rows) {
+        state.rows.forEach((childState) => {
+          cleanState.rows.push(processState(childState, level + 1))
+        })
+      }
+
+      return cleanState
+    }
+
+    return processState(this._stepper.value)
+  }
+
+  _saveStepperState() {
+    if (this._stepper.value) {
+      this._stepper.value.save(this._page.value)
+    }
   }
 }
 

@@ -572,6 +572,21 @@ export class Stepper extends StepState {
 
     this._shuffled = false
   }
+
+  /**
+   * Clears all data from the current step by calling clearData()
+   * Does not affect child nodes or the structure of the state tree
+   * @returns {void}
+   */
+  clearCurrentStepData() {
+    // Get the current leaf node
+    let current = this._root
+    while (current._states.length > 0) {
+      current = current._states[current._currentIndex]
+    }
+    // Clear data on the current leaf node
+    current.clearData()
+  }
 }
 
 export default Stepper

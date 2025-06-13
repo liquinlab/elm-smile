@@ -738,6 +738,14 @@ export class StepState {
    */
   clear() {
     this.clearSubTree()
+    this.clearData()
+  }
+
+  /**
+   * Clears all data from the current node by resetting the data object to empty
+   * Does not affect child nodes or the structure of the state tree
+   */
+  clearData() {
     this._data = {}
   }
 

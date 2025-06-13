@@ -46,8 +46,17 @@ The following functions are available when using `useViewAPI`:
 
 ### Data Access
 
-- `stepData`: Returns the current step's data as a reactive proxy.
-- `d`: Alias for `stepData`.
+- `stepData`: Getter/setter for the current step's data. This is a proxy that
+  allows you to get and set values on the current step's data. Changes are
+  automatically saved to the stepper state.
+- `stepDataLeaf`: Getter/setter for the current leaf node's data only. Similar
+  to `stepData` but only includes data from the current leaf node, not the
+  entire path. This is useful when you want to work with just the current step's
+  data without including parent block data.
+- `queryStepData`, `queryStepDataLeaf`: See
+  [Data Query Methods](#data-query-methods).
+- `pathData`: Getter for the raw data array of all steps in the current path.
+  This is useful when you need to access the raw data structure of the path.
 - `pathData`: Returns the current data path with component resolution.
 - `stepIndex`: Returns the current step index among leaf nodes.
 - `blockIndex`: Returns the current block index.
@@ -80,7 +89,7 @@ The following functions are available when using `useViewAPI`:
 ### State Management
 
 - `clear()`: Clears the stepper state and component registry.
-- `stepperData(pathFilter = null)`: Returns data from leaf nodes, optionally
+- `clearCurrentStepData()`: Clears the data for the current step in the stepper.
   filtered by path pattern.
 - `updateStepper()`: Updates the internal stepper state.
 - `_visualizeStateMachine()`: Returns a visualization of the current state
@@ -258,3 +267,67 @@ references) must be converted to Firestore-safe formats before saving.
   event_data must be Firestore-safe if provided.
 - `saveData(force)`: Saves the current data to the database (force save if
   specified). All data must be Firestore-safe.
+
+### Data Query Methods
+
+These methods provide functionality for querying data across multiple steps in
+the experiment.
+
+#### `queryStepData(pathFilter = null)`
+
+Gets data for all leaf nodes in the stepper, optionally filtered by path
+pattern. Returns only the data directly associated with each leaf node, without
+merging parent block data.
+
+```javascript
+// Get data for all leaf nodes
+const allLeafData = api.queryStepData()
+
+// Get data for nodes matching a pattern
+const trialData = api.queryStepData('trial/block*')
+```
+
+#### `queryStepDataLeaf(pathFilter = null)`
+
+Gets data for all leaf nodes in the stepper, optionally filtered by path
+pattern. Returns only the data directly associated with each leaf node, without
+merging parent block data. This is an alias for `queryStepData` for consistency
+with the `stepDataLeaf` getter.
+
+```javascript
+// Get data for all leaf nodes
+const allLeafData = api.queryStepDataLeaf()
+
+// Get data for nodes matching a pattern
+const trialData = api.queryStepDataLeaf('trial/block*')
+```
+
+#### `queryStepDataMerge(pathFilter = null)`
+
+Gets merged data for all leaf nodes in the stepper, optionally filtered by path
+pattern. Similar to `queryStepData` but returns the merged data for each leaf
+node (including parent block data).
+
+```javascript
+// Get merged data for all leaf nodes
+const allMergedData = api.queryStepDataMerge()
+
+// Get merged data for nodes matching a pattern
+const trialData = api.queryStepDataMerge('trial/block*')
+```
+
+The difference between these methods can be illustrated with an example:
+
+```javascript
+// Given a structure:
+// block (blockType: 'practice')
+//   trial1 (response: 'A')
+//   trial2 (response: 'B')
+
+// queryStepData() returns:
+;[{ response: 'A' }, { response: 'B' }][
+  // queryStepDataMerge() returns:
+  ({ blockType: 'practice', response: 'A' },
+  { blockType: 'practice', response: 'B' })
+]
+```

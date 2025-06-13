@@ -233,13 +233,15 @@ watch(
     <div class="data-container">
       <div class="data-display">
         Step Data <span class="data-label">(.stepData)</span>
+        <!--
         <button
-          @click="api.clearData()"
+          @click="api.clearCurrentStepData()"
           class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
           data-tooltip="Delete Nodes"
         >
           <span><FAIcon icon="fa-solid fa-trash" /></span>
         </button>
+        -->
         <DataPathViewer :data="api.stepData" />
       </div>
     </div>
