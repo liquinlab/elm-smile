@@ -63,11 +63,13 @@ export class StepState {
   }
 
   /**
-   * Sets the id of this node
+   * Sets the id of this node and updates the data field to include the id
    * @param {*} id - The new id to set
    */
   set id(id) {
     this._id = id
+    // Update or add id in the data field
+    this._data = { ...this._data, id }
   }
 
   /**
