@@ -385,7 +385,7 @@ class ViewAPI extends SmileAPI {
    */
   clearPersist() {
     this._gvars.value = reactive({})
-    this.stepper.root.data.gvars = {}
+    this._stepper.value.root.data.gvars = {}
     this._saveStepperState()
   }
 
@@ -722,6 +722,18 @@ class ViewAPI extends SmileAPI {
     return getLeafData(this._stepper.value)
   }
 
+  /**
+   * Clears all data for the current view's stepper
+   * @method clear
+   * @memberof ViewAPI
+   * @instance
+   * @description Removes the stepper state from browser storage, clears the stepper's data subtree,
+   * clears the component registry, and saves the cleared state
+   * @returns {void}
+   * @example
+   * // Clear all data for current view
+   * api.clear()
+   */
   clear() {
     if (this.store.browserPersisted.viewSteppers[this._page.value]) {
       const pageData = this.store.browserPersisted.viewSteppers[this._page.value].data || {}
@@ -734,6 +746,18 @@ class ViewAPI extends SmileAPI {
     this._saveStepperState()
   }
 
+  /**
+   * Clears the data for the current step in the stepper
+   * @method clearCurrentStepData
+   * @memberof ViewAPI
+   * @instance
+   * @description Clears only the data for the current step, leaving other step data intact,
+   * then saves the updated stepper state
+   * @returns {void}
+   * @example
+   * // Clear data for current step
+   * api.clearCurrentStepData()
+   */
   clearCurrentStepData() {
     this._stepper.value.clearCurrentStepData()
     this._saveStepperState()
@@ -766,11 +790,36 @@ class ViewAPI extends SmileAPI {
    * @memberof ViewAPI
    */
 
-  // Update getter to use computed stepper
-  get stepper() {
-    return this._stepper.value
+  /**
+   * Saves the current stepper state to persistent storage
+   * @private
+   * @method _saveStepperState
+   * @memberof ViewAPI
+   * @instance
+   * @description Persists the current stepper state to storage using the current page name as the key.
+   * Only saves if there is an active stepper instance.
+   * @returns {void}
+   */
+  _saveStepperState() {
+    if (this._stepper.value) {
+      this._stepper.value.save(this._page.value)
+    }
   }
 
+  /**
+   * Updates the internal stepper state with new data
+   * @private
+   * @param {Object} data - The new stepper state data
+   * @param {Object} data.dataAlongPath - Data collected along the current path
+   * @param {string} data.currentPathString - String representation of current path
+   * @param {string[]} data.currentPath - Array of steps in current path
+   * @param {number} data.index - Current step index
+   * @param {Object} data.data - Stepper data object
+   * @param {Object} data.data.gvars - Global variables object
+   * @param {boolean} [save=true] - Whether to persist state changes
+   * @memberof ViewAPI
+   * @instance
+   */
   _updateStepperState(data, save = true) {
     this._dataAlongPath.value = data.dataAlongPath
     this._pathString.value = data.currentPathString
@@ -783,10 +832,23 @@ class ViewAPI extends SmileAPI {
     }
   }
 
+  /**
+   * Triggers an update of the stepper state
+   * @method updateStepper
+   * @memberof ViewAPI
+   * @instance
+   */
   updateStepper() {
     this._updateStepperState(this._stepper.value)
   }
 
+  /**
+   * Creates a clean visualization of the state machine structure
+   * @private
+   * @returns {Object} Processed state machine representation
+   * @memberof ViewAPI
+   * @instance
+   */
   _visualizeStateMachine() {
     const processState = (state, level = 0) => {
       const cleanState = {
@@ -808,12 +870,6 @@ class ViewAPI extends SmileAPI {
     }
 
     return processState(this._stepper.value)
-  }
-
-  _saveStepperState() {
-    if (this._stepper.value) {
-      this._stepper.value.save(this._page.value)
-    }
   }
 }
 
