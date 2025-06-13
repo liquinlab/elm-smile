@@ -1,4 +1,4 @@
-# :raising_hand: Getting started contributing
+# Getting started contributing
 
 The <SmileText/> repo
 ([https://github.com/NYUCCL/smile](https://github.com/NYUCCL/smile)) includes

@@ -1,4 +1,4 @@
-# :game_die: Randomization
+# Randomization
 
 Most experiments make use of randomization: tasks are presented to participants
 in a random order, stimuli are randomly selected from a large pool of possible

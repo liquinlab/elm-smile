@@ -1,4 +1,4 @@
-# :fork_and_knife: NestedTable API
+# Example Patterns
 
 NestedTable is a chainable, tree-like data structure that allows nested
 operations, hierarchical data storage, and flexible path-based access.

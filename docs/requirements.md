@@ -1,4 +1,4 @@
-# :space_invader: Required software you will need to install
+# Required software you will need to install
 
 Before getting started on a <SmileText/> project you will need to install a few
 items on your local computer.

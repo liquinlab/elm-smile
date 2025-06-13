@@ -1,4 +1,4 @@
-# :package: Data Storage
+# Data Storage
 
 Data recording and storage are critical functions of an experiment that enables
 [analysis](/analysis). When a user participates in an experiment we would like a

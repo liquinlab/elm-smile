@@ -3,7 +3,7 @@ import SimpleButton from './components/SimpleButton.vue'
 import TextInput from './components/TextInput.vue'
 </script>
 
-# :jigsaw: Components
+# Components
 
 A key to making development faster and more fun in <SmileText/> is to organize
 parts of the overall experiment into smaller, modular units called

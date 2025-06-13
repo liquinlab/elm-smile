@@ -1,4 +1,4 @@
-# 🥸 Design Philosophy
+# Design Philosophy
 
 The design of online experiments (and webpages in general) requires a lot of
 complex choices. The goal of <SmileText/> is to make sensible choices as much as
@@ -11,12 +11,12 @@ contributing to this project:
 ## Our goal is to write error-free experiments, happily.
 
 The first point is that we want to write high-quality code which is bug-free
-while smiling the whole time 🫠 (and not melting too much). We need to do this
-because we have a moral obligation both in our scientific papers and to our
-participants to not have mistakes in our empirical data collection. Messing up a
-model code is bad but at least you didn't waste the time of 1000 subjects and
-the money of taxpayers [^moral]. All the subsequent principles are ultimately in
-the service of this one.
+while smiling the whole time. We need to do this because we have a moral
+obligation both in our scientific papers and to our participants to not have
+mistakes in our empirical data collection. Messing up a model code is bad but at
+least you didn't waste the time of 1000 subjects and the money of taxpayers
+[^moral]. All the subsequent principles are ultimately in the service of this
+one.
 
 A great article with tips on this by Rouder, Haaf, and Snyder is available
 [here](https://journals.sagepub.com/doi/10.1177/2515245918801915).
@@ -163,12 +163,3 @@ the best guard against the unintended consequences of changes in a complex code
 base is unit tests and integration tests. Use them. Smile aims to remove some of
 the cognitive load of other aspects of experiment design so you can focus on
 being bug-free as much as possible.
-
-## Don't try to solve every possible problem.
-
-Deciding what things Smile can do and what things it shouldn't (i.e., project
-scope) can be hard. It can be a matter of taste. psiTurk tried to do a lot
-(front-end development, server-side code, Mechanical Turk API). It is useful to
-pull these services together but made things somewhat complex. A better solution
-is to find the natural break points in how other people develop systems. Have
-pieces that are small and manageable that can be shared between projects.

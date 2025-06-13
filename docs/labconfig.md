@@ -1,4 +1,4 @@
-# :test_tube: Set up for new organization
+# Set up for new organization
 
 Labs and organizations which are looking to start using <SmileText/> will have
 to configure a small set of services (Github, Firebase, Slack, and a web server)

@@ -1,10 +1,9 @@
-# :walking_man: Key Concepts
+# Key Concepts
 
 Smile introduces a new way to build behavioral experiments which promotes
-modularity and reusability. Smile leverages existing open source libraries to
-including Vite, Vue, Bulma, and Google Firebase. However it also provide an
-**entirely new interface** for specifying and debugging interactive experiments
-that goes beyond basic Vue components.
+modularity and reusability. Smile leverages the capabilities of existing open
+source libraries including Vite and Vue, while providing an **entirely new
+interface** for specifying and debugging interactive experiments.
 
 The first concept to introduce is the notion of a [View](./views.md). A View is
 a self-contained bit of code that represents a single "phase" or part of an
@@ -202,7 +201,7 @@ api.steps.append([
 ])
 
 // start the timer if it is not already started
-if (!api.timerStarted()) {
+if (!api.isTimerStarted()) {
   api.startTimer()
 }
 
@@ -256,7 +255,8 @@ data typically needed in behavioral experiments.**
 It gets much more fancy and powerful from there. For example
 [here](https://github.com/NYUCCL/smile/blob/main/src/user/components/stroop_exp/StroopView.vue)
 is a more complex example of a Stroop experiment which uses heriachically nested
-steps, randomization, and more.
+steps, randomization, and more. We provide complete documentation of
+[steps](/steps) and the [API](/api).
 
 ### Transitioning to the next View
 
@@ -278,7 +278,7 @@ api.steps.append([
 ])
 
 // start the timer if it is not already started
-if (!api.timerStarted()) {
+if (!api.isTimerStarted()) {
   api.startTimer()
 }
 

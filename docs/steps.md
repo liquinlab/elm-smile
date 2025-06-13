@@ -1,4 +1,4 @@
-# :ladder: Stepping Through Trials
+# Stepping Through Trials
 
 For some conditions in your experiment, you may want to repeat several trials of
 the same event. Smile provides a trial stepper for organizing and managing

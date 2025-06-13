@@ -1,9 +1,8 @@
 # Smile API
 
-<SmileText /> provides a common API which is accessed in user
-[Views](./views.md) and [Components](./components.md). This API provides a set
-of methods and properties which enable things like navigation, state management,
-data access, and more.
+Smile provides a common API which is accessed in user [Views](./views.md) and
+[Components](./components.md). This API provides a set of methods and properties
+which enable things like navigation, state management, data access, and more.
 
 ## Usage
 
@@ -49,7 +48,7 @@ The following functions are available when using `useViewAPI`:
 
 - `stepData`: Returns the current step's data as a reactive proxy.
 - `d`: Alias for `stepData`.
-- `datapath`: Returns the current data path with component resolution.
+- `pathData`: Returns the current data path with component resolution.
 - `stepIndex`: Returns the current step index among leaf nodes.
 - `blockIndex`: Returns the current block index.
 - `pathString`: Returns the current path as a string.
@@ -68,7 +67,7 @@ The following functions are available when using `useViewAPI`:
 ### Timing
 
 - `startTimer(name = 'default')`: Starts a timer with the given name.
-- `timerStarted(name = 'default')`: Checks if a timer has been started.
+- `isTimerStarted(name = 'default')`: Checks if a timer has been started.
 - `elapsedTime(name = 'default')`: Returns elapsed time in milliseconds.
 - `elapsedTimeInSeconds(name = 'default')`: Returns elapsed time in seconds.
 - `elapsedTimeInMinutes(name = 'default')`: Returns elapsed time in minutes.

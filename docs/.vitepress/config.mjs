@@ -47,7 +47,7 @@ export default defineConfig({
         text: 'Overview',
         items: [
           { text: '👋 Introduction', link: '/introduction' },
-          { text: '🚶‍♂️ Key Concepts', link: '/concepts' },
+          { text: '🔑 Key Concepts', link: '/concepts' },
           { text: '👾 Required software', link: '/requirements' },
           { text: '🧪 Setup a new lab', link: '/labconfig' },
           { text: '👫 Adding a new user', link: '/adduser' },
@@ -97,7 +97,7 @@ export default defineConfig({
         text: 'APIs and Advanced Documentation',
         items: [
           { text: '📚 API', link: '/api' },
-          { text: '🍽️ NestedTable API', link: '/tableapi' },
+          { text: '🔠 Example patterns', link: '/examplepatterns' },
         ],
       },
 
@@ -110,10 +110,7 @@ export default defineConfig({
       },
       {
         text: 'Misc',
-        items: [
-          { text: '📄 Cheat sheet', link: '/cheatsheet' },
-          { text: '🥸 Design philosophy', link: '/philosophy' },
-        ],
+        items: [{ text: '📄 Cheat sheet', link: '/cheatsheet' }],
       },
     ],
     footer: {

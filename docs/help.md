@@ -1,4 +1,4 @@
-# 🙋‍♀️ Getting help
+# Getting help
 
 Smile is a free, open-source project and is provided with no warranty or
 guarantee of support. Effective use of this project assumes you know modern
