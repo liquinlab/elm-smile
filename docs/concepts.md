@@ -27,6 +27,16 @@ A useful way to think about it is the Views are like slides in a presentation
 software like Powerpoint/Keynote and steps are like "builds" or "animations
 steps" that occur within a slide.
 
+A final key concept of Smile is the idea of _persistance_. Persistance refers to
+the fact that information about the application is perserved across page
+reloads. When you record data from your experiment in a database that is one
+kind of persistence. Another is when information about the current application
+survives across page-reloads. It is fairly common for participants to reload
+their browser window, or to close a window and reopen it at another time. In
+most experiment frameworks, the task begins anew when a participant does this
+which can be problematic for certain research questions. Instead, Smile makes it
+easy to persist variables in a way that they will survive page reloads.
+
 ## Creating a simple Experiment View
 
 To help make these concepts more concrete, we will walk through the process of
@@ -409,7 +419,7 @@ With this change there is a new sequence to the experiment
 If we had pasted the `myview` View before the `windowsizer` View, the sequence
 would have been:
 
-... -> myview -> demographic survey -> windowsizer -> instructions -> ...
+... -> demographic survey -> myview -> windowsizer -> instructions -> ...
 
 Smile's timeline API also allow randomized flows for showing different sequences
 depending on what condition a participant is assigned to.
