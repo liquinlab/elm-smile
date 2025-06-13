@@ -59,7 +59,7 @@ export default ({ mode }) => {
       environment: 'happy-dom',
       coverage: {
         all: true,
-        enabled: true,
+        enabled: false,
         src: path.resolve(__dirname, './src'),
         reporter: ['text', 'html'],
         provider: 'v8',
