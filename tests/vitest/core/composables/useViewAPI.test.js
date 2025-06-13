@@ -1064,4 +1064,50 @@ describe('useViewAPI composable', () => {
     expect(api.stepData.responses).toEqual([3, 4])
     expect(api.stepData.difficulty).toBe('extremely hard')
   })
+
+  it('should persist step state across reloads', async () => {
+    const { api } = getMockComponentAndAPI(wrapper)
+
+    // Add steps using api.steps
+    api.steps.append([
+      { path: 'step1', data: { value: 1 } },
+      { path: 'step2', data: { value: 2 } },
+    ])
+
+    // Navigate to second step
+    api.goNextStep()
+    expect(api.pathString).toBe('step2')
+    expect(api.stepData).toEqual({ path: 'step2', data: { value: 2 } })
+
+    // Simulate reload by unmounting and remounting
+    wrapper.unmount()
+
+    // Create a fresh router and pinia
+    const pinia = setupPinia()
+    const router = createRouter({
+      history: createWebHashHistory(),
+      routes,
+    })
+
+    // Remount the component
+    wrapper = mount(TestComponent, {
+      global: {
+        plugins: [router, pinia],
+        stubs: {
+          RouterLink: true,
+        },
+      },
+    })
+
+    // Wait for router to be ready
+    await router.isReady()
+    await flushPromises()
+
+    // Get the new API instance
+    const { api: newApi } = getMockComponentAndAPI(wrapper)
+
+    // Verify we're still on the second step
+    expect(newApi.pathString).toBe('step2')
+    expect(newApi.stepData).toEqual({ path: 'step2', data: { value: 2 } })
+  })
 })
