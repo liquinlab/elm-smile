@@ -73,8 +73,8 @@ function autofill() {
 api.setAutofill(autofill)
 
 const quizCorrect = computed(() => {
-  // Get all questions from all pages using stepperData with a path filter
-  const allQuestions = api.stepperData('pages*').flatMap((page) => page.questions || [])
+  // Get all questions from all pages using queryStepData with a path filter
+  const allQuestions = api.queryStepData('pages*').flatMap((page) => page.questions || [])
 
   return allQuestions.every((question) => {
     if (Array.isArray(question.correctAnswer)) {
@@ -109,7 +109,7 @@ const currentPageComplete = computed(() => {
 function submitQuiz() {
   api.recordData({
     phase: 'INSTRUCTIONS_QUIZ',
-    questions: api.stepperData('pages*'), // Update to use randomized questions
+    questions: api.queryStepData('pages*'), // Update to use randomized questions
     persist: api.persist,
   })
   if (quizCorrect.value) {
