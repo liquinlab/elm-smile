@@ -8,7 +8,7 @@ const api = useViewAPI()
 // define the trials for the experiment as a spec
 const trials = api.steps.append([
   {
-    path: 'stroop',
+    id: 'stroop',
     rt: () => api.faker.rnorm(500, 50), // add the autofill/expected data fields
     hit: () => api.faker.rbinom(1, 0.8),
     response: () => api.faker.rchoice(['r', 'g', 'b']),
@@ -17,19 +17,19 @@ const trials = api.steps.append([
 
 trials[0]
   .append([
-    { path: 'a', word: 'SHIP', color: 'red', condition: 'unrelated' },
-    { path: 'b', word: 'MONKEY', color: 'green', condition: 'unrelated' },
-    { path: 'c', word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
-    { path: 'd', word: 'RED', color: 'red', condition: 'congruent' },
-    { path: 'e', word: 'GREEN', color: 'green', condition: 'congruent' },
-    { path: 'f', word: 'BLUE', color: 'blue', condition: 'congruent' },
-    { path: 'g', word: 'GREEN', color: 'red', condition: 'incongruent' },
-    { path: 'h', word: 'BLUE', color: 'green', condition: 'incongruent' },
-    { path: 'i', word: 'RED', color: 'blue', condition: 'incongruent' },
+    { id: 'a', word: 'SHIP', color: 'red', condition: 'unrelated' },
+    { id: 'b', word: 'MONKEY', color: 'green', condition: 'unrelated' },
+    { id: 'c', word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
+    { id: 'd', word: 'RED', color: 'red', condition: 'congruent' },
+    { id: 'e', word: 'GREEN', color: 'green', condition: 'congruent' },
+    { id: 'f', word: 'BLUE', color: 'blue', condition: 'congruent' },
+    { id: 'g', word: 'GREEN', color: 'red', condition: 'incongruent' },
+    { id: 'h', word: 'BLUE', color: 'green', condition: 'incongruent' },
+    { id: 'i', word: 'RED', color: 'blue', condition: 'incongruent' },
   ])
   .shuffle()
 
-trials.append([{ path: 'summary' }])
+trials.append([{ id: 'summary' }])
 
 // if hits not defined yet then initialize it and timer.
 if (!api.persist.isDefined('hits')) {

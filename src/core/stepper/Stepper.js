@@ -93,7 +93,7 @@ export class Stepper extends StepState {
    * Checks if any of the given items would create duplicate paths in the tree
    * @private
    * @param {Object|Array<Object>} items - Single object or array of objects to check for duplicates
-   * @param {string} [items[].path] - Optional path property on each item
+   * @param {string} [items[].id] - Optional path property on each item
    * @returns {boolean} True if any items would create duplicate paths, false otherwise
    * @description
    * This method checks for duplicates in two ways:
@@ -110,11 +110,11 @@ export class Stepper extends StepState {
     const seenData = new Set()
     for (const item of itemsToCheck) {
       // Check for explicit path duplicates
-      if (item.path !== undefined) {
-        if (seenPaths.has(item.path)) {
+      if (item.id !== undefined) {
+        if (seenPaths.has(item.id)) {
           return true
         }
-        seenPaths.add(item.path)
+        seenPaths.add(item.id)
       }
 
       // Check for data content duplicates
@@ -133,8 +133,8 @@ export class Stepper extends StepState {
     return itemsToCheck.some((item) => {
       // Create a temporary state to get its path
       let state
-      if (item.path !== undefined) {
-        state = new Stepper({ id: item.path, parent: this })
+      if (item.id !== undefined) {
+        state = new Stepper({ id: item.id, parent: this })
       } else {
         state = new Stepper({ parent: this })
       }
@@ -151,13 +151,15 @@ export class Stepper extends StepState {
    * @private
    * @param {Object} item - The item to create a state for
    * @returns {Stepper} The newly created state
+   * @description
+   * If the item contains an 'id' field, it will be used as the state's id.
    */
   _addState(item) {
     let state
     try {
       // Create a new state with auto-incremented id
-      if (item.path !== undefined) {
-        state = this.push(item.path, item)
+      if (item.id !== undefined) {
+        state = this.push(item.id, item)
       } else {
         state = this.push(null, item)
       }

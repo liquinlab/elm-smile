@@ -81,7 +81,7 @@ const mockSerializedState = {
         shuffled: false,
         states: [],
         data: {
-          path: 'survey_page1',
+          id: 'survey_page1',
         },
       },
       {
@@ -91,7 +91,7 @@ const mockSerializedState = {
         shuffled: false,
         states: [],
         data: {
-          path: 'survey_page2',
+          id: 'survey_page2',
         },
       },
       {
@@ -101,7 +101,7 @@ const mockSerializedState = {
         shuffled: false,
         states: [],
         data: {
-          path: 'survey_page3',
+          id: 'survey_page3',
         },
       },
     ],
@@ -313,12 +313,12 @@ describe('useStepper composable', () => {
       const stepper = getCurrentRouteStepper()
 
       // Verify stepper loaded the serialized state
-      expect(stepper.dataAlongPath).toEqual([{ path: 'survey_page1' }])
+      expect(stepper.dataAlongPath).toEqual([{ id: 'survey_page1' }])
       expect(stepper.index).toBe(0)
 
       // Verify navigation works
       stepper.next()
-      expect(stepper.dataAlongPath).toEqual([{ path: 'survey_page2' }])
+      expect(stepper.dataAlongPath).toEqual([{ id: 'survey_page2' }])
       expect(stepper.index).toBe(1)
     })
 
@@ -349,11 +349,11 @@ describe('useStepper composable', () => {
 
       // Get initial stepper
       const initialStepper = getCurrentRouteStepper()
-      expect(initialStepper.dataAlongPath).toEqual([{ path: 'survey_page1' }])
+      expect(initialStepper.dataAlongPath).toEqual([{ id: 'survey_page1' }])
 
       // Navigate to next step
       initialStepper.next()
-      expect(initialStepper.dataAlongPath).toEqual([{ path: 'survey_page2' }])
+      expect(initialStepper.dataAlongPath).toEqual([{ id: 'survey_page2' }])
 
       // Navigate to different route and back
       await router.push('/landing')
@@ -364,7 +364,7 @@ describe('useStepper composable', () => {
       const newStepper = getCurrentRouteStepper()
 
       // Verify state was preserved
-      expect(newStepper.dataAlongPath).toEqual([{ path: 'survey_page2' }])
+      expect(newStepper.dataAlongPath).toEqual([{ id: 'survey_page2' }])
       expect(newStepper.index).toBe(1)
     })
   })

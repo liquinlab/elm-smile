@@ -26,11 +26,11 @@ function init() {
   // randomize questions and add to stepper
   qs = props.randomizeQandA ? getRandomizedQuestions() : props.questions
 
-  const sections = api.steps.append([{ path: 'pages' }, { path: 'feedback' }])
+  const sections = api.steps.append([{ id: 'pages' }, { id: 'feedback' }])
 
   sections[0].append(qs)
 
-  sections[1].append([{ path: 'success' }, { path: 'retry' }]) // add to additional pages
+  sections[1].append([{ id: 'success' }, { id: 'retry' }]) // add to additional pages
 
   if (!api.persist.isDefined('attempts')) {
     api.persist.attempts = 1

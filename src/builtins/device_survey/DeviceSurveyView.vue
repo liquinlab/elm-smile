@@ -5,7 +5,7 @@ import { reactive, computed } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
-api.steps.append([{ path: 'device_page1' }, { path: 'device_page2' }])
+api.steps.append([{ id: 'device_page1' }, { id: 'device_page2' }])
 
 // persists the form info in local storage, otherwise initialize
 if (!api.persist.isDefined('forminfo')) {

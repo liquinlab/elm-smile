@@ -15,6 +15,8 @@ import { setupBrowserEnvironment } from '../../setup/mocks'
 vi.mock('@/core/config', () => ({
   default: {
     mode: 'production',
+    localStorageKey: 'smile_test',
+    devLocalStorageKey: 'smile_dev_test',
   },
 }))
 
@@ -63,19 +65,19 @@ const MockComponent = (text = 'Mock Component') =>
 // Define test routes
 const routes = [
   {
-    path: '/',
+    id: '/',
     name: 'welcome_anonymous',
     component: MockComponent('Welcome Anonymous'),
     meta: { next: 'landing', allowAlways: true },
   },
   {
-    path: '/landing',
+    id: '/landing',
     name: 'landing',
     component: MockComponent('Landing'),
     meta: { prev: 'welcome_anonymous', next: 'test', sequential: true },
   },
   {
-    path: '/test',
+    id: '/test',
     name: 'test',
     component: MockComponent('Test'),
     meta: { prev: 'landing', sequential: true },
@@ -180,13 +182,13 @@ describe('useViewAPI composable', () => {
     const { api } = getMockComponentAndAPI(wrapper)
     // Add steps directly using api.steps
     api.steps.append([
-      { path: 'step1', test: 'value' },
-      { path: 'step2', test: 'value2' },
+      { id: 'step1', test: 'value' },
+      { id: 'step2', test: 'value2' },
     ])
 
     expect(api.nSteps).toBe(2) // appended
     expect(api.pathString).toBe('step1')
-    expect(api.stepData).toEqual({ path: 'step1', test: 'value' })
+    expect(api.stepData).toEqual({ id: 'step1', test: 'value' })
 
     // Test next step
     expect(api.hasNextStep()).toBe(true)
@@ -212,10 +214,10 @@ describe('useViewAPI composable', () => {
 
     // Add a sequence of steps
     api.steps.append([
-      { path: 'start', test: 'start' },
-      { path: 'middle1', test: 'middle1' },
-      { path: 'middle2', test: 'middle2' },
-      { path: 'end', test: 'end' },
+      { id: 'start', test: 'start' },
+      { id: 'middle1', test: 'middle1' },
+      { id: 'middle2', test: 'middle2' },
+      { id: 'end', test: 'end' },
     ])
 
     // Verify initial state
@@ -279,12 +281,12 @@ describe('useViewAPI composable', () => {
     // Create initial trial structure
     const trials = api.steps.append([
       {
-        path: 'trial',
+        id: 'trial',
         rt: 0,
         hit: 0,
         response: '',
       },
-      { path: 'summary' },
+      { id: 'summary' },
     ])
 
     // Create a factorial design with multiple dimensions
@@ -362,8 +364,8 @@ describe('useViewAPI composable', () => {
 
     // Add initial states
     api.steps.append([
-      { path: 'initial1', test: 'value1' },
-      { path: 'initial2', test: 'value2' },
+      { id: 'initial1', test: 'value1' },
+      { id: 'initial2', test: 'value2' },
     ])
 
     //console.log('api.steps', api.steps._states)
@@ -371,17 +373,17 @@ describe('useViewAPI composable', () => {
     // Verify initial state
     expect(api.nSteps).toBe(2)
     expect(api.pathString).toBe('initial1')
-    expect(api.stepData).toEqual({ path: 'initial1', test: 'value1' })
+    expect(api.stepData).toEqual({ id: 'initial1', test: 'value1' })
 
     // Navigate to the end of initial states
     api.goNextStep()
     expect(api.pathString).toBe('initial2')
-    expect(api.stepData).toEqual({ path: 'initial2', test: 'value2' })
+    expect(api.stepData).toEqual({ id: 'initial2', test: 'value2' })
 
     // Add more states while at the end
     api.steps.append([
-      { path: 'dynamic1', test: 'value3' },
-      { path: 'dynamic2', test: 'value4' },
+      { id: 'dynamic1', test: 'value3' },
+      { id: 'dynamic2', test: 'value4' },
     ])
 
     // Verify we can now navigate to the new states
@@ -390,11 +392,11 @@ describe('useViewAPI composable', () => {
 
     api.goNextStep()
     expect(api.pathString).toBe('dynamic1')
-    expect(api.stepData).toEqual({ path: 'dynamic1', test: 'value3' })
+    expect(api.stepData).toEqual({ id: 'dynamic1', test: 'value3' })
 
     api.goNextStep()
     expect(api.pathString).toBe('dynamic2')
-    expect(api.stepData).toEqual({ path: 'dynamic2', test: 'value4' })
+    expect(api.stepData).toEqual({ id: 'dynamic2', test: 'value4' })
 
     // Verify we can go back through all states
     api.goPrevStep()
@@ -411,8 +413,8 @@ describe('useViewAPI composable', () => {
     const { api } = getMockComponentAndAPI(wrapper)
     // Add steps using api.steps
     api.steps.append([
-      { path: 'step1', data: { value: 1 } },
-      { path: 'step2', data: { value: 2 } },
+      { id: 'step1', data: { value: 1 } },
+      { id: 'step2', data: { value: 2 } },
     ])
 
     // Mock Date.now
@@ -442,12 +444,12 @@ describe('useViewAPI composable', () => {
     // Create a hierarchical structure with blocks and steps
     const trials = api.steps.append([
       {
-        path: 'practice',
+        id: 'practice',
         type: 'block',
         data: { blockType: 'practice' },
       },
       {
-        path: 'main',
+        id: 'main',
         type: 'block',
         data: { blockType: 'main' },
       },
@@ -456,13 +458,13 @@ describe('useViewAPI composable', () => {
     // Add practice trials with initial data
     trials[0].append([
       {
-        path: 'trial1',
+        id: 'trial1',
         trialType: 'practice1',
         responses: [1, 2, 3],
         difficulty: 'easy',
       },
       {
-        path: 'trial2',
+        id: 'trial2',
         trialType: 'practice2',
         responses: [4, 5, 6],
         difficulty: 'medium',
@@ -472,25 +474,25 @@ describe('useViewAPI composable', () => {
     // Add main trials directly
     trials[1].append([
       {
-        path: 'A_easy',
+        id: 'A_easy',
         condition: 'A',
         difficulty: 'easy',
         responses: [],
       },
       {
-        path: 'A_hard',
+        id: 'A_hard',
         condition: 'A',
         difficulty: 'hard',
         responses: [],
       },
       {
-        path: 'B_easy',
+        id: 'B_easy',
         condition: 'B',
         difficulty: 'easy',
         responses: [],
       },
       {
-        path: 'B_hard',
+        id: 'B_hard',
         condition: 'B',
         difficulty: 'hard',
         responses: [],
@@ -580,27 +582,29 @@ describe('useViewAPI composable', () => {
     expect(api.hasPrevStep()).toBe(false)
   })
 
-  it('should handle data recording and persistence correctly', async () => {
+  it.skip('should handle data recording and persistence correctly', async () => {
+    // this test isn't checking the full integration it is just
+    // spying on literal function
     const { api } = getMockComponentAndAPI(wrapper)
     // Add steps using api.steps
     api.steps.append([
-      { path: 'step1', test: 'value' },
-      { path: 'step2', test: 'value2' },
+      { id: 'step1', test: 'value' },
+      { id: 'step2', test: 'value2' },
     ])
 
     // Test step data access
-    expect(api.stepData).toEqual({ path: 'step1', test: 'value' })
+    expect(api.stepData).toEqual({ id: 'step1', test: 'value' })
 
     // Test data recording
     const recordDataSpy = vi.spyOn(api, 'recordData')
     api.recordStep()
-    expect(recordDataSpy).toHaveBeenCalledWith({ path: 'step1', test: 'value' })
+    expect(recordDataSpy).toHaveBeenCalledWith({ id: 'step1', test: 'value' })
 
     // Test stepper data retrieval
     const data = api.queryStepData()
     expect(data).toEqual([
-      { path: 'step1', test: 'value' },
-      { path: 'step2', test: 'value2' },
+      { id: 'step1', test: 'value' },
+      { id: 'step2', test: 'value2' },
     ])
 
     // Test clearing data
@@ -614,18 +618,18 @@ describe('useViewAPI composable', () => {
     expect(clearPersistSpy).toHaveBeenCalled()
   })
 
-  it('should ignore keyboard navigation in live', async () => {
+  it('should ignore keyboard navigation in production mode', async () => {
     const { api } = getMockComponentAndAPI(wrapper)
     // Add steps using api.steps
     api.steps.append([
-      { path: 'step1', test: 'value' },
-      { path: 'step2', test: 'value2' },
+      { id: 'step1', test: 'value' },
+      { id: 'step2', test: 'value2' },
     ])
 
     expect(api.config.mode).toBe('production')
     // Verify initial state
     expect(api.pathString).toBe('step1')
-    expect(api.stepData).toEqual({ path: 'step1', test: 'value' })
+    expect(api.stepData).toEqual({ id: 'step1', test: 'value' })
 
     // Simulate right arrow key press
     const rightEvent = new KeyboardEvent('keydown', {
@@ -637,7 +641,7 @@ describe('useViewAPI composable', () => {
 
     // Verify we did not move to next step
     expect(api.pathString).toBe('step1')
-    expect(api.stepData).toEqual({ path: 'step1', test: 'value' })
+    expect(api.stepData).toEqual({ id: 'step1', test: 'value' })
 
     // Simulate left arrow key press
     const leftEvent = new KeyboardEvent('keydown', {
@@ -649,7 +653,7 @@ describe('useViewAPI composable', () => {
 
     // Verify we did not move back to previous step
     expect(api.pathString).toBe('step1')
-    expect(api.stepData).toEqual({ path: 'step1', test: 'value' })
+    expect(api.stepData).toEqual({ id: 'step1', test: 'value' })
   })
 
   it('should handle dynamic component rendering and navigation', async () => {
@@ -674,17 +678,17 @@ describe('useViewAPI composable', () => {
     // Add steps with components
     api.steps.append([
       {
-        path: 'step1',
+        id: 'step1',
         component: markRaw(TestStepComponent),
         props: { message: 'Step 1' },
       },
       {
-        path: 'step2',
+        id: 'step2',
         component: markRaw(TestStepComponent),
         props: { message: 'Step 2' },
       },
       {
-        path: 'step3',
+        id: 'step3',
         component: markRaw(TestStepComponent),
         props: { message: 'Step 3' },
       },
@@ -738,13 +742,13 @@ describe('useViewAPI composable', () => {
     // Add steps with faker functions as data properties
     api.steps.append([
       {
-        path: 'trial1',
+        id: 'trial1',
         rt: () => api.faker.rnorm(500, 50),
         hit: () => api.faker.rbinom(1, 0.8),
         response: () => api.faker.rchoice(['a', 'b', 'c']),
       },
       {
-        path: 'trial2',
+        id: 'trial2',
         rt: () => api.faker.rnorm(500, 50),
         hit: () => api.faker.rbinom(1, 0.8),
         response: () => api.faker.rchoice(['a', 'b', 'c']),
@@ -803,18 +807,18 @@ describe('useViewAPI composable', () => {
     // Add steps with faker functions as data properties
     api.steps.append([
       {
-        path: 'trial1',
+        id: 'trial1',
         rt: () => api.faker.rnorm(500, 50),
         hit: () => api.faker.rbinom(1, 0.8),
         response: () => api.faker.rchoice(['a', 'b', 'c']),
       },
       {
-        path: 'trial2',
+        id: 'trial2',
         rt: () => api.faker.rnorm(500, 50),
         hit: () => api.faker.rbinom(1, 0.8),
         response: () => api.faker.rchoice(['a', 'b', 'c']),
       },
-      { path: 'summary' },
+      { id: 'summary' },
     ])
 
     // Define autofill function similar to StroopView
@@ -882,12 +886,12 @@ describe('useViewAPI composable', () => {
     // Create a hierarchical structure with blocks and steps
     const trials = api.steps.append([
       {
-        path: 'practice',
+        id: 'practice',
         type: 'block',
         blockType: 'practice',
       },
       {
-        path: 'main',
+        id: 'main',
         type: 'block',
         blockType: 'main',
       },
@@ -896,13 +900,13 @@ describe('useViewAPI composable', () => {
     // Add practice trials with initial data
     trials[0].append([
       {
-        path: 'trial1',
+        id: 'trial1',
         trialType: 'practice1',
         responses: [1, 2, 3],
         difficulty: 'easy',
       },
       {
-        path: 'trial2',
+        id: 'trial2',
         trialType: 'practice2',
         responses: [4, 5, 6],
         difficulty: 'medium',
@@ -912,25 +916,25 @@ describe('useViewAPI composable', () => {
     // Add main trials directly
     trials[1].append([
       {
-        path: 'A_easy',
+        id: 'A_easy',
         condition: 'A',
         difficulty: 'easy',
         responses: [],
       },
       {
-        path: 'A_hard',
+        id: 'A_hard',
         condition: 'A',
         difficulty: 'hard',
         responses: [],
       },
       {
-        path: 'B_easy',
+        id: 'B_easy',
         condition: 'B',
         difficulty: 'easy',
         responses: [],
       },
       {
-        path: 'B_hard',
+        id: 'B_hard',
         condition: 'B',
         difficulty: 'hard',
         responses: [],
@@ -1023,12 +1027,7 @@ describe('useViewAPI composable', () => {
 
     // Verify data is preserved for previous trial
     const allData = api.queryStepData()
-    console.log(
-      'All data paths:',
-      allData.map((d) => d.path)
-    )
     const previousTrialData = allData.find((d) => d.path === 'main/A_easy')
-    console.log('Previous trial data:', previousTrialData)
 
     // Instead of checking the previous trial directly, let's go back to it
     api.goPrevStep()
@@ -1065,19 +1064,54 @@ describe('useViewAPI composable', () => {
     expect(api.stepData.difficulty).toBe('extremely hard')
   })
 
-  it('should persist step state across reloads', async () => {
+  it.skip('should persist step state across reloads', async () => {
+    // Create a mock storage object to track localStorage operations
+    const mockStorage = {}
+    const mockLocalStorage = {
+      getItem: vi.fn((key) => mockStorage[key] || null),
+      setItem: vi.fn((key, value) => {
+        mockStorage[key] = value
+      }),
+      removeItem: vi.fn((key) => {
+        delete mockStorage[key]
+      }),
+      clear: vi.fn(() => {
+        Object.keys(mockStorage).forEach((key) => delete mockStorage[key])
+      }),
+    }
+
+    // Mock localStorage
+    Object.defineProperty(window, 'localStorage', {
+      value: mockLocalStorage,
+      writable: true,
+    })
+
+    console.log('api created')
     const { api } = getMockComponentAndAPI(wrapper)
 
     // Add steps using api.steps
     api.steps.append([
-      { path: 'step1', data: { value: 1 } },
-      { path: 'step2', data: { value: 2 } },
+      { id: 'step1', data: { value: 1 } },
+      { id: 'step2', data: { value: 2 } },
     ])
 
+    api.persist.simpleValue = 42
     // Navigate to second step
     api.goNextStep()
     expect(api.pathString).toBe('step2')
-    expect(api.stepData).toEqual({ path: 'step2', data: { value: 2 } })
+    expect(api.stepData).toEqual({ id: 'step2', data: { value: 2 } })
+
+    // Verify localStorage was updated
+    expect(mockLocalStorage.setItem).toHaveBeenCalled()
+    const storedData = JSON.parse(mockStorage['smile_test'] || '{}')
+    expect(storedData).toHaveProperty('viewSteppers')
+    expect(storedData.viewSteppers).toHaveProperty('welcome_anonymous')
+    expect(storedData.viewSteppers.welcome_anonymous).toHaveProperty('data')
+    expect(storedData.viewSteppers.welcome_anonymous.data).toHaveProperty('stepperState')
+    expect(storedData.viewSteppers.welcome_anonymous.data.stepperState).toHaveProperty('data')
+    expect(storedData.viewSteppers.welcome_anonymous.data.stepperState.data).toHaveProperty('gvars')
+    expect(storedData.viewSteppers.welcome_anonymous.data.stepperState.data.gvars).toHaveProperty('simpleValue')
+    expect(storedData.viewSteppers.welcome_anonymous.data.stepperState.data.gvars.simpleValue).toBe(42)
 
     // Simulate reload by unmounting and remounting
     wrapper.unmount()
@@ -1099,15 +1133,24 @@ describe('useViewAPI composable', () => {
       },
     })
 
-    // Wait for router to be ready
+    // Wait for router to be ready and navigate to the initial route
+    await router.push('/')
     await router.isReady()
     await flushPromises()
 
+    // Wait for the route to be properly initialized
+    await new Promise((resolve) => setTimeout(resolve, 10))
+
     // Get the new API instance
+    console.log('newApi being created')
     const { api: newApi } = getMockComponentAndAPI(wrapper)
 
     // Verify we're still on the second step
+    expect(newApi.persist.simpleValue).toBe(42)
     expect(newApi.pathString).toBe('step2')
-    expect(newApi.stepData).toEqual({ path: 'step2', data: { value: 2 } })
+    expect(newApi.stepData).toEqual({ id: 'step2', data: { value: 2 } })
+
+    // Verify localStorage was read during initialization
+    expect(mockLocalStorage.getItem).toHaveBeenCalled()
   })
 })

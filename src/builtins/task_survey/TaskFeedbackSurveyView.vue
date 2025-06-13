@@ -5,7 +5,7 @@ import { reactive, computed } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
-// const pages = api.spec().append([{ path: 'feedback_page1' }])
+// const pages = api.spec().append([{ id: 'feedback_page1' }])
 // api.addSpec(pages)
 
 if (!api.persist.isDefined('forminfo')) {

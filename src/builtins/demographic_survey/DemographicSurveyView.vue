@@ -5,7 +5,7 @@ import { reactive, computed } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
-api.steps.append([{ path: 'survey_page1' }, { path: 'survey_page2' }, { path: 'survey_page3' }])
+api.steps.append([{ id: 'survey_page1' }, { id: 'survey_page2' }, { id: 'survey_page3' }])
 
 // persists the form info in local storage, otherwise initialize
 if (!api.persist.isDefined('forminfo')) {

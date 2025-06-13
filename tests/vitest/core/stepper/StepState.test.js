@@ -58,6 +58,11 @@ describe('StepState', () => {
       expect(stepper.depth).toBe(0)
     })
 
+    it('should allow us to rename the id', () => {
+      stepper.id = 'root'
+      expect(stepper.id).toBe('root')
+    })
+
     it('should push new named states correctly', () => {
       const child = stepper.push('child')
       expect(stepper.states.length).toBe(1)

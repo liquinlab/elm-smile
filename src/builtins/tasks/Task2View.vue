@@ -6,19 +6,19 @@ const api = useViewAPI()
 
 const trials = api.steps.append([
   {
-    path: 'task2_trial_a',
+    id: 'task2_trial_a',
     task: 'unusual',
     sentence: 'The dog ate the _____.',
     options: ['Meal', 'Bone', 'Food', 'Sun'],
   },
   {
-    path: 'task2_trial_b',
+    id: 'task2_trial_b',
     task: 'unusual',
     sentence: 'The cat ate the _____.',
     options: ['Fish', 'Words', 'Food', 'Mouse'],
   },
   {
-    path: 'task2_trial_c',
+    id: 'task2_trial_c',
     task: 'unusual',
     sentence: 'The fish ate the _____.',
     options: ['Water', 'Food', 'Car', 'Moon'],
