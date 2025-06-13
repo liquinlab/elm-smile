@@ -13,12 +13,12 @@
  * - Managing query parameters between routes
  * - Providing navigation utilities for views
  */
-
 import { useRoute, useRouter } from 'vue-router'
 import _ from 'lodash'
 import useSmileStore from '@/core/stores/smilestore'
 import useLog from '@/core/stores/log'
-import { pinia } from '@/core/createpinia'
+import { pinia } from '@/core/stores/createPinia'
+
 /**
  * Timeline management composable for handling view navigation
  * @function useTimeline
@@ -29,7 +29,6 @@ import { pinia } from '@/core/createpinia'
  * - Checking navigation state and route metadata
  * The timeline ensures proper view sequencing and navigation guard handling.
  */
-
 export default function useTimeline() {
   const smilestore = useSmileStore(pinia)
   const route = useRoute()
@@ -96,9 +95,9 @@ export default function useTimeline() {
     // directly to the router.push() function
     // although there's some plan about it in future
     if (force) {
-      smilestore.global.forceNavigate = true
+      smilestore.browserEphemeral.forceNavigate = true
       await router.push({ name: view })
-      smilestore.global.forceNavigate = false
+      smilestore.browserEphemeral.forceNavigate = false
     } else {
       await router.push({ name: view })
     }
@@ -111,7 +110,7 @@ export default function useTimeline() {
    */
   const navigateTo = (goto) => {
     // sets the current page as done
-    smilestore.dev.currentPageDone = true
+    smilestore.dev.currentViewDone = true
 
     if (smilestore.config.autoSave) {
       log.log('TIMELINE STEPPER: Attempting auto saving on navigateTo() navigation')

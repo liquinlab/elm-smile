@@ -1,9 +1,8 @@
 # Smile API
 
-<SmileText /> provides a common API which is accessed in user
-[Views](./views.md) and [Components](./components.md). This API provides a set
-of methods and properties which enable things like navigation, state management,
-data access, and more.
+Smile provides a common API which is accessed in user [Views](./views.md) and
+[Components](./components.md). This API provides a set of methods and properties
+which enable things like navigation, state management, data access, and more.
 
 ## Usage
 
@@ -28,6 +27,8 @@ additional methods for:
 - Keyboard event handling
 - Mouse event handling
 - Step data recording
+- Timing utilities
+- State visualization
 
 ## Stepper Functions
 
@@ -38,44 +39,61 @@ The following functions are available when using `useViewAPI`:
 - `goNextStep()`: Advances to the next step in the stepper.
 - `goPrevStep()`: Returns to the previous step in the stepper.
 - `goToStep(path)`: Navigates to a specific step by path.
-- `reset()`: Resets the stepper to its initial state.
-- `init()`: Initializes the stepper.
+- `goFirstStep()`: Resets the stepper to its first step.
+- `hasNextStep()`: Checks if there's a next step available.
+- `hasPrevStep()`: Checks if there's a previous step available.
+- `hasSteps()`: Checks if the stepper has any steps.
 
 ### Data Access
 
-- `stepData`: Returns the current step's data as a reactive proxy.
-- `d`: Alias for `stepData`.
-- `datapath`: Returns the current data path.
-- `stepIndex`: Returns the current step index.
-- `paths`: Returns the current paths.
-- `path`: Returns the current path.
-- `length`: Returns the number of steps (excluding SOS/EOS).
+- `stepData`: Getter/setter for the current step's data. This is a proxy that
+  allows you to get and set values on the current step's data. Changes are
+  automatically saved to the stepper state.
+- `stepDataLeaf`: Getter/setter for the current leaf node's data only. Similar
+  to `stepData` but only includes data from the current leaf node, not the
+  entire path. This is useful when you want to work with just the current step's
+  data without including parent block data.
+- `queryStepData`, `queryStepDataLeaf`: See
+  [Data Query Methods](#data-query-methods).
+- `pathData`: Getter for the raw data array of all steps in the current path.
+  This is useful when you need to access the raw data structure of the path.
+- `pathData`: Returns the current data path with component resolution.
+- `stepIndex`: Returns the current step index among leaf nodes.
+- `blockIndex`: Returns the current block index.
+- `pathString`: Returns the current path as a string.
+- `path`: Returns the current path array.
+- `length`: Returns the number of steps.
 - `nSteps`: Alias for `length`.
-- `nrows`: Returns the total number of rows including SOS/EOS.
-
-### Table Management
-
-- `spec()`: Creates a new table specification.
-- `addSpec(table, ignoreContent = false)`: Adds a table specification to the
-  stepper.
+- `blockLength`: Returns the number of steps in the current block.
+- `stepLength`: Returns the total number of leaf nodes.
+- `isLastStep()`: Returns true if the current step is the last step in the
+  sequence.
+- `isLastBlockStep()`: Returns true if the current step is the last step in the
+  current block.
+- `steps`: Provides direct access to the underlying Stepper state machine
+  instance.
 
 ### Timing
 
 - `startTimer(name = 'default')`: Starts a timer with the given name.
+- `isTimerStarted(name = 'default')`: Checks if a timer has been started.
 - `elapsedTime(name = 'default')`: Returns elapsed time in milliseconds.
 - `elapsedTimeInSeconds(name = 'default')`: Returns elapsed time in seconds.
 - `elapsedTimeInMinutes(name = 'default')`: Returns elapsed time in minutes.
 
 ### Global Variables
 
-- `globals`: Access and modify global variables.
-- `clearGlobals()`: Clears all global variables.
+- `persist`: Access and modify view-specific persisted variables (gvars).
+- `clearPersist()`: Clears all view-specific persisted variables.
 
 ### State Management
 
-- `clear()`: Clears the stepper state.
-- `stepperData(pathFilter = null)`: Returns data from leaf nodes, optionally
-  filtered by path.
+- `clear()`: Clears the stepper state and component registry.
+- `clearCurrentStepData()`: Clears the data for the current step in the stepper.
+  filtered by path pattern.
+- `updateStepper()`: Updates the internal stepper state.
+- `_visualizeStateMachine()`: Returns a visualization of the current state
+  machine.
 
 ### Event Handling
 
@@ -84,6 +102,10 @@ The following functions are available when using `useViewAPI`:
 - `onKeyUp`: Handler for key up events.
 - `useMouse`: Hook for tracking mouse position and state.
 - `useMousePressed`: Hook for tracking mouse button press state.
+
+### Component Management
+
+- `componentRegistry`: Map for storing and retrieving component definitions.
 
 ## Base API Functions
 
@@ -135,8 +157,8 @@ The following functions are available in both `useAPI` and `useViewAPI`:
 - `private`: Accesses private data store.
 - `all_data`: Accesses combined private and data stores.
 - `all_config`: Accesses combined local, dev, github and main configs.
-- `local`: Accesses local storage.
-- `global`: Accesses global settings.
+- `browserPersisted`: Accesses browser persisted state.
+- `browserEphemeral`: Accesses browser ephemeral state.
 - `dev`: Accesses development-only settings.
 - `route`: Accesses the current route.
 - `router`: Accesses the router object.
@@ -169,13 +191,37 @@ The following functions are available in both `useAPI` and `useViewAPI`:
   in use until the next route.
 - `randomAssignCondition(conditionObject)`: Randomly assigns a condition based
   on the provided condition object. Supports weighted randomization.
-- `shuffle(array)`: Shuffles an array.
-- `randomInt(min, max)`: Generates a random integer.
-- `sampleWithReplacement(array, sampleSize, weights = undefined)`: Samples items
-  from an array with replacement.
-- `sampleWithoutReplacement(array, sampleSize)`: Samples items from an array
-  without replacement.
-- `faker`: Accesses faker distributions for generating random data.
+- `shuffle(options)`: Shuffles the current states using the Fisher-Yates
+  algorithm. If a seed is provided, ensures deterministic shuffling.
+
+**Parameters:**
+
+- `options` (Object|string): Either a string seed or an options object
+  - `seed` (string, optional): Seed for deterministic shuffling
+  - `always` (boolean, optional): If true, allows shuffling even if already
+    shuffled. Defaults to false.
+
+**Returns:**
+
+- Returns the Stepper instance for method chaining
+
+**Example:**
+
+```javascript
+// Shuffle with a seed (only shuffles if not already shuffled)
+stepper.shuffle('seed123')
+
+// Shuffle with options
+stepper.shuffle({ seed: 'seed123', always: false }) // Only shuffles if not already shuffled
+stepper.shuffle({ seed: 'seed123', always: true }) // Always shuffles
+stepper.shuffle({ always: true }) // Always shuffles without a seed
+```
+
+**Notes:**
+
+- The shuffle operation is tracked internally. Once shuffled, subsequent calls
+  to shuffle will be ignored unless `always` is set to true.
+- If there is only one or zero states, the shuffle operation is skipped.
 
 ## Logging and Debugging
 
@@ -221,3 +267,67 @@ references) must be converted to Firestore-safe formats before saving.
   event_data must be Firestore-safe if provided.
 - `saveData(force)`: Saves the current data to the database (force save if
   specified). All data must be Firestore-safe.
+
+### Data Query Methods
+
+These methods provide functionality for querying data across multiple steps in
+the experiment.
+
+#### `queryStepData(pathFilter = null)`
+
+Gets data for all leaf nodes in the stepper, optionally filtered by path
+pattern. Returns only the data directly associated with each leaf node, without
+merging parent block data.
+
+```javascript
+// Get data for all leaf nodes
+const allLeafData = api.queryStepData()
+
+// Get data for nodes matching a pattern
+const trialData = api.queryStepData('trial/block*')
+```
+
+#### `queryStepDataLeaf(pathFilter = null)`
+
+Gets data for all leaf nodes in the stepper, optionally filtered by path
+pattern. Returns only the data directly associated with each leaf node, without
+merging parent block data. This is an alias for `queryStepData` for consistency
+with the `stepDataLeaf` getter.
+
+```javascript
+// Get data for all leaf nodes
+const allLeafData = api.queryStepDataLeaf()
+
+// Get data for nodes matching a pattern
+const trialData = api.queryStepDataLeaf('trial/block*')
+```
+
+#### `queryStepDataMerge(pathFilter = null)`
+
+Gets merged data for all leaf nodes in the stepper, optionally filtered by path
+pattern. Similar to `queryStepData` but returns the merged data for each leaf
+node (including parent block data).
+
+```javascript
+// Get merged data for all leaf nodes
+const allMergedData = api.queryStepDataMerge()
+
+// Get merged data for nodes matching a pattern
+const trialData = api.queryStepDataMerge('trial/block*')
+```
+
+The difference between these methods can be illustrated with an example:
+
+```javascript
+// Given a structure:
+// block (blockType: 'practice')
+//   trial1 (response: 'A')
+//   trial2 (response: 'B')
+
+// queryStepData() returns:
+;[{ response: 'A' }, { response: 'B' }][
+  // queryStepDataMerge() returns:
+  ({ blockType: 'practice', response: 'A' },
+  { blockType: 'practice', response: 'B' })
+]
+```

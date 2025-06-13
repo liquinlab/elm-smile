@@ -1,15 +1,19 @@
-// design.js
-// This file configures the overall logic of your experiment.
-// The critical part is the timeline, which is a list of phases
-// the experiment goes through.  This file configues which phase
-// occurs in the sequence.
+/**
+ * @file design.js
+ * @description Configures the overall logic and timeline of the experiment.
+ * The timeline defines the sequence of phases that the experiment goes through.
+ * This file configures which phases occur in what order.
+ *
+ * Key documentation:
+ * - Views: https://smile.gureckislab.org/views.html
+ * - Timeline: https://smile.gureckislab.org/timeline.html
+ * - Randomization: https://smile.gureckislab.org/randomization.html
+ *
+ * @module design
+ */
 
-// The key documentation for this file
-// Views: https://smile.gureckislab.org/views.html
-// Timeline: https://smile.gureckislab.org/timeline.html
-// Randomization: https://smile.gureckislab.org/randomization.html
 import { markRaw } from 'vue'
-import { processQuery } from '@/core/utils'
+import { processQuery } from '@/core/utils/utils'
 
 // 1. Import main built-in View components
 import Advertisement from '@/builtins/advertisement/AdvertisementView.vue'
@@ -17,7 +21,6 @@ import MTurk from '@/builtins/mturk/MTurkRecruitView.vue'
 import Consent from '@/builtins/simple_consent/InformedConsentView.vue'
 import DemographicSurvey from '@/builtins/demographic_survey/DemographicSurveyView.vue'
 import DeviceSurvey from '@/builtins/device_survey/DeviceSurveyView.vue'
-import Captcha from '@/builtins/captcha/CaptchaView.vue'
 import Instructions from '@/builtins/instructions/InstructionsView.vue'
 import InstructionsQuiz from '@/builtins/instructions_quiz/InstructionsQuiz.vue'
 import Debrief from '@/builtins/debrief/DebriefView.vue'
@@ -36,12 +39,8 @@ import StroopExp from '@/user/components/stroop_exp/StroopView.vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
-import Timeline from '@/core/timeline'
+import Timeline from '@/core/timeline/Timeline'
 const timeline = new Timeline(api)
-
-import useSmileStore from '@/core/stores/smilestore'
-import { onBeforeRouteLeave } from 'vue-router'
-const smilestore = useSmileStore()
 
 // #4.  Set runtime configuration options
 //      See http://smile.gureckislab.org/configuration.html#experiment-options-env
@@ -176,12 +175,6 @@ timeline.pushSeqView({
 timeline.pushSeqView({
   name: 'windowsizer',
   component: WindowSizer,
-})
-
-// captcha
-timeline.pushSeqView({
-  name: 'captcha',
-  component: Captcha,
 })
 
 // instructions

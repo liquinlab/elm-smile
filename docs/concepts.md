@@ -1,10 +1,9 @@
-# :walking_man: Key Concepts
+# Key Concepts
 
 Smile introduces a new way to build behavioral experiments which promotes
-modularity and reusability. Smile leverages existing open source libraries to
-including Vite, Vue, Bulma, and Google Firebase. However it also provide an
-**entirely new interface** for specifying and debugging interactive experiments
-that goes beyond basic Vue components.
+modularity and reusability. Smile leverages the capabilities of existing open
+source libraries including Vite and Vue, while providing an **entirely new
+interface** for specifying and debugging interactive experiments.
 
 The first concept to introduce is the notion of a [View](./views.md). A View is
 a self-contained bit of code that represents a single "phase" or part of an
@@ -27,6 +26,16 @@ results.
 A useful way to think about it is the Views are like slides in a presentation
 software like Powerpoint/Keynote and steps are like "builds" or "animations
 steps" that occur within a slide.
+
+A final key concept of Smile is the idea of _persistance_. Persistance refers to
+the fact that information about the application is perserved across page
+reloads. When you record data from your experiment in a database that is one
+kind of persistence. Another is when information about the current application
+survives across page-reloads. It is fairly common for participants to reload
+their browser window, or to close a window and reopen it at another time. In
+most experiment frameworks, the task begins anew when a participant does this
+which can be problematic for certain research questions. Instead, Smile makes it
+easy to persist variables in a way that they will survive page reloads.
 
 ## Creating a simple Experiment View
 
@@ -202,7 +211,7 @@ api.steps.append([
 ])
 
 // start the timer if it is not already started
-if (!api.timerStarted()) {
+if (!api.isTimerStarted()) {
   api.startTimer()
 }
 
@@ -256,7 +265,8 @@ data typically needed in behavioral experiments.**
 It gets much more fancy and powerful from there. For example
 [here](https://github.com/NYUCCL/smile/blob/main/src/user/components/stroop_exp/StroopView.vue)
 is a more complex example of a Stroop experiment which uses heriachically nested
-steps, randomization, and more.
+steps, randomization, and more. We provide complete documentation of
+[steps](/steps) and the [API](/api).
 
 ### Transitioning to the next View
 
@@ -278,7 +288,7 @@ api.steps.append([
 ])
 
 // start the timer if it is not already started
-if (!api.timerStarted()) {
+if (!api.isTimerStarted()) {
   api.startTimer()
 }
 
@@ -409,7 +419,7 @@ With this change there is a new sequence to the experiment
 If we had pasted the `myview` View before the `windowsizer` View, the sequence
 would have been:
 
-... -> myview -> demographic survey -> windowsizer -> instructions -> ...
+... -> demographic survey -> myview -> windowsizer -> instructions -> ...
 
 Smile's timeline API also allow randomized flows for showing different sequences
 depending on what condition a participant is assigned to.

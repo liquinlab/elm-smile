@@ -80,9 +80,9 @@ In the `scripts` section, you see several commands. To run them you just type
 `npm run <cmd>`. For instance typing `npm run docs:dev` will effectively run the
 command `vitepress dev docs`.  
 The `npm run <cmd>` commands are just aliases/shorthands for running build steps
-of the vitepress documentation system, and later for the 🫠 Smile project
-itself. It is similar to a Makefile. Anytime you forget the possible commands
-just type `npm run` on a line by itself and you'll get a listing like this:
+of the vitepress documentation system, and later for the Smile project itself.
+It is similar to a Makefile. Anytime you forget the possible commands just type
+`npm run` on a line by itself and you'll get a listing like this:
 
 ```
 ➜ npm run

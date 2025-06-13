@@ -23,9 +23,22 @@ vi.mock('@/core/stores/log', () => {
   const mockLogFn =
     (type) =>
     (...args) => {
-      // Only log if DEBUG is true
-      if (DEBUG) {
-        console.log(`[${type}]`, ...args)
+      // Always call the appropriate console method
+      switch (type) {
+        case 'error':
+          if (DEBUG) {
+            console.error(...args)
+          }
+          break
+        case 'warn':
+          if (DEBUG) {
+            console.warn(...args)
+          }
+          break
+        default:
+          if (DEBUG) {
+            console.log(`[${type}]`, ...args)
+          }
       }
     }
 
@@ -55,7 +68,7 @@ vi.mock('axios', () => {
 })
 
 // Mock randomization functions
-vi.mock('@/core/randomization', () => {
+vi.mock('@/core/utils/randomization', () => {
   if (DEBUG) console.log('Mocking randomization...')
   return {
     randomInt: vi.fn(),
@@ -63,22 +76,6 @@ vi.mock('@/core/randomization', () => {
     sampleWithReplacement: vi.fn((arr) => arr[0]),
     sampleWithoutReplacement: vi.fn(),
     fakerDistributions: {},
-  }
-})
-
-// Mock useStepper
-vi.mock('@/core/composables/useStepper', () => {
-  if (DEBUG) console.log('Mocking useStepper...')
-  return {
-    useStepper: vi.fn().mockReturnValue({
-      currentStep: ref(1),
-      totalSteps: ref(5),
-      nextStep: vi.fn(),
-      prevStep: vi.fn(),
-      goToStep: vi.fn(),
-      isFirstStep: computed(() => true),
-      isLastStep: computed(() => false),
-    }),
   }
 })
 

@@ -1,4 +1,4 @@
-# :framed_picture: Images and Video
+# Images and Video
 
 **Static content** refers to files that aren't processed or built using Vite.
 This includes binary files like PNG, JPG, MP4 or unprocessed text like JSON, and

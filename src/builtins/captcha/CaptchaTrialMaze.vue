@@ -6,6 +6,7 @@ const props = defineProps({
 })
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
+
 import { animate } from 'motion'
 // use SVG
 import { SVG } from '@svgdotjs/svg.js'
@@ -104,7 +105,7 @@ onMounted(() => {
   svg.draw.on('mousemove', handleMouseMove)
   start_time = Date.now()
   timeout.value = ((MAX_TIME - (Date.now(0) - start_time)) / MAX_TIME) * 100
-  api.log.debug(`${timeout}`)
+  //api.log.debug(`${timeout}`)
 
   // Add pulsing animation to the circle
   const circle = document.querySelector('#circle')
@@ -203,9 +204,9 @@ const stopDragging = () => {
 
 const flag_touch = () => {
   if (svg.isDragging) {
-    api.log.debug('flag touched')
+    //api.log.debug('flag touched')
   } else {
-    api.log.debug('nice try')
+    //api.log.debug('nice try')
   }
 }
 

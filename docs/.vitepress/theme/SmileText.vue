@@ -1,3 +1,1 @@
-<template>
-  <b>🫠 Smile</b>
-</template>
+<template>Smile</template>

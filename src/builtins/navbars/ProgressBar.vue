@@ -10,7 +10,7 @@ const route = useRoute()
 <template>
   <nav class="navbar is-fixed-bottom" v-if="route.name !== 'recruit' && route.name !== 'mturk'">
     <div class="container is-fluid pl-6 pr-6">
-      <progress class="progress is-success" v-bind:value="smilestore.global.progress" max="100">60%</progress>
+      <progress class="progress is-success" v-bind:value="smilestore.browserEphemeral.progress" max="100">60%</progress>
     </div>
   </nav>
 </template>

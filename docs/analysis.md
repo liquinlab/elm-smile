@@ -1,4 +1,4 @@
-# :monocle_face: Analyzing data
+# Analyzing data
 
 ## Downloading data
 

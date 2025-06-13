@@ -1,4 +1,4 @@
-# :raising_hand: Recruiting Participants
+# Recruiting Participants
 
 The first step in recruiting participants is to get the public URL for your
 study. If you're in the Gureckis Lab, the easiest way to do this is through the

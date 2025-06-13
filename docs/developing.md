@@ -1,4 +1,4 @@
-# :woman_technologist: Developing your experiments
+# Developing your experiments
 
 When developing and debugging your experiment it is useful to interact with a
 web server running on your local computer (i.e., your laptop or desktop). This

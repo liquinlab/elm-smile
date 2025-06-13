@@ -16,8 +16,8 @@ const route = useRoute()
 // construct routes in order we want to display them
 const routerRoutes = router.getRoutes()
 // get seqtimeline and routes from local storage
-const seqtimeline = api.store.local.seqtimeline
-const routes = api.store.local.routes
+const seqtimeline = api.store.browserPersisted.seqtimeline
+const routes = api.store.browserPersisted.routes
 
 // filter routes - only those that aren't in seqtimeline
 const filteredRoutes = routes.filter((r) => {
@@ -53,8 +53,6 @@ function navigate(route) {
         @click="navigate(r.name)"
       >
         <span class="is-size-7">
-          <!-- fa icon arrow down -->
-
           <div class="routename">
             <span v-if="r.meta.level > 0" v-for="i in r.meta.level" style="margin-left: 5px">&nbsp;</span>
             <FAIcon v-if="r.meta.sequential" icon="fa-solid fa-arrow-down" />
@@ -71,6 +69,7 @@ function navigate(route) {
 .dropdown-content {
   padding-left: 10px;
   padding-right: 5px;
+  z-index: 9999;
 }
 .dropdown-content hr {
   margin: 0;

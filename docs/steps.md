@@ -1,4 +1,4 @@
-# :ladder: Stepping Through Trials
+# Stepping Through Trials
 
 For some conditions in your experiment, you may want to repeat several trials of
 the same event. Smile provides a trial stepper for organizing and managing
@@ -94,7 +94,7 @@ console.log(stepper.current) // [{ shape: 'circle', color: 'red' }]
 console.log(stepper.index) // "0"
 
 // Reset always goes to the first trial
-stepper.reset()
+stepper.goFirstStep()
 console.log(stepper.current) // [{ shape: 'circle', color: 'red' }]
 console.log(stepper.index) // "0"
 ```

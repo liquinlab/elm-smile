@@ -10,7 +10,7 @@
  *
  * Used with StepperStateMachine for higher-level state management.
  *
- * @property {*} _id - The node's unique identifier
+ * @property {*} _id - The node's unique identifier (used to create a path to this node)
  * @property {StepState[]} _states - Array of child nodes/states
  * @property {number} _currentIndex - Index tracking current position in children
  * @property {number} _depth - Depth of this node in the tree (0 for root)
@@ -25,11 +25,13 @@ export class StepState {
    * @param {StepState|null} parent - The parent node. If null, this is a root node
    *
    * This constructor initializes:
-   * - id: The node's id
+   * - id: The node's id (used to create a path to this node)
    * - states: Array of child nodes (also called rows)
    * - currentIndex: Index tracking current position when traversing children (-1 means no selection)
    * - depth: How deep this node is in the tree (0 for root)
    * - parent: Reference to parent node
+   * - data: Object to store arbitrary data
+   * - root: Reference to root node of the tree
    */
   constructor(id = null, parent = null) {
     this._id = id === null ? '/' : id
@@ -42,27 +44,6 @@ export class StepState {
     this._parent = parent
     this._root = parent?._root || this
     this._data = {}
-
-    return new Proxy(this, {
-      get(target, prop) {
-        // Handle array/object access
-        if (typeof prop === 'string' || typeof prop === 'number') {
-          // IMPORTANT: We first try to get a child node by id before checking properties/methods
-          // This ensures that child nodes with ids matching getter names (like 'parent')
-          // take precedence over the getter methods
-          const node = target.getNode(prop)
-          if (node) {
-            return node
-          }
-          // If no child node found, then check for properties/methods
-          if (prop in target) {
-            return target[prop]
-          }
-          return undefined
-        }
-        return target[prop]
-      },
-    })
   }
 
   /**
@@ -118,7 +99,11 @@ export class StepState {
    * @param {number} index - The index position to set (-1 means no selection)
    */
   set index(index) {
-    this._currentIndex = index
+    if (index === -1 || this._states[index] !== undefined) {
+      this._currentIndex = index
+    } else {
+      throw new Error(`Invalid index: ${index}. Index must be -1 or between 0 and ${this._states.length - 1}`)
+    }
   }
 
   /**
@@ -127,6 +112,52 @@ export class StepState {
    */
   get index() {
     return this._currentIndex
+  }
+
+  /**
+   * Gets the index of the parent node of the current leaf.
+   * @returns {number|null} The index of the parent node, or null if there is no parent
+   */
+  get parentIndex() {
+    // If this is the root node, return null
+    if (!this._parent) {
+      return null
+    }
+
+    // Return the current index of the parent node
+    return this._parent._currentIndex
+  }
+
+  /**
+   * Gets the index of the parent node of the current leaf in the state tree.
+   * Traverses down from root to find the current leaf node, then returns its parent's index.
+   * @returns {number|null} The index of the parent node of the current leaf, or null if there is no parent
+   */
+  get blockIndex() {
+    // Get the current leaf node
+    let current = this._root
+    while (current._states.length > 0) {
+      current = current._states[current._currentIndex]
+    }
+
+    // Return the parent's index
+    return current._parent ? current._parent._currentIndex : null
+  }
+
+  /**
+   * Gets the number of states in the parent node of the current leaf in the state tree.
+   * Traverses down from root to find the current leaf node, then returns its parent's state count.
+   * @returns {number} The number of states in the parent node, or 0 if there is no parent
+   */
+  get blockLength() {
+    // Get the current leaf node
+    let current = this._root
+    while (current._states.length > 0) {
+      current = current._states[current._currentIndex]
+    }
+
+    // Return the number of states in the parent node, or 0 if no parent
+    return current._parent ? current._parent._states.length : 0
   }
 
   /**
@@ -152,6 +183,7 @@ export class StepState {
   get root() {
     return this._root
   }
+
   /**
    * Get all child states of the current state.
    * row is just a synonym for child states
@@ -170,7 +202,7 @@ export class StepState {
    *
    * @returns {Array} Array of data values from all child states
    */
-  get rowsdata() {
+  get rowsData() {
     return this._states.map((item) => item.data)
   }
 
@@ -179,7 +211,7 @@ export class StepState {
    *
    * @returns {Array} Array of data values from all child states
    */
-  get statesdata() {
+  get statesData() {
     return this._states.map((item) => item.data)
   }
 
@@ -215,7 +247,7 @@ export class StepState {
    *
    * A leaf node is considered "first" if:
    * 1. It is a leaf node (has no children)
-   * 2. It is the leftmost leaf node when traversing the tree that is not marked as 'SOS' or 'EOS'
+   * 2. It is the leftmost leaf node when traversing the tree
    *
    * @returns {boolean} True if this is the first non-special leaf node, false otherwise
    */
@@ -233,13 +265,11 @@ export class StepState {
       return findLeftmostLeaf(state._states[0])
     }
 
-    // Find first non-SOS leaf by checking each branch from left
+    // Find first  leaf by checking each branch from left
     for (let i = 0; i < this._root._states.length; i++) {
       const leftmostLeaf = findLeftmostLeaf(this._root._states[i])
-      if (leftmostLeaf.id !== 'SOS' && leftmostLeaf.id !== 'EOS') {
-        // Return true if this is that first non-SOS leaf
-        return leftmostLeaf.paths === this.paths
-      }
+      // Return true if this is that first  leaf
+      return leftmostLeaf.pathString === this.pathString
     }
 
     return false
@@ -272,6 +302,14 @@ export class StepState {
   }
 
   /**
+   * Checks if this state has any child states.
+   * @returns {boolean} True if this state has child states, false otherwise
+   */
+  hasSteps() {
+    return this._states.length > 0
+  }
+
+  /**
    * Peeks at the next state without moving the current position.
    * @returns {StepState|null} The next state or null if no next state exists
    */
@@ -300,6 +338,18 @@ export class StepState {
   }
 
   /**
+   * Creates a new state instance. This method is used internally to create new states
+   * and can be overridden by subclasses to return instances of the subclass.
+   * @protected
+   * @param {*} id - The id for the new state
+   * @param {StepState} parent - The parent state
+   * @returns {StepState} A new state instance
+   */
+  _createNew(id, parent) {
+    return new StepState(id, parent)
+  }
+
+  /**
    * Creates and adds a new child state to this node.
    * If no id is provided, automatically assigns the next available index as the id.
    * @param {*} id - Optional id for the new state. If null, uses states.length
@@ -323,17 +373,17 @@ export class StepState {
   insert(id = null, index = 0, data = null) {
     const autoid = id === null ? this._states.length : id
 
-    // Check for existing state with same id
+    // Check for existing state with same id and warn if found
     if (this._states.some((state) => state.id === autoid)) {
-      throw new Error(`State id already exists in this node (id: "${autoid}")`)
+      throw new Error(`State id already exists in at this node (id: "${autoid}")`)
     }
 
-    // Check for hyphen in id
-    if (String(autoid).includes('-')) {
-      throw new Error(`State id cannot contain hyphens (id: "${autoid}")`)
+    // Check for string in id
+    if (String(autoid).includes('/')) {
+      throw new Error(`State id cannot contain slashes (id: "${autoid}")`)
     }
 
-    const state = new StepState(autoid, this)
+    const state = this._createNew(autoid, this)
     if (data !== null) {
       state.data = data
     }
@@ -372,7 +422,7 @@ export class StepState {
    */
   goTo(path) {
     // Convert string path to array if needed
-    const pathArray = typeof path === 'string' ? path.split('-') : path
+    const pathArray = typeof path === 'string' ? path.split('/') : path
 
     // Reset the state machine
     this.reset()
@@ -473,11 +523,11 @@ export class StepState {
   /**
    * Gets all leaf node paths in the tree beneath this node.
    * A leaf node is defined as a node that has no children.
-   * @returns {string} A hyphen-separated string of leaf node paths
+   * @returns {string} A slash-separated string of leaf node paths
    */
   get leafNodes() {
     if (this._states.length === 0) {
-      return this.paths
+      return this.pathString
     }
 
     return this._states.reduce((leaves, state) => {
@@ -507,162 +557,6 @@ export class StepState {
   }
 
   /**
-   * Serializes the StepState object to a JSON string.
-   * @returns {string} A JSON representation of the StepState object
-   */
-  get json() {
-    // Helper function to clean non-serializable data
-    const cleanData = (data) => {
-      if (!data) return data
-      const cleaned = {}
-      for (const [key, value] of Object.entries(data)) {
-        // Skip functions unless they are faker functions
-        if (typeof value === 'function') {
-          // Get the function body as string
-          const funcStr = value.toString()
-          // Check if it's a faker function call
-          if (funcStr.includes('api.faker.')) {
-            // Extract the faker function name and parameters
-            const match = funcStr.match(/api\.faker\.(\w+)\((.*)\)/)
-            if (match) {
-              const [_, fakerName, params] = match
-              cleaned[key] = {
-                __fakerFunction: true,
-                name: fakerName,
-                params: params.split(',').map((p) => p.trim()),
-              }
-            }
-          }
-          // Skip all other functions
-          continue
-        }
-
-        // Check if it's a Vue component
-        if (value && typeof value === 'object' && value.name && (value.template || value.render)) {
-          cleaned[key] = {
-            __vueComponent: true,
-            componentName: value.name,
-          }
-          continue
-        }
-
-        // Handle data objects that might contain component references
-        if (key === 'type' && value?.name && (value.template || value.render)) {
-          cleaned[key] = {
-            __vueComponent: true,
-            componentName: value.name,
-          }
-          continue
-        }
-
-        if (
-          typeof value === 'undefined' ||
-          value instanceof RegExp ||
-          (value instanceof Object && 'nodeType' in value)
-        ) {
-          // Skip undefined values, RegExp, and DOM elements entirely
-          continue
-        } else {
-          cleaned[key] = value
-        }
-      }
-      return cleaned
-    }
-
-    return {
-      id: this.id,
-      currentIndex: this._currentIndex,
-      depth: this._depth,
-      states: this._states.map((state) => state.json),
-      data: cleanData(this.data),
-      // Note: We don't serialize _parent or _root as they are circular references
-      // and will be re-established during deserialization
-    }
-  }
-
-  /**
-   * Deserializes a JSON string to a StepState object.
-   * @param {string} data - The JSON string to deserialize
-   */
-  loadFromJSON(data) {
-    // Only reset root-level properties if this is the root node
-    if (this._parent === null) {
-      this._id = data.id
-      this._currentIndex = data.currentIndex
-      this._depth = data.depth
-      this._data = this._reconstructData(data.data)
-      this._states = []
-      this._parent = null
-      this._root = this
-    }
-    // Create child states with proper parent references and load their data
-    this._states = data.states.map((stateData) => {
-      const state = new StepState(stateData.id, this) // Pass 'this' as parent
-      state.loadFromJSON(stateData) // Load child data while preserving parent reference
-      state._depth = stateData.depth
-      state._currentIndex = stateData.currentIndex
-      state._data = this._reconstructData(stateData.data)
-      state._root = this._root
-      state._parent = this
-      return state
-    })
-  }
-
-  /**
-   * Reconstructs data objects, including faker functions
-   * @private
-   * @param {Object} data - The data object to reconstruct
-   * @returns {Object} The reconstructed data object
-   */
-  _reconstructData(data) {
-    if (!data) return data
-
-    // Handle arrays
-    if (Array.isArray(data)) {
-      return data.map((item) => this._reconstructData(item))
-    }
-
-    // Handle objects
-    if (typeof data === 'object') {
-      const reconstructed = {}
-      for (const [key, value] of Object.entries(data)) {
-        if (value && typeof value === 'object') {
-          // Handle faker functions
-          if (value.__fakerFunction) {
-            reconstructed[key] = () => {
-              const fakerFunc = this._root.api?.faker?.[value.name]
-              if (!fakerFunc) {
-                console.warn(`Faker function ${value.name} not found during reconstruction`)
-                return null
-              }
-              return fakerFunc(...value.params)
-            }
-            continue
-          }
-
-          // Handle Vue components
-          if (value.__vueComponent) {
-            reconstructed[key] = {
-              name: value.componentName,
-              __vueComponent: true,
-            }
-            continue
-          }
-
-          // Recursively reconstruct nested objects
-          reconstructed[key] = this._reconstructData(value)
-        } else {
-          reconstructed[key] = value
-        }
-      }
-      return reconstructed
-    }
-
-    // Return primitive values as is
-    return data
-  }
-
-  /**
    * Gets the path from root to this node by walking up the parent chain.
    * Returns an array of ids representing each node's id along the path,
    * excluding the root node ('/').
@@ -683,21 +577,38 @@ export class StepState {
 
   /**
    * Gets the path string for this node by walking up the parent chain.
-   * Returns a hyphen-separated string of ids representing each node's id,
-   * excluding the root node ('/').
+   * Returns a slash-separated string of ids representing each node's id,
+   * including the root node ('/').
    * This is distinct from the currentPath property which returns the path from the
    * root to the current selected node by following .index.
-   * @returns {string} Hyphen-separated string representing the path to this node
+   * @returns {string} Slash-separated string representing the path to this node
    */
-  get paths() {
-    return this.path.join('-')
+  get pathString() {
+    return this.path.join('/')
+  }
+
+  /**
+   * Gets all unique paths in the tree beneath this node.
+   * @returns {Set<string>} Set of all unique paths in the tree
+   */
+  get existingPaths() {
+    const paths = new Set()
+    const collectPaths = (node) => {
+      // Only add path if this is a leaf node (no children)
+      if (node._states.length === 0 && node !== this._root) {
+        paths.add(node.pathString)
+      }
+      node._states.forEach(collectPaths)
+    }
+    collectPaths(this)
+    return paths
   }
 
   /**
    * Gets an array of data objects from all nodes along the current path, from root to leaf.
    * @returns {Array} Array of data objects, where each element is the complete data from a node along the path
    */
-  get pathdata() {
+  get dataAlongPath() {
     const dataArray = []
     let current = this
 
@@ -734,7 +645,7 @@ export class StepState {
 
   /**
    * Sets data for a node at the specified path
-   * @param {Array|string} path - Path to the node (array of ids or hyphen-separated string)
+   * @param {Array|string} path - Path to the node (array of ids or slash-separated string)
    * @param {Object} data - Data to associate with the node
    * @throws {Error} If the path doesn't exist
    */
@@ -744,11 +655,11 @@ export class StepState {
       throw new Error('Data must be an object')
     }
 
-    const pathArray = typeof path === 'string' ? path.split('-') : path
+    const pathArray = typeof path === 'string' ? path.split('/') : path
     let current = this
 
     for (const id of pathArray) {
-      current = current[id]
+      current = current.getNode(id)
       if (!current) {
         throw new Error(`Invalid path: ${path}`)
       }
@@ -775,6 +686,14 @@ export class StepState {
   }
 
   /**
+   * Returns the current path through the tree as a slash-separated string
+   * @returns {string} String representation of the current path
+   */
+  get currentPathString() {
+    return this.currentPath.join('/')
+  }
+
+  /**
    * Returns the data from the current leaf node in the tree
    * @returns {*} The data from the current leaf node
    */
@@ -787,14 +706,6 @@ export class StepState {
     }
 
     return current.data
-  }
-
-  /**
-   * Returns the current path through the tree as a hyphen-separated string
-   * @returns {string} String representation of the current path
-   */
-  get currentPaths() {
-    return this.currentPath.join('-')
   }
 
   /**
@@ -828,24 +739,27 @@ export class StepState {
   /**
    * Completely clears all states and resets to initial condition
    * Removes all child states and resets all internal properties
+   * also clears the data from the current node
    */
   clear() {
-    // Clear all child states recursively
-    this._states.forEach((state) => {
-      state.clear()
-    })
+    this.clearSubTree()
+    this.clearData()
+  }
 
-    // Reset all internal properties
-    this._states = []
-    this._currentIndex = 0
+  /**
+   * Clears all data from the current node by resetting the data object to empty
+   * Does not affect child nodes or the structure of the state tree
+   */
+  clearData() {
     this._data = {}
   }
 
   /**
    * Completely clears all states and resets to initial condition
    * Removes all child states and resets all internal properties
+   * does _not_ clear the data from the current node
    */
-  clearTree() {
+  clearSubTree() {
     // Clear all child states recursively
     this._states.forEach((state) => {
       state.clear()

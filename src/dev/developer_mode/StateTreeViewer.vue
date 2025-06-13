@@ -2,52 +2,21 @@
 import { ref, computed, watch, onMounted, defineComponent, h } from 'vue'
 import TreeNode from './TreeNode.vue'
 import DataPathViewer from '@/dev/developer_mode/DataPathViewer.vue'
-import useAPI from '@/core/composables/useAPI'
 import { useRoute } from 'vue-router'
+import useViewAPI from '@/core/composables/useViewAPI'
+const api = useViewAPI()
 
-const api = useAPI()
-const route = useRoute()
-
-// Reactively get the stepper for the current page
-const stepper = computed(() => {
-  return api.store.global.steppers?.[route.name]
-})
-
-// Add a watcher to handle stepper initialization
-watch(
-  () => api.store.global.steppers?.[route.name],
-  (newStepper) => {
-    if (newStepper) {
-      // Force a component update when stepper becomes available
-      console.log('Stepper initialized:', route.name)
-    }
-  },
-  { immediate: true } // This will run the watcher immediately on component mount
-)
-
-const stateMachine = computed(() => stepper.value?.smviz)
-
-// Update the path watcher to use stepper.value
-watch(
-  () => stepper.value?.path,
-  (newPath) => {
-    console.log('Path watcher triggered:', {
-      newPath,
-      stepper: stepper.value,
-    })
-  },
-  { immediate: true }
-)
+const stateMachine = computed(() => api.steps.visualize())
 
 // Convert array path to string format (e.g., [1, 1] -> "1-1")
 const pathToString = (pathArray) => {
-  return Array.isArray(pathArray) ? pathArray.join('-') : ''
+  return Array.isArray(pathArray) ? pathArray.join('/') : ''
 }
 
 // Add computed property to check if a node is selected
 const isNodeSelected = (nodePath) => {
-  if (!stepper.value?.path) return false
-  const currentPathStr = pathToString(stepper.value.path)
+  if (!api.path) return false
+  const currentPathStr = api.pathString
   return nodePath === currentPathStr
 }
 
@@ -129,8 +98,8 @@ const formatData = (data) => {
 
 const handleNodeClick = (path) => {
   console.log('Node clicked with path:', path)
-  if (stepper.value) {
-    stepper.value.goToStep(path)
+  if (api.steps) {
+    api.goToStep(path)
     // Scroll will happen via the watcher
   } else {
     console.warn('Stepper not available for path reset')
@@ -142,16 +111,11 @@ const handleReload = () => {
   window.location.reload()
 }
 
-const isEndState = computed(() => {
-  if (!stepper.value) return false
-  return stepper.value.paths === 'SOS' || stepper.value.paths === 'EOS'
-})
-
 // Add refs for container and selected node tracking
 const treeContainer = ref(null)
 
 const scrollToSelectedNode = () => {
-  if (!stepper.value?.path) return
+  if (!api.path) return
 
   setTimeout(() => {
     // Use the component's scope to find the selected node
@@ -183,7 +147,7 @@ const scrollToSelectedNode = () => {
 
 // Add watcher for path changes to trigger scroll
 watch(
-  () => stepper.value?.path,
+  () => api.path,
   (newPath) => {
     if (newPath) {
       scrollToSelectedNode()
@@ -193,92 +157,92 @@ watch(
 </script>
 
 <template>
-  <div class="tree-viewer-container" v-if="stepper">
+  <div class="tree-viewer-container" v-if="api.steps">
     <div class="path-display-container">
       <div class="path-info">
-        <div class="path-display">{{ stepper.paths }}</div>
-
-        &nbsp;<FAIcon icon="fa-solid fa-ban" v-if="isEndState" />
+        <div class="path-display">{{ api.pathString }}</div>
       </div>
 
       <div class="field has-addons">
         <p class="control">
-          <button @click="stepper.goPrevStep()" class="button is-small nav-button">
+          <button @click="api.goPrevStep()" class="button is-small nav-button" :disabled="!api.hasSteps()">
             <span><FAIcon icon="fa-solid fa-angle-left" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="stepper.goNextStep()" class="button is-small nav-button">
+          <button @click="api.goNextStep()" class="button is-small nav-button" :disabled="!api.hasSteps()">
             <span><FAIcon icon="fa-solid fa-angle-right" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="stepper.reset()" class="button is-small nav-button">
+          <button @click="api.goFirstStep()" class="button is-small nav-button" :disabled="!api.hasSteps()">
             <span><FAIcon icon="fa-solid fa-house-flag" /></span>
           </button>
         </p>
         <p class="control">
-          <button @click="stepper.clear()" class="button is-small nav-button">
+          <button @click="api.clear()" class="button is-small nav-button" :disabled="!api.hasSteps()">
             <span><FAIcon icon="fa-solid fa-trash" /></span>
-          </button>
-        </p>
-        <p class="control">
-          <button @click="handleReload" class="button is-small nav-button">
-            <span><FAIcon icon="fa-solid fa-arrow-rotate-left" /></span>
           </button>
         </p>
       </div>
     </div>
 
     <div class="tree-container" ref="treeContainer">
-      <div class="index-display">{{ stepper.stepIndex }}/{{ stepper.nSteps }}</div>
+      <div v-if="api.nSteps > 0">
+        <div class="index-display">
+          {{ api.stepIndex }}/{{ api.nSteps }} ({{ api.blockIndex }}/{{ api.blockLength }})
+        </div>
 
-      <ul class="tree-root">
-        <li v-if="stateMachine" class="tree-node root-node">
-          <ul v-if="stateMachine.rows && stateMachine.rows.length > 0" class="children">
-            <TreeNode
-              v-for="(state, index) in stateMachine.rows"
-              :key="index"
-              :state="state"
-              :index="index"
-              :total="stateMachine.rows.length"
-              :is-node-selected="isNodeSelected"
-              :format-data="formatData"
-              :depth="1"
-              :max-depth="5"
-              :vertical-lines="[]"
-              @node-click="handleNodeClick"
-            />
-          </ul>
-        </li>
-      </ul>
+        <ul class="tree-root">
+          <li v-if="stateMachine" class="tree-node root-node">
+            <ul v-if="stateMachine.rows && stateMachine.rows.length > 0" class="children">
+              <TreeNode
+                v-for="(state, index) in stateMachine.rows"
+                :key="index"
+                :state="state"
+                :index="index"
+                :total="stateMachine.rows.length"
+                :is-node-selected="isNodeSelected"
+                :format-data="formatData"
+                :depth="1"
+                :max-depth="5"
+                :vertical-lines="[]"
+                @node-click="handleNodeClick"
+              />
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="tree-viewer-container-empty" v-else>No steps defined</div>
     </div>
     <div class="data-container-global">
       <div class="global-data-display">
-        Global Vars
-        <span class="data-label">(.globals)</span>
+        Persisted Vars
+        <span class="data-label">(.persist)</span>
 
         <button
-          @click="stepper.clearGlobals()"
+          @click="api.clearPersist()"
           class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
           data-tooltip="Delete Global Variables"
         >
           <span><FAIcon icon="fa-solid fa-trash" /></span>
         </button>
-        <DataPathViewer :data="stepper.globals" />
+        <DataPathViewer :data="api.persist" />
       </div>
     </div>
     <div class="data-container">
       <div class="data-display">
-        Table Data <span class="data-label">(.data)</span>
+        Step Data <span class="data-label">(.stepData)</span>
+        <!--
         <button
-          @click="stepper.clear()"
+          @click="api.clearCurrentStepData()"
           class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
           data-tooltip="Delete Nodes"
         >
           <span><FAIcon icon="fa-solid fa-trash" /></span>
         </button>
-        <DataPathViewer :data="stepper.stepData" />
+        -->
+        <DataPathViewer :data="api.stepData" />
       </div>
     </div>
   </div>
@@ -298,16 +262,14 @@ watch(
 .tree-viewer-container-empty {
   flex: 1;
   height: 100%;
-  padding-top: 15px;
+  padding-top: 5px;
   padding-left: 10px;
   padding-right: 10px;
-  padding-bottom: 15px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-family: monospace;
   font-weight: 800;
-  color: #3e7974;
+  color: #9fa0a0;
   border-top: 1px solid #cacaca;
-  background-color: #f1f3f3;
   text-align: left;
 }
 
@@ -457,7 +419,6 @@ watch(
   font-size: 0.8rem;
   font-weight: 800;
   font-family: monospace;
-  z-index: 2000;
 }
 
 .data-display {

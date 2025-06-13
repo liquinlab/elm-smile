@@ -2,11 +2,11 @@
 outline: none
 ---
 
-# :wave: Welcome to Smile!
+# Welcome to Smile!
 
-The <SmileText/> project is a web-based platform designed to make it easy and
-fun to develop rich and interactive online experiments. Unlike tools that cater
-to non-programmers, Smile is designed to help reasonably competent programmers
+The Smile project is new way to develop rich and interactive online experiments.
+Smile prioritizes modularity and reusability. Unlike tools that cater to
+non-programmers, Smile is designed to help reasonably competent programmers
 accomplish more in less time.
 
 ### Highlighted features:
@@ -14,7 +14,8 @@ accomplish more in less time.
 - Fast and fun front-end interface development with [Vue.js](https://vuejs.org)
   and [Bulma CSS](https://bulma.io). Make complex games, animations, and surveys
   with ease.
-
+- Custom [API](/api) and [developer mode tools](/developing) which provides a
+  novel interface for specifying and debugging interactive experiments.
 - Built-in support for [common experiment elements](/views#built-in-views) like
   consent forms, captchas, instructions, and surveys. Just add your custom
   experiment logic and start collecting data.
@@ -43,9 +44,10 @@ accomplish more in less time.
   [Google Firestore and and Real-time Database ](https://firebase.google.com).
 - Automatic and highly reproducible [deployment](/deploying) of the latest code
   to the web using [GitHub Actions](https://github.com/features/actions).
-- Automated [testing](/testing) framework including unit tests and end-to-end
-  tests using [Cypress.io](https://www.cypress.io/) helps experimenters ensure
-  code is reliable and bug-free.
+- Automated [testing](/testing) framework including unit tests via
+  [vitest](https://vitest.dev/) and end-to-end tests using
+  [Cypress.io](https://www.cypress.io/) helps experimenters ensure code is
+  reliable and bug-free.
 - Integrates with the rest of your research life including
   [Slack notifications](/deploying#notifying-the-slack-bot), automatic
   generation of QR codes for

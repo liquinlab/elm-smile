@@ -5,7 +5,7 @@ head:
       href: /css/bulma-prefixed.min.css
 ---
 
-# :artist: Styling, CSS, and Icons
+# Styling, CSS, and Icons
 
 Styling the look and feel of your experiment elements is often a time-consuming
 process. However, it is worthwhile because participants are likely to view your

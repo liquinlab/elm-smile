@@ -1,4 +1,4 @@
-# :gear: Configuration Options
+# Configuration Options
 
 <style>
 .note {

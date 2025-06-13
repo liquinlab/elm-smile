@@ -1,4 +1,4 @@
-# :cloud: Deploying your experiment
+# Deploying your experiment
 
 Deploying (or hosting) your experiment involves building the web application and
 then transferring a copy of the files to a suitable public website where

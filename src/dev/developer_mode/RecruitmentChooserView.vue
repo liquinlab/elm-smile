@@ -1,8 +1,9 @@
 <script setup>
-// this route doesn't actually use any vue features
-//import { ref } from 'vue'
-
-// import and initalize smile API
+/**
+ * Import and initialize the SMILE ViewAPI
+ * @requires useViewAPI SMILE ViewAPI composable that provides view-specific functionality
+ * @constant {ViewAPI} api Global ViewAPI instance for this view
+ */
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 </script>

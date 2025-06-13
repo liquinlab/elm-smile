@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, computed, watch } from 'vue'
+import { reactive, computed } from 'vue'
 
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
@@ -8,8 +8,8 @@ const api = useViewAPI()
 // const pages = api.spec().append([{ path: 'feedback_page1' }])
 // api.addSpec(pages)
 
-if (!api.globals.forminfo) {
-  api.globals.forminfo = reactive({
+if (!api.persist.isDefined('forminfo')) {
+  api.persist.forminfo = reactive({
     difficulty_rating: '', // how difficulty
     enjoyment_rating: '', // how enjoyable
     feedback: '', // general feedback
@@ -19,23 +19,24 @@ if (!api.globals.forminfo) {
 
 const complete = computed(
   () =>
-    api.globals.forminfo.difficulty_rating !== '' &&
-    api.globals.forminfo.enjoyment_rating !== '' &&
-    api.globals.forminfo.feedback !== '' &&
-    api.globals.forminfo.issues !== ''
+    api.persist.forminfo.difficulty_rating !== '' &&
+    api.persist.forminfo.enjoyment_rating !== '' &&
+    api.persist.forminfo.feedback !== '' &&
+    api.persist.forminfo.issues !== ''
 )
 
 function autofill() {
-  api.globals.forminfo.difficulty_rating = '0 - Very Easy'
-  api.globals.forminfo.enjoyment_rating = '6 - Very Fun'
-  api.globals.forminfo.feedback = 'It was good.'
-  api.globals.forminfo.issues = 'Too fun?'
+  api.persist.forminfo.difficulty_rating = '0 - Very Easy'
+  api.persist.forminfo.enjoyment_rating = '6 - Very Fun'
+  api.persist.forminfo.feedback = 'It was good.'
+  api.persist.forminfo.issues = 'Too fun?'
 }
 
 api.setAutofill(autofill)
 
 function finish() {
-  api.recordForm('feedbackForm', api.globals.forminfo)
+  api.recordForm('feedbackForm', api.persist.forminfo)
+  api.saveData(true) // force a data save
   api.goNextView()
 }
 </script>
@@ -78,7 +79,7 @@ function finish() {
                   '6 - Very Difficult',
                   'I\'d rather not say',
                 ]"
-                v-model="api.globals.forminfo.difficulty_rating"
+                v-model="api.persist.forminfo.difficulty_rating"
               />
 
               <FormKit
@@ -97,7 +98,7 @@ function finish() {
                   '6 - Very Fun',
                   'I\'d rather not say',
                 ]"
-                v-model="api.globals.forminfo.enjoyment_rating"
+                v-model="api.persist.forminfo.enjoyment_rating"
               />
 
               <FormKit
@@ -105,14 +106,14 @@ function finish() {
                 name="instructions"
                 label="Any general feedback for the study team?"
                 placeholder="Please provide general thoughts, reactions, or ideas here."
-                v-model="api.globals.forminfo.feedback"
+                v-model="api.persist.forminfo.feedback"
               />
               <FormKit
                 type="textarea"
                 name="instructions"
                 label="Any specific issues to report that might improve the study?"
                 placeholder="Please report any specific issues you had, if any"
-                v-model="api.globals.forminfo.issues"
+                v-model="api.persist.forminfo.issues"
               />
               <hr />
               <div class="columns">

@@ -6,7 +6,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import useAPI from '@/core/composables/useAPI'
-import Timeline from '@/core/timeline'
+import Timeline from '@/core/timeline/Timeline'
 
 vi.mock('axios', () => ({
   get: vi.fn(() => Promise.resolve({ data: '127.0.0.1' })),
@@ -44,7 +44,7 @@ describe('Timeline tests', () => {
           setRandomizedRoute: vi.fn(),
           registerStepper: vi.fn(),
           config: { mode: 'production' },
-          local: {},
+          browserPersisted: {},
         }
         return { api }
       },

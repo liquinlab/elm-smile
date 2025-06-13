@@ -5,12 +5,11 @@ import { reactive, computed } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
-const pages = api.spec().append([{ path: 'survey_page1' }, { path: 'survey_page2' }, { path: 'survey_page3' }])
-api.addSpec(pages)
+api.steps.append([{ path: 'survey_page1' }, { path: 'survey_page2' }, { path: 'survey_page3' }])
 
 // persists the form info in local storage, otherwise initialize
-if (!api.globals.forminfo) {
-  api.globals.forminfo = reactive({
+if (!api.persist.isDefined('forminfo')) {
+  api.persist.forminfo = reactive({
     dob: '',
     gender: '',
     race: '',
@@ -30,49 +29,49 @@ if (!api.globals.forminfo) {
 
 const page_one_complete = computed(
   () =>
-    api.globals.forminfo.dob !== '' &&
-    api.globals.forminfo.gender !== '' &&
-    api.globals.forminfo.race !== '' &&
-    api.globals.forminfo.hispanic !== '' &&
-    api.globals.forminfo.fluent_english !== ''
+    api.persist.forminfo.dob !== '' &&
+    api.persist.forminfo.gender !== '' &&
+    api.persist.forminfo.race !== '' &&
+    api.persist.forminfo.hispanic !== '' &&
+    api.persist.forminfo.fluent_english !== ''
 )
 
 const page_two_complete = computed(
   () =>
-    api.globals.forminfo.color_blind !== '' &&
-    api.globals.forminfo.learning_disability !== '' &&
-    api.globals.forminfo.neurodevelopmental_disorder !== '' &&
-    api.globals.forminfo.psychiatric_disorder !== ''
+    api.persist.forminfo.color_blind !== '' &&
+    api.persist.forminfo.learning_disability !== '' &&
+    api.persist.forminfo.neurodevelopmental_disorder !== '' &&
+    api.persist.forminfo.psychiatric_disorder !== ''
 )
 
 const page_three_complete = computed(
   () =>
-    api.globals.forminfo.country !== '' &&
-    api.globals.forminfo.education_level !== '' &&
-    api.globals.forminfo.household_income !== ''
+    api.persist.forminfo.country !== '' &&
+    api.persist.forminfo.education_level !== '' &&
+    api.persist.forminfo.household_income !== ''
 )
 
 function autofill() {
-  api.globals.forminfo.dob = '1978-09-12'
-  api.globals.forminfo.gender = 'Male'
-  api.globals.forminfo.race = 'Caucasian/White'
-  api.globals.forminfo.hispanic = 'No'
-  api.globals.forminfo.fluent_english = 'Yes'
-  api.globals.forminfo.normal_vision = 'Yes'
-  api.globals.forminfo.color_blind = 'No'
-  api.globals.forminfo.learning_disability = 'No'
-  api.globals.forminfo.neurodevelopmental_disorder = 'No'
-  api.globals.forminfo.psychiatric_disorder = 'No'
-  api.globals.forminfo.country = 'United States'
-  api.globals.forminfo.zipcode = '12345'
-  api.globals.forminfo.education_level = 'Doctorate Degree (PhD/Other)'
-  api.globals.forminfo.household_income = '$100,000–$199,999'
+  api.persist.forminfo.dob = '1978-09-12'
+  api.persist.forminfo.gender = 'Male'
+  api.persist.forminfo.race = 'Caucasian/White'
+  api.persist.forminfo.hispanic = 'No'
+  api.persist.forminfo.fluent_english = 'Yes'
+  api.persist.forminfo.normal_vision = 'Yes'
+  api.persist.forminfo.color_blind = 'No'
+  api.persist.forminfo.learning_disability = 'No'
+  api.persist.forminfo.neurodevelopmental_disorder = 'No'
+  api.persist.forminfo.psychiatric_disorder = 'No'
+  api.persist.forminfo.country = 'United States'
+  api.persist.forminfo.zipcode = '12345'
+  api.persist.forminfo.education_level = 'Doctorate Degree (PhD/Other)'
+  api.persist.forminfo.household_income = '$100,000–$199,999'
 }
 
 api.setAutofill(autofill)
 
 function finish() {
-  api.recordForm('demographicForm', api.globals.forminfo)
+  api.recordForm('demographicForm', api.persist.forminfo)
   api.goNextView()
 }
 </script>
@@ -85,7 +84,8 @@ function finish() {
         We request some information about you which we can use to understand aggregate differences between individuals.
         Your privacy will be maintained and the data will not be linked to your online identity (e.g., email).
       </p>
-      <div class="formstep" v-if="api.paths === 'survey_page1'">
+
+      <div class="formstep" v-if="api.pathString === 'survey_page1'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -100,7 +100,7 @@ function finish() {
                 label="Date of Birth"
                 placeholder="1/1/1960"
                 name="dob"
-                v-model="api.globals.forminfo.dob"
+                v-model="api.persist.forminfo.dob"
                 help="Enter your birthday (required)"
                 validation="required"
               />
@@ -111,13 +111,13 @@ function finish() {
                 help="Enter your self-identified gender (required)"
                 placeholder="Select an option"
                 :options="['Male', 'Female', 'Other', 'I prefer not to say']"
-                v-model="api.globals.forminfo.gender"
+                v-model="api.persist.forminfo.gender"
               />
               <FormKit
                 type="select"
                 label="Race"
                 name="race"
-                v-model="api.globals.forminfo.race"
+                v-model="api.persist.forminfo.race"
                 help="Enter the race that best describes you (required)"
                 placeholder="Select an option"
                 :options="[
@@ -135,7 +135,7 @@ function finish() {
                 type="select"
                 label="Are you hispanic?"
                 name="hispanic"
-                v-model="api.globals.forminfo.hispanic"
+                v-model="api.persist.forminfo.hispanic"
                 placeholder="Select an option"
                 help="Do you consider yourself hispanic? (required)"
                 validation="required"
@@ -145,7 +145,7 @@ function finish() {
                 type="select"
                 label="Are you fluent in English?"
                 name="english"
-                v-model="api.globals.forminfo.fluent_english"
+                v-model="api.persist.forminfo.fluent_english"
                 help="Are you able to speak and understanding English? (required)"
                 placeholder="Select an option"
                 validation="required"
@@ -167,7 +167,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-else-if="api.paths === 'survey_page2'">
+      <div class="formstep" v-else-if="api.pathString === 'survey_page2'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -184,7 +184,7 @@ function finish() {
                 help="Do you have normal vision? (required)"
                 placeholder="Select an option"
                 validation="required"
-                v-model="api.globals.forminfo.normal_vision"
+                v-model="api.persist.forminfo.normal_vision"
                 :options="['Yes', 'No', 'Unsure', 'I prefer not to say']"
               />
               <FormKit
@@ -194,7 +194,7 @@ function finish() {
                 help="Do you have any color blindness? (required)"
                 placeholder="Select an option"
                 validation="required"
-                v-model="api.globals.forminfo.color_blind"
+                v-model="api.persist.forminfo.color_blind"
                 :options="['Yes', 'No', 'Unsure', 'I prefer not to say']"
               />
               <FormKit
@@ -204,7 +204,7 @@ function finish() {
                 help="Do you have a diagnosed learning disability? (required)"
                 placeholder="Select an option"
                 validation="required"
-                v-model="api.globals.forminfo.learning_disability"
+                v-model="api.persist.forminfo.learning_disability"
                 :options="['Yes', 'No', 'Unsure', 'I prefer not to say']"
               />
               <FormKit
@@ -214,7 +214,7 @@ function finish() {
                 help="Do you have a diagnosis of a neurodevelopmental disorder? (required)"
                 placeholder="Select an option"
                 validation="required"
-                v-model="api.globals.forminfo.neurodevelopmental_disorder"
+                v-model="api.persist.forminfo.neurodevelopmental_disorder"
                 :options="['Yes', 'No', 'Unsure', 'I prefer not to say']"
               />
               <FormKit
@@ -223,7 +223,7 @@ function finish() {
                 label="Have you been diagnosed with a psychiatric disorder (e.g., anxiety, depression, OCD)?"
                 help="Do you have diagnosis of a psychiatric disorder? (required)"
                 validation="required"
-                v-model="api.globals.forminfo.psychiatric_disorder"
+                v-model="api.persist.forminfo.psychiatric_disorder"
                 placeholder="Select an option"
                 :options="['Yes', 'No', 'Unsure', 'I prefer not to say']"
               />
@@ -250,7 +250,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-else-if="api.paths === 'survey_page3'">
+      <div class="formstep" v-else-if="api.pathString === 'survey_page3'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -266,7 +266,7 @@ function finish() {
                 name="country"
                 placeholder="Select an option"
                 validation="required"
-                v-model="api.globals.forminfo.country"
+                v-model="api.persist.forminfo.country"
                 help="Select the country in which you reside. (required)"
                 :options="[
                   'Afghanistan',
@@ -473,7 +473,7 @@ function finish() {
                 label="Zipcode/Postal Code"
                 placeholder="Enter zip or postal code"
                 validation="optional"
-                v-model="api.globals.forminfo.zipcode"
+                v-model="api.persist.forminfo.zipcode"
                 help="Select zipcode or postal code of your primary residence. (optional)"
               />
 
@@ -482,7 +482,7 @@ function finish() {
                 name="education"
                 label="Highest level of education"
                 placeholder="Select an option"
-                v-model="api.globals.forminfo.education_level"
+                v-model="api.persist.forminfo.education_level"
                 help="What is your highest level of schooling that you completed? (required)"
                 :options="[
                   'No Formal Qualifications',
@@ -502,7 +502,7 @@ function finish() {
                 label="Enter your approximate household income."
                 help="What is your approximate household income? (required)"
                 placeholder="Select an option"
-                v-model="api.globals.forminfo.household_income"
+                v-model="api.persist.forminfo.household_income"
                 :options="[
                   'Less than $20,000',
                   '$20,000–$39,999',
@@ -539,19 +539,6 @@ function finish() {
           </div>
         </div>
       </div>
-
-      <div class="formstep" v-else>
-        <article class="message is-danger">
-          <div class="message-header">
-            <p>Error</p>
-            <button class="delete" aria-label="delete"></button>
-          </div>
-          <div class="message-body">
-            Error, you shouldn't have been able to get this far! This happened because the stepper for this route has
-            been incremented too many times. There's no problem so long as your code doesn't allow this in live mode.
-          </div>
-        </article>
-      </div>
     </div>
   </div>
 </template>
@@ -561,8 +548,12 @@ function finish() {
   margin-top: 40px;
 }
 
-:root {
+.formkit-input {
   --fk-bg-input: #fff;
+  --fk-max-width-input: 100%;
+}
+
+.formkit-wrapper {
   --fk-max-width-input: 100%;
 }
 

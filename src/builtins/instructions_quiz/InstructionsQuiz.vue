@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, computed, ref, onMounted } from 'vue'
+import { reactive, computed, ref, onMounted, nextTick } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
@@ -26,28 +26,15 @@ function init() {
   // randomize questions and add to stepper
   qs = props.randomizeQandA ? getRandomizedQuestions() : props.questions
 
-  console.log('qs', props.questions)
-  const pages = api
-    .spec()
-    .append({ path: 'pages' })
-    .forEach((row) => {
-      row.append(qs)
-    })
-  api.addSpec(pages, true)
+  const sections = api.steps.append([{ path: 'pages' }, { path: 'feedback' }])
 
-  const feedback = api
-    .spec()
-    .append({ path: 'feedback' })
-    .forEach((row) => {
-      row.append([{ path: 'success' }, { path: 'retry' }]) // add to additional pages
-    })
-  api.addSpec(feedback, true)
+  sections[0].append(qs)
 
-  if (!api.globals.attempts) {
-    api.globals.attempts = 1
+  sections[1].append([{ path: 'success' }, { path: 'retry' }]) // add to additional pages
+
+  if (!api.persist.isDefined('attempts')) {
+    api.persist.attempts = 1
   }
-
-  console.log('api.stepData.questions', api.stepData.questions)
 }
 
 function getRandomizedQuestions() {
@@ -79,15 +66,17 @@ function autofill() {
   }
 
   // Start from root state and traverse all states
-  console.log('api.sm', api.sm)
-  updateQuestionsInState(api.sm)
+  console.log('api.sm', api.steps)
+  updateQuestionsInState(api.steps)
 }
 
 api.setAutofill(autofill)
 
-// Update quizCorrect to handle multiple answers
-const quizCorrect = computed(() =>
-  api.stepData?.questions?.every((question) => {
+const quizCorrect = computed(() => {
+  // Get all questions from all pages using queryStepData with a path filter
+  const allQuestions = api.queryStepData('pages*').flatMap((page) => page.questions || [])
+
+  return allQuestions.every((question) => {
     if (Array.isArray(question.correctAnswer)) {
       // For multiselect, check if arrays have same values regardless of order
       const selectedAnswers = Array.isArray(question.answer) ? question.answer : [question.answer]
@@ -99,7 +88,7 @@ const quizCorrect = computed(() =>
     // For single select, keep existing behavior
     return question.answer === question.correctAnswer[0]
   })
-)
+})
 
 const currentPageComplete = computed(() => {
   if (!api.stepData?.questions || !Array.isArray(api.stepData.questions)) {
@@ -120,21 +109,20 @@ const currentPageComplete = computed(() => {
 function submitQuiz() {
   api.recordData({
     phase: 'INSTRUCTIONS_QUIZ',
-    questions: api.stepperData('pages*'), // Update to use randomized questions
-    globals: api.globals,
+    questions: api.queryStepData('pages*'), // Update to use randomized questions
+    persist: api.persist,
   })
   if (quizCorrect.value) {
-    api.goToStep('feedback-success')
+    api.goToStep('feedback/success')
   } else {
-    api.goToStep('feedback-retry')
+    api.goToStep('feedback/retry')
   }
 }
 
 function returnInstructions() {
-  api.reset() // reset the quiz
+  api.goFirstStep() // reset the quiz
   api.clear() // don't remember across reloads
-  //init()
-  api.globals.attempts = api.globals.attempts + 1 // increment attempts
+  api.persist.attempts = api.persist.attempts + 1 // increment attempts
   api.goToView(props.returnTo) // go back to instructions
 }
 
@@ -149,7 +137,7 @@ init()
   <div class="page prevent-select">
     <div class="formcontent">
       <!-- Replace the two quiz page sections with this single dynamic one -->
-      <div class="formstep" v-if="api.stepIndex <= qs.length && /^pages-pg\d+$/.test(api.paths)">
+      <div class="formstep" v-if="api.stepIndex < qs.length && /^pages\/pg\d+$/.test(api.pathString)">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
@@ -184,7 +172,7 @@ init()
               <div class="columns">
                 <div class="column">
                   <div class="has-text-left">
-                    <button v-if="api.stepIndex > 1" class="button is-warning" @click="api.goPrevStep()">
+                    <button v-if="api.stepIndex >= 1" class="button is-warning" @click="api.goPrevStep()">
                       <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous page
                     </button>
                   </div>
@@ -193,11 +181,11 @@ init()
                   <div class="has-text-right">
                     <button
                       v-if="currentPageComplete"
-                      :class="['button', api.stepIndex === qs.length ? 'is-success' : 'is-warning']"
-                      @click="api.stepIndex === qs.length ? submitQuiz() : api.goNextStep()"
+                      :class="['button', api.isLastBlockStep() ? 'is-success' : 'is-warning']"
+                      @click="api.isLastBlockStep() ? submitQuiz() : api.goNextStep()"
                     >
-                      {{ api.stepIndex === qs.length ? 'Submit' : 'Next page' }}
-                      <template v-if="api.stepIndex !== qs.length">
+                      {{ api.isLastBlockStep() ? 'Submit' : 'Next page' }}
+                      <template v-if="!api.isLastBlockStep()">
                         &nbsp;<FAIcon icon="fa-solid fa-arrow-right" />
                       </template>
                     </button>
@@ -209,7 +197,7 @@ init()
         </div>
       </div>
 
-      <div class="formstep" v-else-if="api.paths === 'feedback-success'">
+      <div class="formstep" v-else-if="api.pathString === 'feedback/success'">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold has-text-centered">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Congrats! You passed.
@@ -221,7 +209,7 @@ init()
         </div>
       </div>
 
-      <div class="formstep" v-else-if="api.paths === 'feedback-retry'">
+      <div class="formstep" v-else-if="api.pathString === 'feedback/retry'">
         <div class="formheader">
           <h3 class="is-size-3 has-text-weight-bold has-text-centered">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Sorry! You did not get all the answers correct.

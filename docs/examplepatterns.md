@@ -1,4 +1,4 @@
-# :fork_and_knife: NestedTable API
+# Example Patterns
 
 NestedTable is a chainable, tree-like data structure that allows nested
 operations, hierarchical data storage, and flexible path-based access.
@@ -109,13 +109,13 @@ console.log(level1[0].paths) // "0-0"
 
 ## Data Collection Properties
 
-### `.pathdata`
+### `.dataAlongPath`
 
 Returns an array of data values along the relative path from the base node to
 the current node.
 
 ```javascript
-console.log(table[0][0].pathdata) // [1, 2]
+console.log(table[0][0].dataAlongPath) // [1, 2]
 ```
 
 ## Iteration Methods
@@ -244,9 +244,8 @@ processDeepData(deepRef[0])
 Choose the right data collection method for your needs:
 
 - `.subtreedata` - When you need all data in a subtree (regardless of structure)
-- `.pathdata` - When you need data along a specific path from your reference
-  point
-- `.abspathdata` - When you need data along the absolute path from root
+- `.dataAlongPath` - When you need data along a specific path from your
+  reference point
 
 ### Preserving Type Safety
 

@@ -9,6 +9,6 @@ const api = useAPI()
     data-tooltip="Reset entire state"
     @click="api.resetLocalState()"
   >
-    <FAIcon icon="fa-solid fa-arrow-rotate-left" />
+    <FAIcon icon="fa-solid fa-trash" />
   </button>
 </template>

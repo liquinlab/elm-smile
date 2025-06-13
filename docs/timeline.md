@@ -1,4 +1,4 @@
-# :twisted_rightwards_arrows: Timeline and Design File
+# Timeline and Design File
 
 Web experiments are often composed of several parts presented in sequence. For
 example, we might show a welcome page &rarr; informed consent &rarr;

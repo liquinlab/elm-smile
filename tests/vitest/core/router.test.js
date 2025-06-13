@@ -8,7 +8,7 @@ import { setupBrowserEnvironment } from '../setup/mocks'
 
 // Import the actual router (not mocked) after the timeline mock is set up
 import useAPI from '@/core/composables/useAPI'
-import Timeline from '@/core/timeline'
+import Timeline from '@/core/timeline/Timeline'
 import { useRouter, addGuards } from '@/core/router'
 import appconfig from '@/core/config'
 import StatusBar from '@/builtins/navbars/StatusBar.vue'
@@ -35,7 +35,7 @@ function createTestTimeline(mode) {
       config: {
         mode: 'development',
       },
-      local: {
+      browserPersisted: {
         seqtimeline: [],
         routes: [],
       },
@@ -438,7 +438,7 @@ describe('useRouter methods', () => {
       router.push('/welcome/prolific?test=test')
       await router.isReady()
       await flushPromises() // Add extra wait for redirect
-      expect(api.store.local.lastRoute).toBe('welcome_referred')
+      expect(api.store.browserPersisted.lastRoute).toBe('welcome_referred')
       expect(router.currentRoute.value.name).toBe('welcome_referred') // have to use .value.name here to unpack reactivity mechanism
     })
 
@@ -448,7 +448,7 @@ describe('useRouter methods', () => {
       router.push('/welcome/cloudresearch?test=test')
       await router.isReady()
       await flushPromises() // Add extra wait for redirect
-      expect(api.store.local.lastRoute).toBe('welcome_referred')
+      expect(api.store.browserPersisted.lastRoute).toBe('welcome_referred')
       expect(router.currentRoute.value.name).toBe('welcome_referred') // have to use .value.name here to unpack reactivity mechanism
     })
 
@@ -458,7 +458,7 @@ describe('useRouter methods', () => {
       router.push('/welcome/mturk?test=test')
       await router.isReady()
       await flushPromises() // Add extra wait for redirect
-      expect(api.store.local.lastRoute).toBe('welcome_referred')
+      expect(api.store.browserPersisted.lastRoute).toBe('welcome_referred')
       expect(router.currentRoute.value.name).toBe('welcome_referred') // have to use .value.name here to unpack reactivity mechanism
     })
 
@@ -468,7 +468,7 @@ describe('useRouter methods', () => {
       router.push('/welcome/citizen?test=test')
       await router.isReady()
       await flushPromises() // Add extra wait for redirect
-      expect(api.store.local.lastRoute).toBe('welcome_referred')
+      expect(api.store.browserPersisted.lastRoute).toBe('welcome_referred')
       expect(router.currentRoute.value.name).toBe('welcome_referred') // have to use .value.name here to unpack reactivity mechanism
     })
 
@@ -594,15 +594,15 @@ describe('useRouter methods', () => {
       expect(api.store.isConsented).toBe(false)
       await api.goToView('welcome_anonymous')
       await flushPromises()
-      expect(api.store.local.lastRoute).toBe('welcome_anonymous')
+      expect(api.store.browserPersisted.lastRoute).toBe('welcome_anonymous')
 
       await api.goNextView()
       await flushPromises()
-      expect(api.store.local.lastRoute).toBe('consent')
+      expect(api.store.browserPersisted.lastRoute).toBe('consent')
 
       await api.goNextView()
       await flushPromises()
-      expect(api.store.local.lastRoute).toBe('demograph')
+      expect(api.store.browserPersisted.lastRoute).toBe('demograph')
 
       expect(api.completeConsent).toHaveBeenCalled()
 
@@ -614,19 +614,19 @@ describe('useRouter methods', () => {
       const { router, api } = await setupApp()
       await api.goToView('welcome_anonymous')
       await flushPromises()
-      expect(api.store.local.lastRoute).toBe('welcome_anonymous')
+      expect(api.store.browserPersisted.lastRoute).toBe('welcome_anonymous')
 
       await api.goNextView()
       await flushPromises()
-      expect(api.store.local.lastRoute).toBe('consent')
+      expect(api.store.browserPersisted.lastRoute).toBe('consent')
 
       await api.goToView('feedback')
       await flushPromises()
-      expect(api.store.local.lastRoute).toBe('feedback')
+      expect(api.store.browserPersisted.lastRoute).toBe('feedback')
 
       await api.goNextView()
       await flushPromises()
-      expect(api.store.local.lastRoute).toBe('thanks')
+      expect(api.store.browserPersisted.lastRoute).toBe('thanks')
 
       expect(api.setDone).toHaveBeenCalled()
       expect(api.store.isConsented).toBe(true)
@@ -639,19 +639,19 @@ describe('useRouter methods', () => {
       const { router, api } = await setupApp()
       await api.goToView('welcome_anonymous')
       await flushPromises()
-      expect(api.store.local.lastRoute).toBe('welcome_anonymous')
+      expect(api.store.browserPersisted.lastRoute).toBe('welcome_anonymous')
 
       await api.goNextView()
       await flushPromises()
-      expect(api.store.local.lastRoute).toBe('consent')
+      expect(api.store.browserPersisted.lastRoute).toBe('consent')
 
       await api.goToView('feedback')
       await flushPromises()
-      expect(api.store.local.lastRoute).toBe('feedback')
+      expect(api.store.browserPersisted.lastRoute).toBe('feedback')
 
       await api.goNextView()
       await flushPromises()
-      expect(api.store.local.lastRoute).toBe('thanks')
+      expect(api.store.browserPersisted.lastRoute).toBe('thanks')
       expect(api.resetApp).toHaveBeenCalled()
     })
 
@@ -659,19 +659,19 @@ describe('useRouter methods', () => {
       const { router, api } = await setupApp()
       await api.goToView('welcome_anonymous')
       await flushPromises()
-      expect(api.store.local.lastRoute).toBe('welcome_anonymous')
+      expect(api.store.browserPersisted.lastRoute).toBe('welcome_anonymous')
 
       await api.goNextView()
       await flushPromises()
-      expect(api.store.local.lastRoute).toBe('consent')
+      expect(api.store.browserPersisted.lastRoute).toBe('consent')
 
       await api.goToView('feedback')
       await flushPromises()
-      expect(api.store.local.lastRoute).toBe('feedback')
+      expect(api.store.browserPersisted.lastRoute).toBe('feedback')
 
       await api.goToView('thanks2')
       await flushPromises()
-      expect(api.store.local.lastRoute).toBe('thanks2')
+      expect(api.store.browserPersisted.lastRoute).toBe('thanks2')
       expect(api.resetApp).not.toHaveBeenCalled()
     })
 
@@ -825,7 +825,7 @@ describe('useRouter methods', () => {
       await api.goNextView()
       await flushPromises()
       expect(router.currentRoute.value.name).toBe('consent')
-      expect(api.store.local.lastRoute).toBe('consent')
+      expect(api.store.browserPersisted.lastRoute).toBe('consent')
       // await api.goToView('consent', false) // this mimics a click rather than a API navigation
       // await flushPromises()
 

@@ -1,4 +1,4 @@
-# :artist: Overview
+# Overview
 
 The following sections describe how to design experiments using the <SmileText/>
 project. It covers the basic of programming new task elements, configuring the

@@ -1,15 +1,6 @@
 <script setup>
-import useAPI from '@/core/composables/useAPI'
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-
-const api = useAPI()
-const route = useRoute()
-
-// Reactively get the stepper for the current page
-const stepper = computed(() => {
-  return api.store.global.steppers?.[route.name]
-})
+import useViewAPI from '@/core/composables/useViewAPI'
+const api = useViewAPI()
 </script>
 
 <template>
@@ -17,9 +8,9 @@ const stepper = computed(() => {
     <p class="control">
       <button
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
-        v-on:click="stepper?.goPrevStep()"
+        v-on:click="api.goPrevStep()"
         data-tooltip="Step trial back"
-        :disabled="!stepper || api.store.dev.pageProvidesTrialStepper == false"
+        :disabled="!api.store.dev.viewProvidesStepper || !api.hasPrevStep()"
       >
         <span>
           <FAIcon icon="fa-solid fa-angle-left" />
@@ -31,9 +22,9 @@ const stepper = computed(() => {
       <button
         class="button is-small is-jump-bar has-tooltip-arrow has-tooltip-bottom"
         data-tooltip="Current stepper path"
-        :disabled="!stepper || api.store.dev.pageProvidesTrialStepper == false"
+        :disabled="!api.store.dev.viewProvidesStepper || !api.hasSteps()"
       >
-        <span class="counter" v-if="stepper?.paths">{{ stepper?.paths }}</span>
+        <span class="counter" v-if="api.store.dev.viewProvidesStepper">{{ api.pathString }}</span>
         <FAIcon icon="fa-solid fa-circle-minus" v-else />
       </button>
     </p>
@@ -41,9 +32,9 @@ const stepper = computed(() => {
     <p class="control">
       <button
         class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
-        v-on:click="stepper?.goNextStep()"
+        v-on:click="api.goNextStep()"
         data-tooltip="Step trial forward"
-        :disabled="!stepper || api.store.dev.pageProvidesTrialStepper == false"
+        :disabled="!api.store.dev.viewProvidesStepper || !api.hasNextStep()"
       >
         <span>
           <FAIcon icon="fa-solid fa-angle-right" />

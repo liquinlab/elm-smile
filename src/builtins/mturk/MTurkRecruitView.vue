@@ -78,7 +78,7 @@ function submit() {
             type="text"
             name="completioncode"
             label="Completion Code"
-            v-model="api.store.local.completionCode"
+            v-model="api.store.browserPersisted.completionCode"
             placeholder="Paste your completion code here"
             validation="required"
           />

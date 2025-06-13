@@ -1,4 +1,4 @@
-# :woman_teacher: Presentation Mode
+# Presentation Mode
 
 Presentation mode is a way of deploying <SmileText /> experiments in a way that
 they can be used to share examples of an experiment with other people. This can

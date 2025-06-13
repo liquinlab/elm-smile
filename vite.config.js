@@ -5,14 +5,17 @@ import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import handlebars from 'vite-plugin-handlebars'
 import Inspect from 'vite-plugin-inspect'
+import { execSync } from 'child_process'
 //import preLoaderPlugin from './plugins/preloader'
 import stripDevToolPlugin from './plugins/strip-devtool'
 import generateQRCode from './plugins/generate-qr.js'
 
+// Execute git environment generation script
+execSync('sh scripts/generate_git_env.sh', { stdio: 'inherit' })
+
 // https://vitejs.dev/config/
 export default ({ mode }) => {
   process.env = {
-    ...process.env,
     ...loadEnv(mode, `${process.cwd()}/env/`, ''),
     ...loadEnv('deploy', `${process.cwd()}/env/`, ''),
     ...loadEnv('git', `${process.cwd()}/env/`, ''),
@@ -56,8 +59,10 @@ export default ({ mode }) => {
       environment: 'happy-dom',
       coverage: {
         all: true,
+        enabled: true,
         src: path.resolve(__dirname, './src'),
-        reporter: ['text'],
+        reporter: ['text', 'html'],
+        provider: 'v8',
       },
     },
     resolve: {
@@ -67,7 +72,6 @@ export default ({ mode }) => {
       },
     },
     define: {
-      'process.env': process.env,
       __BUILD_TIME__: JSON.stringify(new Date().toLocaleDateString()),
     },
   })

@@ -3,7 +3,7 @@ import { faRobot, faSwatchbook } from '@fortawesome/free-solid-svg-icons'
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons'
 
 // Import our icons configuration
-import '@/core/icons'
+import '@/core/utils/icons'
 
 describe('Icon Configuration', () => {
   it('should register solid icons in the library', () => {

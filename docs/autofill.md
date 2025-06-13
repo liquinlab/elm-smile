@@ -1,4 +1,4 @@
-# :writing_hand: Autofill
+# Autofill
 
 When developing and debugging your experiment it is useful to have a way to
 "fake" data for various components. This serves two purposes:

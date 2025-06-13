@@ -29,7 +29,7 @@ import {
   sampleWithReplacement,
   sampleWithoutReplacement,
   fakerDistributions,
-} from '@/core/randomization'
+} from '@/core/utils/randomization'
 
 /**
  * SmileAPI class provides core functionality for SMILE experiments
@@ -47,11 +47,11 @@ import {
  * @property {Object} data - Application data from store
  * @property {Object} private - Private data from store
  * @property {Object} all_data - Combined private and public data
- * @property {Object} all_config - Combined local, dev, github and main configs
+ * @property {Object} all_config - Combined bro, dev, github and main configs
  * @property {Object} urls - Global URL configurations
  * @property {Object} log - Logging methods interface
  */
-class SmileAPI {
+export class SmileAPI {
   /**
    * Creates a new SmileAPI instance
    * @param {Object} store - The Smile store instance containing application state
@@ -73,12 +73,12 @@ class SmileAPI {
     this.private = store.private
     this.all_data = { private: store.private, data: store.data }
     this.all_config = {
-      local: store.local,
+      browserPersisted: store.browserPersisted,
       dev: store.dev,
       code: store.config.github,
       config: store.config,
     }
-    this.urls = store.global.urls
+    this.urls = store.browserEphemeral.urls
   }
 
   // Logging methods
@@ -122,9 +122,9 @@ class SmileAPI {
    */
   goToView = async (view, force = true) => {
     if (force) {
-      this.store.global.forceNavigate = true
+      this.store.browserEphemeral.forceNavigate = true
       await this.router.push({ name: view })
-      this.store.global.forceNavigate = false
+      this.store.browserEphemeral.forceNavigate = false
     } else {
       await this.router.push({ name: view })
     }
@@ -224,7 +224,7 @@ class SmileAPI {
    * Check if the application is in reset state
    * @returns {boolean} True if app is reset, false otherwise
    */
-  isResetApp = () => this.store.local.reset
+  isResetApp = () => this.store.browserPersisted.reset
 
   /**
    * Reset just the store state
@@ -242,6 +242,15 @@ class SmileAPI {
     this.store.resetLocal()
     const url = window.location.href
     window.location.href = url.substring(0, url.lastIndexOf('#/'))
+  }
+
+  /**
+   * Reloads the current browser window/page
+   * Forces a fresh reload of the current page by calling window.location.reload()
+   * @returns {void}
+   */
+  reloadBrowser() {
+    window.location.reload()
   }
 
   // App component management
@@ -340,7 +349,7 @@ class SmileAPI {
    * @returns {Promise<void>} A promise that resolves when the database connection is established
    */
   async connectDB() {
-    if (!this.store.local.knownUser) {
+    if (!this.store.browserPersisted.knownUser) {
       await this.store.setKnown()
       this.store.setConsented()
     }
@@ -423,7 +432,7 @@ class SmileAPI {
    * @returns {void}
    */
   removeAutofill() {
-    this.logStore.debug('SMILEAPI: resetting autofill')
+    this.logStore.debug('SMILEAPI: removing autofill')
     if (this.store.config.mode === 'development') this.store.removeAutofill()
   }
 
@@ -561,7 +570,7 @@ class SmileAPI {
     }
 
     const possibleConditions = conditionObject[name]
-    this.store.local.possibleConditions[name] = possibleConditions
+    this.store.browserPersisted.possibleConditions[name] = possibleConditions
 
     const hasWeights = keys.includes('weights')
     const weights = hasWeights ? conditionObject.weights : undefined
@@ -625,23 +634,24 @@ class SmileAPI {
    */
   async completeConsent() {
     this.setConsented()
-    if (!this.store.local.knownUser) {
+    if (!this.store.browserPersisted.knownUser) {
       await this.setKnown()
     }
   }
 }
+
 /**
  * Creates and returns a reactive SmileAPI instance with necessary dependencies
  * @returns {SmileAPI} A reactive SmileAPI instance with timeline, routing and store functionality
  */
 export default function useAPI() {
-  const { goNextView, goPrevView, goToView, nextView, prevView } = useTimeline()
+  const timeline = useTimeline()
   const route = useRoute()
   const router = useRouter()
   const store = useSmileStore()
   const logStore = useLog()
 
-  const timeline = { goNextView, goPrevView, goToView, nextView, prevView }
+  //const timeline = useTimeline()
   const api = new SmileAPI(store, logStore, route, router, timeline)
   return reactive(api)
 }

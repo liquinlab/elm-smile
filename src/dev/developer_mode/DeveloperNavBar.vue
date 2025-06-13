@@ -1,19 +1,20 @@
 <script setup>
-import { onMounted, watch, ref, reactive, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-
 import DocsDropDown from '@/dev/developer_mode/DocsDropDown.vue'
 import Stepper from '@/dev/developer_mode/Stepper.vue'
 import RouteInfoButton from '@/dev/developer_mode/RouteInfoButton.vue'
 import ResetButton from '@/dev/developer_mode/ResetButton.vue'
+import ReloadButton from '@/dev/developer_mode/ReloadButton.vue'
 import DataBarButton from '@/dev/developer_mode/DataBarButton.vue'
 import ViewButton from '@/dev/developer_mode/ViewButton.vue'
 
 import useAPI from '@/core/composables/useAPI'
+import KeyCommandNotification from '@/dev/developer_mode/KeyCommandNotification.vue'
+
+import { ref } from 'vue'
+
 import { onKeyDown } from '@vueuse/core'
 
 const api = useAPI()
-const router = useRouter()
 
 /**
  * Developer mode keyboard shortcuts
@@ -24,86 +25,128 @@ const router = useRouter()
  * - ArrowDown: Go to next view
  *
  * Panel Controls:
- * - Alt+1: Toggle sidebar/console panels
- * - Alt+2: Cycle through console tabs (Browse -> Log -> Config)
- * - Alt+3: Reset local state
- * - Alt+4: Connect to database
+ * - Ctrl+1: Toggle sidebar/console panels
+ * - Ctrl+2: Cycle through console tabs (Browse -> Log -> Config)
+ * - Ctrl+3: Reset local state
+ * - Ctrl+4: Connect to database
  */
-onKeyDown(['ArrowUp'], (e) => {
-  e.preventDefault()
-  api.goToView(api.prevView()?.name, true)
-})
-
-onKeyDown(['ArrowDown'], (e) => {
-  e.preventDefault()
-  api.goToView(api.nextView()?.name, true)
-})
-
-// Modify Alt+1 handler
-onKeyDown(['Alt', '1'], (e) => {
-  e.preventDefault()
-
-  const sideBar = api.store.dev.showSideBar
-  const consoleBar = api.store.dev.showConsoleBar
-
-  if (!sideBar && !consoleBar) {
-    api.store.dev.showSideBar = true
-    api.store.dev.showConsoleBar = false
-    showTemporaryNotification('Alt + 1', 'Showing Sidebar')
-  } else if (sideBar && !consoleBar) {
-    api.store.dev.showSideBar = false
-    api.store.dev.showConsoleBar = true
-    showTemporaryNotification('Alt + 1', 'Showing Console')
-  } else if (!sideBar && consoleBar) {
-    api.store.dev.showSideBar = true
-    api.store.dev.showConsoleBar = true
-    showTemporaryNotification('Alt + 1', 'Showing Both Panels')
-  } else {
-    api.store.dev.showSideBar = false
-    api.store.dev.showConsoleBar = false
-    showTemporaryNotification('Alt + 1', 'Hiding All Panels')
+onKeyDown((e) => {
+  if (e.key === 'ArrowUp') {
+    e.preventDefault()
+    api.goToView(api.prevView()?.name, true)
   }
 })
 
-// Modify Alt+2 handler
-onKeyDown(['Alt', '2'], (e) => {
-  e.preventDefault()
+onKeyDown((e) => {
+  if (e.key === 'ArrowDown') {
+    e.preventDefault()
+    api.goToView(api.nextView()?.name, true)
+  }
+})
 
-  const currentTab = api.store.dev.consoleBarTab
+// Modify Ctrl+1 handler
+onKeyDown((e) => {
+  if (e.ctrlKey && e.key === '1') {
+    e.preventDefault()
 
-  if (currentTab === 'browse') {
-    api.store.dev.consoleBarTab = 'log'
-    if (api.store.dev.showConsoleBar) {
-      showTemporaryNotification('Alt + 2', 'Switched to Log Tab')
+    const sideBar = api.store.dev.showSideBar
+    const consoleBar = api.store.dev.showConsoleBar
+
+    if (!sideBar && !consoleBar) {
+      api.store.dev.showSideBar = true
+      api.store.dev.showConsoleBar = false
+      showTemporaryNotification('Ctrl + 1', 'Showing Sidebar')
+    } else if (sideBar && !consoleBar) {
+      api.store.dev.showSideBar = false
+      api.store.dev.showConsoleBar = true
+      showTemporaryNotification('Ctrl + 1', 'Showing Console')
+    } else if (!sideBar && consoleBar) {
+      api.store.dev.showSideBar = true
+      api.store.dev.showConsoleBar = true
+      showTemporaryNotification('Ctrl + 1', 'Showing Both Panels')
+    } else {
+      api.store.dev.showSideBar = false
+      api.store.dev.showConsoleBar = false
+      showTemporaryNotification('Ctrl + 1', 'Hiding All Panels')
     }
-  } else if (currentTab === 'log') {
-    api.store.dev.consoleBarTab = 'config'
-    if (api.store.dev.showConsoleBar) {
-      showTemporaryNotification('Alt + 2', 'Switched to Config Tab')
-    }
-  } else {
-    api.store.dev.consoleBarTab = 'browse'
-    if (api.store.dev.showConsoleBar) {
-      showTemporaryNotification('Alt + 2', 'Switched to Browse Tab')
+  }
+})
+
+// Modify Ctrl+2 handler
+onKeyDown((e) => {
+  if (e.ctrlKey && e.key === '2') {
+    e.preventDefault()
+
+    const currentTab = api.store.dev.consoleBarTab
+
+    if (currentTab === 'browse') {
+      api.store.dev.consoleBarTab = 'log'
+      if (api.store.dev.showConsoleBar) {
+        showTemporaryNotification('Ctrl + 2', 'Switched to Log Tab')
+      }
+    } else if (currentTab === 'log') {
+      api.store.dev.consoleBarTab = 'config'
+      if (api.store.dev.showConsoleBar) {
+        showTemporaryNotification('Ctrl + 2', 'Switched to Config Tab')
+      }
+    } else {
+      api.store.dev.consoleBarTab = 'browse'
+      if (api.store.dev.showConsoleBar) {
+        showTemporaryNotification('Ctrl + 2', 'Switched to Browse Tab')
+      }
     }
   }
 })
 
 // Add shortcut for resetting local state
-onKeyDown(['Alt', '3'], (e) => {
-  e.preventDefault()
-  api.resetLocalState()
+onKeyDown((e) => {
+  if (e.ctrlKey && e.key === '3') {
+    e.preventDefault()
+    showTemporaryNotification('Ctrl + 3', 'Resetting Local State')
+    setTimeout(() => {
+      api.resetLocalState()
+    }, 200)
+  }
 })
 
 // Add shortcut for connecting to database
-onKeyDown(['Alt', '4'], (e) => {
-  e.preventDefault()
-  if (!api.store.local.knownUser) {
-    api.setKnown()
-    api.setConsented()
-    showTemporaryNotification('Alt + 4', 'Connected to Database')
+onKeyDown((e) => {
+  if (e.ctrlKey && e.key === '4') {
+    e.preventDefault()
+    if (!api.store.browserPersisted.knownUser) {
+      api.setKnown()
+      api.setConsented()
+      showTemporaryNotification('Ctrl + 4', 'Connected to Database')
+    }
   }
 })
+
+/**
+ * Shows a temporary notification with a command and action that automatically hides after 1.5 seconds
+ *
+ * @param {string} command - The command text to display in the notification
+ * @param {string} action - The action text to display in the notification
+ *
+ * Sets the notification content and shows it by updating reactive refs:
+ * - notificationCommand
+ * - notificationAction
+ * - showNotification
+ *
+ * Uses setTimeout to automatically hide the notification after 1.5 seconds
+ */
+const showTemporaryNotification = (command, action) => {
+  notificationCommand.value = command
+  notificationAction.value = action
+  showNotification.value = true
+  setTimeout(() => {
+    showNotification.value = false
+  }, 1500) // Hide after 1.5 seconds
+}
+
+// Add notification state
+const showNotification = ref(false)
+const notificationCommand = ref('')
+const notificationAction = ref('')
 </script>
 
 <template>
@@ -125,6 +168,11 @@ onKeyDown(['Alt', '4'], (e) => {
       <div class="devbar-end">
         <div class="devbar-item devbar-buttonpanel">
           <div class="buttons">
+            <!-- reload button -->
+            <div class="devbar-resetbutton">
+              <ReloadButton></ReloadButton>
+            </div>
+
             <!-- reset button -->
             <div class="devbar-resetbutton">
               <ResetButton></ResetButton>
@@ -148,6 +196,7 @@ onKeyDown(['Alt', '4'], (e) => {
       </div>
     </div>
   </nav>
+  <KeyCommandNotification :show="showNotification" :command="notificationCommand" :action="notificationAction" />
 </template>
 
 <style>

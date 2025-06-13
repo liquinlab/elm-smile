@@ -1,4 +1,4 @@
-# :writing_hand: Contributing to the documentation
+# Contributing to the documentation
 
 This project takes a "docs first" approach by first planning the development in
 the documentation and then working on implementation. Thus, the place to start
@@ -77,7 +77,7 @@ changes to the `docs/` folder in the `main` GitHub branch, a Github Actions
 script runs which automatically builds the static website using VitePress and
 then syncs the files to the server. **Thus, simply pushing your changes to the
 master branch will update the website, there's nothing else to think about.**
-This is a core design principle of **🫠 Smile**:
+This is a core design principle of Smile:
 [don't sweat the dumb stuff](/philosophy.html#don-t-sweat-the-dumb-stuff).
 
 If the build fails on the Github Action the website will remain unchanged. You

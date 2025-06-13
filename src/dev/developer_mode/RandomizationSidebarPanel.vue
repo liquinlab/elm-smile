@@ -56,7 +56,10 @@ const getBranchType = (index, total) => {
   <div class="randomization-info-sidebar-panel">
     <div
       class="subsection"
-      v-if="smilestore.local.possibleConditions && Object.keys(smilestore.local.possibleConditions).length > 0"
+      v-if="
+        smilestore.browserPersisted.possibleConditions &&
+        Object.keys(smilestore.browserPersisted.possibleConditions).length > 0
+      "
     >
       <div class="sectitle">Random Variables</div>
 
@@ -64,10 +67,10 @@ const getBranchType = (index, total) => {
 
       <div class="randomization-conditions-list-container">
         <ul class="conditions-list">
-          <template v-for="(value, key, index) in smilestore.local.possibleConditions" :key="key">
+          <template v-for="(value, key, index) in smilestore.browserPersisted.possibleConditions" :key="key">
             <li>
               <span class="tree-branch">{{
-                getBranchType(index, Object.keys(smilestore.local.possibleConditions).length)
+                getBranchType(index, Object.keys(smilestore.browserPersisted.possibleConditions).length)
               }}</span>
               <div class="select is-small mb-1">
                 <select v-model="selected[key]" @change="changeCond(key, $event)">
@@ -90,7 +93,7 @@ const getBranchType = (index, total) => {
               type="checkbox"
               name="switchRoundedDefault"
               class="switch is-rounded is-rtl is-small"
-              v-model="smilestore.local.useSeed"
+              v-model="smilestore.browserPersisted.useSeed"
             />
             <label for="switchRoundedDefault"></label>
           </div>

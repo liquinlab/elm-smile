@@ -5,11 +5,11 @@ import { reactive, computed } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
-const pages = api.spec().append([{ path: 'device_page1' }, { path: 'device_page2' }])
-api.addSpec(pages)
+api.steps.append([{ path: 'device_page1' }, { path: 'device_page2' }])
 
-if (!api.globals.forminfo) {
-  api.globals.forminfo = reactive({
+// persists the form info in local storage, otherwise initialize
+if (!api.persist.isDefined('forminfo')) {
+  api.persist.forminfo = reactive({
     device_type: '', // type of device (e.g., desktop, laptop, tablet, phone)
     connection: '', // type of internet connection (e.g., wifi, ethernet, cellular)
     connection_quality: '', // self-reported connection quality
@@ -22,33 +22,33 @@ if (!api.globals.forminfo) {
 
 const page_one_complete = computed(
   () =>
-    api.globals.forminfo.device_type !== '' &&
-    api.globals.forminfo.connection !== '' &&
-    api.globals.forminfo.connection_quality !== '' &&
-    api.globals.forminfo.browser !== ''
+    api.persist.forminfo.device_type !== '' &&
+    api.persist.forminfo.connection !== '' &&
+    api.persist.forminfo.connection_quality !== '' &&
+    api.persist.forminfo.browser !== ''
 )
 
 const page_two_complete = computed(
   () =>
-    api.globals.forminfo.pointer !== '' &&
-    api.globals.forminfo.assistive_technology !== '' &&
-    api.globals.forminfo.tools !== ''
+    api.persist.forminfo.pointer !== '' &&
+    api.persist.forminfo.assistive_technology !== '' &&
+    api.persist.forminfo.tools !== ''
 )
 
 function autofill() {
-  api.globals.forminfo.device_type = 'Desktop Computer'
-  api.globals.forminfo.connection = 'Wifi'
-  api.globals.forminfo.connection_quality = 'Fast'
-  api.globals.forminfo.browser = 'ARC'
-  api.globals.forminfo.pointer = 'Mouse'
-  api.globals.forminfo.assistive_technology = 'No'
-  api.globals.forminfo.tools = 'No'
+  api.persist.forminfo.device_type = 'Desktop Computer'
+  api.persist.forminfo.connection = 'Wifi'
+  api.persist.forminfo.connection_quality = 'Fast'
+  api.persist.forminfo.browser = 'ARC'
+  api.persist.forminfo.pointer = 'Mouse'
+  api.persist.forminfo.assistive_technology = 'No'
+  api.persist.forminfo.tools = 'No'
 }
 
 api.setAutofill(autofill)
 
 function finish() {
-  api.recordForm('deviceForm', api.globals.forminfo)
+  api.recordForm('deviceForm', api.persist.forminfo)
   api.goNextView()
 }
 </script>
@@ -62,7 +62,7 @@ function finish() {
         to improve the quality of our experiments in the future.
       </p>
 
-      <div class="formstep" v-if="api.paths === 'device_page1'">
+      <div class="formstep" v-if="api.pathString === 'device_page1'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -91,7 +91,7 @@ function finish() {
                   'I\'m not sure',
                   'I\'d rather not say',
                 ]"
-                v-model="api.globals.forminfo.device_type"
+                v-model="api.persist.forminfo.device_type"
               />
               <FormKit
                 type="select"
@@ -111,7 +111,7 @@ function finish() {
                   'I\'m not sure',
                   'I\'d rather not say',
                 ]"
-                v-model="api.globals.forminfo.connection"
+                v-model="api.persist.forminfo.connection"
               />
               <FormKit
                 type="select"
@@ -127,7 +127,7 @@ function finish() {
                   'I\'m not sure',
                   'I\'d rather not say',
                 ]"
-                v-model="api.globals.forminfo.connection_quality"
+                v-model="api.persist.forminfo.connection_quality"
               />
               <FormKit
                 type="select"
@@ -150,7 +150,7 @@ function finish() {
                   'I\'m not sure',
                   'I\'d rather not say',
                 ]"
-                v-model="api.globals.forminfo.browser"
+                v-model="api.persist.forminfo.browser"
               />
               <hr />
               <div class="columns">
@@ -168,7 +168,7 @@ function finish() {
         </div>
       </div>
 
-      <div class="formstep" v-else-if="api.paths === 'device_page2'">
+      <div class="formstep" v-else-if="api.pathString === 'device_page2'">
         <div class="columns">
           <div class="column is-one-third">
             <div class="formsectionexplainer">
@@ -200,7 +200,7 @@ function finish() {
                   'I\'m not sure',
                   'I\'d rather not say',
                 ]"
-                v-model="api.globals.forminfo.pointer"
+                v-model="api.persist.forminfo.pointer"
               />
               <FormKit
                 type="select"
@@ -209,7 +209,7 @@ function finish() {
                 help="Examples include screen readers, screen magnifiers, or voice input systems."
                 placeholder="Select an option"
                 :options="['No', 'Yes', 'I\'m not sure', 'I\'d rather not say']"
-                v-model="api.globals.forminfo.assistive_technology"
+                v-model="api.persist.forminfo.assistive_technology"
               />
               <FormKit
                 type="select"
@@ -218,7 +218,7 @@ function finish() {
                 help="Examples include browser extensions that help you fill forms, enter text, or navigate the web or copying answers from AI/Large Language Models."
                 placeholder="Select an option"
                 :options="['No', 'Yes', 'I\'m not sure', 'I\'d rather not say']"
-                v-model="api.globals.forminfo.tools"
+                v-model="api.persist.forminfo.tools"
               />
               <hr />
               <div class="columns">
@@ -240,19 +240,6 @@ function finish() {
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="formstep" v-else>
-        <article class="message is-danger">
-          <div class="message-header">
-            <p>Error</p>
-            <button class="delete" aria-label="delete"></button>
-          </div>
-          <div class="message-body">
-            Error, you shouldn't have been able to get this far! This happened because the stepper for this route has
-            been incremented too many times. There's no problem so long as your code doesn't allow this in live mode.
-          </div>
-        </article>
       </div>
     </div>
   </div>

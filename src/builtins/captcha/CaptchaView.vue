@@ -1,5 +1,5 @@
 <script setup>
-import { shallowRef, ref, computed } from 'vue'
+import { onMounted, ref, markRaw } from 'vue'
 
 import CaptchaInstructionsText_01 from '@/builtins/captcha/CaptchaInstructionsText_01.vue'
 import CaptchaInstructionsText_02 from '@/builtins/captcha/CaptchaInstructionsText_02.vue'
@@ -61,16 +61,15 @@ const api = useViewAPI()
 // 5 - human brain should show stroop interference
 // 6 -
 
-const trials = api.spec().append([
-  { path: 'instructions_01', component: CaptchaInstructionsText_01, props: { adjective: '' } },
+api.steps.append([
+  { path: 'instructions_01', component: markRaw(CaptchaInstructionsText_01), props: { adjective: '' } },
   {
     path: 'rotate_image',
-    component: CaptchaTrialRotateImage,
+    component: markRaw(CaptchaTrialRotateImage),
     props: { timed_task: true, max_time: 50000 },
   },
-  { path: 'maze', component: CaptchaTrialMaze, props: { timed_task: false } },
+  //{ path: 'maze', component: markRaw(CaptchaTrialMaze), props: { timed_task: false } },
 ])
-api.addSpec(trials)
 
 // const currentTab = computed(() => {
 //   return stepppages[step.index()]
@@ -78,7 +77,7 @@ api.addSpec(trials)
 // captcha steps
 
 function next_trial() {
-  if (api.stepIndex >= api.nSteps) {
+  if (api.isLastStep()) {
     api.goNextView()
   } else {
     api.saveData() // force a save
@@ -89,29 +88,11 @@ function next_trial() {
 
 <template>
   <div class="page">
-    <div class="instructions" v-if="api.paths == 'EOS'">
-      <div class="formstep">
-        <article class="message is-danger">
-          <div class="message-header">
-            <p>Error</p>
-            {{ api.index }}
-            <button class="delete" aria-label="delete"></button>
-          </div>
-          <div class="message-body">
-            Error, you shouldn't have been able to get this far! This happened because the pageTracker for this route
-            has been incremented too many times. There's no problem so long as your code doesn't allow this in live
-            mode.
-          </div>
-        </article>
-      </div>
-    </div>
-
     <component
       :is="api.stepData.component"
       v-bind="api.stepData.props"
       @next-page-captcha="next_trial()"
       :key="api.index"
-      v-else
     >
     </component>
   </div>

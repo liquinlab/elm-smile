@@ -1,4 +1,4 @@
-# :page_facing_up: Cheat sheet
+# Cheat sheet
 
 ## Interacting with project
 

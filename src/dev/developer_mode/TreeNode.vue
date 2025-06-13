@@ -1,6 +1,4 @@
 <script setup>
-import { computed } from 'vue'
-
 const props = defineProps({
   state: Object,
   index: Number,
@@ -54,10 +52,6 @@ const getChildVerticalLines = (verticalLines, index, total) => {
 
   return newLines
 }
-
-const isEndState = computed(() => {
-  return props.state.path === 'SOS' || props.state.path === 'EOS'
-})
 </script>
 
 <template>
@@ -70,12 +64,11 @@ const isEndState = computed(() => {
       @click="handleClick"
     >
       <span class="vertical-lines">{{ getVerticalPrefix(verticalLines) }}</span>
-      <span class="tree-branch" :class="{ 'end-state': isEndState }">{{ getBranchType(index, total, depth) }}</span>
-      <span class="node-path" :class="{ 'end-state': isEndState, 'leaf-state': !state.isLeaf }"
+      <span class="tree-branch">{{ getBranchType(index, total, depth) }}</span>
+      <span class="node-path" :class="{ 'leaf-state': !state.isLeaf }"
         >{{ state.path }} <FAIcon icon="fa-solid fa-house-flag" class="home-icon" v-if="state.isFirstLeaf" />
-        <FAIcon icon="fa-solid fa-leaf" class="leaf-icon" v-else-if="state.isLeaf && !isEndState" />
-        <FAIcon icon="fa-solid fa-ban" v-if="isEndState"
-      /></span>
+        <FAIcon icon="fa-solid fa-leaf" class="leaf-icon" v-else-if="state.isLeaf" />
+      </span>
     </div>
 
     <!-- Recursive tree nodes, but limit depth -->
@@ -123,6 +116,7 @@ const isEndState = computed(() => {
   background-color: rgb(146, 249, 224);
   color: black;
   border-radius: 10px;
+  margin-right: 70px;
 }
 
 .vertical-lines {
