@@ -499,7 +499,6 @@ export class Stepper extends StepState {
       // Create a clean object without currentIndex, depth, and parent
       const cleanState = {
         data: state.data,
-        pathdata: state.pathData,
         path: state.pathString,
         index: state.index,
         isLeaf: state.isLeaf,

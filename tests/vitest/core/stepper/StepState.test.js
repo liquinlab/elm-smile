@@ -729,7 +729,7 @@ describe('StepState', () => {
       expect(stepper.currentPath).toEqual(['child2'])
     })
 
-    it('should correctly update pathdata after goTo', () => {
+    it('should correctly update dataAlongPath after goTo', () => {
       const child1 = stepper.push('child1')
       const child2 = stepper.push('child2')
       const grandchild1 = child1.push('grandchild1')
@@ -744,19 +744,19 @@ describe('StepState', () => {
       grandchild3.data = { level: 4 }
 
       // Initially at first path
-      expect(stepper.pathData).toEqual([{ level: 1 }, { level: 2 }])
+      expect(stepper.dataAlongPath).toEqual([{ level: 1 }, { level: 2 }])
 
       // Reset to a different path
       stepper.goTo(['child2', 'grandchild3'])
-      expect(stepper.pathData).toEqual([{ level: 1 }, { level: 4 }])
+      expect(stepper.dataAlongPath).toEqual([{ level: 1 }, { level: 4 }])
 
       // Reset to another path
       stepper.goTo(['child1', 'grandchild2'])
-      expect(stepper.pathData).toEqual([{ level: 1 }, { level: 3 }])
+      expect(stepper.dataAlongPath).toEqual([{ level: 1 }, { level: 3 }])
 
       // Reset to a path with no data
       stepper.goTo(['child1'])
-      expect(stepper.pathData).toEqual([{ level: 1 }, { level: 2 }])
+      expect(stepper.dataAlongPath).toEqual([{ level: 1 }, { level: 2 }])
     })
   })
 
@@ -1316,7 +1316,7 @@ describe('StepState', () => {
       expect(first.data).toEqual({})
     })
 
-    describe('pathData', () => {
+    describe('dataAlongPath', () => {
       it('should collect data from all nodes along current path', () => {
         // Set up a path with data
         const child1 = stepper.push('child1')
@@ -1330,7 +1330,7 @@ describe('StepState', () => {
         //stepper.next() // moves to grandchild
 
         // Should get data from child1 and grandchild
-        expect(stepper.pathData).toEqual([{ level: 1 }, { level: 2 }])
+        expect(stepper.dataAlongPath).toEqual([{ level: 1 }, { level: 2 }])
       })
 
       it('should return empty array for path with no data', () => {
@@ -1338,8 +1338,8 @@ describe('StepState', () => {
         const second = first.push('second')
         const third = second.push('third')
 
-        const pathData = third.pathData
-        expect(pathData).toEqual([])
+        const dataAlongPath = third.dataAlongPath
+        expect(dataAlongPath).toEqual([])
       })
 
       it('should skip nodes without data', () => {
@@ -1353,7 +1353,7 @@ describe('StepState', () => {
         //stepper.next() // moves to grandchild
 
         // Should only get grandchild data
-        expect(stepper.pathData).toEqual([{ data: 'test' }])
+        expect(stepper.dataAlongPath).toEqual([{ data: 'test' }])
       })
 
       it('should ignore root node data', () => {
@@ -1364,7 +1364,7 @@ describe('StepState', () => {
         stepper.next() // move to child
 
         // Should not include root data
-        expect(stepper.pathData).toEqual([{ child: 'data' }])
+        expect(stepper.dataAlongPath).toEqual([{ child: 'data' }])
       })
 
       it('should handle complex paths with multiple data points', () => {
@@ -1382,7 +1382,7 @@ describe('StepState', () => {
         //stepper.next() // moves to greatgrandchild
 
         // Should get data from the path child1 -> grandchild1 -> greatgrandchild
-        expect(stepper.pathData).toEqual([{ level: 1 }, { level: 2 }, { level: 3 }])
+        expect(stepper.dataAlongPath).toEqual([{ level: 1 }, { level: 2 }, { level: 3 }])
       })
 
       it('should return empty array when no data exists along path', () => {
@@ -1391,7 +1391,7 @@ describe('StepState', () => {
 
         //stepper.next() // move to grandchild
 
-        expect(stepper.pathData).toEqual([])
+        expect(stepper.dataAlongPath).toEqual([])
       })
     })
 

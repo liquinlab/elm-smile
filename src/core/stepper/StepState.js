@@ -144,6 +144,11 @@ export class StepState {
     return current._parent ? current._parent._currentIndex : null
   }
 
+  /**
+   * Gets the number of states in the parent node of the current leaf in the state tree.
+   * Traverses down from root to find the current leaf node, then returns its parent's state count.
+   * @returns {number} The number of states in the parent node, or 0 if there is no parent
+   */
   get blockLength() {
     // Get the current leaf node
     let current = this._root
@@ -603,7 +608,7 @@ export class StepState {
    * Gets an array of data objects from all nodes along the current path, from root to leaf.
    * @returns {Array} Array of data objects, where each element is the complete data from a node along the path
    */
-  get pathData() {
+  get dataAlongPath() {
     const dataArray = []
     let current = this
 

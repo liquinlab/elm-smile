@@ -43,7 +43,7 @@ class ViewAPI extends SmileAPI {
     })
 
     // Internal reactive refs
-    this._pathData = ref(null)
+    this._dataAlongPath = ref(null)
     this._path = ref(null)
     this._pathString = ref('')
     this._index = ref(null)
@@ -471,7 +471,7 @@ class ViewAPI extends SmileAPI {
    * The data methods include:
    * - stepData: Gets/sets merged data from all steps in the current path (parent blocks + current step)
    * - stepDataLeaf: Gets/sets data for only the current step (leaf node)
-   * - pathData: Gets raw data array for all steps in the current path
+   * - dataAlongPath: Gets raw data array for all steps in the current path
    * - queryStepData(): Gets data for all steps, optionally filtered by path pattern
    * - clearCurrentStepData(): Clears data for the current step
    * - clear(): Clears all step data for the current view
@@ -511,10 +511,10 @@ class ViewAPI extends SmileAPI {
    * api.stepData.response = 'new value'
    */
   get stepData() {
-    if (!this._pathData.value) return null
+    if (!this._dataAlongPath.value) return null
 
     const mergedData = computed(() => {
-      return this._pathData.value.reduce((merged, item) => {
+      return this._dataAlongPath.value.reduce((merged, item) => {
         return { ...merged, ...item }
       }, {})
     })
@@ -630,10 +630,10 @@ class ViewAPI extends SmileAPI {
    * Gets the path data for the current step, with component types resolved from the registry
    * @returns {Array|null} Array of path data objects with resolved component types, or null if no path data exists
    */
-  get pathData() {
-    if (this._pathData.value === null) return null
+  get dataAlongPath() {
+    if (this._dataAlongPath.value === null) return null
 
-    return this._pathData.value.map((item) => {
+    return this._dataAlongPath.value.map((item) => {
       if (item?.type?.__vueComponent) {
         return {
           ...item,
@@ -772,7 +772,7 @@ class ViewAPI extends SmileAPI {
   }
 
   _updateStepperState(data, save = true) {
-    this._pathData.value = data.pathData
+    this._dataAlongPath.value = data.dataAlongPath
     this._pathString.value = data.currentPathString
     this._path.value = data.currentPath
     this._index.value = data.index
@@ -791,7 +791,6 @@ class ViewAPI extends SmileAPI {
     const processState = (state, level = 0) => {
       const cleanState = {
         data: state.data,
-        pathdata: state.pathData,
         path: state.pathString,
         index: state.index,
         isLeaf: state.isLeaf,

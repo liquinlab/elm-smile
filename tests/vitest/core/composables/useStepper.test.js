@@ -313,12 +313,12 @@ describe('useStepper composable', () => {
       const stepper = getCurrentRouteStepper()
 
       // Verify stepper loaded the serialized state
-      expect(stepper.pathData).toEqual([{ path: 'survey_page1' }])
+      expect(stepper.dataAlongPath).toEqual([{ path: 'survey_page1' }])
       expect(stepper.index).toBe(0)
 
       // Verify navigation works
       stepper.next()
-      expect(stepper.pathData).toEqual([{ path: 'survey_page2' }])
+      expect(stepper.dataAlongPath).toEqual([{ path: 'survey_page2' }])
       expect(stepper.index).toBe(1)
     })
 
@@ -333,7 +333,7 @@ describe('useStepper composable', () => {
       // Verify new stepper was created with default state
       expect(stepper).toBeDefined()
       expect(stepper.name).toBe('welcome_anonymous')
-      expect(stepper.pathData).toEqual([])
+      expect(stepper.dataAlongPath).toEqual([])
       expect(stepper.index).toBe(0)
 
       // Verify error was logged with the correct message
@@ -349,11 +349,11 @@ describe('useStepper composable', () => {
 
       // Get initial stepper
       const initialStepper = getCurrentRouteStepper()
-      expect(initialStepper.pathData).toEqual([{ path: 'survey_page1' }])
+      expect(initialStepper.dataAlongPath).toEqual([{ path: 'survey_page1' }])
 
       // Navigate to next step
       initialStepper.next()
-      expect(initialStepper.pathData).toEqual([{ path: 'survey_page2' }])
+      expect(initialStepper.dataAlongPath).toEqual([{ path: 'survey_page2' }])
 
       // Navigate to different route and back
       await router.push('/landing')
@@ -364,7 +364,7 @@ describe('useStepper composable', () => {
       const newStepper = getCurrentRouteStepper()
 
       // Verify state was preserved
-      expect(newStepper.pathData).toEqual([{ path: 'survey_page2' }])
+      expect(newStepper.dataAlongPath).toEqual([{ path: 'survey_page2' }])
       expect(newStepper.index).toBe(1)
     })
   })

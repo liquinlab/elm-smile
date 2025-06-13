@@ -89,9 +89,9 @@ describe('Stepper test', () => {
       grandchild.data = { value: 'test' }
 
       // Check that path data contains the data at each level
-      const path = grandchild.pathData
+      const path = grandchild.dataAlongPath
       expect(Array.isArray(path)).toBe(true)
-      expect(path).toHaveLength(2) // pathData contains data from both child and grandchild
+      expect(path).toHaveLength(2) // dataAlongPath contains data from both child and grandchild
       expect(path[0]).toEqual({ level: 'first' })
       expect(path[1]).toEqual({ value: 'test' })
 
