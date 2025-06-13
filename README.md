@@ -1,4 +1,4 @@
-# 🫠 Smile.
+# Smile.
 
 A happy approach to online research.
 
