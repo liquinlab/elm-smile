@@ -41,7 +41,7 @@ if (!api.persist.isDefined('hits')) {
 // this is the persistent timer
 // if you want to start timer since last reload then just
 // write api.startTimer()
-if (!api.timerStarted()) {
+if (!api.isTimerStarted()) {
   api.startTimer()
 }
 
