@@ -947,20 +947,19 @@ trials.push()
 
 #### Special Data Fields
 
-##### The `path` Field
+##### The `id` Field
 
-When building trial tables, you can use a special `path` field in your trial
-data to explicitly control the node identifiers in the state machine. This is
-useful when you need specific path values rather than the default sequential
-numbering:
+When building trial tables, you can use a special `id` field in your trial data
+to explicitly control the node identifiers in the state machine. This is useful
+when you need specific path values rather than the default sequential numbering:
 
 ```js
 const stepper = api.useHStepper()
 
 const trials = stepper.spec().append([
-  { path: 'intro', type: 'instruction' },
-  { path: 'practice', type: 'trial' },
-  { path: 'main', type: 'trial' },
+  { id: 'intro', type: 'instruction' },
+  { id: 'practice', type: 'trial' },
+  { id: 'main', type: 'trial' },
 ])
 
 // Results in nodes with paths:
@@ -981,10 +980,10 @@ This also works with nested tables:
 ```js
 const stepper = api.useHStepper()
 
-const trials = stepper.spec().append({ path: 'block1' })
+const trials = stepper.spec().append({ id: 'block1' })
 trials[0].spec().append([
-  { path: 'stim', type: 'stimulus' },
-  { path: 'feedback', type: 'feedback' },
+  { id: 'stim', type: 'stimulus' },
+  { id: 'feedback', type: 'feedback' },
 ])
 
 // Results in paths:

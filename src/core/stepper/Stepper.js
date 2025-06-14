@@ -93,7 +93,7 @@ export class Stepper extends StepState {
    * Checks if any of the given items would create duplicate paths in the tree
    * @private
    * @param {Object|Array<Object>} items - Single object or array of objects to check for duplicates
-   * @param {string} [items[].path] - Optional path property on each item
+   * @param {string} [items[].id] - Optional path property on each item
    * @returns {boolean} True if any items would create duplicate paths, false otherwise
    * @description
    * This method checks for duplicates in two ways:
@@ -110,11 +110,11 @@ export class Stepper extends StepState {
     const seenData = new Set()
     for (const item of itemsToCheck) {
       // Check for explicit path duplicates
-      if (item.path !== undefined) {
-        if (seenPaths.has(item.path)) {
+      if (item.id !== undefined) {
+        if (seenPaths.has(item.id)) {
           return true
         }
-        seenPaths.add(item.path)
+        seenPaths.add(item.id)
       }
 
       // Check for data content duplicates
@@ -133,8 +133,8 @@ export class Stepper extends StepState {
     return itemsToCheck.some((item) => {
       // Create a temporary state to get its path
       let state
-      if (item.path !== undefined) {
-        state = new Stepper({ id: item.path, parent: this })
+      if (item.id !== undefined) {
+        state = new Stepper({ id: item.id, parent: this })
       } else {
         state = new Stepper({ parent: this })
       }
@@ -151,13 +151,15 @@ export class Stepper extends StepState {
    * @private
    * @param {Object} item - The item to create a state for
    * @returns {Stepper} The newly created state
+   * @description
+   * If the item contains an 'id' field, it will be used as the state's id.
    */
   _addState(item) {
     let state
     try {
       // Create a new state with auto-incremented id
-      if (item.path !== undefined) {
-        state = this.push(item.path, item)
+      if (item.id !== undefined) {
+        state = this.push(item.id, item)
       } else {
         state = this.push(null, item)
       }
@@ -170,10 +172,11 @@ export class Stepper extends StepState {
   /**
    * Appends one or more objects as new states to the current node
    * @param {Object|Array<Object>} items - Single object or array of objects to append as new states
+   * @param {Function} [idGenerator] - Optional function to generate custom IDs for each item
    * @returns {Stepper} Returns this instance for method chaining
    * @throws {Error} If items is not an object or array, or if adding items would exceed maxStepperRows
    */
-  append(items, options = {}) {
+  append(items, idGenerator = null) {
     this._log.debug('\tappend', items)
     // Convert single item to array if needed
     const itemsToAdd = Array.isArray(items) ? items : [items]
@@ -190,6 +193,11 @@ export class Stepper extends StepState {
 
     // Try to add each item individually
     itemsToAdd.forEach((item) => {
+      // If an idGenerator function is provided, use it to generate the ID
+      if (typeof idGenerator === 'function') {
+        item.id = idGenerator(item)
+      }
+
       // Check if this specific item would create a duplicate path
       if (this._hasDuplicatePaths(item)) {
         this._log.warn(`Warning: Skipping item that would create duplicate path`)
@@ -207,11 +215,11 @@ export class Stepper extends StepState {
    * Each combination will be a row in the resulting table.
    *
    * @param {Object} trials - Object with arrays as values
-   * @param {Object} options - Options for handling the operation (reserved for future use)
+   * @param {Function} [idGenerator] - Optional function to generate custom IDs for each combination
    * @returns {Stepper} Returns this instance for method chaining
    * @throws {Error} If trials is not an object or if operation would exceed maxStepperRows
    */
-  outer(trials, options = {}) {
+  outer(trials, idGenerator = null) {
     if (typeof trials !== 'object' || trials === null) {
       throw new Error('outer() requires an object with arrays as values')
     }
@@ -257,6 +265,11 @@ export class Stepper extends StepState {
 
     // Try to add each combination individually
     outerRows.forEach((row) => {
+      // If an idGenerator function is provided, use it to generate the ID
+      if (typeof idGenerator === 'function') {
+        row.id = idGenerator(row)
+      }
+
       // Check if this specific combination would create a duplicate path
       if (this._hasDuplicatePaths(row)) {
         this._log.warn(`Warning: Skipping combination that would create duplicate path`)
@@ -274,16 +287,23 @@ export class Stepper extends StepState {
    * Supports different methods for handling arrays of different lengths.
    *
    * @param {Object} trials - Object with arrays as values
-   * @param {Object} options - Options for handling arrays of different lengths
-   * @param {string} options.method - Method to use: 'loop', 'pad', or 'last'
-   * @param {*} options.padValue - Value to use for padding when method is 'pad'
+   * @param {Function|Object} [idGeneratorOrOptions] - Either a function to generate custom IDs or options object
+   * @param {Object} [options] - Options for handling arrays of different lengths (only used if idGeneratorOrOptions is a function)
+   * @param {string} [options.method] - Method to use: 'loop', 'pad', or 'last'
+   * @param {*} [options.padValue] - Value to use for padding when method is 'pad'
    * @returns {Stepper} Returns this instance for method chaining
    * @throws {Error} If trials is not an object or if operation would exceed maxStepperRows
    */
-  zip(trials, options = {}) {
+  zip(trials, idGeneratorOrOptions = {}, options = {}) {
     if (typeof trials !== 'object' || trials === null) {
       throw new Error('zip() requires an object with arrays as values')
     }
+
+    // Handle both API styles:
+    // 1. zip(trials, options)
+    // 2. zip(trials, idGenerator, options)
+    const idGenerator = typeof idGeneratorOrOptions === 'function' ? idGeneratorOrOptions : null
+    const actualOptions = typeof idGeneratorOrOptions === 'function' ? options : idGeneratorOrOptions
 
     const columns = Object.entries(trials)
     if (columns.length === 0) {
@@ -308,7 +328,7 @@ export class Stepper extends StepState {
     const hasDifferentLengths = processedColumns.some(([_, arr]) => arr.length !== maxLength)
 
     // By default, throw error if lengths are different
-    if (hasDifferentLengths && !options.method) {
+    if (hasDifferentLengths && !actualOptions.method) {
       throw new Error(
         'All columns must have the same length when using zip(). Specify a method (loop, pad, last) to handle different lengths.'
       )
@@ -335,8 +355,8 @@ export class Stepper extends StepState {
     const processedArrays = processedColumns.map(([key, arr]) => {
       if (arr.length === maxLength) return arr
 
-      const method = options.method
-      const padValue = options.padValue
+      const method = actualOptions.method
+      const padValue = actualOptions.padValue
 
       if (method === 'loop') {
         return adjustArrayLength(arr, maxLength, 'loop')
@@ -365,6 +385,11 @@ export class Stepper extends StepState {
 
     // Try to add each combination individually
     zippedRows.forEach((row) => {
+      // If an idGenerator function is provided, use it to generate the ID
+      if (typeof idGenerator === 'function') {
+        row.id = idGenerator(row)
+      }
+
       // Check if this specific combination would create a duplicate path
       if (this._hasDuplicatePaths(row)) {
         this._log.warn(`Warning: Skipping combination that would create duplicate path`)
@@ -427,6 +452,10 @@ export class Stepper extends StepState {
   /**
    * Executes a function once for each item in the table.
    * Returns the table for chaining.
+   *
+   * Note: While the 'id' field can be modified through forEach, doing so will throw an error
+   * if it would create duplicate paths. IDs should generally be set during node creation
+   * (via append, outer, or zip) to avoid potential conflicts.
    *
    * @param {Function} callback - Function to execute for each element
    * @param {Stepper} callback.item - The current item being processed

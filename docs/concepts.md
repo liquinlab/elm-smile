@@ -433,8 +433,10 @@ A final key concept of Smile is the advanced tools which help you develop and
 debug your experiment. We think of it as enabling "brain surgery" on your
 experiment. You can use these tools to bounce around, inspect various elements
 of your interface, and check the format of your data. You can read more about
-[development](/developing) in the remainder of the documentation. However, most
-simply you type
+[development](/developing) in the remainder of the documentation. However,
+assuming you've done everything to
+[install the required software](/requirements), [setup](/labconfig) and
+[configured your repo](/starting), you can type
 
 ```sh
 npm run dev

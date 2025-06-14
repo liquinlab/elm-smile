@@ -62,13 +62,13 @@ const api = useViewAPI()
 // 6 -
 
 api.steps.append([
-  { path: 'instructions_01', component: markRaw(CaptchaInstructionsText_01), props: { adjective: '' } },
+  { id: 'instructions_01', component: markRaw(CaptchaInstructionsText_01), props: { adjective: '' } },
   {
-    path: 'rotate_image',
+    id: 'rotate_image',
     component: markRaw(CaptchaTrialRotateImage),
     props: { timed_task: true, max_time: 50000 },
   },
-  //{ path: 'maze', component: markRaw(CaptchaTrialMaze), props: { timed_task: false } },
+  //{ id: 'maze', component: markRaw(CaptchaTrialMaze), props: { timed_task: false } },
 ])
 
 // const currentTab = computed(() => {

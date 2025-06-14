@@ -40,7 +40,7 @@ Timeline object and how to configure your design file.
 
 ## Single-page Applications and Routing
 
-Moany modern apps such as <SmileText/> are what are known as **Single-page
+Many modern apps such as <SmileText/> are what are known as **Single-page
 Applications (SPAs)**. Rather than having content spread across multiple HTML
 pages, these apps load a single HTML page and then use a Javascript framework to
 control the dynamic interactions of the page including showing and hiding

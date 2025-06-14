@@ -18,7 +18,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest",
-    "test:gui": "vitest --ui",
+    "test:gui": "vitest --ui --coverage.enabled=true",
     "coverage": "vitest run --coverage",
     "test:ui": "cypress open --project tests",
     "dashboard": "vite --mode dashboard",

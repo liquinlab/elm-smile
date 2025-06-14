@@ -313,8 +313,8 @@ describe('Stepper test', () => {
     })
 
     it('should skip items that would create duplicate paths', () => {
-      stepper.append({ path: 'test' })
-      stepper.append({ path: 'test' }) // Should be skipped
+      stepper.append({ id: 'test' })
+      stepper.append({ id: 'test' }) // Should be skipped
       expect(stepper.states.length).toBe(1) // test
     })
   })
@@ -421,11 +421,11 @@ describe('Stepper test', () => {
 
     it('should prevent duplicate paths from being added', () => {
       // Create initial data with a specific path
-      stepper.append({ path: 'test1', value: 'initial' })
+      stepper.append({ id: 'test1', value: 'initial' })
 
       // Create combinations that would include the same path
       const trials = {
-        path: ['test1', 'test2'], // test1 would create a duplicate path
+        id: ['test1', 'test2'], // test1 would create a duplicate path
         value: ['a', 'b'],
       }
 
@@ -437,12 +437,12 @@ describe('Stepper test', () => {
       expect(stepper.states.length).toBe(2)
 
       // Verify the initial state is preserved
-      expect(stepper.states[0].data).toEqual({ path: 'test1', value: 'initial' })
+      expect(stepper.states[0].data).toEqual({ id: 'test1', value: 'initial' })
 
       // Verify only the non-duplicate combinations were added
       const addedStates = stepper.states
       expect(stepper.states).toHaveLength(2)
-      expect(stepper.states[1].data).toEqual({ path: 'test2', value: 'a' })
+      expect(stepper.states[1].data).toEqual({ id: 'test2', value: 'a' })
     })
   })
 
@@ -489,15 +489,15 @@ describe('Stepper test', () => {
         // Return transformed data with new path
         return {
           ...row.data,
-          path: pathString,
+          id: pathString,
         }
       })
 
       // Verify that only one state exists for each unique path
       const paths = new Set()
       stepper.forEach((row) => {
-        if (row.data.path) {
-          paths.add(row.data.path)
+        if (row.data.id) {
+          paths.add(row.data.id)
         }
       })
 
@@ -505,10 +505,10 @@ describe('Stepper test', () => {
       expect(paths.size).toBe(2)
 
       // Verify the transformed data
-      const states = stepper.states.filter((s) => s.data.path)
+      const states = stepper.states.filter((s) => s.data.id)
       expect(states).toHaveLength(2)
-      expect(states[0].data.path).toBe('rs1ul') // red, small, 1, up, left
-      expect(states[1].data.path).toBe('bl2dr') // blue, large, 2, down, right
+      expect(states[0].data.id).toBe('rs1ul') // red, small, 1, up, left
+      expect(states[1].data.id).toBe('bl2dr') // blue, large, 2, down, right
     })
   })
 

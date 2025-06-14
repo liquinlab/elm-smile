@@ -27,7 +27,7 @@ export class StepState {
    * This constructor initializes:
    * - id: The node's id (used to create a path to this node)
    * - states: Array of child nodes (also called rows)
-   * - currentIndex: Index tracking current position when traversing children (-1 means no selection)
+   * - currentIndex: Index tracking current position when traversing children
    * - depth: How deep this node is in the tree (0 for root)
    * - parent: Reference to parent node
    * - data: Object to store arbitrary data
@@ -63,11 +63,13 @@ export class StepState {
   }
 
   /**
-   * Sets the id of this node
+   * Sets the id of this node and updates the data field to include the id
    * @param {*} id - The new id to set
    */
   set id(id) {
     this._id = id
+    // Update or add id in the data field
+    this._data = { ...this._data, id }
   }
 
   /**
@@ -96,19 +98,19 @@ export class StepState {
 
   /**
    * Sets the current index position in the state sequence
-   * @param {number} index - The index position to set (-1 means no selection)
+   * @param {number} index - The index position to set
    */
   set index(index) {
-    if (index === -1 || this._states[index] !== undefined) {
+    if (Number.isInteger(index) && index >= 0 && index <= Math.max(0, this._states.length - 1)) {
       this._currentIndex = index
     } else {
-      throw new Error(`Invalid index: ${index}. Index must be -1 or between 0 and ${this._states.length - 1}`)
+      throw new Error(`Invalid index: ${index}. Index must be between 0 and ${this._states.length - 1}`)
     }
   }
 
   /**
    * Gets the current index position in the state sequence
-   * @returns {number} The current index (-1 means no selection)
+   * @returns {number} The current index
    */
   get index() {
     return this._currentIndex
@@ -285,7 +287,6 @@ export class StepState {
     if (this._currentIndex === this._states.length - 1) {
       return this._states[this._currentIndex].hasNext()
     }
-    return false
   }
 
   /**
@@ -298,7 +299,6 @@ export class StepState {
     if (this._currentIndex === 0) {
       return this._states[this._currentIndex].hasPrev()
     }
-    return false
   }
 
   /**

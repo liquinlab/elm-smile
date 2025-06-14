@@ -63,19 +63,19 @@ const MockComponent = (text = 'Mock Component') =>
 // Define test routes
 const routes = [
   {
-    path: '/',
+    id: '/',
     name: 'welcome_anonymous',
     component: MockComponent('Welcome Anonymous'),
     meta: { next: 'landing', allowAlways: true },
   },
   {
-    path: '/landing',
+    id: '/landing',
     name: 'landing',
     component: MockComponent('Landing'),
     meta: { prev: 'welcome_anonymous', next: 'test', sequential: true },
   },
   {
-    path: '/test',
+    id: '/test',
     name: 'test',
     component: MockComponent('Test'),
     meta: { prev: 'landing', sequential: true },
@@ -108,7 +108,7 @@ describe('useViewAPI composable in development mode', () => {
     wrapper = mount(TestComponent, {
       global: {
         plugins: [router, pinia],
-        stubs: {
+        stus: {
           RouterLink: true,
         },
       },
@@ -135,14 +135,14 @@ describe('useViewAPI composable in development mode', () => {
 
     // Add steps using api.steps
     api.steps.append([
-      { path: 'step1', test: 'value' },
-      { path: 'step2', test: 'value2' },
+      { id: 'step1', test: 'value' },
+      { id: 'step2', test: 'value2' },
     ])
 
     expect(api.config.mode).toBe('development')
     // Verify initial state
     expect(api.pathString).toBe('step1')
-    expect(api.stepData).toEqual({ path: 'step1', test: 'value' })
+    expect(api.stepData).toEqual({ id: 'step1', test: 'value' })
 
     // Simulate right arrow key press
     const rightEvent = new KeyboardEvent('keydown', {
@@ -154,7 +154,7 @@ describe('useViewAPI composable in development mode', () => {
 
     // Verify we moved to next step
     expect(api.pathString).toBe('step2')
-    expect(api.stepData).toEqual({ path: 'step2', test: 'value2' })
+    expect(api.stepData).toEqual({ id: 'step2', test: 'value2' })
 
     // Simulate left arrow key press
     const leftEvent = new KeyboardEvent('keydown', {
@@ -166,6 +166,6 @@ describe('useViewAPI composable in development mode', () => {
 
     // Verify we moved back to previous step
     expect(api.pathString).toBe('step1')
-    expect(api.stepData).toEqual({ path: 'step1', test: 'value' })
+    expect(api.stepData).toEqual({ id: 'step1', test: 'value' })
   })
 })

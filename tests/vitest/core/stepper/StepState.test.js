@@ -58,6 +58,11 @@ describe('StepState', () => {
       expect(stepper.depth).toBe(0)
     })
 
+    it('should allow us to rename the id', () => {
+      stepper.id = 'root'
+      expect(stepper.id).toBe('root')
+    })
+
     it('should push new named states correctly', () => {
       const child = stepper.push('child')
       expect(stepper.states.length).toBe(1)
@@ -109,8 +114,6 @@ describe('StepState', () => {
       expect(stepper.index).toBe(1)
       stepper.index = 2
       expect(stepper.index).toBe(2)
-      stepper.index = -1
-      expect(stepper.index).toBe(-1)
     })
 
     it('should throw error for invalid indices', () => {
@@ -120,22 +123,27 @@ describe('StepState', () => {
       // Test invalid indices
       expect(() => {
         stepper.index = 3
-      }).toThrow('Invalid index: 3. Index must be -1 or between 0 and 1')
+      }).toThrow(`Invalid index: 3. Index must be between 0 and ${stepper.states.length - 1}`)
       expect(() => {
         stepper.index = -2
-      }).toThrow('Invalid index: -2. Index must be -1 or between 0 and 1')
+      }).toThrow(`Invalid index: -2. Index must be between 0 and ${stepper.states.length - 1}`)
       expect(() => {
         stepper.index = 1.5
-      }).toThrow('Invalid index: 1.5. Index must be -1 or between 0 and 1')
+      }).toThrow(`Invalid index: 1.5. Index must be between 0 and ${stepper.states.length - 1}`)
     })
 
+    it('should correctly handle hasNext and hasPrev', () => {
+      expect(stepper.hasNext()).toBe(false)
+      expect(stepper.hasPrev()).toBe(false)
+      stepper.push('child1')
+      expect(stepper.hasNext()).toBe(false)
+      expect(stepper.hasPrev()).toBe(false)
+    })
     it('should handle empty state array', () => {
-      // With no children, only -1 is valid
-      stepper.index = -1
-      expect(stepper.index).toBe(-1)
-      expect(() => {
-        stepper.index = 0
-      }).toThrow('Invalid index: 0. Index must be -1 or between 0 and -1')
+      // With no children, only 0 is valid
+      expect(stepper.index).toBe(0)
+      stepper.index = 0
+      expect(stepper.index).toBe(0)
     })
 
     it('should correctly track index with nested structure', () => {
@@ -511,9 +519,6 @@ describe('StepState', () => {
       it('should get correct current path', () => {
         const child = stepper.push('child')
         const grandchild = child.push('grandchild')
-        // Navigate through the tree to set indices
-        stepper.next() // moves to child
-        child.next() // moves to grandchild
         expect(grandchild.currentPathString).toBe('child/grandchild')
       })
 
@@ -837,6 +842,7 @@ describe('StepState', () => {
       const grandchild5 = child2.push('grandchild5')
       const grandchild6 = child3.push('grandchild6')
       const grandchild7 = child4.push('grandchild7')
+
       // add greatgrandchild to some of the grandchildren
       const greatgrandchild1 = grandchild1.push('greatgrandchild1')
       const greatgrandchild2 = grandchild2.push('greatgrandchild2')
@@ -844,7 +850,6 @@ describe('StepState', () => {
       const greatgrandchild4 = grandchild3.push('greatgrandchild4')
       const greatgrandchild6 = grandchild7.push('greatgrandchild6')
       const greatgrandchild7 = grandchild7.push('greatgrandchild7')
-      //console.log(stepper.treeDiagram)
 
       // now navigate through the tree
       expect(stepper.next().id).toBe('greatgrandchild2')
@@ -858,7 +863,6 @@ describe('StepState', () => {
       expect(stepper.next()).toBeNull()
 
       // now navigate backward
-      //expect(stepper.prev()).toBe('greatgrandchild7')  // this is not output because we stop on last node
       expect(stepper.prev().id).toBe('greatgrandchild6')
       expect(stepper.prev().id).toBe('grandchild6')
       expect(stepper.prev().id).toBe('grandchild5')
@@ -1013,7 +1017,7 @@ describe('StepState', () => {
     })
   })
 
-  describe('cleartree operations', () => {
+  describe('clearSubTree operations', () => {
     it('should clear all states but preserve data', () => {
       const root = new StepState()
       const a = root.push('A')
