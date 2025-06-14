@@ -27,11 +27,11 @@ A useful way to think about it is the Views are like slides in a presentation
 software like Powerpoint/Keynote and steps are like "builds" or "animations
 steps" that occur within a slide.
 
-A final key concept of Smile is the idea of _persistance_. Persistance refers to
-the fact that information about the application is perserved across page
+A final key concept of Smile is the idea of _persistence_. Persistence refers to
+the fact that information about the application is preserved across page
 reloads. When you record data from your experiment in a database that is one
 kind of persistence. Another is when information about the current application
-survives across page-reloads. It is fairly common for participants to reload
+survives across page reloads. It is fairly common for participants to reload
 their browser window, or to close a window and reopen it at another time. In
 most experiment frameworks, the task begins anew when a participant does this
 which can be problematic for certain research questions. Instead, Smile makes it
@@ -80,7 +80,7 @@ steps in the experiment.
 
 ```vue{2-4,6-11}
 <script setup>
-// import and initalize smile API
+// import and initialize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
@@ -108,7 +108,7 @@ user presses the spacebar.
 
 ```vue{13-15}
 <script setup>
-// import and initalize smile API
+// import and initialize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
@@ -143,7 +143,7 @@ the template part of the component.
 
 ```vue{20}
 <script setup>
-// import and initalize smile API
+// import and initialize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
@@ -180,7 +180,7 @@ template to display the new word.
 This is already a working View! On first load it will show the word "THIS" since
 that is the first step. Then if the user presses the spacebar, it will advance
 to the next step and show the word "IS" and so on. When it get to the last step,
-subseqent presses of the spacebar will do nothing since there are no more steps
+subsequent presses of the spacebar will do nothing since there are no more steps
 to advance to.
 
 **This covers only part of the Smile API and development approach but we hope is
@@ -199,7 +199,7 @@ reaction time of the user.
 
 ```vue{13-16,19-21}
 <script setup>
-// import and initalize smile API
+// import and initialize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
@@ -264,8 +264,8 @@ data typically needed in behavioral experiments.**
 
 It gets much more fancy and powerful from there. For example
 [here](https://github.com/NYUCCL/smile/blob/main/src/user/components/stroop_exp/StroopView.vue)
-is a more complex example of a Stroop experiment which uses heriachically nested
-steps, randomization, and more. We provide complete documentation of
+is a more complex example of a Stroop experiment which uses hierarchically
+nested steps, randomization, and more. We provide complete documentation of
 [steps](/steps) and the [API](/api).
 
 ### Transitioning to the next View
@@ -276,7 +276,7 @@ next View.
 
 ```vue{22-26}
 <script setup>
-// import and initalize smile API
+// import and initialize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
@@ -410,7 +410,7 @@ You'll notice that there are many other Views in the default timeline including
 are commonly used in experiments. You can of course remove any of these, or edit
 them to your liking. Some are quite sophisticated and can save you a lot of time
 such as the `InstructionsQuiz` View which can be used to quickly build
-comprehension check quizes.
+comprehension check quizzes.
 
 With this change there is a new sequence to the experiment
 
