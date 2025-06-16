@@ -4,10 +4,12 @@ import { Stepper } from '@/core/stepper/Stepper'
 import { defineComponent } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
 import useSmileStore from '@/core/stores/smilestore'
+import { fakerDistributions } from '@/core/utils/randomization'
 
 describe('StepperSerializer', () => {
   let stepper
   let root
+  let api
   let pinia
   let store
 
@@ -17,12 +19,12 @@ describe('StepperSerializer', () => {
     setActivePinia(pinia)
     store = useSmileStore()
 
-    // Create a root stepper with mock faker API
+    // Create a root stepper with real randomization API
     root = new Stepper({ id: '/', parent: null, store })
-    root.api = {
+    api = {
       faker: {
-        randomNumber: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
-        randomName: () => 'John Doe',
+        runif: (min, max) => fakerDistributions.runif(min, max).val,
+        rchoice: (options) => fakerDistributions.rchoice(options).val,
       },
     }
     stepper = new Stepper({ id: 'test', parent: root, store })
@@ -46,21 +48,21 @@ describe('StepperSerializer', () => {
 
     it('should handle faker functions', () => {
       const data = {
-        randomNum: () => root.api.faker.randomNumber(1, 10),
-        randomName: () => root.api.faker.randomName(),
+        randomNum: () => api.faker.runif(1, 10),
+        randomChoice: () => api.faker.rchoice(['John', 'Jane', 'Bob']),
       }
       stepper.data = data
 
       const serialized = StepperSerializer.serialize(stepper)
       expect(serialized.data.randomNum).toEqual({
         __fakerFunction: true,
-        name: 'randomNumber',
+        name: 'runif',
         params: ['1', '10'],
       })
-      expect(serialized.data.randomName).toEqual({
+      expect(serialized.data.randomChoice).toEqual({
         __fakerFunction: true,
-        name: 'randomName',
-        params: [''],
+        name: 'rchoice',
+        params: ['John', 'Jane', 'Bob'],
       })
     })
 
@@ -152,13 +154,13 @@ describe('StepperSerializer', () => {
         data: {
           randomNum: {
             __fakerFunction: true,
-            name: 'randomNumber',
+            name: 'runif',
             params: ['1', '10'],
           },
-          randomName: {
+          randomChoice: {
             __fakerFunction: true,
-            name: 'randomName',
-            params: [''],
+            name: 'rchoice',
+            params: [['John', 'Jane', 'Bob']],
           },
         },
       }
@@ -167,10 +169,11 @@ describe('StepperSerializer', () => {
       StepperSerializer.deserialize(serialized, newStepper, root)
 
       expect(typeof newStepper._data.randomNum).toBe('function')
-      expect(typeof newStepper._data.randomName).toBe('function')
-      expect(newStepper._data.randomNum()).toBeGreaterThanOrEqual(1)
-      expect(newStepper._data.randomNum()).toBeLessThanOrEqual(10)
-      expect(newStepper._data.randomName()).toBe('John Doe')
+      expect(typeof newStepper._data.randomChoice).toBe('function')
+      const randomValue = newStepper._data.randomNum()
+      expect(randomValue).toBeGreaterThanOrEqual(1)
+      expect(randomValue).toBeLessThanOrEqual(10)
+      expect(newStepper._data.randomChoice()).toBeOneOf(['John', 'Jane', 'Bob'])
     })
 
     it('should handle Vue components', () => {
