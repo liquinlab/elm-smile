@@ -77,7 +77,7 @@ app.use(notivue) // Notifications
 app.use(
   VueGtag,
   {
-    disableScriptLoad: import.meta.env.MODE === 'development', // Disable in dev mode
+    disableScriptLoad: import.meta.env.MODE !== 'production', // Disable in dev mode
     pageTrackerExcludedRoutes: ['recruit'], // Exclude recruit route
     config: { id: import.meta.env.VITE_GOOGLE_ANALYTICS },
   },
