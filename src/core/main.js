@@ -9,16 +9,15 @@
  * - Application configuration (timeline, icons)
  */
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { plugin, defaultConfig } from '@formkit/vue'
 import { useRouter, addGuards } from '@/core/router'
 import { pinia } from '@/core/stores/createPinia'
 import { createNotivue } from 'notivue'
 import timeline from '@/user/design'
-import '@formkit/themes/genesis'
 import App from '@/core/App.vue'
 import { createApp } from 'vue'
 import VueGtag from 'vue-gtag'
 import '@/core/utils/icons'
+import '@/core/main.css'
 
 /**
  * Initialize the Vue application and router
@@ -60,7 +59,6 @@ const notivue = createNotivue({
  * @description Sets up the Vue application with required plugins:
  * - Pinia for state management
  * - Vue Router for navigation
- * - FormKit for form handling
  * - Notivue for notifications
  * - Vue-Gtag for Google Analytics
  *
@@ -70,7 +68,6 @@ const notivue = createNotivue({
 // Register core plugins
 app.use(pinia) // State management
 app.use(router) // Routing
-app.use(plugin, defaultConfig) // FormKit
 app.use(notivue) // Notifications
 
 // Configure and register Google Analytics

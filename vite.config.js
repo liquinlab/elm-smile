@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /// <reference types="vitest" />
 import { defineConfig, loadEnv } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import Vue from '@vitejs/plugin-vue'
 import path from 'path'
 import handlebars from 'vite-plugin-handlebars'
 import Inspect from 'vite-plugin-inspect'
@@ -9,6 +9,10 @@ import { execSync } from 'child_process'
 //import preLoaderPlugin from './plugins/preloader'
 import stripDevToolPlugin from './plugins/strip-devtool'
 import generateQRCode from './plugins/generate-qr.js'
+import tailwindcss from '@tailwindcss/vite'
+import Icons from 'unplugin-icons/vite'
+import Components from 'unplugin-vue-components/vite'
+import IconsResolver from 'unplugin-icons/resolver'
 
 // Execute git environment generation script
 execSync('sh scripts/generate_git_env.sh', { stdio: 'inherit' })
@@ -28,11 +32,21 @@ export default ({ mode }) => {
     plugins: [
       Inspect(),
       stripDevToolPlugin(),
-      vue(),
+      tailwindcss(),
+      Vue(),
+      Components({
+        resolvers: [
+          IconsResolver(),
+        ],
+      }),
+      Icons({
+        compiler: 'vue3',
+      }),
       generateQRCode(),
       handlebars({
         context: {
-          main_js: mode=='dashboard'? "/src/dev/dashboard/dashboard.js": "/src/core/main.js"
+          main_js: '/src/core/main.js',
+          //main_js: mode=='dashboard'? "/src/dev/dashboard/dashboard.js": "/src/core/main.js"
         }
       }),
       //preLoaderPlugin(),

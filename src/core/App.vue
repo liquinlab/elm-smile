@@ -15,6 +15,8 @@ import 'notivue/animations.css' // Only needed if using built-in animations
 import 'notivue/notification-progress.css'
 import { pastelTheme } from 'notivue'
 
+import AppSidebar from '@/dev/AppSidebar.vue'
+import { SidebarInset, SidebarProvider } from '@/uikit/components/ui/sidebar'
 /**
  * Import main application component
  * @requires SmileApp Main SMILE application component
@@ -125,5 +127,15 @@ onMounted(() => {
       <NotificationProgress :item="item" />
     </Notification>
   </Notivue>
-  <SmileApp />
+  <SidebarProvider
+    :default-open="false"
+    :style="{
+      '--sidebar-width': '48px',
+    }"
+  >
+    <AppSidebar />
+    <SidebarInset>
+      <SmileApp />
+    </SidebarInset>
+  </SidebarProvider>
 </template>

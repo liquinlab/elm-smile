@@ -35,3 +35,4 @@ env/*.zip
 
 # Firebase service account
 *.service-account*
+/components.d.ts
