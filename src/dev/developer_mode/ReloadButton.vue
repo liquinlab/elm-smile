@@ -1,14 +1,19 @@
 <script setup>
+import { Button } from '@/uikit/components/ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 </script>
 
 <template>
-  <button
-    class="button devbar-button has-tooltip-arrow has-tooltip-bottom"
-    data-tooltip="Reload page via browser"
-    @click="api.reloadBrowser()"
-  >
-    <FAIcon icon="fa-solid fa-arrow-rotate-left" />
-  </button>
+  <TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button size="menu" variant="outline" @click="api.reloadBrowser()">
+          <i-lucide-rotate-ccw :stroke-width="2.5" />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="bottom"> Reload browser </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
 </template>

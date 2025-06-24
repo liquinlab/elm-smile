@@ -9,6 +9,11 @@ const smilestore = useSmileStore() // load the global store
 const seed = ref(smilestore.getSeedID)
 import { v4 as uuidv4 } from 'uuid'
 import TextInputWithButton from '@/dev/developer_mode/TextInputWithButton.vue'
+import { Button } from '@/uikit/components/ui/button'
+import { Input } from '@/uikit/components/ui/input'
+import { Switch } from '@/uikit/components/ui/switch'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
 
 function randomize_seed() {
   // seed.value = uuidv4()
@@ -23,9 +28,8 @@ function randomize_seed() {
 const selected = smilestore.getConditions
 
 // when toolbar selection changes, change conditions in the data
-function changeCond(key, event) {
-  const cond = event.target.value
-  smilestore.setCondition(key, cond)
+function changeCond(key, value) {
+  smilestore.setCondition(key, value)
   // Force a reload to resample conditions and variables
   router.go(0)
 }
@@ -53,169 +57,93 @@ const getBranchType = (index, total) => {
 }
 </script>
 <template>
-  <div class="randomization-info-sidebar-panel">
-    <div
-      class="subsection"
-      v-if="
-        smilestore.browserPersisted.possibleConditions &&
-        Object.keys(smilestore.browserPersisted.possibleConditions).length > 0
-      "
-    >
-      <div class="sectitle">Random Variables</div>
-
-      <!-- -->
-
-      <div class="randomization-conditions-list-container">
-        <ul class="conditions-list">
-          <template v-for="(value, key, index) in smilestore.browserPersisted.possibleConditions" :key="key">
-            <li>
-              <span class="tree-branch">{{
-                getBranchType(index, Object.keys(smilestore.browserPersisted.possibleConditions).length)
-              }}</span>
-              <div class="select is-small mb-1">
-                <select v-model="selected[key]" @change="changeCond(key, $event)">
-                  <option v-for="cond in value" :key="cond" :value="cond">{{ key }}: {{ cond }}</option>
-                </select>
-              </div>
-            </li>
-          </template>
-        </ul>
-        <div class="randomization-note">see design.js</div>
-      </div>
-    </div>
-    <div class="sectitle">Set seed</div>
-    <div class="randomization-seed-container">
-      <div class="columns is-mobile m-0 p-0">
-        <div class="column is-2 p-0">
-          <div class="field has-tooltip-arrow has-tooltip-right" data-tooltip="Use fixed seed">
-            <input
-              id="switchRoundedDefault"
-              type="checkbox"
-              name="switchRoundedDefault"
-              class="switch is-rounded is-rtl is-small"
-              v-model="smilestore.browserPersisted.useSeed"
-            />
-            <label for="switchRoundedDefault"></label>
-          </div>
+  <TooltipProvider>
+    <div class="h-fit p-0 m-0">
+      <div
+        class="subsection"
+        v-if="
+          smilestore.browserPersisted.possibleConditions &&
+          Object.keys(smilestore.browserPersisted.possibleConditions).length > 0
+        "
+      >
+        <div
+          class="text-xs font-extrabold text-left bg-muted text-muted-foreground px-2 py-1.5 m-0 border-t border-b border-border"
+        >
+          Random Variables
         </div>
-        <div class="column is-10 p-0">
-          <div class="textinput">
-            <input class="input is-small" type="text" placeholder="Current seed" size="15" width="10" v-model="seed" />
-            <button
-              class="button is-small is-light removeedge has-tooltip-arrow has-tooltip-left"
-              data-tooltip="Set new seed"
-              @click="randomize_seed()"
-            >
-              <FAIcon icon="fa-solid fa-arrow-right" />
-            </button>
-          </div>
+
+        <div class="relative m-0 p-0 pt-1.5">
+          <ul class="list-none p-0 m-0 text-left ml-1.5 pb-2">
+            <template v-for="(value, key, index) in smilestore.browserPersisted.possibleConditions" :key="key">
+              <li class="flex items-center mb-0 ml-0.5 mt-1">
+                <span class="font-mono text-sm text-gray-500 whitespace-pre mr-0">{{
+                  getBranchType(index, Object.keys(smilestore.browserPersisted.possibleConditions).length)
+                }}</span>
+                <Select :model-value="selected[key]" @update:model-value="(val) => changeCond(key, val)">
+                  <SelectTrigger class="h-7 text-[0.65rem] py-1 px-1font-mono font-bold">
+                    <SelectValue :placeholder="`${key}: ${selected[key]}`" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="cond in value" :key="cond" :value="cond"> {{ key }}: {{ cond }} </SelectItem>
+                  </SelectContent>
+                </Select>
+              </li>
+            </template>
+          </ul>
+          <div class="text-xs text-muted-foreground absolute top-0 right-3">see design.js</div>
         </div>
       </div>
+      <div
+        class="text-xs text-muted-foreground font-extrabold text-left bg-muted px-2 py-1.5 m-0 border-t border-b border-border"
+      >
+        Set seed
+      </div>
+      <div class="mt-0 p-0 z-50">
+        <div class="flex items-center gap-2">
+          <div class="w-8">
+            <Tooltip>
+              <TooltipTrigger>
+                <Switch
+                  :model-value="smilestore.browserPersisted.useSeed"
+                  @update:model-value="smilestore.browserPersisted.useSeed = $event"
+                />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Use fixed seed</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <div class="flex-1">
+            <div class="relative inline-block">
+              <Input
+                v-model="seed"
+                type="text"
+                placeholder="Current seed"
+                class="h-5 text-xs font-mono pr-8 w-44 ml-1"
+              />
+              <Tooltip>
+                <TooltipTrigger as-child>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="absolute right-1 top-0 h-5 w-6 p-0"
+                    @click="randomize_seed()"
+                  >
+                    <FAIcon icon="fa-solid fa-arrow-right" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Set new seed</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+  </TooltipProvider>
 </template>
 
 <style scoped>
-.randomization-info-sidebar-panel {
-  height: fit-content;
-  padding: 0px 0 0 0;
-  margin: 0;
-  background-color: #fff;
-}
-.randomization-conditions-list-container {
-  position: relative;
-  margin: 0;
-  padding: 0;
-  padding-top: 6px;
-}
-.randomization-note {
-  font-size: 0.4em;
-  color: #666;
-  position: absolute;
-  top: 0;
-  right: 0.3rem;
-}
-.randomization-seed-container {
-  margin-top: 0px;
-  padding: 0px;
-  z-index: 2000;
-}
-.sectitle {
-  font-size: 0.7em;
-  text-align: left;
-  font-weight: 800;
-  color: #484e4e;
-  background-color: #f0f0f0;
-  padding: 0.4rem 0.5rem;
-  margin: 0rem 0rem 0px 0;
-  border-top: 1px solid #d2d2d2;
-  border-bottom: 1px solid #d2d2d2;
-}
-.select select {
-  font-size: 0.9em;
-  font-family: monospace;
-  font-weight: bold;
-  color: #3b7e7e;
-}
-.collabel {
-  font-size: 0.7em;
-}
-
-.textinput {
-  border: 0.1em solid #d2d2d2;
-  border-radius: var(--bulma-radius-small);
-  width: 180px;
-  display: inline-block;
-  position: relative;
-  font-size: 0.7em;
-  margin-left: 4px;
-  margin-right: auto;
-  margin-bottom: 0.5rem;
-}
-.textinput input {
-  border: none;
-  padding-right: 30px;
-  font-family: var(--bulma-code);
-  font-size: 0.85em;
-  min-height: 20px;
-}
-.textinput button {
-  position: absolute;
-  right: 2px;
-  top: 0px;
-  padding: 6px;
-  margin-right: 0px;
-  margin-left: auto;
-  border: none;
-  box-shadow: none;
-  background: #fff;
-}
-
-/* Add this new style for columns spacing */
-.columns.mb-0 {
-  margin-bottom: 0 !important;
-}
-
-.conditions-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  text-align: left;
-  margin-left: 0.4rem;
-}
-
-.conditions-list li {
-  display: flex;
-  align-items: center;
-  margin-bottom: 0rem;
-  margin-left: 0.2rem;
-}
-
-.tree-branch {
-  font-family: monospace;
-  font-size: 0.9em;
-  color: #666;
-  white-space: pre;
-  margin-right: 0rem;
-}
+/* Remove all Bulma-specific styles and keep only custom styles if needed */
 </style>

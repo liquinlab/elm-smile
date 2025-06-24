@@ -1,14 +1,19 @@
 <script setup>
+import { Button } from '@/uikit/components/ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 </script>
 
 <template>
-  <button
-    class="button devbar-button has-tooltip-arrow has-tooltip-bottom"
-    data-tooltip="Reset entire state"
-    @click="api.resetLocalState()"
-  >
-    <FAIcon icon="fa-solid fa-trash" />
-  </button>
+  <TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button size="menu" variant="outline" @click="api.resetLocalState()">
+          <i-f7-bolt-fill />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="bottom"> Reset local state </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
 </template>

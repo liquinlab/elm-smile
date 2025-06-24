@@ -1,24 +1,33 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import useAPI from '@/core/composables/useAPI'
+import { ButtonGroup, ButtonGroupItem } from '@/uikit/components/ui/button-group'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
 import RouteJumper from '@/dev/developer_mode/RouteJumper.vue'
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/uikit/components/ui/dropdown-menu'
 
 const api = useAPI()
 
 const buttonstyle = computed(() => {
-  let base = 'button is-small is-route is-jump-bar has-tooltip-arrow has-tooltip-bottom'
-  if (api.store.dev.routePanel.visible) {
-    return base + ' is-selected'
-  } else if (api.store.dev.pinnedRoute !== null) {
+  let base = ''
+  if (api.store.dev.pinnedRoute !== null) {
     return base + ' pinned'
   } else {
     return base
   }
 })
 
-const toggleRoutePanel = () => {
+const handleDropdownOpenChange = (open) => {
   if (api.store.dev.pinnedRoute == null) {
-    api.store.dev.routePanel.visible = !api.store.dev.routePanel.visible
+    api.store.dev.routePanel.visible = open
   }
 }
 
@@ -29,107 +38,87 @@ const togglePin = () => {
 </script>
 
 <template>
-  <div class="field has-addons">
-    <p class="control">
-      <button
-        class="button is-small is-jump-bar has-tooltip-arrow has-tooltip-bottom"
-        v-on:click="api.autofill()"
-        :data-tooltip="api.hasAutofill() ? 'Autofill Form' : 'No form to autofill'"
-        :disabled="!api.hasAutofill()"
-      >
-        <span>
-          <FAIcon icon="fa-solid fa-pen-to-square" />
-        </span>
-      </button>
-    </p>
+  <TooltipProvider>
+    <ButtonGroup variant="outline" size="menu">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <ButtonGroupItem v-on:click="api.autofill()" :disabled="!api.hasAutofill()">
+            <i-mdi-magic />
+          </ButtonGroupItem>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">
+          {{ api.hasAutofill() ? 'Autofill' : 'No autofill available' }}
+        </TooltipContent>
+      </Tooltip>
 
-    <p class="control" v-if="api.hasPrevView()">
-      <button
-        class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
-        v-on:click="api.goToView(api.route?.meta?.prev)"
-        data-tooltip="Previous page"
-      >
-        <span>
-          <FAIcon icon="fa-solid fa-angles-left" />
-        </span>
-      </button>
-    </p>
-    <p class="control" v-else>
-      <button class="button is-small devbar-button" disabled>
-        <span>
-          <FAIcon icon="fa-solid fa-angles-left" />
-        </span>
-      </button>
-    </p>
+      <template v-if="api.hasPrevView()">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <ButtonGroupItem v-on:click="api.goToView(api.route?.meta?.prev)">
+              <i-meteor-icons-angles-left />
+            </ButtonGroupItem>
+          </TooltipTrigger>
+          <TooltipContent side="bottom"> Previous View </TooltipContent>
+        </Tooltip>
+      </template>
+      <template v-else>
+        <ButtonGroupItem disabled>
+          <i-meteor-icons-angles-left />
+        </ButtonGroupItem>
+      </template>
 
-    <p class="control" v-if="api.hasNextView()">
-      <button
-        class="button is-small devbar-button has-tooltip-arrow has-tooltip-bottom"
-        v-on:click="api.goNextView()"
-        data-tooltip="Step page forward"
-      >
-        <span>
-          <FAIcon icon="fa-solid fa-angles-right" />
-        </span>
-      </button>
-    </p>
-    <p class="control" v-else>
-      <button class="button is-small devbar-button" disabled>
-        <span>
-          <FAIcon icon="fa-solid fa-angles-right" />
-        </span>
-      </button>
-    </p>
-    <p class="control" v-if="api.store.config.mode === 'development'">
-      <button
-        class="button is-small is-jump-bar has-tooltip-arrow has-tooltip-bottom"
-        :class="{ pinned: api.store.dev.pinnedRoute !== null }"
-        v-on:click="togglePin()"
-        data-tooltip="Pin current route"
-      >
-        <span>
-          <FAIcon icon="fa-solid fa-thumbtack" />
-        </span>
-      </button>
-    </p>
-    <div class="dropdown is-hoverable is-right" :class="{ 'is-active': api.store.dev.routePanel.visible }">
-      <div class="dropdown-trigger">
-        <p class="control is-route">
-          <button :class="buttonstyle" @click="toggleRoutePanel()">
-            <div class="routelabel">/{{ api.currentRouteName() }}</div>
-          </button>
-        </p>
-      </div>
-      <div class="dropdown-menu pt-0 mt-0" id="dropdown-menu" role="menu" v-if="api.store.dev.pinnedRoute === null">
-        <RouteJumper :routeName="api.currentRouteName()"></RouteJumper>
-      </div>
-    </div>
-  </div>
+      <template v-if="api.hasNextView()">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <ButtonGroupItem v-on:click="api.goNextView()">
+              <i-meteor-icons-angles-right />
+            </ButtonGroupItem>
+          </TooltipTrigger>
+          <TooltipContent side="bottom"> Next View </TooltipContent>
+        </Tooltip>
+      </template>
+      <template v-else>
+        <ButtonGroupItem disabled>
+          <i-meteor-icons-angles-right />
+        </ButtonGroupItem>
+      </template>
+
+      <template v-if="api.store.config.mode === 'development'">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <ButtonGroupItem v-on:click="togglePin()" :class="{ pinned: api.store.dev.pinnedRoute !== null }">
+              <i-ic-baseline-pin-off v-if="api.store.dev.pinnedRoute !== null" />
+              <i-ic-baseline-push-pin v-else />
+            </ButtonGroupItem>
+          </TooltipTrigger>
+          <TooltipContent side="bottom"> Pin current route </TooltipContent>
+        </Tooltip>
+      </template>
+
+      <DropdownMenu :open="api.store.dev.routePanel.visible" @update:open="handleDropdownOpenChange">
+        <DropdownMenuTrigger as-child>
+          <ButtonGroupItem :class="buttonstyle">
+            <div class="font-mono text-[0.65rem] font-medium min-w-[100px]">/{{ api.currentRouteName() }}</div>
+          </ButtonGroupItem>
+        </DropdownMenuTrigger>
+        <RouteJumper />
+      </DropdownMenu>
+    </ButtonGroup>
+  </TooltipProvider>
 </template>
 
 <style scoped>
 .pinned {
-  background-color: #ffdd57;
-}
-.is-route {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
+  background-color: var(--pinned-route);
+  color: var(--dev-contrast-text);
 }
 
 .dropdown {
   margin-top: 0;
 }
-.is-selected {
-  background-color: rgb(219, 219, 219);
-}
-.is-jump-bar {
+
+.route-info-button-group {
   font-size: 0.65rem;
   height: 2em;
-  margin: 0px;
-}
-.routelabel {
-  min-width: 100px;
-  font-weight: 1000;
-  font-family: 'Courier New', Courier, monospace;
 }
 </style>

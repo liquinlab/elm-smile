@@ -4,6 +4,10 @@ import TreeNode from './TreeNode.vue'
 import DataPathViewer from '@/dev/developer_mode/DataPathViewer.vue'
 import { useRoute } from 'vue-router'
 import useViewAPI from '@/core/composables/useViewAPI'
+import { ButtonGroup, ButtonGroupItem } from '@/uikit/components/ui/button-group'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
+import { Button } from '@/uikit/components/ui/button'
+
 const api = useViewAPI()
 
 const stateMachine = computed(() => api.steps.visualize())
@@ -163,28 +167,45 @@ watch(
         <div class="path-display">{{ api.pathString }}</div>
       </div>
 
-      <div class="field has-addons">
-        <p class="control">
-          <button @click="api.goPrevStep()" class="button is-small nav-button" :disabled="!api.hasSteps()">
-            <span><FAIcon icon="fa-solid fa-angle-left" /></span>
-          </button>
-        </p>
-        <p class="control">
-          <button @click="api.goNextStep()" class="button is-small nav-button" :disabled="!api.hasSteps()">
-            <span><FAIcon icon="fa-solid fa-angle-right" /></span>
-          </button>
-        </p>
-        <p class="control">
-          <button @click="api.goFirstStep()" class="button is-small nav-button" :disabled="!api.hasSteps()">
-            <span><FAIcon icon="fa-solid fa-house-flag" /></span>
-          </button>
-        </p>
-        <p class="control">
-          <button @click="api.clear()" class="button is-small nav-button" :disabled="!api.hasSteps()">
-            <span><FAIcon icon="fa-solid fa-trash" /></span>
-          </button>
-        </p>
-      </div>
+      <TooltipProvider>
+        <ButtonGroup variant="outline" size="menu">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ButtonGroupItem @click="api.goPrevStep()" :disabled="!api.hasSteps()">
+                <i-lucide-chevron-left />
+              </ButtonGroupItem>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Previous Step</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ButtonGroupItem @click="api.goNextStep()" :disabled="!api.hasSteps()">
+                <i-lucide-chevron-right />
+              </ButtonGroupItem>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Next Step</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ButtonGroupItem @click="api.goFirstStep()" :disabled="!api.hasSteps()">
+                <i-famicons-home />
+              </ButtonGroupItem>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">First Step</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ButtonGroupItem @click="api.clear()" :disabled="!api.hasSteps()">
+                <i-mdi-trash />
+              </ButtonGroupItem>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Clear Steps</TooltipContent>
+          </Tooltip>
+        </ButtonGroup>
+      </TooltipProvider>
     </div>
 
     <div class="tree-container" ref="treeContainer">
@@ -220,13 +241,15 @@ watch(
         Persisted Vars
         <span class="data-label">(.persist)</span>
 
-        <button
+        <Button
           @click="api.clearPersist()"
-          class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
+          variant="ghost"
+          size="xs"
+          class="has-tooltip-arrow has-tooltip-bottom"
           data-tooltip="Delete Global Variables"
         >
-          <span><FAIcon icon="fa-solid fa-trash" /></span>
-        </button>
+          <FAIcon icon="fa-solid fa-trash" />
+        </Button>
         <DataPathViewer :data="api.persist" />
       </div>
     </div>
@@ -255,8 +278,8 @@ watch(
   height: 100%;
   min-height: 0; /* Important for nested flex containers */
   overflow: hidden;
-  background-color: #f1f3f3;
-  border-top: 1px solid #cacaca;
+  background-color: var(--background);
+  border-top: 1px solid var(--border);
 }
 
 .tree-viewer-container-empty {
@@ -267,14 +290,14 @@ watch(
   padding-right: 10px;
   font-size: 0.75rem;
   font-family: monospace;
-  font-weight: 800;
-  color: #9fa0a0;
-  border-top: 1px solid #cacaca;
+  font-weight: 200;
+  color: var(--muted-foreground);
   text-align: left;
+  font-style: italic;
 }
 
 .path-display-container {
-  background-color: #f1f3f3;
+  background-color: var(--background);
   padding: 0px 5px;
   display: flex;
   justify-content: space-between;
@@ -363,12 +386,12 @@ watch(
   flex: 0 1 auto; /* don't grow, can shrink, auto basis */
   overflow: auto;
   font-family: monospace;
-  border-top: 1px solid #cacaca;
+  border-top: 1px solid var(--border);
   position: relative;
   scroll-behavior: smooth;
   max-height: 300px;
   min-height: 50px;
-  background-color: #fff;
+  background-color: var(--background);
 }
 
 .data-container-global {
@@ -376,9 +399,9 @@ watch(
   overflow: visible;
   display: flex;
   flex-direction: column;
-  max-height: 120px;
-  background-color: #f1f3f3;
-  border-top: 1px solid #cacaca;
+  min-height: 120px;
+  background-color: var(--background);
+  border-top: 1px solid var(--border);
   text-align: left;
 }
 
@@ -387,8 +410,9 @@ watch(
   overflow: visible;
   display: flex;
   flex-direction: column;
-  background-color: #f1f3f3;
-  border-top: 1px solid #cacaca;
+  background-color: var(--background);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   text-align: left;
 }
 
@@ -414,11 +438,10 @@ watch(
   flex: 1;
   overflow: auto;
   padding: 10px;
-  max-height: 120px;
-  min-height: 120px;
   font-size: 0.8rem;
-  font-weight: 800;
+  font-weight: 200;
   font-family: monospace;
+  color: var(--muted-foreground);
 }
 
 .data-display {
@@ -427,13 +450,14 @@ watch(
   padding: 10px;
   min-height: 180px;
   font-size: 0.8rem;
-  font-weight: 800;
+  font-weight: 500;
   font-family: monospace;
+  color: var(--muted-foreground);
 }
 
 .data-label {
   font-size: 0.7rem;
-  font-weight: 800;
+  font-weight: 500;
   font-family: monospace;
   color: #10a8a2;
   padding-right: 6px;

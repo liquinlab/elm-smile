@@ -129,7 +129,7 @@ const getChildVerticalLines = (verticalLines, index, total) => {
 
 .node-path {
   margin-left: 4px;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .node-data {
