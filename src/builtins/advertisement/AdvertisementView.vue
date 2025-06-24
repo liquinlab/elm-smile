@@ -6,6 +6,9 @@ import { onMounted, ref, onBeforeUnmount } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
+// import UIkit components
+import { Button } from '@/uikit/components/ui/button'
+
 // animation library
 import { animate } from 'motion'
 
@@ -40,15 +43,15 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="page prevent-select">
+  <div class="page prevent-select text-center flex flex-col items-center">
     <br /><br /><br />
     <img ref="logo" src="@/user/assets/brain.svg" width="220" />
     <h1 ref="title" class="title is-3">Please help us understand the mind!</h1>
     <p>Take part in a short experiment where you play some games.</p>
     <br />
-    <button ref="button" class="button is-warning" id="begintask" @click="finish()">
-      I'm ready! &nbsp;
-      <FAIcon icon="fa-solid fa-arrow-right" />
-    </button>
+    <Button ref="button" id="begintask" @click="finish()" size="lg">
+      I'm ready!
+      <i-lucide-arrow-right />
+    </Button>
   </div>
 </template>
