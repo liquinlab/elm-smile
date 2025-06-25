@@ -1,13 +1,10 @@
 import { createApp } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { plugin, defaultConfig } from '@formkit/vue'
-import '@formkit/themes/genesis'
 // import with an @ symbol are resolved by vite to ./src directory
 
 import Dashboard from '@/dev/dashboard/Dashboard.vue' // import the main app component
-import { router } from '@/core/router' // import the router
-import { pinia } from '@/core/stores/createPinia'
-import '@/core/icons' // configure fontawesome
+//import { router } from '@/core/router' // import the router
+//import { pinia } from '@/core/stores/createPinia'
 
 // drag components
 // import VueDraggableResizable from 'vue-draggable-resizable'
@@ -27,13 +24,8 @@ const notivue = createNotivue({
   },
 })
 // register plugins
-app.use(pinia) // tell the app to use the data store
-app.use(router) // tell the app to use the router
-app.use(plugin, defaultConfig)
-app.use(notivue)
-
-// load any global components (these will be available in all other components)
-app.component('FAIcon', FontAwesomeIcon)
+// app.use(pinia) // tell the app to use the data store
+// app.use(router) // tell the app to use the router
 
 // add the ability to drag and resize elements
 //app.component('vue-draggable-resizable', VueDraggableResizable)

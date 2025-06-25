@@ -15,10 +15,10 @@ import { Switch } from '@/uikit/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
 
-function randomize_seed() {
+function set_seed() {
   // seed.value = uuidv4()
   //seed = smilestore.randomizeSeed()
-  api.debug('Setting seed to ', seed.value)
+  api.log.debug('Setting seed to ', seed.value)
   smilestore.setSeedID(seed.value)
   // Force a reload to resample conditions and variables
   router.go(0)
@@ -60,6 +60,52 @@ const getBranchType = (index, total) => {
   <TooltipProvider>
     <div class="h-fit p-0 m-0">
       <div
+        class="text-xs text-muted-foreground font-mono text-left bg-muted px-2 py-1.5 m-0 border-t border-b border-border"
+      >
+        Random seed
+      </div>
+
+      <div class="bg-background pb-5 border-b border-border">
+        <div class="text-xs m-2">
+          Toggle to use a fixed seed (off means uses the current time as seed). A specific seed can be set in the input
+          field. Press the arrow to reload the view with the new seed.
+        </div>
+
+        <div class="mt-0 p-0 z-50 mx-4">
+          <div class="grid grid-cols-2 gap-3">
+            <!-- First row: Label and Switch (spans both columns) -->
+            <div class="col-span-2 flex items-center gap-2">
+              <label class="text-xs font-mono">Fixed seed:</label>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Switch
+                    :model-value="smilestore.browserPersisted.useSeed"
+                    @update:model-value="smilestore.browserPersisted.useSeed = $event"
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Use fixed seed</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+
+            <!-- Second row: Input and Button (each in their own column) -->
+            <div class="flex-1">
+              <Input
+                v-model="seed"
+                type="text"
+                placeholder="Current seed"
+                :class="{ 'opacity-50 pointer-events-none': !smilestore.browserPersisted.useSeed }"
+              />
+            </div>
+            <Button @click="set_seed" :disabled="!smilestore.browserPersisted.useSeed" size="sm" variant="outline">
+              Update seed
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div
         class="subsection"
         v-if="
           smilestore.browserPersisted.possibleConditions &&
@@ -67,76 +113,35 @@ const getBranchType = (index, total) => {
         "
       >
         <div
-          class="text-xs font-extrabold text-left bg-muted text-muted-foreground px-2 py-1.5 m-0 border-t border-b border-border"
+          class="text-xs text-left font-mono bg-muted text-muted-foreground px-2 py-1.5 m-0 border-t border-b border-border"
         >
           Random Variables
         </div>
 
-        <div class="relative m-0 p-0 pt-1.5">
-          <ul class="list-none p-0 m-0 text-left ml-1.5 pb-2">
-            <template v-for="(value, key, index) in smilestore.browserPersisted.possibleConditions" :key="key">
-              <li class="flex items-center mb-0 ml-0.5 mt-1">
-                <span class="font-mono text-sm text-gray-500 whitespace-pre mr-0">{{
-                  getBranchType(index, Object.keys(smilestore.browserPersisted.possibleConditions).length)
-                }}</span>
-                <Select :model-value="selected[key]" @update:model-value="(val) => changeCond(key, val)">
-                  <SelectTrigger class="h-7 text-[0.65rem] py-1 px-1font-mono font-bold">
-                    <SelectValue :placeholder="`${key}: ${selected[key]}`" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem v-for="cond in value" :key="cond" :value="cond"> {{ key }}: {{ cond }} </SelectItem>
-                  </SelectContent>
-                </Select>
-              </li>
-            </template>
-          </ul>
-          <div class="text-xs text-muted-foreground absolute top-0 right-3">see design.js</div>
-        </div>
-      </div>
-      <div
-        class="text-xs text-muted-foreground font-extrabold text-left bg-muted px-2 py-1.5 m-0 border-t border-b border-border"
-      >
-        Set seed
-      </div>
-      <div class="mt-0 p-0 z-50">
-        <div class="flex items-center gap-2">
-          <div class="w-8">
-            <Tooltip>
-              <TooltipTrigger>
-                <Switch
-                  :model-value="smilestore.browserPersisted.useSeed"
-                  @update:model-value="smilestore.browserPersisted.useSeed = $event"
-                />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Use fixed seed</p>
-              </TooltipContent>
-            </Tooltip>
+        <div class="bg-background">
+          <div class="text-xs m-2">
+            Use these dropdowns to force specific values for each variable (see design.js). By default these are choosen
+            randomly based on the seed.
           </div>
-          <div class="flex-1">
-            <div class="relative inline-block">
-              <Input
-                v-model="seed"
-                type="text"
-                placeholder="Current seed"
-                class="h-5 text-xs font-mono pr-8 w-44 ml-1"
-              />
-              <Tooltip>
-                <TooltipTrigger as-child>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    class="absolute right-1 top-0 h-5 w-6 p-0"
-                    @click="randomize_seed()"
-                  >
-                    <FAIcon icon="fa-solid fa-arrow-right" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Set new seed</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
+
+          <div class="relative m-0 p-0 pt-1.5 mb-3 mt-2">
+            <ul class="list-none p-0 m-0 text-left ml-1.5 pb-2">
+              <template v-for="(value, key, index) in smilestore.browserPersisted.possibleConditions" :key="key">
+                <li class="flex items-center mb-0 ml-0.5 mt-1">
+                  <span class="font-mono text-sm text-gray-500 whitespace-pre mr-0">{{
+                    getBranchType(index, Object.keys(smilestore.browserPersisted.possibleConditions).length)
+                  }}</span>
+                  <Select :model-value="selected[key]" @update:model-value="(val) => changeCond(key, val)">
+                    <SelectTrigger class="h-7 text-[0.65rem] py-1 px-3 font-mono">
+                      <SelectValue :placeholder="`${key}: ${selected[key]}`" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem v-for="cond in value" :key="cond" :value="cond"> {{ key }}: {{ cond }} </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </li>
+              </template>
+            </ul>
           </div>
         </div>
       </div>

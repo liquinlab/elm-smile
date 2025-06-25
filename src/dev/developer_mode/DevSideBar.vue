@@ -6,21 +6,18 @@ import RandomizationSidebarPanel from '@/dev/developer_mode/RandomizationSidebar
 import StudyInfo from '@/dev/developer_mode/StudyInfo.vue'
 import ProgressSteps from '@/dev/developer_mode/ProgressSteps.vue'
 
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/uikit/components/ui/tabs'
 </script>
 
 <template>
   <div class="sidebar-container">
     <div class="sidebar-content">
-      <div class="w-full bg-muted border-b border-border">
-        <StudyInfo />
-      </div>
-      <ProgressSteps />
-      <ToggleStatus />
-      <Tabs default-value="steps" class="w-full border-t border-border py-2">
+      <Tabs v-model="api.store.dev.sidebarTab" class="w-full border-t border-border py-2">
         <TabsList class="mx-auto text-xs">
           <TabsTrigger value="steps" class="text-[0.75rem] font-mono"> Steps </TabsTrigger>
-          <TabsTrigger value="randomization" class="text-[0.75rem] font-mono"> Randomization </TabsTrigger>
+          <TabsTrigger value="randomization" class="text-[0.75rem] font-mono"> Random </TabsTrigger>
           <TabsTrigger value="db" class="text-[0.75rem] font-mono"> DB </TabsTrigger>
         </TabsList>
         <TabsContent value="steps">
@@ -35,7 +32,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/uikit/components/ui/
       </Tabs>
     </div>
 
-    <div class="sidebar-footer"></div>
+    <div class="sidebar-footer">
+      <ToggleStatus />
+
+      <ProgressSteps />
+      <div class="w-full bg-muted border-b border-border">
+        <StudyInfo />
+      </div>
+    </div>
   </div>
 </template>
 

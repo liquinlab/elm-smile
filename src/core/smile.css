@@ -54,16 +54,20 @@
 }
 
 .table-cell-small {
-  font-size: 0.7em;
+  font-size: 0.8em;
 }
 
 .table-cell-base {
-  padding: 0.4rem 0.75rem;
+  padding: 0.5rem 0.85rem;
 }
 
 .table-row-base {
   transition: background-color 0.2s;
   border-top: 1px solid var(--border); /* border-gray-200 */
+}
+
+.table-row-base-bottom {
+  border-bottom: 1px solid var(--dev-bar-lines); /* border-gray-200 */
 }
 
 .table-row-odd {
@@ -95,5 +99,9 @@
 }
 
 .table-border-top {
-  border-top: 1px solid rgb(229 231 235); /* border-gray-200 */
+  border-top: 1px solid var(--border); /* border-gray-200 */
+}
+
+.table-border-bottom {
+  border-bottom: 1px solid var(--border); /* border-gray-200 */
 }

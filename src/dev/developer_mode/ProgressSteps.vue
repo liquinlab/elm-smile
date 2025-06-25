@@ -36,7 +36,7 @@ const step3Status = computed(() => {
 </script>
 
 <template>
-  <Stepper class="flex w-full items-start gap-2 my-2">
+  <Stepper class="flex w-full items-start gap-2 my-0 pt-4 pb-2 border-t border-border">
     <StepperItem v-slot="{ state }" class="relative flex w-full flex-col items-center justify-center" :step="1">
       <StepperSeparator
         class="absolute left-[calc(50%+20px)] right-[calc(-50%+10px)] top-5 block h-0.5 shrink-0 rounded-full bg-muted"

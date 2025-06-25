@@ -27,13 +27,13 @@ const buttonstyle = computed(() => {
 
 const handleDropdownOpenChange = (open) => {
   if (api.store.dev.pinnedRoute == null) {
-    api.store.dev.routePanel.visible = open
+    api.store.dev.routePanelVisible = open
   }
 }
 
 const togglePin = () => {
   api.store.dev.pinnedRoute = api.store.dev.pinnedRoute === null ? api.currentRouteName() : null
-  api.store.dev.routePanel.visible = false
+  api.store.dev.routePanelVisible = false
 }
 </script>
 
@@ -95,7 +95,7 @@ const togglePin = () => {
         </Tooltip>
       </template>
 
-      <DropdownMenu :open="api.store.dev.routePanel.visible" @update:open="handleDropdownOpenChange">
+      <DropdownMenu :open="api.store.dev.routePanelVisible" @update:open="handleDropdownOpenChange">
         <DropdownMenuTrigger as-child>
           <ButtonGroupItem :class="buttonstyle">
             <div class="font-mono text-[0.65rem] font-medium min-w-[100px]">/{{ api.currentRouteName() }}</div>

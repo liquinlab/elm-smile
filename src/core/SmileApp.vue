@@ -75,7 +75,7 @@ const showStatusBar = computed(() => {
  */
 const shouldUseResponsiveContainer = computed(() => {
   const routeName = api.currentRouteName()
-  return routeName !== undefined && routeName !== 'recruit'
+  return routeName !== undefined && routeName !== 'recruit' && api.config.mode == 'development'
 })
 
 /**
@@ -107,8 +107,14 @@ const isLoading = computed(() => {
             <p>Loading...</p>
           </div>
           <template v-else>
-            <ResponsiveDeviceContainer v-if="shouldUseResponsiveContainer"><router-view /></ResponsiveDeviceContainer>
-            <router-view v-else />
+            <ResponsiveDeviceContainer v-if="shouldUseResponsiveContainer">
+              <StatusBar v-if="showStatusBar" />
+              <router-view />
+            </ResponsiveDeviceContainer>
+            <template v-else>
+              <StatusBar v-if="showStatusBar" />
+              <router-view />
+            </template>
           </template>
         </div>
 

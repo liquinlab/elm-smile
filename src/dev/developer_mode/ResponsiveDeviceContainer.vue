@@ -1,31 +1,14 @@
 <script setup>
-import { ref, computed } from 'vue'
-
-const deviceWidth = ref(393)
-const deviceHeight = ref(852)
-const selectedDevice = ref('iphone') // Track current device selection
-const isRotated = ref(false) // Track rotation state
-const isFullscreen = ref(false) // Track fullscreen state
-
-const containerStyle = computed(() => ({
-  '--device-width': `${deviceWidth.value}px`,
-  '--device-height': `${deviceHeight.value}px`,
-}))
-
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/uikit/components/ui/select'
+import { ref, computed, watch } from 'vue'
+import useAPI from '@/core/composables/useAPI'
+import ResponsiveDeviceSelect from './ResponsiveDeviceSelect.vue'
 import { Separator } from '@/uikit/components/ui/separator'
 import { Button } from '@/uikit/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
 
-// Device presets
+const api = useAPI()
+
+// Initialize device dimensions based on the selected device from store
 const devicePresets = {
   iphone: { width: 393, height: 852, name: 'iPhone' },
   'iphone-plus': { width: 430, height: 932, name: 'iPhone Plus' },
@@ -42,38 +25,62 @@ const devicePresets = {
   desktop16: { width: 1920, height: 1080, name: '1920x1080' },
 }
 
-// Handle device selection from dropdown
-const handleDeviceChange = (value) => {
-  console.log('handleDeviceChange called with:', value)
+// Initialize device dimensions based on the selected device from store
+const initialPreset = devicePresets[api.store.dev.selectedDevice] || devicePresets.desktop1
+const deviceWidth = ref(initialPreset.width)
+const deviceHeight = ref(initialPreset.height)
 
-  if (value === 'custom') {
-    selectedDevice.value = 'custom'
-    return
-  }
+// Watch for changes in the store and sync local dimensions
+watch(
+  () => [api.store.dev.deviceWidth, api.store.dev.deviceHeight],
+  ([newWidth, newHeight]) => {
+    if (newWidth && newHeight) {
+      deviceWidth.value = newWidth
+      deviceHeight.value = newHeight
+    }
+  },
+  { immediate: true }
+)
 
-  const preset = devicePresets[value]
-  console.log('preset found:', preset)
+// Watch for rotation changes in the store
+watch(
+  () => api.store.dev.isRotated,
+  (isRotated) => {
+    // If rotation state changed externally, update local dimensions
+    if (api.store.dev.deviceWidth && api.store.dev.deviceHeight) {
+      if (isRotated) {
+        // Swap dimensions for rotated state
+        deviceWidth.value = api.store.dev.deviceHeight
+        deviceHeight.value = api.store.dev.deviceWidth
+      } else {
+        // Use original dimensions for normal state
+        deviceWidth.value = api.store.dev.deviceWidth
+        deviceHeight.value = api.store.dev.deviceHeight
+      }
+    }
+  },
+  { immediate: true }
+)
 
-  if (preset) {
-    deviceWidth.value = preset.width
-    deviceHeight.value = preset.height
-    selectedDevice.value = value
-    console.log('Updated dimensions to:', deviceWidth.value, 'x', deviceHeight.value)
-  } else {
-    console.log('No preset found for value:', value)
-  }
-}
+const containerStyle = computed(() => ({
+  '--device-width': `${deviceWidth.value}px`,
+  '--device-height': `${deviceHeight.value}px`,
+}))
 
 // Check if current dimensions match any preset
 const checkForMatchingPreset = () => {
   for (const [key, preset] of Object.entries(devicePresets)) {
-    if (deviceWidth.value === preset.width && deviceHeight.value === preset.height) {
-      selectedDevice.value = key
+    // Check both normal orientation and rotated orientation
+    const matchesNormal = deviceWidth.value === preset.width && deviceHeight.value === preset.height
+    const matchesRotated = deviceWidth.value === preset.height && deviceHeight.value === preset.width
+
+    if (matchesNormal || matchesRotated) {
+      api.store.dev.selectedDevice = key
       return
     }
   }
   // If no match found, keep as custom
-  selectedDevice.value = 'custom'
+  api.store.dev.selectedDevice = 'custom'
 }
 
 // Resize functionality
@@ -93,7 +100,7 @@ const startResize = (direction, event) => {
   startHeight.value = deviceHeight.value
 
   // Switch to custom size when starting to resize
-  selectedDevice.value = 'custom'
+  api.store.dev.selectedDevice = 'custom'
 
   document.addEventListener('mousemove', handleResize)
   document.addEventListener('mouseup', stopResize)
@@ -107,17 +114,20 @@ const handleResize = (event) => {
   const deltaY = event.clientY - startY.value
 
   // Ensure we're in custom mode when resizing
-  selectedDevice.value = 'custom'
+  api.store.dev.selectedDevice = 'custom'
 
   if (resizeDirection.value.includes('right')) {
     deviceWidth.value = Math.max(200, startWidth.value + deltaX)
+    api.store.dev.deviceWidth = deviceWidth.value
   }
   if (resizeDirection.value.includes('left')) {
     const newWidth = Math.max(200, startWidth.value - deltaX)
     deviceWidth.value = newWidth
+    api.store.dev.deviceWidth = deviceWidth.value
   }
   if (resizeDirection.value.includes('bottom')) {
     deviceHeight.value = Math.max(400, startHeight.value + deltaY)
+    api.store.dev.deviceHeight = deviceHeight.value
   }
 }
 
@@ -136,7 +146,11 @@ const toggleRotation = () => {
   const tempWidth = deviceWidth.value
   deviceWidth.value = deviceHeight.value
   deviceHeight.value = tempWidth
-  isRotated.value = !isRotated.value
+  api.store.dev.isRotated = !api.store.dev.isRotated
+
+  // Update store dimensions
+  api.store.dev.deviceWidth = deviceWidth.value
+  api.store.dev.deviceHeight = deviceHeight.value
 
   // Check if the new dimensions match any preset
   checkForMatchingPreset()
@@ -144,27 +158,13 @@ const toggleRotation = () => {
 
 // Toggle fullscreen mode
 const toggleFullscreen = () => {
-  isFullscreen.value = !isFullscreen.value
+  api.store.dev.isFullscreen = !api.store.dev.isFullscreen
 }
 </script>
 
 <template>
   <!-- Fullscreen mode - just the slot content -->
-  <div v-if="isFullscreen" class="fullscreen-container">
-    <div class="fullscreen-controls">
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="xs" @click="toggleFullscreen">
-              <i-ri-pencil-ruler-2-fill class="!size-5" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            <p>Responsive Design Mode</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
+  <div v-if="api.store.dev.isFullscreen" class="fullscreen-container">
     <slot />
   </div>
 
@@ -172,43 +172,12 @@ const toggleFullscreen = () => {
   <div v-else class="device-container-wrapper">
     <div class="device-info">
       <div class="device-controls">
-        <Select v-model="selectedDevice" @update:modelValue="handleDeviceChange">
-          <SelectTrigger class="select-small">
-            <SelectValue placeholder="Custom size" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel class="mt-2">Mobile</SelectLabel>
-              <SelectItem value="iphone"> iPhone </SelectItem>
-              <SelectItem value="iphone-plus"> iPhone Plus </SelectItem>
-              <SelectItem value="iphone-pro"> iPhone Pro </SelectItem>
-              <SelectItem value="iphone-pro-max"> iPhone Pro Max </SelectItem>
-              <SelectItem value="iphone-se"> iPhone SE </SelectItem>
-            </SelectGroup>
-            <SelectGroup>
-              <SelectLabel class="mt-2">Tablet</SelectLabel>
-              <SelectItem value="ipad-11"> iPad 11-inch </SelectItem>
-              <SelectItem value="ipad-13"> iPad 13-inch</SelectItem>
-            </SelectGroup>
-            <SelectGroup>
-              <SelectLabel class="mt-2">Desktop</SelectLabel>
-              <SelectItem value="desktop1"> 800x600</SelectItem>
-              <SelectItem value="desktop2"> 1024x768</SelectItem>
-              <SelectItem value="desktop3"> 1280x1024</SelectItem>
-              <SelectItem value="desktop4"> 1440x900</SelectItem>
-              <SelectItem value="desktop5"> 1600x1200</SelectItem>
-            </SelectGroup>
-            <SelectGroup>
-              <SelectLabel class="mt-2">Other</SelectLabel>
-              <SelectItem value="custom"> Custom size </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+        <ResponsiveDeviceSelect />
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="xs" @click="toggleRotation">
-                <i-carbon-rotate-counterclockwise-filled :class="{ 'text-blue-400': isRotated }" />
+                <i-carbon-rotate-counterclockwise-filled :class="{ 'text-blue-400': api.store.dev.isRotated }" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="bottom">
@@ -256,8 +225,9 @@ const toggleFullscreen = () => {
 .fullscreen-controls {
   position: absolute;
   top: 10px;
-  right: 10px;
-  z-index: 10;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
   background-color: var(--background);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -346,15 +316,21 @@ const toggleFullscreen = () => {
 
 .resize-handle {
   position: absolute;
-  background: #e0e0e0;
+  background: #8f8f8f;
   border-radius: 20px;
   transition: all 0.2s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform-origin: center;
 }
 
 .resize-handle:hover {
-  background: #0056b3;
+  background: #90b7e5;
   transform: scale(1.1);
+}
+
+.resize-handle:active {
+  background: #90b7e5;
+  transform: scale(1.05);
 }
 
 .resize-handle-left {
@@ -366,6 +342,14 @@ const toggleFullscreen = () => {
   transform: translateY(-50%);
 }
 
+.resize-handle-left:hover {
+  transform: translateY(-50%) scale(1.1);
+}
+
+.resize-handle-left:active {
+  transform: translateY(-50%) scale(1.05);
+}
+
 .resize-handle-right {
   top: 50%;
   right: -15px;
@@ -375,6 +359,14 @@ const toggleFullscreen = () => {
   transform: translateY(-50%);
 }
 
+.resize-handle-right:hover {
+  transform: translateY(-50%) scale(1.1);
+}
+
+.resize-handle-right:active {
+  transform: translateY(-50%) scale(1.05);
+}
+
 .resize-handle-bottom {
   bottom: -15px;
   left: 50%;
@@ -382,6 +374,14 @@ const toggleFullscreen = () => {
   height: 8px;
   cursor: ns-resize;
   transform: translateX(-50%);
+}
+
+.resize-handle-bottom:hover {
+  transform: translateX(-50%) scale(1.1);
+}
+
+.resize-handle-bottom:active {
+  transform: translateX(-50%) scale(1.05);
 }
 
 .resize-handle-corner {

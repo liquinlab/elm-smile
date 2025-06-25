@@ -1,7 +1,7 @@
 <script setup>
 //import { useTimeAgo } from '@vueuse/core'
 import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue'
-
+import { Button } from '@/uikit/components/ui/button'
 import SmileAPI from '@/core/composables/useAPI'
 const api = SmileAPI()
 
@@ -72,31 +72,6 @@ const showServiceSelect = ref(false)
 <template>
   <table class="w-full text-sm table-border-top">
     <tbody>
-      <tr class="table-row-base table-row-odd">
-        <td class="table-cell-base table-cell-left table-cell-small" colspan="1"><b>Service:</b></td>
-        <td class="table-cell-base table-cell-left table-cell-mono table-cell-small" colspan="3">
-          <div class="flex items-center">
-            <template v-if="!showServiceSelect">
-              <span class="mr-2">{{ smilestore.data.recruitmentService }}</span>
-
-              <FAIcon icon="fa-solid fa-pen-to-square" @click="showServiceSelect = true" />
-            </template>
-            <div v-else class="control select is-small">
-              <select
-                id="recruitment"
-                v-model="smilestore.data.recruitmentService"
-                class="select is-small"
-                @change="showServiceSelect = false"
-                @blur="showServiceSelect = false"
-              >
-                <option v-for="(cond, key) in smilestore.browserEphemeral.urls" :key="cond">
-                  {{ key }}
-                </option>
-              </select>
-            </div>
-          </div>
-        </td>
-      </tr>
       <tr class="table-row-base table-row-even hidden sm:table-row">
         <td class="table-cell-base table-cell-left table-cell-small"><b>Last route:</b></td>
         <td class="table-cell-base table-cell-left table-cell-mono table-cell-small">
@@ -143,7 +118,7 @@ const showServiceSelect = ref(false)
           {{ api.config.autoSave }}
         </td>
       </tr>
-      <tr class="table-row-base table-row-odd hidden sm:table-row">
+      <tr class="table-row-base table-row-odd hidden sm:table-row table-border-bottom">
         <td class="table-cell-base table-cell-left table-cell-small"><b>Size:</b></td>
         <td class="table-cell-base table-cell-left table-cell-mono table-cell-small">
           {{ api.store.browserPersisted.approxDataSize }} / 1,048,576 max ({{
@@ -153,4 +128,8 @@ const showServiceSelect = ref(false)
       </tr>
     </tbody>
   </table>
+
+  <div class="flex justify-end mt-4 mr-4">
+    <Button @click="open_firebase_console(firebase_url)" variant="outline" size="sm"> Browse in Firebase </Button>
+  </div>
 </template>

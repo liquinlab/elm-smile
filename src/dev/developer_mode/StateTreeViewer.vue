@@ -211,7 +211,14 @@ watch(
     <div class="tree-container" ref="treeContainer">
       <div v-if="api.nSteps > 0">
         <div class="index-display">
-          {{ api.stepIndex }}/{{ api.nSteps }} ({{ api.blockIndex }}/{{ api.blockLength }})
+          <Tooltip>
+            <TooltipTrigger>{{ api.stepIndex }}/{{ api.nSteps }}</TooltipTrigger>
+            <TooltipContent side="bottom">Step index</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger class="ml-1 text-teal-500">({{ api.blockIndex }}/{{ api.blockLength }})</TooltipTrigger>
+            <TooltipContent side="bottom">Index within block</TooltipContent>
+          </Tooltip>
         </div>
 
         <ul class="tree-root">
@@ -237,25 +244,27 @@ watch(
       <div class="tree-viewer-container-empty" v-else>No steps defined</div>
     </div>
     <div class="data-container-global">
-      <div class="global-data-display">
-        Persisted Vars
-        <span class="data-label">(.persist)</span>
-
+      <div class="section-title">
+        <span>Persisted Vars <span class="data-label">(.persist)</span></span>
         <Button
           @click="api.clearPersist()"
-          variant="ghost"
-          size="xs"
+          variant="outline"
+          size="menu"
           class="has-tooltip-arrow has-tooltip-bottom"
           data-tooltip="Delete Global Variables"
         >
           <FAIcon icon="fa-solid fa-trash" />
         </Button>
+      </div>
+      <div class="global-data-display">
         <DataPathViewer :data="api.persist" />
       </div>
     </div>
-    <div class="data-container">
+    <div class="data-container" :class="{ disabled: api.nSteps === 0 }">
+      <div class="section-title">
+        <span>Step Data <span class="data-label">(.stepData)</span></span>
+      </div>
       <div class="data-display">
-        Step Data <span class="data-label">(.stepData)</span>
         <!--
         <button
           @click="api.clearCurrentStepData()"
@@ -320,7 +329,7 @@ watch(
   margin-left: 5px;
   font-size: clamp(0.5rem, 0.8rem, 0.8rem); /* Shrink font size if needed but not larger than 0.9rem */
   font-family: monospace;
-  font-weight: 800;
+  font-weight: 500;
   color: #246761;
   line-height: 1;
   white-space: nowrap; /* Prevent wrapping */
@@ -360,13 +369,14 @@ watch(
   padding-right: 4px;
   padding-top: 3px;
   font-family: monospace;
-  font-weight: 800;
+  font-weight: 500;
   color: #e49310;
   line-height: 1; /* Add line-height to match */
   text-align: right;
   position: absolute;
   right: 0;
   top: 4px;
+  z-index: 50;
 }
 .content-display {
   font-size: 0.7rem;
@@ -416,6 +426,11 @@ watch(
   text-align: left;
 }
 
+.data-container.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .tree-root {
   list-style-type: none;
   padding-left: 0;
@@ -461,5 +476,20 @@ watch(
   font-family: monospace;
   color: #10a8a2;
   padding-right: 6px;
+}
+
+.section-title {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  font-family: monospace;
+  text-align: left;
+  background-color: var(--muted);
+  padding: 0.375rem 0.5rem;
+  margin: 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

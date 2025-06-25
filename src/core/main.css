@@ -92,7 +92,7 @@
   --dev-lines: 0.01em solid #b5b5b5;
   --dev-contrast-text: #4d4d4d;
   --pinned-route: rgb(255, 208, 80);
-  --hover-table-row: rgb(255, 208, 80);
+  --hover-table-row: var(--muted);
 }
 
 .dark {
@@ -136,7 +136,7 @@
   --dev-lines: 0.01em solid #b5b5b5;
   --dev-contrast-text: #4d4d4d;
   --pinned-route: rgb(255, 208, 80);
-  --hover-table-row: rgb(255, 208, 80);
+  --hover-table-row: var(--muted);
 }
 
 @layer base {

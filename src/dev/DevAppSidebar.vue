@@ -15,12 +15,8 @@ import {
   useSidebar,
 } from '@/uikit/components/ui/sidebar'
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/uikit/components/ui/popover'
-
+import { Popover, PopoverContent, PopoverTrigger } from '@/uikit/components/ui/popover'
+import ConfigDevPanel from '@/dev/developer_mode/ConfigDevPanel.vue'
 import Toggle from '@/uikit/components/ui/toggle/Toggle.vue'
 import { Sun, Moon } from 'lucide-vue-next'
 import { useColorMode } from '@vueuse/core'
@@ -36,6 +32,9 @@ const props = defineProps({
 const mode = useColorMode()
 const activeItem = ref('DevMode')
 const { setOpen } = useSidebar()
+
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 </script>
 
 <template>
@@ -66,41 +65,34 @@ const { setOpen } = useSidebar()
             <SidebarMenuItem>
               <SidebarMenuButton
                 class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
-                asChild
-                isActive
+                :isActive="api.store.dev.mainView === 'devmode'"
                 tooltip="Developer Mode"
+                @click="api.store.dev.mainView = 'devmode'"
               >
-                <i-lucide-bug-play class="!size-9" />
+                <i-lucide-bug-play class="!size-5" :class="{ 'text-chart-1': api.store.dev.mainView === 'devmode' }" />
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <!-- Firebase -->
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
-                asChild
-                tooltip="Firebase"
-              >
-                <i-mdi-firebase class="w-9 h-9" />
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+
             <!-- Analyze -->
             <SidebarMenuItem>
               <SidebarMenuButton
                 class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
-                asChild
                 tooltip="Analyze Data"
+                :isActive="api.store.dev.mainView === 'analyze'"
+                @click="api.store.dev.mainView = 'analyze'"
               >
-                <i-ix-analyze class="w-9 h-9" />
+                <i-ix-analyze class="!size-5" :class="{ 'text-chart-1': api.store.dev.mainView === 'analyze' }" />
               </SidebarMenuButton>
             </SidebarMenuItem>
             <!-- Recruit -->
             <SidebarMenuItem>
               <SidebarMenuButton
                 class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
-                asChild
                 tooltip="Recruit Participants"
+                :isActive="api.store.dev.mainView === 'recruit'"
+                @click="api.store.dev.mainView = 'recruit'"
               >
-                <i-bxs-megaphone class="w-9 h-9" />
+                <i-bxs-megaphone class="!size-5" :class="{ 'text-chart-1': api.store.dev.mainView === 'recruit' }" />
               </SidebarMenuButton>
             </SidebarMenuItem>
 
@@ -108,10 +100,11 @@ const { setOpen } = useSidebar()
             <SidebarMenuItem>
               <SidebarMenuButton
                 class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
-                asChild
                 tooltip="Documentation"
+                :isActive="api.store.dev.mainView === 'docs'"
+                @click="api.store.dev.mainView = 'docs'"
               >
-                <i-lucide-book-marked class="w-9 h-9" />
+                <i-lucide-book-marked class="!size-5" :class="{ 'text-chart-1': api.store.dev.mainView === 'docs' }" />
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -120,30 +113,20 @@ const { setOpen } = useSidebar()
     </SidebarContent>
     <SidebarFooter>
       <!-- Developer Mode Configuration -->
-       <Popover>
+      <Popover>
         <PopoverTrigger>
-          <SidebarMenuButton class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1" asChild tooltip="Configuration">
-            <i-lucide-settings class="w-9 h-9" />
+          <SidebarMenuButton
+            class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
+            asChild
+            tooltip="Configuration"
+          >
+            <i-lucide-settings class="!size-5" />
           </SidebarMenuButton>
         </PopoverTrigger>
         <PopoverContent side="right" align="end">
-          Some popover content
+          <ConfigDevPanel />
         </PopoverContent>
       </Popover>
-      <!-- Toggle Dark Mode for Developer Mode-->
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Toggle aria-label="Toggle dark mode" @click="mode = mode === 'dark' ? 'light' : 'dark'">
-              <Moon v-if="mode === 'light'" class="h-4 w-4" />
-              <Sun v-else class="h-4 w-4" />
-            </Toggle>
-          </TooltipTrigger>
-          <TooltipContent side="right">
-            <p>{{ mode === 'dark' ? 'Light Mode (Dev)' : 'Dark Mode (Dev)' }}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
     </SidebarFooter>
   </Sidebar>
 </template>

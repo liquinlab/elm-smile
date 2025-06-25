@@ -2,7 +2,7 @@
 import { reactive, onMounted } from 'vue'
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
+import { Button } from '@/uikit/components/ui/button'
 // get access to the global store
 const emit = defineEmits(['toggleWithdraw', 'submitWithdraw'])
 const props = defineProps(['prefillEmail'])
@@ -21,21 +21,21 @@ function withdraw() {
 </script>
 
 <template>
-  <article class="message is-danger">
-    <div class="message-header">
-      <p>Withdraw from study</p>
+  <div class="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
+    <div class="mb-4 border-b border-red-200 pb-3">
+      <h3 class="text-lg font-semibold text-red-800">Withdraw from study</h3>
     </div>
-    <div class="message-body has-text-left">
-      <p class="has-text-left">
-        <b>
+    <div class="space-y-4">
+      <p class="text-left text-sm text-gray-700">
+        <strong>
           You are free to withdraw from this study at any time. Withdrawing from the study may affect the total amount
           of your compensation. Please complete the following form to complete your withdraw. We will follow up with you
           about partial compensation. You do not have to answer any particular question but we appreciate understanding
           the reasons for your withdraw.
-        </b>
+        </strong>
       </p>
-      <br />
-      <p>
+
+      <div class="space-y-4">
         <FormKit
           v-model="forminfo.reason_select"
           type="checkbox"
@@ -71,13 +71,12 @@ function withdraw() {
           validation-visibility="live"
           placeholder="participant@gmail.com"
         />
-      </p>
-      <div class="has-text-right mt-6">
-        <button class="button mr-4" id="nevermind" @click="$emit('toggleWithdraw')">
-          Nevermind, take me back to the study!
-        </button>
-        <button class="button is-danger mr-3" id="finish" @click="withdraw()">Withdraw</button>
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-6">
+        <Button variant="outline" @click="$emit('toggleWithdraw')"> Nevermind, take me back to the study! </Button>
+        <Button variant="destructive" @click="withdraw()"> Withdraw </Button>
       </div>
     </div>
-  </article>
+  </div>
 </template>
