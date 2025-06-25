@@ -4,6 +4,16 @@ import ConfigList from '@/dev/developer_mode/ConfigList.vue'
 import SmileAPI from '@/core/composables/useAPI'
 const api = SmileAPI()
 
+// shadcn/ui components
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+} from '@/uikit/components/ui/breadcrumb'
+import { Button } from '@/uikit/components/ui/button'
+
 const browse_panels = reactive({ path: ['/', null, null] })
 
 onMounted(() => {
@@ -68,11 +78,6 @@ function panel_jump(index) {
   }
   // trim browse_panels to length three
   browse_panels.path = browse_panels.path.slice(0, 3)
-  /*
-  for (var i = index; i < index; i++) {
-    browse_panels.path.push(null)
-  }
-  */
 }
 
 function resetDevState() {
@@ -81,105 +86,52 @@ function resetDevState() {
 }
 </script>
 <template>
-  <!-- content of panel here -->
-  <div class="contentpanel">
-    <nav class="breadcrumb has-arrow-separator" aria-label="breadcrumbs">
-      <ul>
+  <div class="h-full m-0 p-0">
+    <Breadcrumb class="bg-gray-100 border-b border-t border-dev-lines px-3 py-2 font-mono">
+      <BreadcrumbList>
         <template v-for="(option, index) in browse_panels.path">
-          <li v-if="option !== null" :class="{ 'is-active': index == n_active_panels - 1 }">
-            <a @click="panel_jump(index)">
-              <template v-if="option == '/'"><FAIcon icon="fa-solid fa-home" />&nbsp;</template>
-              <template v-else>{{ option }}</template>
-            </a>
-          </li>
+          <template v-if="option !== null">
+            <BreadcrumbItem :key="index">
+              <BreadcrumbLink as="button" @click="panel_jump(index)" class="flex items-center text-xs">
+                <template v-if="option == '/'">
+                  <FAIcon icon="fa-solid fa-home" />
+                </template>
+                <template v-else>{{ option }}</template>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator v-if="index < n_active_panels - 1" />
+          </template>
         </template>
-      </ul>
-    </nav>
+      </BreadcrumbList>
+    </Breadcrumb>
 
-    <div class="columns colcontent is-mobile">
-      <div class="column colcontent is-2 edge">
-        <div class="actionsbar">
-          <p class="is-left is-size-7 p-2">
-            Read more about configuration options
-            <a href="https://smile.gureckislab.org/configuration.html">in the docs</a>.
-          </p>
-          <div class="resetbutton ml-2 mb-2 mt-2">
-            <a
-              class="button is-small has-tooltip-arrow has-tooltip-right"
-              @click="api.resetLocalState()"
-              data-tooltip="Reset local state"
-            >
-              <b>Local:</b> <FAIcon icon=" fa-solid fa-arrow-rotate-left" />
-            </a>
-          </div>
-          <div class="resetbutton ml-2">
-            <a
-              class="button is-small has-tooltip-arrow has-tooltip-right"
-              @click="resetDevState()"
-              data-tooltip="Reset developer interface"
-            >
-              <b>Dev:</b> <FAIcon icon=" fa-solid fa-arrow-rotate-left" />
-            </a>
-          </div>
+    <div class="flex flex-row h-[calc(100%-30px)]">
+      <div class="flex flex-col w-1/6 min-w-[120px] border-r border-gray-200 bg-white p-2 gap-2">
+        <div class="text-xs text-left mb-2 font-mono">
+          Read more about configuration options
+          <a href="https://smile.gureckislab.org/configuration.html" class="text-blue-600 underline ml-1">in the docs</a
+          >.
         </div>
       </div>
-      <div class="column colcontent is-3 edge isdark">
-        <!-- two from end -->
-        <ConfigList
-          :data="panel_path(2)"
-          :selected="browse_panels.path[browse_panels.path.length - 2]"
-          @selected="panel1_select"
-        ></ConfigList>
-      </div>
-      <div class="column colcontent is-3 edge isdark">
-        <!-- one from end -->
-        <ConfigList
-          :data="panel_path(1)"
-          :selected="browse_panels.path[browse_panels.path.length - 1]"
-          @selected="panel2_select"
-        ></ConfigList>
-      </div>
-      <div class="column colcontent is-4 edge isdark">
-        <!-- zero from end -->
-        <ConfigList :data="panel_path(0)" @selected="panel3_select"></ConfigList>
+      <div class="flex-1 grid grid-cols-3 gap-0 bg-gray-50 overflow-hidden">
+        <div class="border-r border-gray-200 bg-gray-50 h-full overflow-hidden">
+          <ConfigList
+            :data="panel_path(2)"
+            :selected="browse_panels.path[browse_panels.path.length - 2]"
+            @selected="panel1_select"
+          />
+        </div>
+        <div class="border-r border-gray-200 bg-gray-50 h-full overflow-hidden">
+          <ConfigList
+            :data="panel_path(1)"
+            :selected="browse_panels.path[browse_panels.path.length - 1]"
+            @selected="panel2_select"
+          />
+        </div>
+        <div class="bg-gray-50 h-full overflow-hidden">
+          <ConfigList :data="panel_path(0)" @selected="panel3_select" />
+        </div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.breadcrumb {
-  padding: 5px;
-  padding-top: 5px;
-  padding-bottom: 4px;
-  padding-left: 10px;
-  margin: 0px;
-  height: 30px;
-  background-color: #eeeeee;
-  border-bottom: 1px solid #ccc;
-  border-top: 1px solid #ccc;
-  font-size: 0.8em;
-  color: #434343;
-}
-.breadcrumb li + li::before {
-  color: var(--darker-grey);
-}
-.contentpanel {
-  padding-left: 0px;
-  margin: 0px;
-  height: 100%;
-}
-.colcontent {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-.actionsbar {
-  height: 100%;
-}
-.edge {
-  border-right: 1px solid #e3e3e3;
-  margin: 0px;
-  padding: 0px;
-}
-</style>

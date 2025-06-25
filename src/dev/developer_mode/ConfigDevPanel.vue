@@ -6,8 +6,10 @@ import { Switch } from '@/uikit/components/ui/switch'
 import { Button } from '@/uikit/components/ui/button'
 import { Separator } from '@/uikit/components/ui/separator'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
 import { useColorMode } from '@vueuse/core'
 import { computed } from 'vue'
+
 const api = useAPI()
 const mode = useColorMode()
 
@@ -18,6 +20,50 @@ const isDarkMode = computed({
     mode.value = value ? 'dark' : 'light'
   },
 })
+
+// Device presets for rotation logic
+const devicePresets = {
+  iphone: { width: 393, height: 852, name: 'iPhone' },
+  'iphone-plus': { width: 430, height: 932, name: 'iPhone Plus' },
+  'iphone-pro': { width: 402, height: 874, name: 'iPhone Pro' },
+  'iphone-pro-max': { width: 440, height: 956, name: 'iPhone Pro Max' },
+  'iphone-se': { width: 375, height: 667, name: 'iPhone SE' },
+  'ipad-11': { width: 1180, height: 820, name: 'iPad 11-inch' },
+  'ipad-13': { width: 1366, height: 1024, name: 'iPad 13-inch' },
+  desktop1: { width: 800, height: 600, name: '800x600' },
+  desktop2: { width: 1024, height: 768, name: '1024x768' },
+  desktop3: { width: 1280, height: 1024, name: '1280x1024' },
+  desktop4: { width: 1440, height: 900, name: '1440x900' },
+  desktop5: { width: 1600, height: 1200, name: '1600x1200' },
+  desktop16: { width: 1920, height: 1080, name: '1920x1080' },
+}
+
+// Check if current dimensions match any preset
+const checkForMatchingPreset = () => {
+  for (const [key, preset] of Object.entries(devicePresets)) {
+    // Check both normal orientation and rotated orientation
+    const matchesNormal = api.store.dev.deviceWidth === preset.width && api.store.dev.deviceHeight === preset.height
+    const matchesRotated = api.store.dev.deviceWidth === preset.height && api.store.dev.deviceHeight === preset.width
+
+    if (matchesNormal || matchesRotated) {
+      api.store.dev.selectedDevice = key
+      return
+    }
+  }
+  // If no match found, keep as custom
+  api.store.dev.selectedDevice = 'custom'
+}
+
+// Toggle rotation (swap width and height) - same logic as ResponsiveDeviceContainer
+const toggleRotation = () => {
+  const tempWidth = api.store.dev.deviceWidth
+  api.store.dev.deviceWidth = api.store.dev.deviceHeight
+  api.store.dev.deviceHeight = tempWidth
+  api.store.dev.isRotated = !api.store.dev.isRotated
+
+  // Check if the new dimensions match any preset
+  checkForMatchingPreset()
+}
 
 // Reset developer mode settings to default
 function resetDevState() {
@@ -91,13 +137,21 @@ function resetDevState() {
         <Switch id="width" v-model="api.store.dev.isFullscreen" class="col-span-2" />
       </div>
       <div class="grid grid-cols-3 items-center gap-4">
-        <Label for="maxWidth">Rotate</Label>
-        <Switch id="maxWidth" v-model="api.store.dev.isRotated" class="col-span-2" />
-      </div>
-      <div class="grid grid-cols-3 items-center gap-4">
         <Label for="device">Target Device</Label>
-        <div class="col-span-2">
+        <div class="col-span-2 flex items-center gap-2">
           <ResponsiveDeviceSelect />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="xs" @click="toggleRotation">
+                  <i-carbon-rotate-counterclockwise-filled :class="{ 'text-blue-400': api.store.dev.isRotated }" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Rotate device</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
       <div class="relative mt-5">

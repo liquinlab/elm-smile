@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 import ResponsiveDeviceSelect from './ResponsiveDeviceSelect.vue'
 import { Separator } from '@/uikit/components/ui/separator'
@@ -25,54 +25,24 @@ const devicePresets = {
   desktop16: { width: 1920, height: 1080, name: '1920x1080' },
 }
 
-// Initialize device dimensions based on the selected device from store
-const initialPreset = devicePresets[api.store.dev.selectedDevice] || devicePresets.desktop1
-const deviceWidth = ref(initialPreset.width)
-const deviceHeight = ref(initialPreset.height)
-
-// Watch for changes in the store and sync local dimensions
-watch(
-  () => [api.store.dev.deviceWidth, api.store.dev.deviceHeight],
-  ([newWidth, newHeight]) => {
-    if (newWidth && newHeight) {
-      deviceWidth.value = newWidth
-      deviceHeight.value = newHeight
-    }
-  },
-  { immediate: true }
-)
-
-// Watch for rotation changes in the store
-watch(
-  () => api.store.dev.isRotated,
-  (isRotated) => {
-    // If rotation state changed externally, update local dimensions
-    if (api.store.dev.deviceWidth && api.store.dev.deviceHeight) {
-      if (isRotated) {
-        // Swap dimensions for rotated state
-        deviceWidth.value = api.store.dev.deviceHeight
-        deviceHeight.value = api.store.dev.deviceWidth
-      } else {
-        // Use original dimensions for normal state
-        deviceWidth.value = api.store.dev.deviceWidth
-        deviceHeight.value = api.store.dev.deviceHeight
-      }
-    }
-  },
-  { immediate: true }
-)
+// Initialize store values if they don't exist
+if (!api.store.dev.deviceWidth || !api.store.dev.deviceHeight) {
+  const initialPreset = devicePresets[api.store.dev.selectedDevice] || devicePresets.desktop1
+  api.store.dev.deviceWidth = initialPreset.width
+  api.store.dev.deviceHeight = initialPreset.height
+}
 
 const containerStyle = computed(() => ({
-  '--device-width': `${deviceWidth.value}px`,
-  '--device-height': `${deviceHeight.value}px`,
+  '--device-width': `${api.store.dev.deviceWidth}px`,
+  '--device-height': `${api.store.dev.deviceHeight}px`,
 }))
 
 // Check if current dimensions match any preset
 const checkForMatchingPreset = () => {
   for (const [key, preset] of Object.entries(devicePresets)) {
     // Check both normal orientation and rotated orientation
-    const matchesNormal = deviceWidth.value === preset.width && deviceHeight.value === preset.height
-    const matchesRotated = deviceWidth.value === preset.height && deviceHeight.value === preset.width
+    const matchesNormal = api.store.dev.deviceWidth === preset.width && api.store.dev.deviceHeight === preset.height
+    const matchesRotated = api.store.dev.deviceWidth === preset.height && api.store.dev.deviceHeight === preset.width
 
     if (matchesNormal || matchesRotated) {
       api.store.dev.selectedDevice = key
@@ -96,8 +66,8 @@ const startResize = (direction, event) => {
   resizeDirection.value = direction
   startX.value = event.clientX
   startY.value = event.clientY
-  startWidth.value = deviceWidth.value
-  startHeight.value = deviceHeight.value
+  startWidth.value = api.store.dev.deviceWidth
+  startHeight.value = api.store.dev.deviceHeight
 
   // Switch to custom size when starting to resize
   api.store.dev.selectedDevice = 'custom'
@@ -117,17 +87,13 @@ const handleResize = (event) => {
   api.store.dev.selectedDevice = 'custom'
 
   if (resizeDirection.value.includes('right')) {
-    deviceWidth.value = Math.max(200, startWidth.value + deltaX)
-    api.store.dev.deviceWidth = deviceWidth.value
+    api.store.dev.deviceWidth = Math.max(200, startWidth.value + deltaX)
   }
   if (resizeDirection.value.includes('left')) {
-    const newWidth = Math.max(200, startWidth.value - deltaX)
-    deviceWidth.value = newWidth
-    api.store.dev.deviceWidth = deviceWidth.value
+    api.store.dev.deviceWidth = Math.max(200, startWidth.value - deltaX)
   }
   if (resizeDirection.value.includes('bottom')) {
-    deviceHeight.value = Math.max(400, startHeight.value + deltaY)
-    api.store.dev.deviceHeight = deviceHeight.value
+    api.store.dev.deviceHeight = Math.max(400, startHeight.value + deltaY)
   }
 }
 
@@ -143,14 +109,10 @@ const stopResize = () => {
 
 // Toggle rotation (swap width and height)
 const toggleRotation = () => {
-  const tempWidth = deviceWidth.value
-  deviceWidth.value = deviceHeight.value
-  deviceHeight.value = tempWidth
+  const tempWidth = api.store.dev.deviceWidth
+  api.store.dev.deviceWidth = api.store.dev.deviceHeight
+  api.store.dev.deviceHeight = tempWidth
   api.store.dev.isRotated = !api.store.dev.isRotated
-
-  // Update store dimensions
-  api.store.dev.deviceWidth = deviceWidth.value
-  api.store.dev.deviceHeight = deviceHeight.value
 
   // Check if the new dimensions match any preset
   checkForMatchingPreset()
@@ -160,7 +122,8 @@ const toggleRotation = () => {
 const toggleFullscreen = () => {
   api.store.dev.isFullscreen = !api.store.dev.isFullscreen
 }
-const deviceWidthPixels = computed(() => deviceWidth.value + 'px')
+
+const deviceWidthPixels = computed(() => api.store.dev.deviceWidth + 'px')
 </script>
 
 <template>
@@ -188,7 +151,7 @@ const deviceWidthPixels = computed(() => deviceWidth.value + 'px')
             </Tooltip>
           </TooltipProvider>
           <Separator orientation="vertical" />
-          <div class="device-dimensions">{{ deviceWidth }} x {{ deviceHeight }}</div>
+          <div class="device-dimensions">{{ api.store.dev.deviceWidth }} x {{ api.store.dev.deviceHeight }}</div>
 
           <TooltipProvider>
             <Tooltip>

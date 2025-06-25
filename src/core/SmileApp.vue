@@ -9,9 +9,11 @@ import { ref, computed } from 'vue'
  * Developer mode components for debugging and development tools
  * @requires DeveloperNavBar Navigation bar for developer mode
  * @requires DevConsoleBar Console bar for developer tools
+ * @requires DevConsoleBarTailwind Console bar for developer tools
  * @requires DevSideBar Side bar for developer tools
  */
 import DeveloperNavBar from '@/dev/developer_mode/DeveloperNavBar.vue'
+//import DevConsoleBar from '@/dev/developer_mode/DevConsoleBar.vue'
 import DevConsoleBar from '@/dev/developer_mode/DevConsoleBar.vue'
 import DevSideBar from '@/dev/developer_mode/DevSideBar.vue'
 /**
@@ -121,7 +123,7 @@ const isLoading = computed(() => {
         <!-- Bottom console - can be toggled -->
         <Transition name="console-slide">
           <div v-if="api.config.mode == 'development' && api.store.dev.showConsoleBar" class="console">
-            <!--<DevConsoleBar />-->
+            <DevConsoleBar />
           </div>
         </Transition>
       </div>

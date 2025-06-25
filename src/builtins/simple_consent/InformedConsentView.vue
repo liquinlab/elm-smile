@@ -82,7 +82,7 @@ onBeforeUnmount(() => {
                 <div class="border-t border-gray-200 my-4"></div>
 
                 <div class="flex items-center space-x-2 mb-4">
-                  <Switch v-model="api.persist.agree" id="consent_toggle" name="consent_toggle" />
+                  <Switch v-model="api.persist.agree" id="consent_toggle" name="consent_toggle" size="lg" />
                   <Label for="consent_toggle" class="text-left text-sm font-medium">
                     I consent and am over 18 years old.
                   </Label>

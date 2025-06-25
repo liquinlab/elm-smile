@@ -44,93 +44,77 @@ function option_selected(option) {
 </script>
 
 <template>
-  <aside class="menu">
-    <div class="columnheader" v-if="header">
-      <template v-if="header == '/'"><FAIcon icon="fa-solid fa-home" />&nbsp;</template>
+  <aside class="w-full h-full flex flex-col" style="background-color: var(--background)">
+    <!-- Header -->
+    <div v-if="header" class="bg-muted text-gray-600 px-3 py-2 text-xs font-medium border-b border-dev-lines">
+      <template v-if="header == '/'">
+        <FAIcon icon="fa-solid fa-home" class="mr-1" />
+      </template>
       <template v-else>{{ header }}</template>
     </div>
 
-    <ul class="menu-list">
-      <div
-        v-if="
-          (data_field === null || data_field === undefined || Object.keys(data_field).length == 0) && header !== null
-        "
-      >
-        <li>
-          <a>Empty currently</a>
+    <!-- Menu List -->
+    <div class="flex-1 overflow-y-auto overflow-x-hidden" :style="{ height: height_pct }">
+      <ul class="space-y-0.5 p-1">
+        <!-- Empty state -->
+        <li
+          v-if="
+            (data_field === null || data_field === undefined || Object.keys(data_field).length == 0) && header !== null
+          "
+        >
+          <div class="px-2 py-1.5 text-foreground text-xs font-mono">Empty currently</div>
         </li>
-      </div>
-      <li v-for="(option, key) in data_field" :class="{ active: key === props.selected }">
-        <div v-if="option === null || (typeof option != 'object' && !Array.isArray(option))">
-          <a>
-            <b>{{ truncateText(key) }}</b
-            >: {{ option === null ? 'null' : truncateText(String(option)) }}
-          </a>
-        </div>
-        <div v-else @click="option_selected(key)">
-          <a>
-            <b>{{ truncateText(key) }}</b>
-            <div class="arrow">
-              <FAIcon icon=" fa-solid fa-angle-right" />
+
+        <!-- Data items -->
+        <li v-for="(option, key) in data_field" :key="key">
+          <!-- Non-object values (display only) -->
+          <div
+            v-if="option === null || (typeof option != 'object' && !Array.isArray(option))"
+            class="px-2 py-1.5 text-xs font-mono"
+          >
+            <span class="font-semibold text-chart2">{{ truncateText(key) }}</span>
+            <span class="text-foreground">: {{ option === null ? 'null' : truncateText(String(option)) }}</span>
+          </div>
+
+          <!-- Object values (clickable) -->
+          <button
+            v-else
+            @click="option_selected(key)"
+            :class="[
+              'w-full text-left px-2 py-1.5 text-xs font-mono rounded transition-colors duration-150',
+              'hover:bg-blue-50 hover:text-blue-700',
+              'focus:outline-none focus:ring-1 focus:ring-blue-300 focus:bg-blue-50',
+              key === props.selected ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'text-gray-700',
+            ]"
+          >
+            <div class="flex items-center justify-between">
+              <span class="font-semibold">{{ truncateText(key) }}</span>
+              <FAIcon icon="fa-solid fa-angle-right" class="text-gray-400 text-xs" />
             </div>
-          </a>
-        </div>
-      </li>
-    </ul>
+          </button>
+        </li>
+      </ul>
+    </div>
   </aside>
 </template>
 
 <style scoped>
-.active a {
-  background-color: rgb(199, 215, 228);
-  color: #fff;
-}
-.active a:hover {
-  background-color: rgb(199, 215, 228);
-  color: #fff;
-}
-.active li a {
-  color: #fff;
+/* Custom scrollbar styling for better UX */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
 }
 
-.columnheader {
-  background: #f4f4f4;
-  color: #858484;
-  padding: 5px;
-  font-size: 0.8em;
-  margin-bottom: 0px;
-  padding-left: 10px;
-}
-.menu-list {
-  height: v-bind(height_pct);
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
-.menu-list li {
-  font-size: 0.73em;
-  font-family: monospace;
-  margin-top: 2px;
-  margin-right: 4px;
-  margin-left: 4px;
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
 }
 
-.menu-list li a {
-  color: #717a80;
-  padding-top: 5px;
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
 }
 
-.menu-list li b {
-  color: steelblue;
-}
-
-.arrow {
-  float: right;
-  margin: 0px;
-  padding-right: 0px;
-  color: #434343;
-  vertical-align: middle;
-  padding: 0px;
-  font-size: 0.9em;
-  margin-top: 3px;
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 </style>
