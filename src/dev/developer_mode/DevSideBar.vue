@@ -18,7 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/uikit/components/ui/
         <TabsList class="mx-auto text-xs">
           <TabsTrigger value="steps" class="text-[0.75rem] font-mono"> Steps </TabsTrigger>
           <TabsTrigger value="randomization" class="text-[0.75rem] font-mono"> Random </TabsTrigger>
-          <TabsTrigger value="db" class="text-[0.75rem] font-mono"> DB </TabsTrigger>
+          <TabsTrigger value="db" class="text-[0.75rem] font-mono"> Info </TabsTrigger>
         </TabsList>
         <TabsContent value="steps">
           <StateTreeViewer />
@@ -36,9 +36,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/uikit/components/ui/
       <ToggleStatus />
 
       <ProgressSteps />
-      <div class="w-full bg-muted border-b border-border">
-        <StudyInfo />
-      </div>
+      <StudyInfo />
     </div>
   </div>
 </template>

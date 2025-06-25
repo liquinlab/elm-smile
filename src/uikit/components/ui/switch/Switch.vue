@@ -1,7 +1,7 @@
 <script setup>
-import { reactiveOmit } from "@vueuse/core";
-import { SwitchRoot, SwitchThumb, useForwardPropsEmits } from "reka-ui";
-import { cn } from '@/uikit/lib/utils';
+import { reactiveOmit } from '@vueuse/core'
+import { SwitchRoot, SwitchThumb, useForwardPropsEmits } from 'reka-ui'
+import { cn } from '@/uikit/lib/utils'
 
 const props = defineProps({
   defaultValue: { type: Boolean, required: false },
@@ -14,13 +14,32 @@ const props = defineProps({
   name: { type: String, required: false },
   required: { type: Boolean, required: false },
   class: { type: null, required: false },
-});
+  size: { type: String, default: 'default', validator: (value) => ['default', 'sm', 'lg'].includes(value) },
+})
 
-const emits = defineEmits(["update:modelValue"]);
+const emits = defineEmits(['update:modelValue'])
 
-const delegatedProps = reactiveOmit(props, "class");
+const delegatedProps = reactiveOmit(props, 'class', 'size')
 
-const forwarded = useForwardPropsEmits(delegatedProps, emits);
+const forwarded = useForwardPropsEmits(delegatedProps, emits)
+
+const sizeClasses = {
+  sm: {
+    root: 'h-[1rem] w-6',
+    thumb: 'w-3 h-3',
+    translate: 'data-[state=checked]:translate-x-[calc(100%-1px)]',
+  },
+  default: {
+    root: 'h-[1.15rem] w-8',
+    thumb: 'w-4 h-4',
+    translate: 'data-[state=checked]:translate-x-[calc(100%-2px)]',
+  },
+  lg: {
+    root: 'h-[1.5rem] w-12',
+    thumb: 'w-5 h-5',
+    translate: 'data-[state=checked]:translate-x-[25px]',
+  },
+}
 </script>
 
 <template>
@@ -29,8 +48,9 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
     v-bind="forwarded"
     :class="
       cn(
-        'peer data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
-        props.class,
+        'peer data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 inline-flex shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
+        sizeClasses[size].root,
+        props.class
       )
     "
   >
@@ -38,7 +58,9 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
       data-slot="switch-thumb"
       :class="
         cn(
-          'bg-background dark:data-[state=unchecked]:bg-foreground dark:data-[state=checked]:bg-primary-foreground pointer-events-none block size-4 rounded-full ring-0 transition-transform data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0',
+          'bg-background dark:data-[state=unchecked]:bg-foreground dark:data-[state=checked]:bg-primary-foreground pointer-events-none block rounded-full ring-0 transition-transform data-[state=unchecked]:translate-x-0',
+          sizeClasses[size].thumb,
+          sizeClasses[size].translate
         )
       "
     >

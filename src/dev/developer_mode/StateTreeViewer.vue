@@ -162,50 +162,52 @@ watch(
 
 <template>
   <div class="tree-viewer-container" v-if="api.steps">
-    <div class="path-display-container">
-      <div class="path-info">
-        <div class="path-display">{{ api.pathString }}</div>
+    <div :class="{ disabled: api.nSteps === 0 }">
+      <div class="path-display-container">
+        <div class="path-info">
+          <div class="path-display">{{ api.pathString }}</div>
+        </div>
+
+        <TooltipProvider>
+          <ButtonGroup variant="outline" size="menu">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ButtonGroupItem @click="api.goPrevStep()" :disabled="!api.hasSteps()">
+                  <i-lucide-chevron-left />
+                </ButtonGroupItem>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Previous Step</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ButtonGroupItem @click="api.goNextStep()" :disabled="!api.hasSteps()">
+                  <i-lucide-chevron-right />
+                </ButtonGroupItem>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Next Step</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ButtonGroupItem @click="api.goFirstStep()" :disabled="!api.hasSteps()">
+                  <i-famicons-home />
+                </ButtonGroupItem>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">First Step</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ButtonGroupItem @click="api.clear()" :disabled="!api.hasSteps()">
+                  <i-mdi-trash />
+                </ButtonGroupItem>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Clear Steps</TooltipContent>
+            </Tooltip>
+          </ButtonGroup>
+        </TooltipProvider>
       </div>
-
-      <TooltipProvider>
-        <ButtonGroup variant="outline" size="menu">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ButtonGroupItem @click="api.goPrevStep()" :disabled="!api.hasSteps()">
-                <i-lucide-chevron-left />
-              </ButtonGroupItem>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Previous Step</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ButtonGroupItem @click="api.goNextStep()" :disabled="!api.hasSteps()">
-                <i-lucide-chevron-right />
-              </ButtonGroupItem>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Next Step</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ButtonGroupItem @click="api.goFirstStep()" :disabled="!api.hasSteps()">
-                <i-famicons-home />
-              </ButtonGroupItem>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">First Step</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ButtonGroupItem @click="api.clear()" :disabled="!api.hasSteps()">
-                <i-mdi-trash />
-              </ButtonGroupItem>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Clear Steps</TooltipContent>
-          </Tooltip>
-        </ButtonGroup>
-      </TooltipProvider>
     </div>
 
     <div class="tree-container" ref="treeContainer">
@@ -241,9 +243,10 @@ watch(
           </li>
         </ul>
       </div>
-      <div class="tree-viewer-container-empty" v-else>No steps defined</div>
+      <div class="tree-viewer-container-empty disabled" v-else>No steps defined</div>
     </div>
-    <div class="data-container-global">
+
+    <div class="data-container-global" :class="{ disabled: Object.keys(api.persist).length === 0 }">
       <div class="section-title">
         <span>Persisted Vars <span class="data-label">(.persist)</span></span>
         <Button
@@ -257,7 +260,8 @@ watch(
         </Button>
       </div>
       <div class="global-data-display">
-        <DataPathViewer :data="api.persist" />
+        <DataPathViewer :data="api.persist" v-if="Object.keys(api.persist).length !== 0" />
+        <div class="italic text-xs" v-else>No variables persisted</div>
       </div>
     </div>
     <div class="data-container" :class="{ disabled: api.nSteps === 0 }">
@@ -274,7 +278,8 @@ watch(
           <span><FAIcon icon="fa-solid fa-trash" /></span>
         </button>
         -->
-        <DataPathViewer :data="api.stepData" />
+        <DataPathViewer :data="api.stepData" v-if="api.nSteps !== 0" />
+        <div class="italic text-xs" v-else>Data defined on this step</div>
       </div>
     </div>
   </div>
@@ -427,6 +432,16 @@ watch(
 }
 
 .data-container.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.data-container-global.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.disabled {
   opacity: 0.5;
   pointer-events: none;
 }

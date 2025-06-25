@@ -182,7 +182,7 @@ const isLoading = computed(() => {
 }
 
 .sidebar {
-  flex: 0 0 280px;
+  flex: 0 0 300px;
   height: 100%;
   overflow-y: auto;
   border-left: 1px solid var(--border);

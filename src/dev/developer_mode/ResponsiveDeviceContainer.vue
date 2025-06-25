@@ -160,6 +160,7 @@ const toggleRotation = () => {
 const toggleFullscreen = () => {
   api.store.dev.isFullscreen = !api.store.dev.isFullscreen
 }
+const deviceWidthPixels = computed(() => deviceWidth.value + 'px')
 </script>
 
 <template>
@@ -169,48 +170,50 @@ const toggleFullscreen = () => {
   </div>
 
   <!-- Normal device container mode -->
-  <div v-else class="device-container-wrapper">
-    <div class="device-info">
-      <div class="device-controls">
-        <ResponsiveDeviceSelect />
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="xs" @click="toggleRotation">
-                <i-carbon-rotate-counterclockwise-filled :class="{ 'text-blue-400': api.store.dev.isRotated }" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              <p>Rotate device</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <Separator orientation="vertical" />
-        <div class="device-dimensions">{{ deviceWidth }} x {{ deviceHeight }}</div>
+  <div v-else class="device-container-wrapper" :style="containerStyle">
+    <div class="device-content-wrapper">
+      <div class="device-info">
+        <div class="device-controls">
+          <ResponsiveDeviceSelect />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="xs" @click="toggleRotation">
+                  <i-carbon-rotate-counterclockwise-filled :class="{ 'text-blue-400': api.store.dev.isRotated }" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Rotate device</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <Separator orientation="vertical" />
+          <div class="device-dimensions">{{ deviceWidth }} x {{ deviceHeight }}</div>
 
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="xs" @click="toggleFullscreen">
-                <i-ic-outline-fullscreen />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              <p>Fullscreen Mode</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="xs" @click="toggleFullscreen">
+                  <i-ic-outline-fullscreen />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Fullscreen Mode</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </div>
-    </div>
-    <div class="device-wrapper">
-      <div class="device-container" :style="containerStyle">
-        <slot />
-      </div>
+      <div class="device-wrapper">
+        <div class="device-container">
+          <slot />
+        </div>
 
-      <!-- Resize handles -->
-      <div class="resize-handle resize-handle-left" @mousedown="startResize('left', $event)"></div>
-      <div class="resize-handle resize-handle-right" @mousedown="startResize('right', $event)"></div>
-      <div class="resize-handle resize-handle-bottom" @mousedown="startResize('bottom', $event)"></div>
+        <!-- Resize handles -->
+        <div class="resize-handle resize-handle-left" @mousedown="startResize('left', $event)"></div>
+        <div class="resize-handle resize-handle-right" @mousedown="startResize('right', $event)"></div>
+        <div class="resize-handle resize-handle-bottom" @mousedown="startResize('bottom', $event)"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -245,12 +248,48 @@ const toggleFullscreen = () => {
     linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
   background-size: 20px 20px;
   background-position: -1px 0px;
+  overflow-y: scroll;
+  overflow-x: scroll;
+  container-type: inline-size; /* Enable container queries */
+}
+
+.device-content-wrapper {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: center; /* Default: center everything */
   justify-content: flex-start;
-  overflow-y: auto;
-  overflow-x: auto;
+  padding: 20px;
+  background-color: var(--test-background);
+}
+
+/* When container is wide enough, use normal centered layout */
+@container (min-width: 800px) {
+  .device-content-wrapper {
+    align-items: center;
+    padding: 20px;
+  }
+
+  .device-wrapper {
+    justify-content: center;
+    margin-left: 15px;
+  }
+}
+
+/* When container is too narrow, switch to left-anchored layout */
+@container (max-width: 799px) {
+  .device-content-wrapper {
+    align-items: flex-start; /* Left-aligned */
+    margin-left: 0;
+  }
+
+  .device-wrapper {
+    justify-content: flex-start; /* Left align the device container */
+    margin-left: 15px; /* Space for left handle */
+  }
+
+  .device-info {
+    margin-left: 15px; /* Align with device-wrapper's left margin */
+  }
 }
 
 .device-info {
@@ -258,7 +297,6 @@ const toggleFullscreen = () => {
   margin-bottom: 10px;
   font-family: monospace;
   font-size: 14px;
-  margin-top: 10px;
   background-color: var(--background);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -299,10 +337,9 @@ const toggleFullscreen = () => {
 .device-wrapper {
   position: relative;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start; /* Left align the device container */
   align-items: center;
-  background-color: #fff;
-  flex-shrink: 1;
+  background-color: #fff; /* this should be set by a variable */
 }
 
 .device-container {

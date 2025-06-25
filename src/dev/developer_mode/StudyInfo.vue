@@ -15,5 +15,7 @@ const studyinfo = computed(() => {
 </script>
 
 <template>
-  <p class="text-xs font-mono py-2 px-3 border-t border-border" v-html="studyinfo"></p>
+  <div class="w-full bg-muted border-b border-border">
+    <p class="text-xs font-mono py-2 px-3 border-t border-border" v-html="studyinfo"></p>
+  </div>
 </template>
