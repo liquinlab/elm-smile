@@ -21,7 +21,7 @@ const api = useAPI()
               variant="ghost"
               size="icon"
               class="w-8 h-8"
-              :class="{ 'bg-gray-200': api.store.dev.consoleBarTab === 'browse' }"
+              :class="{ 'bg-ring': api.store.dev.consoleBarTab === 'browse' }"
               @click="api.store.dev.consoleBarTab = 'browse'"
             >
               <i-tdesign-data-base-filled />

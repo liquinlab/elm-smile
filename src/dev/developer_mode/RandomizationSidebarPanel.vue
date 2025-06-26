@@ -98,7 +98,13 @@ const getBranchType = (index, total) => {
                 :class="{ 'opacity-50 pointer-events-none': !smilestore.browserPersisted.useSeed }"
               />
             </div>
-            <Button @click="set_seed" :disabled="!smilestore.browserPersisted.useSeed" size="sm" variant="outline">
+            <Button
+              @click="set_seed"
+              :disabled="!smilestore.browserPersisted.useSeed"
+              size="sm"
+              variant="outline"
+              class="font-mono text-xs"
+            >
               Update seed
             </Button>
           </div>

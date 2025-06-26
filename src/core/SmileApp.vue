@@ -91,50 +91,73 @@ const isLoading = computed(() => {
 </script>
 <template>
   <div class="app-container">
-    <!-- Top toolbar - always visible, 39px tall, full width -->
-    <div class="toolbar">
-      <DeveloperNavBar />
+    <!-- Analyze Mode - Clean full-screen dashboard -->
+    <div v-if="api.store.dev.mainView === 'dashboard'" class="analyze-container">
+      <iframe
+        :src="api.getPublicUrl('dashboard.html')"
+        class="dashboard-iframe"
+        frameborder="0"
+        title="Dashboard"
+      ></iframe>
     </div>
 
-    <!-- Middle row - content and sidebar -->
-    <div class="router" v-if="toosmall">
-      <WindowSizerView triggered="true"></WindowSizerView>
+    <!-- Recruit Mode - Clean full-screen recruit page -->
+    <div v-else-if="api.store.dev.mainView === 'recruit'" class="recruit-container">
+      <iframe :src="api.getPublicUrl('recruit.html')" class="recruit-iframe" frameborder="0" title="Recruit"></iframe>
     </div>
-    <div v-else class="content-wrapper">
-      <div class="content-and-console">
-        <!-- Main content - scrollable -->
-        <div class="main-content">
-          <div v-if="isLoading" class="loading-container">
-            <div class="loading-spinner"></div>
-            <p>Loading...</p>
-          </div>
-          <template v-else>
-            <ResponsiveDeviceContainer v-if="shouldUseResponsiveContainer">
-              <StatusBar v-if="showStatusBar" />
-              <router-view />
-            </ResponsiveDeviceContainer>
+
+    <!-- Docs Mode - Clean full-screen documentation -->
+    <div v-else-if="api.store.dev.mainView === 'docs'" class="docs-container">
+      <iframe src="https://smile.gureckislab.org" class="docs-iframe" frameborder="0" title="Documentation"></iframe>
+    </div>
+
+    <!-- Developer Mode - Full interface with toolbar, sidebar, console -->
+    <template v-else>
+      <!-- Top toolbar -->
+      <div class="toolbar">
+        <DeveloperNavBar />
+      </div>
+
+      <!-- Middle row - content and sidebar -->
+      <div class="router" v-if="toosmall">
+        <WindowSizerView triggered="true"></WindowSizerView>
+      </div>
+      <div v-else class="content-wrapper">
+        <div class="content-and-console">
+          <!-- Main content - scrollable -->
+          <div class="main-content">
+            <div v-if="isLoading" class="loading-container">
+              <div class="loading-spinner"></div>
+              <p>Loading...</p>
+            </div>
             <template v-else>
-              <StatusBar v-if="showStatusBar" />
-              <router-view />
+              <ResponsiveDeviceContainer v-if="shouldUseResponsiveContainer">
+                <StatusBar v-if="showStatusBar" />
+                <router-view />
+              </ResponsiveDeviceContainer>
+              <template v-else>
+                <StatusBar v-if="showStatusBar" />
+                <router-view />
+              </template>
             </template>
-          </template>
+          </div>
+
+          <!-- Bottom console - can be toggled -->
+          <Transition name="console-slide">
+            <div v-if="api.config.mode == 'development' && api.store.dev.showConsoleBar" class="console">
+              <DevConsoleBar />
+            </div>
+          </Transition>
         </div>
 
-        <!-- Bottom console - can be toggled -->
-        <Transition name="console-slide">
-          <div v-if="api.config.mode == 'development' && api.store.dev.showConsoleBar" class="console">
-            <DevConsoleBar />
+        <!-- Sidebar - can be toggled, transitions in/out -->
+        <Transition name="sidebar-slide">
+          <div v-if="api.config.mode == 'development' && api.store.dev.showSideBar" class="sidebar">
+            <DevSideBar />
           </div>
         </Transition>
       </div>
-
-      <!-- Sidebar - can be toggled, transitions in/out -->
-      <Transition name="sidebar-slide">
-        <div v-if="api.config.mode == 'development' && api.store.dev.showSideBar" class="sidebar">
-          <DevSideBar />
-        </div>
-      </Transition>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -150,6 +173,24 @@ const isLoading = computed(() => {
   flex-direction: column;
   height: 100vh;
   width: 100%;
+}
+
+.analyze-container {
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.recruit-container {
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.docs-container {
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
 }
 
 .toolbar {
@@ -197,6 +238,35 @@ const isLoading = computed(() => {
   background-color: #adadad;
   overflow: hidden;
   overflow-x: hidden;
+}
+
+.analyze-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+}
+
+.dashboard-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  overflow: hidden;
+}
+
+.recruit-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  overflow: hidden;
+}
+
+.docs-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  overflow: hidden;
 }
 
 /* Transition effects */

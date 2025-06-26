@@ -29,10 +29,6 @@ const props = defineProps({
   class: { type: null, required: false },
 })
 
-const mode = useColorMode()
-const activeItem = ref('DevMode')
-const { setOpen } = useSidebar()
-
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 </script>
@@ -78,13 +74,13 @@ const api = useAPI()
               <SidebarMenuButton
                 class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
                 tooltip="Analyze Data"
-                :isActive="api.store.dev.mainView === 'analyze'"
-                @click="api.store.dev.mainView = 'analyze'"
+                :isActive="api.store.dev.mainView === 'dashboard'"
+                @click="api.store.dev.mainView = 'dashboard'"
               >
-                <i-ix-analyze class="!size-5" :class="{ 'text-chart-1': api.store.dev.mainView === 'analyze' }" />
+                <i-ix-analyze class="!size-5" :class="{ 'text-chart-1': api.store.dev.mainView === 'dashboard' }" />
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <!-- Recruit -->
+            <!-- Recruit 
             <SidebarMenuItem>
               <SidebarMenuButton
                 class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
@@ -95,6 +91,7 @@ const api = useAPI()
                 <i-bxs-megaphone class="!size-5" :class="{ 'text-chart-1': api.store.dev.mainView === 'recruit' }" />
               </SidebarMenuButton>
             </SidebarMenuItem>
+            -->
 
             <!-- Docs -->
             <SidebarMenuItem>

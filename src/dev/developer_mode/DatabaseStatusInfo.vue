@@ -130,6 +130,8 @@ const showServiceSelect = ref(false)
   </table>
 
   <div class="flex justify-end mt-4 mr-4">
-    <Button @click="open_firebase_console(firebase_url)" variant="outline" size="sm"> Browse in Firebase </Button>
+    <Button @click="open_firebase_console(firebase_url)" variant="outline" size="sm" class="text-xs font-mono">
+      Browse in Firebase
+    </Button>
   </div>
 </template>

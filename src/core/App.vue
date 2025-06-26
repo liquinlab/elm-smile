@@ -15,6 +15,9 @@ import 'notivue/animations.css' // Only needed if using built-in animations
 import 'notivue/notification-progress.css'
 import { pastelTheme } from 'notivue'
 
+import { useColorMode } from '@vueuse/core'
+useColorMode()
+
 import DevAppSidebar from '@/dev/DevAppSidebar.vue'
 import { SidebarInset, SidebarProvider } from '@/uikit/components/ui/sidebar'
 /**

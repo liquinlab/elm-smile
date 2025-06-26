@@ -44,13 +44,15 @@ function option_selected(option) {
 </script>
 
 <template>
-  <aside class="w-full h-full flex flex-col" style="background-color: var(--background)">
+  <aside class="w-full h-full flex flex-col database-list-container" style="background-color: var(--background)">
     <!-- Header -->
-    <div v-if="header" class="bg-muted text-gray-600 px-3 py-2 text-xs font-medium border-b border-dev-lines">
+    <div v-if="header" class="bg-muted text-dev-text px-3 py-2 text-xs font-medium border-b border-dev-lines">
       <template v-if="header == '/'">
         <FAIcon icon="fa-solid fa-home" class="mr-1" />
       </template>
-      <template v-else>{{ header }}</template>
+      <template v-else
+        ><span class="font-mono">{{ header }}</span></template
+      >
     </div>
 
     <!-- Menu List -->
@@ -70,10 +72,12 @@ function option_selected(option) {
           <!-- Non-object values (display only) -->
           <div
             v-if="option === null || (typeof option != 'object' && !Array.isArray(option))"
-            class="px-2 py-1.5 text-xs font-mono"
+            class="px-2 py-1.5 text-xs font-mono primitive-item"
           >
-            <span class="font-semibold text-chart2">{{ truncateText(key) }}</span>
-            <span class="text-foreground">: {{ option === null ? 'null' : truncateText(String(option)) }}</span>
+            <span class="font-mono font-semibold text-foreground item-key">{{ truncateText(key) }}</span>
+            <span class="text-foreground item-value"
+              >: {{ option === null ? 'null' : truncateText(String(option)) }}</span
+            >
           </div>
 
           <!-- Object values (clickable) -->
@@ -81,14 +85,14 @@ function option_selected(option) {
             v-else
             @click="option_selected(key)"
             :class="[
-              'w-full text-left px-2 py-1.5 text-xs font-mono rounded transition-colors duration-150',
-              'hover:bg-blue-50 hover:text-blue-700',
+              'w-full text-left px-2 py-1.5 text-xs font-mono rounded transition-colors duration-150 object-item',
+              'hover:bg-ring hover:text-blue-700',
               'focus:outline-none focus:ring-1 focus:ring-blue-300 focus:bg-blue-50',
-              key === props.selected ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'text-gray-700',
+              key === props.selected ? 'bg-blue-100 text-blue-800 border border-muted' : 'text-gray-700',
             ]"
           >
             <div class="flex items-center justify-between">
-              <span class="font-semibold">{{ truncateText(key) }}</span>
+              <span class="font-semibold text-foreground item-key">{{ truncateText(key) }}</span>
               <FAIcon icon="fa-solid fa-angle-right" class="text-gray-400 text-xs" />
             </div>
           </button>
@@ -116,5 +120,39 @@ function option_selected(option) {
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+/* Semantic styling for database list items */
+.item-key {
+  color: #0baac3; /* Blue for keys */
+  font-weight: 400; /* Remove semibold */
+}
+
+.primitive-item .item-value {
+  color: #dda814; /* Orange for primitive values */
+  font-weight: 400; /* Remove semibold */
+}
+
+.object-item .item-key {
+  color: #0baac3; /* Blue for keys in clickable objects */
+  font-weight: 400; /* Remove semibold */
+}
+
+.object-item .item-value {
+  color: #0baac3; /* Blue for clickable object values */
+  font-weight: 400; /* Remove semibold */
+}
+
+/* Selected state styling */
+.database-list-container .bg-blue-100 {
+  background-color: var(--accent);
+}
+
+.database-list-container .text-blue-800 {
+  color: var(--accent-foreground);
+}
+
+.database-list-container .border-blue-200 {
+  border-color: var(--accent);
 }
 </style>

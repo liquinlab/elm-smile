@@ -39,24 +39,24 @@ function filter_log(msg) {
 function getBgClass(msg) {
   switch (msg.type) {
     case 'log':
-      return 'bg-white'
+      return 'bg-background'
     case 'warn':
       return 'bg-yellow-100'
     case 'error':
       return 'bg-red-100'
     case 'debug':
-      return 'bg-gray-100 text-gray-700'
+      return 'bg-muted text-muted-foreground'
     case 'success':
       return 'bg-green-100'
     default:
-      return 'bg-white'
+      return 'bg-background'
   }
 }
 </script>
 <template>
   <!-- content of panel here -->
   <div class="h-full p-0 m-0">
-    <div class="bg-gray-100 border-b border-t border-dev-lines px-3 py-2 font-mono">
+    <div class="bg-muted border-b border-t border-dev-lines px-3 py-2 font-mono">
       <div class="flex items-center justify-end gap-4 text-xs">
         <div class="flex items-center gap-2">
           <Label class="text-xs font-semibold">Since last view:</Label>
@@ -115,7 +115,7 @@ function getBgClass(msg) {
               v-if="filter_log(msg)"
               :class="[
                 getBgClass(msg),
-                'text-xs font-mono p-2 pr-0 border-b border-gray-200 whitespace-pre-wrap break-words max-w-full',
+                'text-xs font-mono p-2 pr-0 border-b border-border whitespace-pre-wrap break-words max-w-full',
               ]"
             >
               <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
@@ -137,7 +137,7 @@ function getBgClass(msg) {
               v-if="filter_log(msg)"
               :class="[
                 getBgClass(msg),
-                'text-xs font-mono p-2 pr-0 border-b border-gray-200 whitespace-pre-wrap break-words max-w-full',
+                'text-xs font-mono p-2 pr-0 border-b border-border whitespace-pre-wrap break-words max-w-full',
               ]"
             >
               <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
@@ -159,41 +159,78 @@ function getBgClass(msg) {
 </template>
 
 <style scoped>
+/* Custom scrollbar styling for better UX */
+.overflow-y-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.overflow-y-scroll::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.overflow-y-scroll::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Theme-aware background colors for log messages */
+.bg-background {
+  background-color: var(--background);
+}
+
+.bg-muted {
+  background-color: var(--muted);
+}
+
+.text-muted-foreground {
+  color: var(--muted-foreground);
+}
+
+.border-border {
+  border-color: var(--border);
+}
+
+/* Legacy styles for backward compatibility - now using theme variables */
 .search {
   max-width: 100px;
 }
+
 .togglebar {
   min-height: 35px;
-  background-color: #eeeeee;
-  border-bottom: 0.05em solid #cbcbcb;
+  background-color: var(--muted);
+  border-bottom: 0.05em solid var(--border);
   padding-bottom: 3px;
   padding-top: 3px;
   width: 100%;
   text-align: right;
 }
+
 .togglebar ul {
   list-style-type: none;
   padding: 0px;
   padding-left: 10px;
 }
+
 .togglebar li {
   display: inline;
   padding: 5px;
   font-size: 0.7em;
 }
-/*
-.togglebar select {
-}
-*/
 
 .columnheader {
-  background: #f4f4f4;
-  color: #858484;
+  background: var(--muted);
+  color: var(--muted-foreground);
   padding: 5px;
   font-size: 0.8em;
   margin-bottom: 10px;
   margin-top: 0px;
 }
+
 .contentpanel {
   padding-left: 0px;
   margin: 0px;
@@ -201,6 +238,7 @@ function getBgClass(msg) {
   margin-bottom: 0px;
   height: 100%;
 }
+
 .scrollablelog {
   height: v-bind(height_pct);
   max-height: 100%;
@@ -214,6 +252,7 @@ function getBgClass(msg) {
   flex-direction: column-reverse;
   box-sizing: border-box;
 }
+
 .menu-list {
   width: 100%;
   max-width: 100%;
@@ -221,32 +260,30 @@ function getBgClass(msg) {
   word-wrap: break-word;
   word-break: break-word;
 }
+
 .menu-list li {
   font-size: 0.7em;
   font-family: monospace;
   padding: 7px;
   padding-right: 0px;
-  border-bottom: 1px solid #f2f2f2;
+  border-bottom: 1px solid var(--border);
   white-space: pre-wrap;
   word-wrap: break-word;
   word-break: break-word;
   max-width: 100%;
   overflow-wrap: break-word;
 }
-.bg-white {
-  background-color: #ffffff;
+
+/* Keep semantic colors for log types but make them theme-aware */
+.bg-yellow-100 {
+  background-color: hsl(48, 96%, 89%);
 }
-.bg-yellow {
-  background-color: #e0deaa;
+
+.bg-red-100 {
+  background-color: hsl(0, 84%, 90%);
 }
-.bg-red {
-  background-color: #e0aaaa;
-}
-.bg-grey {
-  background-color: #d0dadd;
-  color: #505050;
-}
-.bg-green {
-  background-color: rgb(189, 241, 189);
+
+.bg-green-100 {
+  background-color: hsl(142, 76%, 94%);
 }
 </style>
