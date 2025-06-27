@@ -1,5 +1,5 @@
 <script setup>
-import { h, ref } from 'vue'
+import { h, ref, computed } from 'vue'
 import {
   Sidebar,
   SidebarContent,
@@ -31,6 +31,19 @@ const props = defineProps({
 
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
+
+// Add color mode functionality
+
+// Add color mode functionality
+const mode = useColorMode()
+
+// Computed property to bind to the switch
+const isDarkMode = computed({
+  get: () => mode.value === 'dark',
+  set: (value) => {
+    mode.value = value ? 'dark' : 'light'
+  },
+})
 </script>
 
 <template>
@@ -80,6 +93,21 @@ const api = useAPI()
                 <i-ix-analyze class="!size-5" :class="{ 'text-chart-1': api.store.dev.mainView === 'dashboard' }" />
               </SidebarMenuButton>
             </SidebarMenuItem>
+
+            <!-- Present -->
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
+                tooltip="Presentation Mode"
+                :isActive="api.store.dev.mainView === 'presentation'"
+                @click="api.store.dev.mainView = 'presentation'"
+              >
+                <i-uil-presentation-line
+                  class="!size-5"
+                  :class="{ 'text-chart-1': api.store.dev.mainView === 'dashboard' }"
+                />
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             <!-- Recruit 
             <SidebarMenuItem>
               <SidebarMenuButton
@@ -109,6 +137,25 @@ const api = useAPI()
       </SidebarGroup>
     </SidebarContent>
     <SidebarFooter>
+      <!-- color mode toggle -->
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <SidebarMenuButton
+              class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
+              tooltip="Toggle Dark Mode"
+              @click="isDarkMode = !isDarkMode"
+            >
+              <Sun v-if="isDarkMode" class="!size-5" />
+              <Moon v-else class="!size-5" />
+            </SidebarMenuButton>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            <p>{{ isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode' }}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
       <!-- Developer Mode Configuration -->
       <Popover>
         <PopoverTrigger>

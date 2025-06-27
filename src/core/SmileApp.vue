@@ -3,7 +3,7 @@
  * @fileoverview Main SmileApp component that handles the core application layout and mode-specific components
  */
 
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 
 /**
  * Developer mode components for debugging and development tools
@@ -21,7 +21,7 @@ import DevSideBar from '@/dev/developer_mode/DevSideBar.vue'
  * @requires PresentationNavBar Navigation bar for presentation mode
  */
 import PresentationNavBar from '@/dev/presentation_mode/PresentationNavBar.vue'
-
+import PresentationModeView from '@/dev/presentation_mode/PresentationModeView.vue'
 /**
  * Built-in experiment components
  * @requires StatusBar Status bar component
@@ -49,6 +49,18 @@ const api = useAPI()
  * @type {import('vue').Ref<boolean>}
  */
 const toosmall = ref(api.isBrowserTooSmall())
+
+/**
+ * Reactive reference for dashboard iframe URL
+ * @type {import('vue').Ref<string>}
+ */
+const dashboardUrl = ref('')
+
+/**
+ * Reactive reference for dashboard iframe element
+ * @type {import('vue').Ref<HTMLIFrameElement|null>}
+ */
+const dashboardIframe = ref(null)
 
 /**
  * Computed property for console bar height in pixels
@@ -88,16 +100,84 @@ const shouldUseResponsiveContainer = computed(() => {
 const isLoading = computed(() => {
   return api.currentRouteName() === undefined
 })
+
+/**
+ * Initialize dashboard URL from localStorage or default
+ */
+function initializeDashboardUrl() {
+  const savedUrl = localStorage.getItem('smile-dashboard-url')
+  if (savedUrl) {
+    dashboardUrl.value = savedUrl
+  } else {
+    dashboardUrl.value = api.getPublicUrl('dashboard.html')
+  }
+}
+
+/**
+ * Save dashboard URL to localStorage
+ */
+function saveDashboardUrl(url) {
+  localStorage.setItem('smile-dashboard-url', url)
+  dashboardUrl.value = url
+}
+
+/**
+ * Monitor iframe URL changes and persist them
+ */
+function monitorIframeUrl() {
+  if (!dashboardIframe.value) return
+
+  try {
+    // Check if iframe content is accessible (same-origin)
+    const iframeDoc = dashboardIframe.value.contentDocument || dashboardIframe.value.contentWindow?.document
+    if (iframeDoc) {
+      const currentUrl = dashboardIframe.value.contentWindow.location.href
+      if (currentUrl !== dashboardUrl.value) {
+        saveDashboardUrl(currentUrl)
+      }
+    }
+  } catch (error) {
+    // Cross-origin restriction, can't access iframe content
+    console.log('Cannot access iframe content (cross-origin)')
+  }
+}
+
+/**
+ * Set up iframe monitoring when iframe loads
+ */
+function onIframeLoad() {
+  if (!dashboardIframe.value) return
+
+  // Monitor URL changes periodically
+  const interval = setInterval(() => {
+    if (api.store.dev.mainView !== 'dashboard') {
+      clearInterval(interval)
+      return
+    }
+    monitorIframeUrl()
+  }, 1000)
+
+  // Also monitor on focus events
+  if (dashboardIframe.value.contentWindow) {
+    dashboardIframe.value.contentWindow.addEventListener('focus', monitorIframeUrl)
+  }
+}
+
+onMounted(() => {
+  initializeDashboardUrl()
+})
 </script>
 <template>
   <div class="app-container">
     <!-- Analyze Mode - Clean full-screen dashboard -->
     <div v-if="api.store.dev.mainView === 'dashboard'" class="analyze-container">
       <iframe
-        :src="api.getPublicUrl('dashboard.html')"
+        ref="dashboardIframe"
+        :src="dashboardUrl"
         class="dashboard-iframe"
         frameborder="0"
         title="Dashboard"
+        @load="onIframeLoad"
       ></iframe>
     </div>
 
@@ -110,6 +190,19 @@ const isLoading = computed(() => {
     <div v-else-if="api.store.dev.mainView === 'docs'" class="docs-container">
       <iframe src="https://smile.gureckislab.org" class="docs-iframe" frameborder="0" title="Documentation"></iframe>
     </div>
+
+    <!-- Presentation Mode - Clean full-screen presentation -->
+    <template v-else-if="api.store.dev.mainView === 'presentation'">
+      <!-- Top toolbar -->
+      <div class="toolbar">
+        <PresentationNavBar />
+      </div>
+
+      <!-- Middle row - content and sidebar -->
+      <div class="presentation-content-wrapper">
+        <PresentationModeView />
+      </div>
+    </template>
 
     <!-- Developer Mode - Full interface with toolbar, sidebar, console -->
     <template v-else>
@@ -205,6 +298,14 @@ const isLoading = computed(() => {
   display: flex;
   flex: 1;
   overflow: hidden;
+  width: 100%;
+}
+
+.presentation-content-wrapper {
+  display: flex;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
   width: 100%;
 }
 
