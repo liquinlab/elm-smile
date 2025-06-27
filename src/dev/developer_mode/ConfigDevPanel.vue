@@ -154,18 +154,6 @@ function resetDevState() {
           </TooltipProvider>
         </div>
       </div>
-      <div class="relative mt-5">
-        <div class="absolute inset-0 flex items-center">
-          <Separator />
-        </div>
-        <div class="relative flex justify-center text-xs uppercase">
-          <span class="bg-background px-2 text-muted-foreground">UI/UX</span>
-        </div>
-      </div>
-      <div class="grid grid-cols-3 items-center gap-4">
-        <Label for="maxHeight">Dark mode</Label>
-        <Switch id="maxHeight" v-model="isDarkMode" class="col-span-2"> </Switch>
-      </div>
     </div>
     <div class="flex justify-end mt-5">
       <Button variant="outline" size="sm" @click="resetDevState"> Reset to Default </Button>

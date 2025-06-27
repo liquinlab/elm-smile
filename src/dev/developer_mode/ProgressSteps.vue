@@ -85,7 +85,7 @@ const smilestore = useSmileStore()
               ? 'bg-green-200'
               : api.store.browserEphemeral.dbConnected && api.store.browserEphemeral.dbChanges
                 ? 'bg-amber-100'
-                : 'bg-gray-200',
+                : 'bg-muted',
           ]"
         >
           <i-fluent-cloud-sync-24-filled
