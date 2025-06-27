@@ -3,6 +3,8 @@
 
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
+import { Button } from '@/uikit/components/ui/button'
+
 const api = useViewAPI()
 
 // define the trials for the experiment as a spec
@@ -96,39 +98,45 @@ function finish() {
 </script>
 
 <template>
-  <div class="page prevent-select">
+  <div class="flex items-center justify-center select-none py-8">
     <!-- Show this for each trial -->
-    <div class="strooptrial" v-if="api.path[0] == 'stroop'">
-      {{ api.blockIndex }} / {{ api.blockLength }}, {{ api.stepIndex }} / {{ api.nSteps }}
-      <h1 class="title is-1 is-huge" :class="api.stepData.color">{{ api.stepData.word }}</h1>
-      <p id="prompt">Type "R" for Red, "B" for blue, "G" for green.</p>
+    <div class="text-center" v-if="api.path[0] == 'stroop'">
+      <div class="text-sm text-gray-600 mb-4">
+        {{ api.blockIndex }} / {{ api.blockLength }}, {{ api.stepIndex }} / {{ api.nSteps }}
+      </div>
+      <h1
+        class="text-6xl font-bold mb-8"
+        :class="{
+          'text-red-500': api.stepData.color === 'red',
+          'text-blue-500': api.stepData.color === 'blue',
+          'text-green-500': api.stepData.color === 'green',
+        }"
+      >
+        {{ api.stepData.word }}
+      </h1>
+      <p class="text-lg text-gray-700" id="prompt">Type "R" for Red, "B" for blue, "G" for green.</p>
     </div>
 
     <!-- Show this when you are done with the trials and offer a button
          which will advance to the next route -->
-    <div class="endoftask" v-else>
-      <p id="prompt">Thanks! You are finished with this task and can move on.</p>
+    <div class="text-center" v-else>
+      <p class="text-lg text-gray-700 mb-4" id="prompt">Thanks! You are finished with this task and can move on.</p>
       <!-- display the final score -->
-      <p>Your score was {{ api.persist.finalScore.toFixed(2) }}%</p>
-      <button class="button is-success" id="finish" @click="finish()">
-        Continue &nbsp;
-        <FAIcon icon="fa-solid fa-arrow-right" />
-      </button>
+      <p class="text-xl font-semibold text-gray-800 mb-6">Your score was {{ api.persist.finalScore.toFixed(2) }}%</p>
+      <Button variant="default" size="lg" id="finish" @click="finish()">
+        Continue
+        <svg class="w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </Button>
     </div>
   </div>
 </template>
 
 <style scoped>
-/*  pick your colors for the stroop design here */
-.red {
-  color: rgb(240, 75, 75);
-}
-
-.blue {
-  color: rgb(118, 193, 237);
-}
-
-.green {
-  color: rgb(123, 199, 123);
-}
+/* Remove Bulma-specific styles as we're now using Tailwind CSS */
 </style>
