@@ -165,17 +165,17 @@ function getBgClass(msg) {
 }
 
 .overflow-y-scroll::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--scrollbar-track);
   border-radius: 3px;
 }
 
 .overflow-y-scroll::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: var(--scrollbar-thumb);
   border-radius: 3px;
 }
 
 .overflow-y-scroll::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Theme-aware background colors for log messages */

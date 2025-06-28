@@ -302,7 +302,7 @@ const deviceWidthPixels = computed(() => api.store.dev.deviceWidth + 'px')
   display: flex;
   justify-content: flex-start; /* Left align the device container */
   align-items: center;
-  background-color: #fff; /* this should be set by a variable */
+  background-color: var(--background); /* Use theme-aware background color */
 }
 
 .device-container {

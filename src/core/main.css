@@ -93,6 +93,11 @@
   --dev-contrast-text: #4d4d4d;
   --pinned-route: rgb(255, 208, 80);
   --hover-table-row: var(--muted);
+
+  /* Scrollbar colors for light mode */
+  --scrollbar-track: #f1f1f1;
+  --scrollbar-thumb: #c1c1c1;
+  --scrollbar-thumb-hover: #a8a8a8;
 }
 
 .dark {
@@ -137,6 +142,11 @@
   --dev-contrast-text: #4d4d4d;
   --pinned-route: rgb(255, 208, 80);
   --hover-table-row: var(--muted);
+
+  /* Scrollbar colors for dark mode */
+  --scrollbar-track: #2a2a2a;
+  --scrollbar-thumb: #555555;
+  --scrollbar-thumb-hover: #777777;
 }
 
 @layer base {
@@ -146,4 +156,34 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Theme-aware scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
+}
+
+/* Firefox scrollbar styles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
