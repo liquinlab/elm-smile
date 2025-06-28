@@ -74,11 +74,14 @@ const isDarkMode = computed({
             <SidebarMenuItem>
               <SidebarMenuButton
                 class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
-                :isActive="api.store.dev.mainView === 'devmode'"
+                :class="{ 
+                  'bg-chart-4 hover:!bg-chart-4/80': api.store.dev.mainView === 'devmode',
+                  'hover:!bg-sidebar-border': api.store.dev.mainView !== 'devmode'
+                }"
                 tooltip="Developer Mode"
                 @click="api.store.dev.mainView = 'devmode'"
               >
-                <i-lucide-bug-play class="!size-5" :class="{ 'text-chart-1': api.store.dev.mainView === 'devmode' }" />
+                <i-lucide-bug-play class="!size-5" />
               </SidebarMenuButton>
             </SidebarMenuItem>
 
@@ -86,11 +89,14 @@ const isDarkMode = computed({
             <SidebarMenuItem>
               <SidebarMenuButton
                 class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
+                :class="{ 
+                  'bg-chart-4 hover:!bg-chart-4/80': api.store.dev.mainView === 'dashboard',
+                  'hover:!bg-sidebar-border': api.store.dev.mainView !== 'dashboard'
+                }"
                 tooltip="Analyze Data"
-                :isActive="api.store.dev.mainView === 'dashboard'"
                 @click="api.store.dev.mainView = 'dashboard'"
               >
-                <i-ix-analyze class="!size-5" :class="{ 'text-chart-1': api.store.dev.mainView === 'dashboard' }" />
+                <i-ix-analyze class="!size-5" />
               </SidebarMenuButton>
             </SidebarMenuItem>
 
@@ -98,14 +104,14 @@ const isDarkMode = computed({
             <SidebarMenuItem>
               <SidebarMenuButton
                 class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
+                :class="{ 
+                  'bg-chart-4 hover:!bg-chart-4/80': api.store.dev.mainView === 'presentation',
+                  'hover:!bg-sidebar-border': api.store.dev.mainView !== 'presentation'
+                }"
                 tooltip="Presentation Mode"
-                :isActive="api.store.dev.mainView === 'presentation'"
                 @click="api.store.dev.mainView = 'presentation'"
               >
-                <i-uil-presentation-line
-                  class="!size-5"
-                  :class="{ 'text-chart-1': api.store.dev.mainView === 'dashboard' }"
-                />
+                <i-uil-presentation-line class="!size-5" />
               </SidebarMenuButton>
             </SidebarMenuItem>
             <!-- Recruit 
@@ -125,11 +131,14 @@ const isDarkMode = computed({
             <SidebarMenuItem>
               <SidebarMenuButton
                 class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
+                :class="{ 
+                  'bg-chart-4 hover:!bg-chart-4/80': api.store.dev.mainView === 'docs',
+                  'hover:!bg-sidebar-border': api.store.dev.mainView !== 'docs'
+                }"
                 tooltip="Documentation"
-                :isActive="api.store.dev.mainView === 'docs'"
                 @click="api.store.dev.mainView = 'docs'"
               >
-                <i-lucide-book-marked class="!size-5" :class="{ 'text-chart-1': api.store.dev.mainView === 'docs' }" />
+                <i-lucide-book-marked class="!size-5" />
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

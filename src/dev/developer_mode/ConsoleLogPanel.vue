@@ -55,7 +55,7 @@ function getBgClass(msg) {
 </script>
 <template>
   <!-- content of panel here -->
-  <div class="h-full p-0 m-0">
+  <div class="h-full p-0 m-0 overflow-hidden">
     <div class="bg-muted border-b border-t border-dev-lines px-3 py-2 font-mono">
       <div class="flex items-center justify-end gap-4 text-xs">
         <div class="flex items-center gap-2">
@@ -105,51 +105,61 @@ function getBgClass(msg) {
     </div>
 
     <div
-      class="w-full max-w-full m-0 overflow-hidden overflow-y-scroll flex flex-col-reverse box-border"
+      class="w-full overflow-hidden overflow-y-scroll flex flex-col-reverse box-border"
       :style="{ height: height_pct }"
     >
-      <div class="w-full max-w-full">
-        <ul v-if="api.store.dev.lastViewLimit" class="w-full max-w-full">
+      <div class="w-full min-w-0">
+        <ul v-if="api.store.dev.lastViewLimit" class="w-full min-w-0">
           <template v-for="msg in log.page_history">
             <li
               v-if="filter_log(msg)"
               :class="[
                 getBgClass(msg),
-                'text-xs font-mono p-2 pr-0 border-b border-border whitespace-pre-wrap break-words max-w-full',
+                'text-xs font-mono p-2 pr-0 border-b border-border whitespace-pre-wrap break-words break-all min-w-0 w-full',
               ]"
             >
-              <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
-              <FAIcon icon="fa-solid fa-database" v-else-if="msg.message.includes('SMILESTORE')" />
-              <FAIcon icon="fa-solid fa-gear" v-else-if="msg.message.includes('DEV MODE')" />
-              <FAIcon icon="fa-solid fa-clock" v-else-if="msg.message.includes('TIMELINE STEPPER')" />
-              <FAIcon icon="fa-regular fa-clock" v-else-if="msg.message.includes('TRIAL STEPPER')" />
-              <img src="/src/assets/dev/firebase-bw.svg" width="15" v-else-if="msg.message.includes('FIRESTORE')" />
-              <FAIcon icon="fa-solid fa-angle-right" v-else />
-              &nbsp;{{ msg.time }} <span class="font-semibold">{{ msg.message }}</span> <br />&nbsp;&nbsp;{{
-                msg.trace
-              }}
+              <div class="flex items-start gap-1 min-w-0">
+                <div class="flex-shrink-0 mt-0.5">
+                  <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
+                  <FAIcon icon="fa-solid fa-database" v-else-if="msg.message.includes('SMILESTORE')" />
+                  <FAIcon icon="fa-solid fa-gear" v-else-if="msg.message.includes('DEV MODE')" />
+                  <FAIcon icon="fa-solid fa-clock" v-else-if="msg.message.includes('TIMELINE STEPPER')" />
+                  <FAIcon icon="fa-regular fa-clock" v-else-if="msg.message.includes('TRIAL STEPPER')" />
+                  <img src="/src/assets/dev/firebase-bw.svg" width="15" v-else-if="msg.message.includes('FIRESTORE')" />
+                  <FAIcon icon="fa-solid fa-angle-right" v-else />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="font-semibold break-words break-all">{{ msg.time }} {{ msg.message }}</div>
+                  <div class="break-words break-all text-xs opacity-75">{{ msg.trace }}</div>
+                </div>
+              </div>
             </li>
           </template>
         </ul>
-        <ul v-else class="w-full max-w-full">
+        <ul v-else class="w-full min-w-0">
           <template v-for="msg in log.history">
             <li
               v-if="filter_log(msg)"
               :class="[
                 getBgClass(msg),
-                'text-xs font-mono p-2 pr-0 border-b border-border whitespace-pre-wrap break-words max-w-full',
+                'text-xs font-mono p-2 pr-0 border-b border-border whitespace-pre-wrap break-words break-all min-w-0 w-full',
               ]"
             >
-              <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
-              <FAIcon icon="fa-solid fa-database" v-else-if="msg.message.includes('SMILESTORE')" />
-              <FAIcon icon="fa-solid fa-gear" v-else-if="msg.message.includes('DEV MODE')" />
-              <FAIcon icon="fa-solid fa-clock" v-else-if="msg.message.includes('TIMELINE STEPPER')" />
-              <FAIcon icon="fa-regular fa-clock" v-else-if="msg.message.includes('TRIAL STEPPER')" />
-              <img src="/src/assets/dev/firebase-bw.svg" width="15" v-else-if="msg.message.includes('FIRESTORE')" />
-              <FAIcon icon="fa-solid fa-angle-right" v-else />
-              &nbsp;{{ msg.time }} <span class="font-semibold">{{ msg.message }}</span> <br />&nbsp;&nbsp;{{
-                msg.trace
-              }}
+              <div class="flex items-start gap-1 min-w-0">
+                <div class="flex-shrink-0 mt-0.5">
+                  <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
+                  <FAIcon icon="fa-solid fa-database" v-else-if="msg.message.includes('SMILESTORE')" />
+                  <FAIcon icon="fa-solid fa-gear" v-else-if="msg.message.includes('DEV MODE')" />
+                  <FAIcon icon="fa-solid fa-clock" v-else-if="msg.message.includes('TIMELINE STEPPER')" />
+                  <FAIcon icon="fa-regular fa-clock" v-else-if="msg.message.includes('TRIAL STEPPER')" />
+                  <img src="/src/assets/dev/firebase-bw.svg" width="15" v-else-if="msg.message.includes('FIRESTORE')" />
+                  <FAIcon icon="fa-solid fa-angle-right" v-else />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="font-semibold break-words break-all">{{ msg.time }} {{ msg.message }}</div>
+                  <div class="break-words break-all text-xs opacity-75">{{ msg.trace }}</div>
+                </div>
+              </div>
             </li>
           </template>
         </ul>
@@ -193,85 +203,6 @@ function getBgClass(msg) {
 
 .border-border {
   border-color: var(--border);
-}
-
-/* Legacy styles for backward compatibility - now using theme variables */
-.search {
-  max-width: 100px;
-}
-
-.togglebar {
-  min-height: 35px;
-  background-color: var(--muted);
-  border-bottom: 0.05em solid var(--border);
-  padding-bottom: 3px;
-  padding-top: 3px;
-  width: 100%;
-  text-align: right;
-}
-
-.togglebar ul {
-  list-style-type: none;
-  padding: 0px;
-  padding-left: 10px;
-}
-
-.togglebar li {
-  display: inline;
-  padding: 5px;
-  font-size: 0.7em;
-}
-
-.columnheader {
-  background: var(--muted);
-  color: var(--muted-foreground);
-  padding: 5px;
-  font-size: 0.8em;
-  margin-bottom: 10px;
-  margin-top: 0px;
-}
-
-.contentpanel {
-  padding-left: 0px;
-  margin: 0px;
-  margin-right: 0px;
-  margin-bottom: 0px;
-  height: 100%;
-}
-
-.scrollablelog {
-  height: v-bind(height_pct);
-  max-height: 100%;
-  width: 100%;
-  max-width: 100%;
-  margin: 0px;
-  margin-top: 0px;
-  overflow: hidden;
-  overflow-y: scroll;
-  display: flex;
-  flex-direction: column-reverse;
-  box-sizing: border-box;
-}
-
-.menu-list {
-  width: 100%;
-  max-width: 100%;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
-}
-
-.menu-list li {
-  font-size: 0.7em;
-  font-family: monospace;
-  padding: 7px;
-  padding-right: 0px;
-  border-bottom: 1px solid var(--border);
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  word-break: break-word;
-  max-width: 100%;
-  overflow-wrap: break-word;
 }
 
 /* Keep semantic colors for log types but make them theme-aware */

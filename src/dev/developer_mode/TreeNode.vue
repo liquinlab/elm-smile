@@ -110,6 +110,7 @@ const getChildVerticalLines = (verticalLines, index, total) => {
 .tree-line:hover {
   background-color: rgba(0, 0, 0, 0.03);
   border-radius: 10px;
+  margin-right: 70px;
 }
 
 .node-selected {
@@ -117,6 +118,10 @@ const getChildVerticalLines = (verticalLines, index, total) => {
   color: black;
   border-radius: 10px;
   margin-right: 70px;
+}
+
+.node-selected:hover {
+  background-color: rgba(146, 249, 224, 0.5);
 }
 
 .vertical-lines {

@@ -114,14 +114,14 @@ function resetDevState() {
         </div>
       </div>
       <div class="flex-1 grid grid-cols-3 gap-0 bg-gray-50 overflow-hidden">
-        <div class="border-r border-gray-200 bg-gray-50 h-full overflow-hidden">
+        <div class="border-r border-dev-lines h-full overflow-hidden">
           <ConfigList
             :data="panel_path(2)"
             :selected="browse_panels.path[browse_panels.path.length - 2]"
             @selected="panel1_select"
           />
         </div>
-        <div class="border-r border-gray-200 bg-gray-50 h-full overflow-hidden">
+        <div class="border-r border-dev-lines h-full overflow-hidden">
           <ConfigList
             :data="panel_path(1)"
             :selected="browse_panels.path[browse_panels.path.length - 1]"

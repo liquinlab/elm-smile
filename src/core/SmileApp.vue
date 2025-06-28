@@ -314,6 +314,8 @@ onMounted(() => {
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .main-content {
@@ -323,6 +325,7 @@ onMounted(() => {
   overflow-y: auto;
   overflow-x: auto;
   min-height: 0;
+  min-width: 0;
 }
 
 .sidebar {
@@ -339,6 +342,8 @@ onMounted(() => {
   background-color: #adadad;
   overflow: hidden;
   overflow-x: hidden;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .analyze-content {

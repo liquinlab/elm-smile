@@ -44,7 +44,7 @@ function option_selected(option) {
 </script>
 
 <template>
-  <aside class="w-full h-full flex flex-col config-list-container" style="background-color: var(--background)">
+  <aside class="w-full h-full flex flex-col config-list-container bg-background" >
     <!-- Header -->
     <div v-if="header" class="bg-muted text-dev-text px-3 py-2 text-xs font-medium border-b border-dev-lines">
       <template v-if="header == '/'">
