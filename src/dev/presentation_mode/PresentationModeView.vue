@@ -72,8 +72,8 @@ function getAffiliationIndex(affiliation) {
 <template>
   <div class="min-h-screen bg-background">
     <!-- Header Section -->
-    <header class="bg-muted/50 border-b">
-      <div class="w-2/3 mx-auto px-6 py-16">
+    <header class="bg-muted/50 border-b py-6">
+      <div class="w-2/3 mx-auto px-6 py-8">
         <h1 class="text-5xl font-bold text-foreground mb-4 leading-tight">
           {{ title }}
         </h1>
@@ -88,10 +88,10 @@ function getAffiliationIndex(affiliation) {
       <div class="w-2/3 mx-auto px-6 py-8">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
           <!-- Authors -->
-          <div class="md:col-span-3">
+          <div class="md:col-span-2">
             <h3 class="text-[0.65rem] font-extralight uppercase tracking-widest text-muted-foreground mb-4">Authors</h3>
             <div class="space-y-2">
-              <div v-for="(author, index) in projectauthors" :key="index" class="text-[0.8rem]">
+              <div v-for="(author, index) in projectauthors" :key="index" class="text-[0.9rem]">
                 <template v-if="author.link">
                   <a
                     :href="author.link"
@@ -116,12 +116,12 @@ function getAffiliationIndex(affiliation) {
           </div>
 
           <!-- Affiliations -->
-          <div class="md:col-span-4">
+          <div class="md:col-span-3">
             <h3 class="text-[0.65rem] font-extralight uppercase tracking-widest text-muted-foreground mb-4">
               Affiliations
             </h3>
-            <div class="space-y-2">
-              <div v-for="(aff, index) in uniqueAffiliations" :key="index" class="text-[0.8rem]">
+            <div class="space-y-3">
+              <div v-for="(aff, index) in uniqueAffiliations" :key="index" class="text-[0.9rem]">
                 <sup class="text-xs">{{ index + 1 }}</sup
                 >&nbsp;{{ aff }}
               </div>
@@ -133,17 +133,17 @@ function getAffiliationIndex(affiliation) {
             <h3 class="text-[0.65rem] font-extralight uppercase tracking-widest text-muted-foreground mb-4">
               Last Updated
             </h3>
-            <p class="text-[0.8rem] text-foreground">{{ lastupdated }}</p>
+            <p class="text-[0.9rem] text-foreground">{{ lastupdated }}</p>
           </div>
 
           <!-- Project Info -->
-          <div class="md:col-span-3">
+          <div class="md:col-span-4">
             <div class="space-y-4">
               <div v-for="item in info" :key="item.title">
                 <h3 class="text-[0.65rem] font-extralight uppercase tracking-widest text-muted-foreground mb-2">
                   {{ item.title }}
                 </h3>
-                <div class="text-[0.8rem]">
+                <div class="text-[0.9rem]">
                   <a
                     v-if="item.link"
                     :href="item.link"
