@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
+import { Button } from '@/uikit/components/ui/button'
 const api = useViewAPI()
 
 const cond = api.getConditionByName('instructionsVersion')
@@ -27,13 +28,15 @@ function finish(goto) {
 </script>
 
 <template>
-  <div class="page prevent-select">
-    <h1 class="title is-3">Instructions</h1>
-    <p class="has-text-center is-size-5">{{ instText }}</p>
-    <hr />
-    <button class="button is-success" id="finish" @click="finish()">
-      next &nbsp;
-      <FAIcon icon="fa-solid fa-arrow-right" />
-    </button>
+  <div class="page select-none">
+    <h1 class="text-2xl font-bold mb-4">Instructions</h1>
+    <p class="text-center text-lg mb-4">{{ instText }}</p>
+    <hr class="border-gray-300 my-4" />
+    <div class="flex justify-end">
+      <Button variant="default" @click="finish()">
+        next
+        <FAIcon icon="fa-solid fa-arrow-right" />
+      </Button>
+    </div>
   </div>
 </template>

@@ -7,66 +7,66 @@ api.saveData(true) // force a data save
 </script>
 
 <template>
-  <div class="page prevent-select">
-    <div class="withdraw" v-if="api.getRecruitmentService() == 'prolific'">
-      <h1 class="title is-3 has-text-danger">You have successfully withdrawn from the study.</h1>
-      <article class="message is-danger" v-if="api.store.browserPersisted.withdrawn">
-        <div class="message-header">
+  <div class="page select-none">
+    <div class="w-3/5 mx-auto" v-if="api.getRecruitmentService() == 'prolific'">
+      <h1 class="text-2xl font-bold text-red-600 mb-4">You have successfully withdrawn from the study.</h1>
+      <article class="border border-red-300 rounded bg-red-50" v-if="api.store.browserPersisted.withdrawn">
+        <div class="bg-red-500 text-white px-3 py-2 text-sm font-medium border-b border-red-300">
           <p>Notice about withdraw from our Prolific study</p>
         </div>
-        <div class="message-body has-text-left">
+        <div class="p-3 text-left text-red-800">
           You have indicated that you withdrew from the study. Please return the task and we will contact you for
           partial payment if you are eligible.
         </div>
       </article>
     </div>
 
-    <div class="withdraw" v-if="api.getRecruitmentService() == 'cloudresearch'">
-      <h1 class="title is-3 has-text-danger">You have successfully withdrawn from the study.</h1>
-      <article class="message is-danger" v-if="api.store.browserPersisted.withdrawn">
-        <div class="message-header">
+    <div class="w-3/5 mx-auto" v-if="api.getRecruitmentService() == 'cloudresearch'">
+      <h1 class="text-2xl font-bold text-red-600 mb-4">You have successfully withdrawn from the study.</h1>
+      <article class="border border-red-300 rounded bg-red-50" v-if="api.store.browserPersisted.withdrawn">
+        <div class="bg-red-500 text-white px-3 py-2 text-sm font-medium border-b border-red-300">
           <p>Notice about withdraw from our CloudResearch study</p>
         </div>
-        <div class="message-body has-text-left">
+        <div class="p-3 text-left text-red-800">
           You have indicated that you withdrew from the study. Please return the task and we will contact you for
           partial payment if you are eligible.
         </div>
       </article>
     </div>
 
-    <div class="withdraw" v-if="api.getRecruitmentService() == 'mturk'">
-      <h1 class="title is-3 has-text-danger">You have successfully withdrawn from the study.</h1>
-      <article class="message is-danger" v-if="api.store.browserPersisted.withdrawn">
-        <div class="message-header">
+    <div class="w-3/5 mx-auto" v-if="api.getRecruitmentService() == 'mturk'">
+      <h1 class="text-2xl font-bold text-red-600 mb-4">You have successfully withdrawn from the study.</h1>
+      <article class="border border-red-300 rounded bg-red-50" v-if="api.store.browserPersisted.withdrawn">
+        <div class="bg-red-500 text-white px-3 py-2 text-sm font-medium border-b border-red-300">
           <p>Notice about withdraw from our Amazon Mechanical Turk study</p>
         </div>
-        <div class="message-body has-text-left">
+        <div class="p-3 text-left text-red-800">
           You have indicated that you withdrew from the study. Please return the task and we will contact you for
           partial payment if you are eligible.
         </div>
       </article>
     </div>
 
-    <div class="withdraw" v-if="api.getRecruitmentService() == 'citizensci'">
-      <h1 class="title is-3 has-text-danger">You have successfully withdrawn from the study.</h1>
-      <article class="message is-danger" v-if="api.store.browserPersisted.withdrawn">
-        <div class="message-header">
+    <div class="w-3/5 mx-auto" v-if="api.getRecruitmentService() == 'citizensci'">
+      <h1 class="text-2xl font-bold text-red-600 mb-4">You have successfully withdrawn from the study.</h1>
+      <article class="border border-red-300 rounded bg-red-50" v-if="api.store.browserPersisted.withdrawn">
+        <div class="bg-red-500 text-white px-3 py-2 text-sm font-medium border-b border-red-300">
           <p>Notice about withdraw from our study</p>
         </div>
-        <div class="message-body has-text-left">
+        <div class="p-3 text-left text-red-800">
           You have indicated that you withdrew from the study. Please return the task and we will contact you for
           partial payment if you are eligible.
         </div>
       </article>
     </div>
 
-    <div class="withdraw" v-if="api.getRecruitmentService() == 'web'">
-      <h1 class="title is-3 has-text-danger">You have successfully withdrawn from the study.</h1>
-      <article class="message is-danger" v-if="api.store.browserPersisted.withdrawn">
-        <div class="message-header">
+    <div class="w-3/5 mx-auto" v-if="api.getRecruitmentService() == 'web'">
+      <h1 class="text-2xl font-bold text-red-600 mb-4">You have successfully withdrawn from the study.</h1>
+      <article class="border border-red-300 rounded bg-red-50" v-if="api.store.browserPersisted.withdrawn">
+        <div class="bg-red-500 text-white px-3 py-2 text-sm font-medium border-b border-red-300">
           <p>Notice about withdraw from our web study</p>
         </div>
-        <div class="message-body has-text-left">
+        <div class="p-3 text-left text-red-800">
           You have indicated that you withdrew from the study. Please return the task and we will contact you for
           partial payment if you are eligible.
         </div>
@@ -74,10 +74,3 @@ api.saveData(true) // force a data save
     </div>
   </div>
 </template>
-
-<style scoped>
-.withdraw {
-  width: 60%;
-  margin: auto;
-}
-</style>

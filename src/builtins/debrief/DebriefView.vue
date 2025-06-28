@@ -2,6 +2,7 @@
 //import DebriefText from '@/user/components/DebriefText.vue' // get access to the global store
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
+import { Button } from '@/uikit/components/ui/button'
 const api = useViewAPI()
 
 const props = defineProps({
@@ -18,11 +19,13 @@ function finish() {
 </script>
 
 <template>
-  <div class="page prevent-select">
+  <div class="page select-none">
     <component :is="debriefText" />
-    <button class="button is-success" id="finish" @click="finish()">
-      next &nbsp;
-      <FAIcon icon="fa-solid fa-arrow-right" />
-    </button>
+    <div class="flex justify-end mt-4">
+      <Button variant="default" @click="finish()">
+        next
+        <FAIcon icon="fa-solid fa-arrow-right" />
+      </Button>
+    </div>
   </div>
 </template>

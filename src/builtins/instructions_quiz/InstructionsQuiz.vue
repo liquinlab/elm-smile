@@ -1,6 +1,8 @@
 <script setup>
 import { reactive, computed, ref, onMounted, nextTick } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
+import { Button } from '@/uikit/components/ui/button'
+import { Checkbox } from '@/uikit/components/ui/checkbox'
 const api = useViewAPI()
 
 // read in props
@@ -97,7 +99,7 @@ const currentPageComplete = computed(() => {
   return api.stepData.questions.every((question) => {
     if ('answer' in question) {
       // For multiselect, ensure at least one option is selected
-      if (question.multiselect) {
+      if (question.multiSelect) {
         return Array.isArray(question.answer) && question.answer.length > 0
       }
       return true
@@ -134,90 +136,130 @@ init()
 </script>
 
 <template>
-  <div class="page prevent-select">
-    <div class="formcontent">
+  <div class="page select-none">
+    <div class="w-4/5 mx-auto mb-10 pb-52 text-left">
       <!-- Replace the two quiz page sections with this single dynamic one -->
-      <div class="formstep" v-if="api.stepIndex < qs.length && /^pages\/pg\d+$/.test(api.pathString)">
-        <div class="formheader">
-          <h3 class="is-size-3 has-text-weight-bold">
+      <div class="mt-10" v-if="api.stepIndex < qs.length && /^pages\/pg\d+$/.test(api.pathString)">
+        <div class="mb-10">
+          <h3 class="text-2xl font-bold mb-4">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
           </h3>
-          <p class="is-size-6">
+          <p class="text-sm">
             Using the information provided in the previous pages, please select the correct answer for each question. Do
             your best! If anything is unclear you can review the instructions again after you submit your response.
           </p>
         </div>
-        <div class="columns">
-          <div class="column is-one-third">
-            <div class="formsectionexplainer">
-              <h3 class="is-size-6 has-text-weight-bold">Test your understanding</h3>
-              <p class="is-size-6">You must answer all the questions in order to move on.</p>
+        <div class="flex gap-6">
+          <div class="w-1/3">
+            <div class="text-left text-gray-600">
+              <h3 class="text-sm font-bold mb-2">Test your understanding</h3>
+              <p class="text-sm">You must answer all the questions in order to move on.</p>
             </div>
           </div>
-          <div class="column">
-            <div class="box is-shadowless formbox">
-              <div v-for="(question, index) in api.stepData.questions" :key="question.id" class="mb-5">
-                <FormKit
-                  :type="question.multiSelect ? 'checkbox' : 'select'"
-                  :label="question.question"
-                  :name="question.id"
-                  :placeholder="question.multiSelect ? 'Select options' : 'Select option'"
+          <div class="flex-1">
+            <div class="border border-gray-300 text-left bg-gray-50 p-6 rounded">
+              <div v-for="(question, index) in api.stepData.questions" :key="question.id" class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                  {{ question.question }}
+                </label>
+
+                <!-- Multi-select checkbox -->
+                <div v-if="question.multiSelect" class="space-y-3">
+                  <div
+                    v-for="(answer, answerIndex) in question.answers"
+                    :key="answerIndex"
+                    class="flex items-center space-x-2"
+                  >
+                    <Checkbox
+                      :id="`${question.id}-${answerIndex}`"
+                      :checked="
+                        Array.isArray(api.stepData.questions[index].answer) &&
+                        api.stepData.questions[index].answer.includes(answer)
+                      "
+                      @update:checked="
+                        (checked) => {
+                          // Initialize answer as array if it doesn't exist or isn't an array
+                          if (
+                            !api.stepData.questions[index].answer ||
+                            !Array.isArray(api.stepData.questions[index].answer)
+                          ) {
+                            api.stepData.questions[index].answer = []
+                          }
+
+                          // Create a new array to ensure reactivity
+                          const currentAnswers = [...api.stepData.questions[index].answer]
+
+                          if (checked) {
+                            if (!currentAnswers.includes(answer)) {
+                              currentAnswers.push(answer)
+                            }
+                          } else {
+                            const answerIndex = currentAnswers.indexOf(answer)
+                            if (answerIndex > -1) {
+                              currentAnswers.splice(answerIndex, 1)
+                            }
+                          }
+
+                          // Update the reactive data
+                          api.stepData.questions[index].answer = currentAnswers
+                        }
+                      "
+                    />
+                    <label :for="`${question.id}-${answerIndex}`" class="text-sm text-gray-700 cursor-pointer">
+                      {{ answer }}
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Single select dropdown -->
+                <select
+                  v-else
                   v-model="api.stepData.questions[index].answer"
-                  :options="question.answers"
-                  validation="required"
-                  :multiple="question.multiSelect"
-                />
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Select an option</option>
+                  <option v-for="answer in question.answers" :key="answer" :value="answer">
+                    {{ answer }}
+                  </option>
+                </select>
               </div>
-              <hr />
-              <div class="columns">
-                <div class="column">
-                  <div class="has-text-left">
-                    <button v-if="api.stepIndex >= 1" class="button is-warning" @click="api.goPrevStep()">
-                      <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous page
-                    </button>
-                  </div>
-                </div>
-                <div class="column">
-                  <div class="has-text-right">
-                    <button
-                      v-if="currentPageComplete"
-                      :class="['button', api.isLastBlockStep() ? 'is-success' : 'is-warning']"
-                      @click="api.isLastBlockStep() ? submitQuiz() : api.goNextStep()"
-                    >
-                      {{ api.isLastBlockStep() ? 'Submit' : 'Next page' }}
-                      <template v-if="!api.isLastBlockStep()">
-                        &nbsp;<FAIcon icon="fa-solid fa-arrow-right" />
-                      </template>
-                    </button>
-                  </div>
-                </div>
+
+              <hr class="border-gray-300 my-6" />
+
+              <div class="flex justify-between">
+                <Button variant="outline" v-if="api.stepIndex >= 1" @click="api.goPrevStep()">
+                  <FAIcon icon="fa-solid fa-arrow-left" />
+                  Previous page
+                </Button>
+                <Button
+                  v-if="currentPageComplete"
+                  :variant="api.isLastBlockStep() ? 'default' : 'outline'"
+                  @click="api.isLastBlockStep() ? submitQuiz() : api.goNextStep()"
+                >
+                  {{ api.isLastBlockStep() ? 'Submit' : 'Next page' }}
+                  <FAIcon v-if="!api.isLastBlockStep()" icon="fa-solid fa-arrow-right" />
+                </Button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="formstep" v-else-if="api.pathString === 'feedback/success'">
-        <div class="formheader">
-          <h3 class="is-size-3 has-text-weight-bold has-text-centered">
-            <FAIcon icon="fa-solid fa-square-check" />&nbsp;Congrats! You passed.
-          </h3>
-          <p class="is-size-5 has-text-centered">Click here to begin the next phase of the experiment.</p>
-        </div>
-        <div class="has-text-centered">
-          <button class="button is-warning" @click="finish">Let's begin.</button>
+      <div class="mt-10" v-else-if="api.pathString === 'feedback/success'">
+        <div class="text-center">
+          <h3 class="text-2xl font-bold mb-4"><FAIcon icon="fa-solid fa-square-check" />&nbsp;Congrats! You passed.</h3>
+          <p class="text-lg mb-6">Click here to begin the next phase of the experiment.</p>
+          <Button variant="outline" @click="finish">Let's begin.</Button>
         </div>
       </div>
 
-      <div class="formstep" v-else-if="api.pathString === 'feedback/retry'">
-        <div class="formheader">
-          <h3 class="is-size-3 has-text-weight-bold has-text-centered">
+      <div class="mt-10" v-else-if="api.pathString === 'feedback/retry'">
+        <div class="text-center">
+          <h3 class="text-2xl font-bold mb-4">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Sorry! You did not get all the answers correct.
           </h3>
-          <p class="is-size-5 has-text-centered">Please re-read the instructions and try again.</p>
-        </div>
-        <div class="has-text-centered">
-          <button class="button is-warning" @click="returnInstructions">Back to Instructions</button>
+          <p class="text-lg mb-6">Please re-read the instructions and try again.</p>
+          <Button variant="outline" @click="returnInstructions">Back to Instructions</Button>
         </div>
       </div>
     </div>

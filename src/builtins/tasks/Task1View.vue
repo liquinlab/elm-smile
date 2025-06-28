@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
+import { Button } from '@/uikit/components/ui/button'
 const api = useViewAPI()
 const ntrials = ref(1)
 
@@ -12,10 +13,10 @@ function finish() {
 </script>
 
 <template>
-  <div class="page prevent-select">
-    <h1 class="title is-3">Task 1</h1>
+  <div class="page select-none">
+    <h1 class="text-2xl font-bold mb-4">Task 1</h1>
 
-    <div class="formcontent">
+    <div class="w-1/4 mx-auto mb-10 pb-52 text-left">
       <FormKit
         type="text"
         name="zipcode"
@@ -26,28 +27,12 @@ function finish() {
         help="How many trials do you want to do?"
       />
 
-      <div class="formbutton">
-        <button class="button is-success" id="finish" @click="finish()">
-          next &nbsp;
+      <div class="mt-4 pt-2.5 text-right">
+        <Button variant="default" @click="finish()">
+          next
           <FAIcon icon="fa-solid fa-arrow-right" />
-        </button>
+        </Button>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.formcontent {
-  width: 25%;
-  margin: auto;
-  margin-bottom: 40px;
-  padding-bottom: 200px;
-  text-align: left;
-}
-
-.formbutton {
-  margin-top: 1px solid #ccc;
-  padding-top: 10px;
-  text-align: right;
-}
-</style>

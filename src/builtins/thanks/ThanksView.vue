@@ -8,6 +8,7 @@ import stringify from 'json-stable-stringify'
 
 import useAPI from '@/core/composables/useAPI'
 import appconfig from '@/core/config'
+import { Button } from '@/uikit/components/ui/button'
 const api = useAPI()
 
 api.saveData(true) // force a data save
@@ -51,82 +52,86 @@ clipboard.on('success', (e) => {
 </script>
 
 <template>
-  <div class="page prevent-select">
-    <h1 class="title is-3">
-      <FAIcon icon="fa-solid fa-square-check" />
-    </h1>
-
-    <div class="payment" v-if="api.getRecruitmentService() == 'prolific'">
-      <h1 class="title is-3">Thanks, let's begin the payment process!</h1>
-      <p class="has-text-left pb-5">
+  <div class="page select-none">
+    <div class="w-3/5 mx-auto" v-if="api.getRecruitmentService() == 'prolific'">
+      <h1 class="text-2xl font-bold mb-4">
+        <FAIcon icon="fa-solid fa-square-check" />
+        Thanks, let's begin the payment process!
+      </h1>
+      <p class="text-left pb-5 mb-4">
         Please click the button below to begin the process of payment. This will notify Prolific you successfully
         completed the task. Your work will be approved within several hours and any performance related bonuses will be
         assigned at that time. We really appreciate your time.
       </p>
-      <hr />
-      <a :href="`https://app.prolific.co/submissions/complete?cc=${completionCode}`" class="button is-info"
-        >Submit my work to Prolific &nbsp;
+      <hr class="border-gray-300 my-4" />
+      <Button variant="default" as="a" :href="`https://app.prolific.co/submissions/complete?cc=${completionCode}`">
+        Submit my work to Prolific
         <FAIcon icon="fa-solid fa-arrow-right" />
-      </a>
+      </Button>
     </div>
-    <div class="payment" v-if="api.getRecruitmentService() == 'cloudresearch'">
-      <h1 class="title is-3">Thanks, let's begin the payment process!</h1>
-      <p class="has-text-left pb-5">
+    <div class="w-3/5 mx-auto" v-if="api.getRecruitmentService() == 'cloudresearch'">
+      <h1 class="text-2xl font-bold mb-4">
+        <FAIcon icon="fa-solid fa-square-check" />
+        Thanks, let's begin the payment process!
+      </h1>
+      <p class="text-left pb-5 mb-4">
         Please copy the code displayed below (or click the button) and paste it into the Mechanical Turk window to begin
         the process of payment. Your work will be approved within several hours and any performance related bonuses will
         be assigned at that time. We really appreciate your time.
       </p>
-      <hr />
-      <h1 class="title is-5">Unique completion code:</h1>
-      <span class="completioncode">{{ completionCode }}</span
-      ><button class="button is-info" id="copy_code" data-clipboard-target=".completioncode">
-        Copy Code &nbsp;
-        <FAIcon icon="fa-solid fa-clipboard" />
-      </button>
+      <hr class="border-gray-300 my-4" />
+      <h1 class="text-lg font-semibold mb-2">Unique completion code:</h1>
+      <div class="flex items-center gap-4 mb-4">
+        <span class="text-2xl font-bold mr-5 p-2.5 border border-gray-300 rounded">{{ completionCode }}</span>
+        <Button variant="default" id="copy_code" data-clipboard-target=".completioncode">
+          Copy Code
+          <FAIcon icon="fa-solid fa-clipboard" />
+        </Button>
+      </div>
     </div>
-    <div class="payment" v-if="api.getRecruitmentService() == 'mturk'">
-      <h1 class="title is-3">Thanks, let's begin the payment process!</h1>
-      <p class="has-text-left pb-5">
+    <div class="w-3/5 mx-auto" v-if="api.getRecruitmentService() == 'mturk'">
+      <h1 class="text-2xl font-bold mb-4">
+        <FAIcon icon="fa-solid fa-square-check" />
+        Thanks, let's begin the payment process!
+      </h1>
+      <p class="text-left pb-5 mb-4">
         Please verify the code displayed below is visible in the form on the Mechanical Turk website. If it is not click
         the button to copy it to your clipboard and paste it into the Mechanical Turk window to begin the process of
         payment. Your work will be approved within several hours and any performance related bonuses will be assigned at
         that time. We really appreciate your time.
       </p>
-      <hr />
-      <h1 class="title is-5">Unique completion code:</h1>
-      <span class="completioncode">{{ completionCode }}</span
-      ><button class="button is-info" id="copy_code" data-clipboard-target=".completioncode">
-        Copy Code &nbsp;
-        <FAIcon icon="fa-solid fa-clipboard" />
-      </button>
+      <hr class="border-gray-300 my-4" />
+      <h1 class="text-lg font-semibold mb-2">Unique completion code:</h1>
+      <div class="flex items-center gap-4 mb-4">
+        <span class="text-2xl font-bold mr-5 p-2.5 border border-gray-300 rounded">{{ completionCode }}</span>
+        <Button variant="default" id="copy_code" data-clipboard-target=".completioncode">
+          Copy Code
+          <FAIcon icon="fa-solid fa-clipboard" />
+        </Button>
+      </div>
     </div>
-    <div class="payment" v-if="api.getRecruitmentService() == 'citizensci'">
-      <h1 class="title is-3">Thanks, let's begin the payment process!</h1>
-      <p class="has-text-left pb-5">This still needs to be implemented</p>
-      <hr />
-      <a :href="!appconfig.anonymousMode ? 'http://gureckislab.org' : 'http://google.com'" class="button is-info"
-        >Submit my work &nbsp;
+    <div class="w-3/5 mx-auto" v-if="api.getRecruitmentService() == 'citizensci'">
+      <h1 class="text-2xl font-bold mb-4">
+        <FAIcon icon="fa-solid fa-square-check" />
+        Thanks, let's begin the payment process!
+      </h1>
+      <p class="text-left pb-5 mb-4">This still needs to be implemented</p>
+      <hr class="border-gray-300 my-4" />
+      <Button
+        variant="default"
+        as="a"
+        :href="!appconfig.anonymousMode ? 'http://gureckislab.org' : 'http://google.com'"
+      >
+        Submit my work
         <FAIcon icon="fa-solid fa-arrow-right" />
-      </a>
+      </Button>
     </div>
-    <div class="payment" v-if="api.getRecruitmentService() == 'web'">
-      <h1 class="title is-3">Thanks for your contribution to science!</h1>
+    <div class="w-3/5 mx-auto" v-if="api.getRecruitmentService() == 'web'">
+      <h1 class="text-2xl font-bold mb-4">
+        <FAIcon icon="fa-solid fa-square-check" />
+        Thanks for your contribution to science!
+      </h1>
       <p>Your data have been successfully recorded and you can close this window or navigate to another page.</p>
     </div>
   </div>
 </template>
-
-<style scoped>
-.payment {
-  width: 60%;
-  margin: auto;
-}
-
-.completioncode {
-  font-size: 1.5em;
-  font-weight: bold;
-  margin-right: 20px;
-  padding: 10px;
-  border: 1px solid #ccc;
-}
-</style>
