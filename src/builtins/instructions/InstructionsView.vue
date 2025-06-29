@@ -29,7 +29,9 @@ function finish(goto) {
 
 <template>
   <div class="mt-20 w-3/5 mx-auto select-none">
-    <h1 class="text-2xl font-bold mb-4">Instructions</h1>
+    <h1 class="text-2xl font-bold mb-4">
+      <i-material-symbols-integration-instructions class="inline-block mr-2 text-3xl" /> Instructions
+    </h1>
     <p class="text-left text-lg mb-4">{{ instText }}</p>
     <hr class="border-gray-300 my-4" />
     <div class="flex justify-end">

@@ -5,7 +5,7 @@ import useSmileStore from '@/core/stores/smilestore'
 import appconfig from '@/core/config'
 import useAPI from '@/core/composables/useAPI'
 // load sub-components used in this compomnents
-import WithdrawFormModal from '@/builtins/withdraw/WithdrawFormModal.vue'
+import WithdrawModal from '@/builtins/withdraw/WithdrawModal.vue'
 import InformedConsentModal from '@/builtins/simple_consent/InformedConsentModal.vue'
 import ReportIssueModal from '@/builtins/report_issue/ReportIssueModal.vue'
 import { Button } from '@/uikit/components/ui/button'
@@ -13,7 +13,6 @@ import { Button } from '@/uikit/components/ui/button'
 const router = useRouter()
 const smilestore = useSmileStore() // get the global store
 const api = useAPI() // get the api
-const withdrawform = ref(null) // this uses the ref="withdrawform" in the template
 const email = ref('')
 
 // IF OTHER SERVICES PROVIDE EASY EMAIL ADDRESSES, ADD THEM HERE
@@ -79,7 +78,11 @@ function submitWithdraw() {
             <Button
               variant="destructive"
               size="xs"
-              v-if="api.store.browserPersisted.consented && !api.store.browserPersisted.withdrawn"
+              v-if="
+                api.store.browserPersisted.consented &&
+                !api.store.browserPersisted.withdrawn &&
+                !api.store.browserPersisted.done
+              "
               @click="toggleWithdraw()"
             >
               <FAIcon icon="circle-xmark" />
@@ -96,50 +99,15 @@ function submitWithdraw() {
   </div>
 
   <!-- modal for viewing consent form -->
-  <div class="absolute inset-0 z-50 flex items-center justify-center p-8" :class="{ hidden: !showconsentmodal }">
-    <div class="absolute inset-0 bg-black bg-opacity-50" @click="toggleConsent()"></div>
-    <div class="w-[80%] h-[80%] overflow-y-auto relative bg-white rounded-lg shadow-xl w-full h-full flex flex-col">
-      <div class="flex-shrink-0 p-6 border-b border-gray-200">
-        <div class="flex justify-between items-center">
-          <h2 class="text-xl font-semibold text-gray-900">Informed Consent</h2>
-          <button
-            class="text-gray-400 hover:text-gray-600 text-2xl"
-            aria-label="close"
-            @click="toggleConsent()"
-          >
-            ×
-          </button>
-        </div>
-      </div>
-      <div class="flex-1 flex items-center justify-center p-6">
-        <div class="">
-          <InformedConsentModal @toggle-consent="toggleConsent()" />
-        </div>
-      </div>
-    </div>
-  </div>
+  <InformedConsentModal :show="showconsentmodal" @toggle-consent="toggleConsent()" />
 
   <!-- modal for withdrawing from study -->
-  <div class="absolute inset-0 z-50 flex items-center justify-center p-8" :class="{ hidden: !showwithdrawmodal }">
-    <div class="absolute inset-0 bg-black bg-opacity-50" @click="toggleWithdraw()"></div>
-    <div class="relative bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-      <div class="p-8">
-        <WithdrawFormModal
-          :prefill-email="email"
-          ref="withdrawform"
-          @toggle-withdraw="toggleWithdraw()"
-          @submit-withdraw="submitWithdraw()"
-        />
-      </div>
-    </div>
-    <button
-      class="absolute top-8 right-8 text-gray-400 hover:text-gray-600 text-2xl z-10"
-      aria-label="close"
-      @click="toggleWithdraw()"
-    >
-      ×
-    </button>
-  </div>
+  <WithdrawModal
+    :show="showwithdrawmodal"
+    :prefill-email="email"
+    @toggle-withdraw="toggleWithdraw()"
+    @submit-withdraw="submitWithdraw()"
+  />
 
   <!-- modal for reporting issues -->
   <div class="absolute inset-0 z-50 flex items-center justify-center p-8" :class="{ hidden: !showreportissuemodal }">

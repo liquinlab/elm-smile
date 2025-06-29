@@ -63,60 +63,58 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="select-none">
-    <div class="container mx-auto px-4 py-8">
-      <div class="bg-muted/50 text-foreground rounded-lg p-6">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div class="lg:col-span-7">
-            <div class="pt-5 overflow-y-scroll h-[600px] text-foreground">
-              <component :is="informedConsentText" />
-            </div>
+  <div class="select-none w-4/5 mx-auto">
+    <div class="mx-auto px-4 py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-7">
+          <div class="pt-5 text-foreground">
+            <component :is="informedConsentText" />
           </div>
-          <div class="lg:col-span-5">
-            <Card class="mt-8">
-              <CardContent class="p-6">
-                <p class="text-left font-semibold text-foreground mb-4">
-                  We first must verify that you are participating willingly and know your rights. Please take the time
-                  to read the consent form (you can scroll the page).
-                </p>
-                <div class="border-t border-gray-200 my-4"></div>
+        </div>
+        <div class="lg:col-span-5">
+          <Card class="mt-8 bg-muted">
+            <CardContent class="bg-muted">
+              <p class="text-left font-semibold text-foreground mb-4">
+                We first must verify that you are participating willingly and know your rights. Please take the time to
+                read the consent form (you can scroll the page).
+              </p>
+              <div class="border-t border-gray-200 my-4"></div>
 
-                <div class="flex items-center space-x-2 mb-4">
-                  <Switch v-model="api.persist.agree" id="consent_toggle" name="consent_toggle" size="lg" />
-                  <Label for="consent_toggle" class="text-left text-sm font-medium">
-                    I consent and am over 18 years old.
-                  </Label>
-                </div>
+              <div class="flex items-center space-x-2 mb-4">
+                <Switch v-model="api.persist.agree" id="consent_toggle" name="consent_toggle" size="lg" />
+                <Label for="consent_toggle" class="text-left text-sm font-medium">
+                  I consent and am over 18 years old.
+                </Label>
+              </div>
 
-                <div class="hidden">
-                  <Label for="your_name" class="text-sm font-medium text-gray-700 mb-2 block">
-                    Required! Please enter your name:
-                  </Label>
-                  <Input id="your_name" name="your_name" v-model="name" placeholder="Enter your name" class="w-full" />
-                </div>
+              <div class="hidden">
+                <Label for="your_name" class="text-sm font-medium text-gray-700 mb-2 block">
+                  Required! Please enter your name:
+                </Label>
+                <Input id="your_name" name="your_name" v-model="name" placeholder="Enter your name" class="w-full" />
+              </div>
 
-                <div class="mt-6">
-                  <Button
-                    ref="button"
-                    variant="default"
-                    size="lg"
-                    class="w-full"
-                    v-if="api.persist.agree"
-                    @click="finish()"
-                  >
-                    Let's start
-                    <svg class="w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fill-rule="evenodd"
-                        d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              <div class="mt-6">
+                <Button
+                  ref="button"
+                  variant="default"
+                  size="lg"
+                  class="w-full"
+                  v-if="api.persist.agree"
+                  @click="finish()"
+                >
+                  Let's start
+                  <svg class="w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from 'vue'
+import { reactive, onMounted } from 'vue'
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
@@ -15,11 +15,11 @@ function finish() {
 </script>
 
 <template>
-  <div class="page select-none" style="position: relative; min-height: 100vh;">
+  <div class="page select-none" style="position: relative; min-height: 100vh">
     <div
       class="bg-cyan-100 border-animation"
-      :style="{ 
-        width: api.config.windowsizerRequest.width + 'px', 
+      :style="{
+        width: api.config.windowsizerRequest.width + 'px',
         height: api.config.windowsizerRequest.height + 'px',
         position: 'absolute',
         top: '20px',
@@ -27,7 +27,7 @@ function finish() {
         transform: 'translateX(-50%)',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
       }"
     >
       <div class="w-2/3 pt-8 mx-auto text-center" v-if="!props.triggered">

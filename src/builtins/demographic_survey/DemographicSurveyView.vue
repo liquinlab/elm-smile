@@ -117,7 +117,7 @@ function finish() {
 
 <template>
   <div class="w-full select-none mx-auto py-10">
-    <div class="w-4/5 mx-auto text-left">
+    <div class="w-5/7 mx-auto text-left">
       <h3 class="text-3xl font-bold mb-4"><FAIcon icon="fa-solid fa-person" />&nbsp;Demographic Information</h3>
       <p class="text-lg mb-8">
         We request some information about you which we can use to understand aggregate differences between individuals.
@@ -129,13 +129,15 @@ function finish() {
           <div class="w-1/3">
             <div class="text-left text-muted-foreground">
               <h3 class="text-lg font-bold mb-2">Basic Info</h3>
-              <p class="text-md text-muted-foreground">First, we need some basic, generic information about you.</p>
+              <p class="text-md font-light text-muted-foreground">
+                First, we need some basic, generic information about you.
+              </p>
             </div>
           </div>
           <div class="flex-1">
             <div class="border border-border text-left bg-muted p-6 rounded-lg">
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2"> Date of Birth </label>
+                <label class="block text-md font-semibold text-foreground mb-2"> Date of Birth </label>
                 <Popover>
                   <PopoverTrigger as-child>
                     <Button
@@ -159,7 +161,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2"> Gender </label>
+                <label class="block text-md font-semibold text-foreground mb-2"> Gender </label>
                 <Select v-model="api.persist.forminfo.gender">
                   <SelectTrigger class="w-full bg-background dark:bg-background text-base">
                     <SelectValue placeholder="Select an option" />
@@ -195,7 +197,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2"> Are you hispanic? </label>
+                <label class="block text-md font-semibold text-foreground mb-2"> Are you hispanic? </label>
                 <Select v-model="api.persist.forminfo.hispanic">
                   <SelectTrigger class="w-full bg-background dark:bg-background text-base">
                     <SelectValue placeholder="Select an option" />
@@ -210,7 +212,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2"> Are you fluent in English? </label>
+                <label class="block text-md font-semibold text-foreground mb-2"> Are you fluent in English? </label>
                 <Select v-model="api.persist.forminfo.fluent_english">
                   <SelectTrigger class="w-full bg-background dark:bg-background text-base">
                     <SelectValue placeholder="Select an option" />
@@ -244,13 +246,15 @@ function finish() {
           <div class="w-1/3">
             <div class="text-left text-muted-foreground">
               <h3 class="text-lg font-bold mb-2">Psychological Information</h3>
-              <p class="text-md text-muted-foreground">Next, we need some basic information about your ability to perceive this study.</p>
+              <p class="text-md font-light text-muted-foreground">
+                Next, we need some basic information about your ability to perceive this study.
+              </p>
             </div>
           </div>
           <div class="flex-1">
             <div class="border border-border text-left bg-muted p-6 rounded-lg">
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
+                <label class="block text-md font-semibold text-foreground mb-2">
                   Do you have normal vision (or corrected to be normal)?
                 </label>
                 <Select v-model="api.persist.forminfo.normal_vision">
@@ -268,7 +272,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2"> Are you color blind? </label>
+                <label class="block text-md font-semibold text-foreground mb-2"> Are you color blind? </label>
                 <Select v-model="api.persist.forminfo.color_blind">
                   <SelectTrigger class="w-full bg-background dark:bg-background text-base">
                     <SelectValue placeholder="Select an option" />
@@ -284,7 +288,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
+                <label class="block text-md font-semibold text-foreground mb-2">
                   Have you been diagnosed with a learning disability (e.g., dyslexia, dysclaculia)?
                 </label>
                 <Select v-model="api.persist.forminfo.learning_disability">
@@ -304,7 +308,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
+                <label class="block text-md font-semibold text-foreground mb-2">
                   Have you been diagnosed with a neurodevelopmental disorder (e.g., autism, tic disorder)?
                 </label>
                 <Select v-model="api.persist.forminfo.neurodevelopmental_disorder">
@@ -324,7 +328,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
+                <label class="block text-md font-semibold text-foreground mb-2">
                   Have you been diagnosed with a psychiatric disorder (e.g., anxiety, depression, OCD)?
                 </label>
                 <Select v-model="api.persist.forminfo.psychiatric_disorder">
@@ -365,13 +369,13 @@ function finish() {
           <div class="w-1/3">
             <div class="text-left text-muted-foreground">
               <h3 class="text-lg font-bold mb-2">Household Info</h3>
-              <p class="text-md text-muted-foreground">Finally we need some basic household information.</p>
+              <p class="text-md font-light text-muted-foreground">Finally we need some basic household information.</p>
             </div>
           </div>
           <div class="flex-1">
             <div class="border border-border text-left bg-muted p-6 rounded-lg">
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2"> Country </label>
+                <label class="block text-md font-semibold text-foreground mb-2"> Country </label>
                 <Select v-model="api.persist.forminfo.country">
                   <SelectTrigger class="w-full bg-background dark:bg-background text-base">
                     <SelectValue placeholder="Select an option" />
@@ -579,7 +583,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2"> Zipcode/Postal Code </label>
+                <label class="block text-md font-semibold text-foreground mb-2"> Zipcode/Postal Code </label>
                 <input
                   type="text"
                   v-model="api.persist.forminfo.zipcode"
@@ -592,7 +596,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2"> Highest level of education </label>
+                <label class="block text-md font-semibold text-foreground mb-2"> Highest level of education </label>
                 <Select v-model="api.persist.forminfo.education_level">
                   <SelectTrigger class="w-full bg-background dark:bg-background text-base">
                     <SelectValue placeholder="Select an option" />
@@ -621,7 +625,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
+                <label class="block text-md font-semibold text-foreground mb-2">
                   Enter your approximate household income.
                 </label>
                 <Select v-model="api.persist.forminfo.household_income">

@@ -59,7 +59,7 @@ function finish() {
           <div class="w-1/3">
             <div class="text-left text-muted-foreground">
               <h3 class="text-lg font-bold mb-2">Important Note</h3>
-              <p class="text-md text-muted-foreground">
+              <p class="text-md font-light text-muted-foreground">
                 If this is a paid study your answers to these questions will have
                 <b>no effect on your final payment</b>. We are just interested in your honest answers.
               </p>
@@ -68,7 +68,7 @@ function finish() {
           <div class="flex-1">
             <div class="border border-border text-left bg-muted p-6 rounded-lg">
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
+                <label class="block text-md font-semibold text-foreground mb-2">
                   How difficult was the task over all?
                 </label>
                 <Select v-model="api.persist.forminfo.difficulty_rating">
@@ -90,7 +90,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
+                <label class="block text-md font-semibold text-foreground mb-2">
                   How enjoyable/fun was the task over all?
                 </label>
                 <Select v-model="api.persist.forminfo.enjoyment_rating">
@@ -112,7 +112,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
+                <label class="block text-md font-semibold text-foreground mb-2">
                   Any general feedback for the study team?
                 </label>
                 <Textarea
@@ -125,7 +125,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
+                <label class="block text-md font-semibold text-foreground mb-2">
                   Any specific issues to report that might improve the study?
                 </label>
                 <Textarea

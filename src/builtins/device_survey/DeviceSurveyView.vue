@@ -70,7 +70,7 @@ function finish() {
           <div class="w-1/3">
             <div class="text-left text-muted-foreground">
               <h3 class="text-lg font-bold mb-2">Important Note</h3>
-              <p class="text-md text-muted-foreground">
+              <p class="text-md font-light text-muted-foreground">
                 If this is a paid study your answers to these questions will have
                 <b>no effect on your final payment</b>. We are just interested in your honest answers.
               </p>
@@ -79,7 +79,7 @@ function finish() {
           <div class="flex-1">
             <div class="border border-border text-left bg-muted p-6 rounded-lg">
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
+                <label class="block text-md font-semibold text-foreground mb-2">
                   What best describes the computer you are using right now?
                 </label>
                 <Select v-model="api.persist.forminfo.device_type">
@@ -101,7 +101,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
+                <label class="block text-md font-semibold text-foreground mb-2">
                   What type of Internet connection are you using right now?
                 </label>
                 <Select v-model="api.persist.forminfo.connection">
@@ -125,7 +125,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
+                <label class="block text-md font-semibold text-foreground mb-2">
                   How would you rate you Internet connection quality today?
                 </label>
                 <Select v-model="api.persist.forminfo.connection_quality">
@@ -145,7 +145,9 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2"> What web browser are you using? </label>
+                <label class="block text-md font-semibold text-foreground mb-2">
+                  What web browser are you using?
+                </label>
                 <Select v-model="api.persist.forminfo.browser">
                   <SelectTrigger class="w-full bg-background dark:bg-background text-base">
                     <SelectValue placeholder="Select an option" />
@@ -187,7 +189,7 @@ function finish() {
           <div class="w-1/3">
             <div class="text-left text-muted-foreground">
               <h3 class="text-lg font-bold mb-2">Important Note</h3>
-              <p class="text-md text-muted-foreground">
+              <p class="text-md font-light text-muted-foreground">
                 If this is a paid study your answers to these questions will have
                 <b>no effect on your final payment</b>. We are just interested in your honest answers.
               </p>
@@ -196,7 +198,7 @@ function finish() {
           <div class="flex-1">
             <div class="border border-border text-left bg-muted p-6 rounded-lg">
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
+                <label class="block text-md font-semibold text-foreground mb-2">
                   What best descries how you moved the cursor, clicked, or scrolled things during this experiment?
                 </label>
                 <Select v-model="api.persist.forminfo.pointer">
@@ -221,7 +223,7 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
+                <label class="block text-md font-semibold text-foreground mb-2">
                   Are you using any assistive technologies?
                 </label>
                 <Select v-model="api.persist.forminfo.assistive_technology">
@@ -241,8 +243,8 @@ function finish() {
               </div>
 
               <div class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
-                  Did you use any tools to help you complete this experiment?
+                <label class="block text-md font-semibold text-foreground mb-2">
+                  Did you use any AI or other tools to help you complete this experiment?
                 </label>
                 <Select v-model="api.persist.forminfo.tools">
                   <SelectTrigger class="w-full bg-background dark:bg-background text-base">

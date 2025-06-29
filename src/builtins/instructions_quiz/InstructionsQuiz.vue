@@ -138,7 +138,7 @@ init()
 
 <template>
   <div class="w-full select-none mx-auto py-10">
-    <div class="w-4/5 mx-auto text-left">
+    <div class="w-5/7 mx-auto text-left">
       <!-- Replace the two quiz page sections with this single dynamic one -->
       <div class="mt-10" v-if="api.stepIndex < qs.length && /^pages\/pg\d+$/.test(api.pathString)">
         <div class="mb-10">
@@ -154,13 +154,13 @@ init()
           <div class="w-1/3">
             <div class="text-left text-muted-foreground">
               <h3 class="text-lg font-bold mb-2">Test your understanding</h3>
-              <p class="text-md text-muted-foreground">You must answer all the questions in order to move on.</p>
+              <p class="text-md font-light text-muted-foreground">You must answer all the questions to move on.</p>
             </div>
           </div>
           <div class="flex-1">
             <div class="border border-border text-left bg-muted p-6 rounded-lg">
               <div v-for="(question, index) in api.stepData.questions" :key="question.id" class="mb-3">
-                <label class="block text-md font-medium text-foreground mb-2">
+                <label class="block text-md font-semibold text-foreground mb-2">
                   {{ question.question }}
                 </label>
 
