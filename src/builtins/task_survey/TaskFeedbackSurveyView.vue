@@ -4,6 +4,9 @@ import { reactive, computed } from 'vue'
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
+import { Textarea } from '@/uikit/components/ui/textarea'
+
 const api = useViewAPI()
 
 // const pages = api.spec().append([{ id: 'feedback_page1' }])
@@ -43,10 +46,10 @@ function finish() {
 </script>
 
 <template>
-  <div class="page select-none">
-    <div class="w-4/5 mx-auto mb-10 pb-52 text-left">
-      <h3 class="text-2xl font-bold mb-4"><FAIcon icon="fa-solid fa-pencil" /> Give us feedback</h3>
-      <p class="text-sm mb-8">
+  <div class="w-full select-none mx-auto py-10">
+    <div class="w-4/5 mx-auto text-left">
+      <h3 class="text-3xl font-bold mb-4"><FAIcon icon="fa-solid fa-pencil" />&nbsp;Give us feedback</h3>
+      <p class="text-lg mb-8">
         Please give us feedback about your experience with the study. Your feedback will help us improve our study and
         we appreciate your effort and thoughts.
       </p>
@@ -54,86 +57,90 @@ function finish() {
       <div class="mt-10">
         <div class="flex gap-6">
           <div class="w-1/3">
-            <div class="text-left text-gray-600">
-              <h3 class="text-sm font-bold mb-2">Important Note</h3>
-              <p class="text-sm">
+            <div class="text-left text-muted-foreground">
+              <h3 class="text-lg font-bold mb-2">Important Note</h3>
+              <p class="text-md text-muted-foreground">
                 If this is a paid study your answers to these questions will have
                 <b>no effect on your final payment</b>. We are just interested in your honest answers.
               </p>
             </div>
           </div>
           <div class="flex-1">
-            <div class="border border-gray-300 text-left bg-gray-50 p-6 rounded">
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+            <div class="border border-border text-left bg-muted p-6 rounded-lg">
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2">
                   How difficult was the task over all?
                 </label>
-                <select
-                  v-model="api.persist.forminfo.difficulty_rating"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select an option</option>
-                  <option value="0 - Very Easy">0 - Very Easy</option>
-                  <option value="1 - Easy">1 - Easy</option>
-                  <option value="2 - Somewhat Easy">2 - Somewhat Easy</option>
-                  <option value="3 - Neutral">3 - Neutral</option>
-                  <option value="4 - Somewhat Difficult">4 - Somewhat Difficult</option>
-                  <option value="5 - Difficult">5 - Difficult</option>
-                  <option value="6 - Very Difficult">6 - Very Difficult</option>
-                  <option value="I'd rather not say">I'd rather not say</option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">Select your rating</p>
+                <Select v-model="api.persist.forminfo.difficulty_rating">
+                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0 - Very Easy">0 - Very Easy</SelectItem>
+                    <SelectItem value="1 - Easy">1 - Easy</SelectItem>
+                    <SelectItem value="2 - Somewhat Easy">2 - Somewhat Easy</SelectItem>
+                    <SelectItem value="3 - Neutral">3 - Neutral</SelectItem>
+                    <SelectItem value="4 - Somewhat Difficult">4 - Somewhat Difficult</SelectItem>
+                    <SelectItem value="5 - Difficult">5 - Difficult</SelectItem>
+                    <SelectItem value="6 - Very Difficult">6 - Very Difficult</SelectItem>
+                    <SelectItem value="I'd rather not say">I'd rather not say</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p class="text-xs text-muted-foreground mt-1">Select your rating</p>
               </div>
 
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2">
                   How enjoyable/fun was the task over all?
                 </label>
-                <select
-                  v-model="api.persist.forminfo.enjoyment_rating"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select an option</option>
-                  <option value="0 - Very Boring">0 - Very Boring</option>
-                  <option value="1 - Boring">1 - Boring</option>
-                  <option value="2 - Somewhat Boring">2 - Somewhat Boring</option>
-                  <option value="3 - Neutral">3 - Neutral</option>
-                  <option value="4 - Somewhat Fun">4 - Somewhat Fun</option>
-                  <option value="5 - Fun">5 - Fun</option>
-                  <option value="6 - Very Fun">6 - Very Fun</option>
-                  <option value="I'd rather not say">I'd rather not say</option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">Select your rating</p>
+                <Select v-model="api.persist.forminfo.enjoyment_rating">
+                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0 - Very Boring">0 - Very Boring</SelectItem>
+                    <SelectItem value="1 - Boring">1 - Boring</SelectItem>
+                    <SelectItem value="2 - Somewhat Boring">2 - Somewhat Boring</SelectItem>
+                    <SelectItem value="3 - Neutral">3 - Neutral</SelectItem>
+                    <SelectItem value="4 - Somewhat Fun">4 - Somewhat Fun</SelectItem>
+                    <SelectItem value="5 - Fun">5 - Fun</SelectItem>
+                    <SelectItem value="6 - Very Fun">6 - Very Fun</SelectItem>
+                    <SelectItem value="I'd rather not say">I'd rather not say</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p class="text-xs text-muted-foreground mt-1">Select your rating</p>
               </div>
 
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2">
                   Any general feedback for the study team?
                 </label>
-                <textarea
+                <Textarea
                   v-model="api.persist.forminfo.feedback"
                   placeholder="Please provide general thoughts, reactions, or ideas here."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical"
+                  class="w-full bg-background dark:bg-background text-base resize-vertical"
                   rows="4"
-                ></textarea>
+                />
+                <p class="text-xs text-muted-foreground mt-1">Share your general thoughts and reactions</p>
               </div>
 
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2">
                   Any specific issues to report that might improve the study?
                 </label>
-                <textarea
+                <Textarea
                   v-model="api.persist.forminfo.issues"
                   placeholder="Please report any specific issues you had, if any"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical"
+                  class="w-full bg-background dark:bg-background text-base resize-vertical"
                   rows="4"
-                ></textarea>
+                />
+                <p class="text-xs text-muted-foreground mt-1">Report any specific issues or suggestions</p>
               </div>
 
-              <hr class="border-gray-300 my-6" />
+              <hr class="border-border my-6" />
 
               <div class="flex justify-end">
-                <Button variant="default" v-if="complete" @click="finish()"> I'm finished </Button>
+                <Button variant="default" :disabled="!complete" @click="finish()"> I'm finished </Button>
               </div>
             </div>
           </div>

@@ -52,86 +52,164 @@ clipboard.on('success', (e) => {
 </script>
 
 <template>
-  <div class="page select-none">
-    <div class="w-3/5 mx-auto" v-if="api.getRecruitmentService() == 'prolific'">
-      <h1 class="text-2xl font-bold mb-4">
-        <FAIcon icon="fa-solid fa-square-check" />
-        Thanks, let's begin the payment process!
-      </h1>
-      <p class="text-left pb-5 mb-4">
-        Please click the button below to begin the process of payment. This will notify Prolific you successfully
-        completed the task. Your work will be approved within several hours and any performance related bonuses will be
-        assigned at that time. We really appreciate your time.
-      </p>
-      <hr class="border-gray-300 my-4" />
-      <Button variant="default" as="a" :href="`https://app.prolific.co/submissions/complete?cc=${completionCode}`">
-        Submit my work to Prolific
-        <FAIcon icon="fa-solid fa-arrow-right" />
-      </Button>
-    </div>
-    <div class="w-3/5 mx-auto" v-if="api.getRecruitmentService() == 'cloudresearch'">
-      <h1 class="text-2xl font-bold mb-4">
-        <FAIcon icon="fa-solid fa-square-check" />
-        Thanks, let's begin the payment process!
-      </h1>
-      <p class="text-left pb-5 mb-4">
-        Please copy the code displayed below (or click the button) and paste it into the Mechanical Turk window to begin
-        the process of payment. Your work will be approved within several hours and any performance related bonuses will
-        be assigned at that time. We really appreciate your time.
-      </p>
-      <hr class="border-gray-300 my-4" />
-      <h1 class="text-lg font-semibold mb-2">Unique completion code:</h1>
-      <div class="flex items-center gap-4 mb-4">
-        <span class="text-2xl font-bold mr-5 p-2.5 border border-gray-300 rounded">{{ completionCode }}</span>
-        <Button variant="default" id="copy_code" data-clipboard-target=".completioncode">
-          Copy Code
-          <FAIcon icon="fa-solid fa-clipboard" />
-        </Button>
+  <div class="w-full select-none mx-auto py-10">
+    <div class="w-4/5 mx-auto text-left">
+      <div v-if="api.getRecruitmentService() == 'prolific'">
+        <h1 class="text-2xl font-bold mb-4">
+          <FAIcon icon="fa-solid fa-square-check" />&nbsp;Thanks, let's begin the payment process!
+        </h1>
+        <p class="text-sm mb-8">
+          Please click the button below to begin the process of payment. This will notify Prolific you successfully
+          completed the task. Your work will be approved within several hours and any performance related bonuses will be
+          assigned at that time. We really appreciate your time.
+        </p>
+        <div class="mt-10">
+          <div class="flex gap-6">
+            <div class="w-1/3">
+              <div class="text-left text-muted-foreground">
+                <h3 class="text-md font-bold mb-2">Payment Process</h3>
+                <p class="text-sm text-muted-foreground">
+                  Click the button to complete your submission and receive payment through Prolific.
+                </p>
+              </div>
+            </div>
+            <div class="flex-1">
+              <div class="border border-border text-left bg-muted p-6 rounded-lg">
+                <Button variant="default" as="a" :href="`https://app.prolific.co/submissions/complete?cc=${completionCode}`">
+                  Submit my work to Prolific
+                  <FAIcon icon="fa-solid fa-arrow-right" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="w-3/5 mx-auto" v-if="api.getRecruitmentService() == 'mturk'">
-      <h1 class="text-2xl font-bold mb-4">
-        <FAIcon icon="fa-solid fa-square-check" />
-        Thanks, let's begin the payment process!
-      </h1>
-      <p class="text-left pb-5 mb-4">
-        Please verify the code displayed below is visible in the form on the Mechanical Turk website. If it is not click
-        the button to copy it to your clipboard and paste it into the Mechanical Turk window to begin the process of
-        payment. Your work will be approved within several hours and any performance related bonuses will be assigned at
-        that time. We really appreciate your time.
-      </p>
-      <hr class="border-gray-300 my-4" />
-      <h1 class="text-lg font-semibold mb-2">Unique completion code:</h1>
-      <div class="flex items-center gap-4 mb-4">
-        <span class="text-2xl font-bold mr-5 p-2.5 border border-gray-300 rounded">{{ completionCode }}</span>
-        <Button variant="default" id="copy_code" data-clipboard-target=".completioncode">
-          Copy Code
-          <FAIcon icon="fa-solid fa-clipboard" />
-        </Button>
+
+      <div v-if="api.getRecruitmentService() == 'cloudresearch'">
+        <h1 class="text-2xl font-bold mb-4">
+          <FAIcon icon="fa-solid fa-square-check" />&nbsp;Thanks, let's begin the payment process!
+        </h1>
+        <p class="text-sm mb-8">
+          Please copy the code displayed below (or click the button) and paste it into the Mechanical Turk window to begin
+          the process of payment. Your work will be approved within several hours and any performance related bonuses will
+          be assigned at that time. We really appreciate your time.
+        </p>
+        <div class="mt-10">
+          <div class="flex gap-6">
+            <div class="w-1/3">
+              <div class="text-left text-muted-foreground">
+                <h3 class="text-md font-bold mb-2">Completion Code</h3>
+                <p class="text-sm text-muted-foreground">
+                  Copy this unique code and paste it into the Mechanical Turk submission form.
+                </p>
+              </div>
+            </div>
+            <div class="flex-1">
+              <div class="border border-border text-left bg-muted p-6 rounded-lg">
+                <h3 class="text-lg font-semibold mb-4 text-foreground">Unique completion code:</h3>
+                <div class="flex items-center gap-4 mb-4">
+                  <span class="text-2xl font-bold p-3 border border-border rounded bg-background text-foreground">{{ completionCode }}</span>
+                  <Button variant="default" id="copy_code" data-clipboard-target=".completioncode">
+                    Copy Code
+                    <FAIcon icon="fa-solid fa-clipboard" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="w-3/5 mx-auto" v-if="api.getRecruitmentService() == 'citizensci'">
-      <h1 class="text-2xl font-bold mb-4">
-        <FAIcon icon="fa-solid fa-square-check" />
-        Thanks, let's begin the payment process!
-      </h1>
-      <p class="text-left pb-5 mb-4">This still needs to be implemented</p>
-      <hr class="border-gray-300 my-4" />
-      <Button
-        variant="default"
-        as="a"
-        :href="!appconfig.anonymousMode ? 'http://gureckislab.org' : 'http://google.com'"
-      >
-        Submit my work
-        <FAIcon icon="fa-solid fa-arrow-right" />
-      </Button>
-    </div>
-    <div class="w-3/5 mx-auto" v-if="api.getRecruitmentService() == 'web'">
-      <h1 class="text-2xl font-bold mb-4">
-        <FAIcon icon="fa-solid fa-square-check" />
-        Thanks for your contribution to science!
-      </h1>
-      <p>Your data have been successfully recorded and you can close this window or navigate to another page.</p>
+
+      <div v-if="api.getRecruitmentService() == 'mturk'">
+        <h1 class="text-2xl font-bold mb-4">
+          <FAIcon icon="fa-solid fa-square-check" />&nbsp;Thanks, let's begin the payment process!
+        </h1>
+        <p class="text-sm mb-8">
+          Please verify the code displayed below is visible in the form on the Mechanical Turk website. If it is not click
+          the button to copy it to your clipboard and paste it into the Mechanical Turk window to begin the process of
+          payment. Your work will be approved within several hours and any performance related bonuses will be assigned at
+          that time. We really appreciate your time.
+        </p>
+        <div class="mt-10">
+          <div class="flex gap-6">
+            <div class="w-1/3">
+              <div class="text-left text-muted-foreground">
+                <h3 class="text-md font-bold mb-2">Completion Code</h3>
+                <p class="text-sm text-muted-foreground">
+                  Verify this code appears in your Mechanical Turk submission form, or copy it manually.
+                </p>
+              </div>
+            </div>
+            <div class="flex-1">
+              <div class="border border-border text-left bg-muted p-6 rounded-lg">
+                <h3 class="text-lg font-semibold mb-4 text-foreground">Unique completion code:</h3>
+                <div class="flex items-center gap-4 mb-4">
+                  <span class="text-2xl font-bold p-3 border border-border rounded bg-background text-foreground">{{ completionCode }}</span>
+                  <Button variant="default" id="copy_code" data-clipboard-target=".completioncode">
+                    Copy Code
+                    <FAIcon icon="fa-solid fa-clipboard" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="api.getRecruitmentService() == 'citizensci'">
+        <h1 class="text-2xl font-bold mb-4">
+          <FAIcon icon="fa-solid fa-square-check" />&nbsp;Thanks, let's begin the payment process!
+        </h1>
+        <p class="text-sm mb-8">This still needs to be implemented</p>
+        <div class="mt-10">
+          <div class="flex gap-6">
+            <div class="w-1/3">
+              <div class="text-left text-muted-foreground">
+                <h3 class="text-md font-bold mb-2">Submission</h3>
+                <p class="text-sm text-muted-foreground">
+                  Click the button to complete your submission.
+                </p>
+              </div>
+            </div>
+            <div class="flex-1">
+              <div class="border border-border text-left bg-muted p-6 rounded-lg">
+                <Button
+                  variant="default"
+                  as="a"
+                  :href="!appconfig.anonymousMode ? 'http://gureckislab.org' : 'http://google.com'"
+                >
+                  Submit my work
+                  <FAIcon icon="fa-solid fa-arrow-right" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="api.getRecruitmentService() == 'web'">
+        <h1 class="text-2xl font-bold mb-4">
+          <FAIcon icon="fa-solid fa-square-check" />&nbsp;Thanks for your contribution to science!
+        </h1>
+        <p class="text-sm mb-8">Your data have been successfully recorded and you can close this window or navigate to another page.</p>
+        <div class="mt-10">
+          <div class="flex gap-6">
+            <div class="w-1/3">
+              <div class="text-left text-muted-foreground">
+                <h3 class="text-md font-bold mb-2">Study Complete</h3>
+                <p class="text-sm text-muted-foreground">
+                  Thank you for participating in our research study. Your contribution helps advance scientific knowledge.
+                </p>
+              </div>
+            </div>
+            <div class="flex-1">
+              <div class="border border-border text-left bg-muted p-6 rounded-lg">
+                <p class="text-foreground">You may now safely close this browser window.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

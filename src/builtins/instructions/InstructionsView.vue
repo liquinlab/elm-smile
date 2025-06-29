@@ -28,9 +28,9 @@ function finish(goto) {
 </script>
 
 <template>
-  <div class="page select-none">
+  <div class="mt-20 w-3/5 mx-auto select-none">
     <h1 class="text-2xl font-bold mb-4">Instructions</h1>
-    <p class="text-center text-lg mb-4">{{ instText }}</p>
+    <p class="text-left text-lg mb-4">{{ instText }}</p>
     <hr class="border-gray-300 my-4" />
     <div class="flex justify-end">
       <Button variant="default" @click="finish()">

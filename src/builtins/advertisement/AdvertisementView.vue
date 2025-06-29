@@ -19,8 +19,8 @@ const button = ref(null) // reference to button
 // this function wiggles the button a little if it hasn't been clicked
 // just some fun
 function wiggle() {
-  if (!clicked) {
-    animate(button.value, { rotate: [0, 10, -10, 10, -10, 0] }, { duration: 0.75 }).finished.then(() => {
+  if (!clicked && button.value) {
+    animate(button.value.$el, { rotate: [0, 60, -60, 60, -60, 0] }, { duration: 0.75 }).finished.then(() => {
       timer = setTimeout(wiggle, 15000) // Reinitialize the timer after animation
     })
   }
@@ -43,9 +43,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="page prevent-select text-center flex flex-col items-center">
-    <br /><br /><br />
-    <img ref="logo" src="@/user/assets/brain.svg" width="220" />
+  <div class="mt-20 prevent-select flex flex-col items-center">
+    <img ref="logo" src="@/user/assets/brain.svg" width="220" class="brain-logo" />
     <h1 ref="title" class="text-3xl font-bold mb-4">Please help us understand the mind!</h1>
     <p>Take part in a short experiment where you play some games.</p>
     <br />
@@ -55,3 +54,13 @@ onBeforeUnmount(() => {
     </Button>
   </div>
 </template>
+
+<style scoped>
+.brain-logo {
+  filter: invert(0);
+}
+
+.dark .brain-logo {
+  filter: invert(1);
+}
+</style>

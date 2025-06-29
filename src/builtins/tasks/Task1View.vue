@@ -13,7 +13,7 @@ function finish() {
 </script>
 
 <template>
-  <div class="page select-none">
+  <div class="w-4/5 py-10 select-none mx-auto ">
     <h1 class="text-2xl font-bold mb-4">Task 1</h1>
 
     <div class="w-1/4 mx-auto mb-10 pb-52 text-left">

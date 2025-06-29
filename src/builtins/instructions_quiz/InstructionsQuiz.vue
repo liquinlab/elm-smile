@@ -3,6 +3,7 @@ import { reactive, computed, ref, onMounted, nextTick } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
 import { Checkbox } from '@/uikit/components/ui/checkbox'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
 const api = useViewAPI()
 
 // read in props
@@ -136,30 +137,30 @@ init()
 </script>
 
 <template>
-  <div class="page select-none">
-    <div class="w-4/5 mx-auto mb-10 pb-52 text-left">
+  <div class="w-full select-none mx-auto py-10">
+    <div class="w-4/5 mx-auto text-left">
       <!-- Replace the two quiz page sections with this single dynamic one -->
       <div class="mt-10" v-if="api.stepIndex < qs.length && /^pages\/pg\d+$/.test(api.pathString)">
         <div class="mb-10">
-          <h3 class="text-2xl font-bold mb-4">
+          <h3 class="text-3xl font-bold mb-4">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
           </h3>
-          <p class="text-sm">
+          <p class="text-lg mb-8">
             Using the information provided in the previous pages, please select the correct answer for each question. Do
             your best! If anything is unclear you can review the instructions again after you submit your response.
           </p>
         </div>
         <div class="flex gap-6">
           <div class="w-1/3">
-            <div class="text-left text-gray-600">
-              <h3 class="text-sm font-bold mb-2">Test your understanding</h3>
-              <p class="text-sm">You must answer all the questions in order to move on.</p>
+            <div class="text-left text-muted-foreground">
+              <h3 class="text-lg font-bold mb-2">Test your understanding</h3>
+              <p class="text-md text-muted-foreground">You must answer all the questions in order to move on.</p>
             </div>
           </div>
           <div class="flex-1">
-            <div class="border border-gray-300 text-left bg-gray-50 p-6 rounded">
-              <div v-for="(question, index) in api.stepData.questions" :key="question.id" class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-3">
+            <div class="border border-border text-left bg-muted p-6 rounded-lg">
+              <div v-for="(question, index) in api.stepData.questions" :key="question.id" class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2">
                   {{ question.question }}
                 </label>
 
@@ -205,35 +206,36 @@ init()
                         }
                       "
                     />
-                    <label :for="`${question.id}-${answerIndex}`" class="text-sm text-gray-700 cursor-pointer">
+                    <label :for="`${question.id}-${answerIndex}`" class="text-sm text-foreground cursor-pointer">
                       {{ answer }}
                     </label>
                   </div>
                 </div>
 
                 <!-- Single select dropdown -->
-                <select
-                  v-else
-                  v-model="api.stepData.questions[index].answer"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select an option</option>
-                  <option v-for="answer in question.answers" :key="answer" :value="answer">
-                    {{ answer }}
-                  </option>
-                </select>
+                <Select v-else v-model="api.stepData.questions[index].answer">
+                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="answer in question.answers" :key="answer" :value="answer">
+                      {{ answer }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              <hr class="border-gray-300 my-6" />
+              <hr class="border-border my-6" />
 
               <div class="flex justify-between">
                 <Button variant="outline" v-if="api.stepIndex >= 1" @click="api.goPrevStep()">
                   <FAIcon icon="fa-solid fa-arrow-left" />
                   Previous page
                 </Button>
+                <div v-else></div>
                 <Button
-                  v-if="currentPageComplete"
                   :variant="api.isLastBlockStep() ? 'default' : 'outline'"
+                  :disabled="!currentPageComplete"
                   @click="api.isLastBlockStep() ? submitQuiz() : api.goNextStep()"
                 >
                   {{ api.isLastBlockStep() ? 'Submit' : 'Next page' }}
@@ -247,15 +249,15 @@ init()
 
       <div class="mt-10" v-else-if="api.pathString === 'feedback/success'">
         <div class="text-center">
-          <h3 class="text-2xl font-bold mb-4"><FAIcon icon="fa-solid fa-square-check" />&nbsp;Congrats! You passed.</h3>
+          <h3 class="text-3xl font-bold mb-4"><FAIcon icon="fa-solid fa-square-check" />&nbsp;Congrats! You passed.</h3>
           <p class="text-lg mb-6">Click here to begin the next phase of the experiment.</p>
-          <Button variant="outline" @click="finish">Let's begin.</Button>
+          <Button variant="default" @click="finish">Let's begin.</Button>
         </div>
       </div>
 
       <div class="mt-10" v-else-if="api.pathString === 'feedback/retry'">
         <div class="text-center">
-          <h3 class="text-2xl font-bold mb-4">
+          <h3 class="text-3xl font-bold mb-4">
             <FAIcon icon="fa-solid fa-square-check" />&nbsp;Sorry! You did not get all the answers correct.
           </h3>
           <p class="text-lg mb-6">Please re-read the instructions and try again.</p>

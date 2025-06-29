@@ -6,11 +6,6 @@ import { Button } from '@/uikit/components/ui/button'
 const api = useViewAPI()
 const props = defineProps(['triggered'])
 
-const sizer = reactive({
-  w: api.config.windowsizerRequest.width + 'px',
-  h: api.config.windowsizerRequest.height + 'px',
-})
-
 function finish() {
   // smilestore.setConsented()
   // smilestore.saveData()
@@ -20,10 +15,20 @@ function finish() {
 </script>
 
 <template>
-  <div class="page flex justify-center p-4 select-none">
+  <div class="page select-none" style="position: relative; min-height: 100vh;">
     <div
-      class="bg-cyan-100 border-animation flex items-center justify-center"
-      :style="{ width: sizer.w, height: sizer.h }"
+      class="bg-cyan-100 border-animation"
+      :style="{ 
+        width: api.config.windowsizerRequest.width + 'px', 
+        height: api.config.windowsizerRequest.height + 'px',
+        position: 'absolute',
+        top: '20px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }"
     >
       <div class="w-2/3 pt-8 mx-auto text-center" v-if="!props.triggered">
         <span class="text-4xl text-blue-900 mb-4 block">

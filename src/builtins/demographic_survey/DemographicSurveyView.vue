@@ -1,6 +1,6 @@
 <script setup>
 import { reactive, computed, ref } from 'vue'
-import { DateFormatter, getLocalTimeZone } from '@internationalized/date'
+import { DateFormatter, getLocalTimeZone, CalendarDate } from '@internationalized/date'
 import { CalendarIcon } from 'lucide-vue-next'
 
 // import and initalize smile API
@@ -8,6 +8,7 @@ import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
 import { Calendar } from '@/uikit/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/uikit/components/ui/popover'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
 import { cn } from '@/uikit/lib/utils'
 
 const api = useViewAPI()
@@ -49,6 +50,21 @@ watch(dateValue, (newValue) => {
   }
 })
 
+// Watch for form data changes and update the date picker
+watch(
+  () => api.persist.forminfo.dob,
+  (newValue) => {
+    if (newValue && newValue !== '') {
+      // Parse the date string and create a CalendarDate object
+      const [year, month, day] = newValue.split('-').map(Number)
+      dateValue.value = new CalendarDate(year, month, day)
+    } else {
+      dateValue.value = null
+    }
+  },
+  { immediate: true }
+)
+
 const page_one_complete = computed(
   () =>
     api.persist.forminfo.dob !== '' &&
@@ -74,7 +90,8 @@ const page_three_complete = computed(
 )
 
 function autofill() {
-  api.persist.forminfo.dob = '1978-09-12'
+  // Set the date value first so the watcher can handle it
+  dateValue.value = new CalendarDate(1978, 9, 12)
   api.persist.forminfo.gender = 'Male'
   api.persist.forminfo.race = 'Caucasian/White'
   api.persist.forminfo.hispanic = 'No'
@@ -99,10 +116,10 @@ function finish() {
 </script>
 
 <template>
-  <div class="page select-none">
-    <div class="w-4/5 mx-auto mb-10 pb-52 text-left">
-      <h3 class="text-2xl font-bold mb-4"><FAIcon icon="fa-solid fa-person" />&nbsp;Demographic Information</h3>
-      <p class="text-sm mb-8">
+  <div class="w-full select-none mx-auto py-10">
+    <div class="w-4/5 mx-auto text-left">
+      <h3 class="text-3xl font-bold mb-4"><FAIcon icon="fa-solid fa-person" />&nbsp;Demographic Information</h3>
+      <p class="text-lg mb-8">
         We request some information about you which we can use to understand aggregate differences between individuals.
         Your privacy will be maintained and the data will not be linked to your online identity (e.g., email).
       </p>
@@ -110,20 +127,25 @@ function finish() {
       <div class="mt-10" v-if="api.pathString === 'survey_page1'">
         <div class="flex gap-6">
           <div class="w-1/3">
-            <div class="text-left text-gray-600">
-              <h3 class="text-sm font-bold mb-2">Basic Info</h3>
-              <p class="text-sm">First, we need some basic, generic information about you.</p>
+            <div class="text-left text-muted-foreground">
+              <h3 class="text-lg font-bold mb-2">Basic Info</h3>
+              <p class="text-md text-muted-foreground">First, we need some basic, generic information about you.</p>
             </div>
           </div>
           <div class="flex-1">
-            <div class="border border-gray-300 text-left bg-gray-50 p-6 rounded">
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2"> Date of Birth </label>
+            <div class="border border-border text-left bg-muted p-6 rounded-lg">
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2"> Date of Birth </label>
                 <Popover>
                   <PopoverTrigger as-child>
                     <Button
-                      variant="outline"
-                      :class="cn('w-full justify-start text-left font-normal', !dateValue && 'text-muted-foreground')"
+                      variant="secondary"
+                      :class="
+                        cn(
+                          'w-full justify-start text-left font-normal text-base border border-input bg-background hover:bg-background',
+                          !dateValue && 'text-muted-foreground'
+                        )
+                      "
                     >
                       <CalendarIcon class="mr-2 h-4 w-4" />
                       {{ dateValue ? df.format(dateValue.toDate(getLocalTimeZone())) : 'Pick a date' }}
@@ -133,75 +155,81 @@ function finish() {
                     <Calendar v-model="dateValue" initial-focus />
                   </PopoverContent>
                 </Popover>
-                <p class="text-xs text-gray-500 mt-1">Enter your birthday (required)</p>
+                <p class="text-xs text-muted-foreground mt-1">Enter your birthday (required)</p>
               </div>
 
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2"> Gender </label>
-                <select
-                  v-model="api.persist.forminfo.gender"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select an option</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                  <option value="I prefer not to say">I prefer not to say</option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">Enter your self-identified gender (required)</p>
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2"> Gender </label>
+                <Select v-model="api.persist.forminfo.gender">
+                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                    <SelectItem value="I prefer not to say">I prefer not to say</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p class="text-xs text-muted-foreground mt-1">Enter your self-identified gender (required)</p>
               </div>
 
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2"> Race </label>
-                <select
-                  v-model="api.persist.forminfo.race"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select an option</option>
-                  <option value="Asian">Asian</option>
-                  <option value="Black/African American">Black/African American</option>
-                  <option value="Caucasian/White">Caucasian/White</option>
-                  <option value="Native American">Native American</option>
-                  <option value="Pacific Islander/Native Hawaiian">Pacific Islander/Native Hawaiian</option>
-                  <option value="Mixed Race">Mixed Race</option>
-                  <option value="Other">Other</option>
-                  <option value="I prefer not to say">I prefer not to say</option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">Enter the race that best describes you (required)</p>
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2"> Race </label>
+                <Select v-model="api.persist.forminfo.race">
+                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Asian">Asian</SelectItem>
+                    <SelectItem value="Black/African American">Black/African American</SelectItem>
+                    <SelectItem value="Caucasian/White">Caucasian/White</SelectItem>
+                    <SelectItem value="Native American">Native American</SelectItem>
+                    <SelectItem value="Pacific Islander/Native Hawaiian">Pacific Islander/Native Hawaiian</SelectItem>
+                    <SelectItem value="Mixed Race">Mixed Race</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                    <SelectItem value="I prefer not to say">I prefer not to say</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p class="text-xs text-muted-foreground mt-1">Enter the race that best describes you (required)</p>
               </div>
 
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2"> Are you hispanic? </label>
-                <select
-                  v-model="api.persist.forminfo.hispanic"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select an option</option>
-                  <option value="No">No</option>
-                  <option value="Yes">Yes</option>
-                  <option value="I prefer not to say">I prefer not to say</option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">Do you consider yourself hispanic? (required)</p>
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2"> Are you hispanic? </label>
+                <Select v-model="api.persist.forminfo.hispanic">
+                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="No">No</SelectItem>
+                    <SelectItem value="Yes">Yes</SelectItem>
+                    <SelectItem value="I prefer not to say">I prefer not to say</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p class="text-xs text-muted-foreground mt-1">Do you consider yourself hispanic? (required)</p>
               </div>
 
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2"> Are you fluent in English? </label>
-                <select
-                  v-model="api.persist.forminfo.fluent_english"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select an option</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                  <option value="I prefer not to say">I prefer not to say</option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">Are you able to speak and understanding English? (required)</p>
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2"> Are you fluent in English? </label>
+                <Select v-model="api.persist.forminfo.fluent_english">
+                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Yes">Yes</SelectItem>
+                    <SelectItem value="No">No</SelectItem>
+                    <SelectItem value="I prefer not to say">I prefer not to say</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p class="text-xs text-muted-foreground mt-1">
+                  Are you able to speak and understanding English? (required)
+                </p>
               </div>
 
-              <hr class="border-gray-300 my-6" />
+              <hr class="border-border my-6" />
 
               <div class="flex justify-end">
-                <Button variant="outline" v-if="page_one_complete" @click="api.goNextStep()">
+                <Button variant="outline" :disabled="!page_one_complete" @click="api.goNextStep()">
                   Continue
                   <FAIcon icon="fa-solid fa-arrow-right" />
                 </Button>
@@ -214,106 +242,115 @@ function finish() {
       <div class="mt-10" v-else-if="api.pathString === 'survey_page2'">
         <div class="flex gap-6">
           <div class="w-1/3">
-            <div class="text-left text-gray-600">
-              <h3 class="text-sm font-bold mb-2">Psychological Information</h3>
-              <p class="text-sm">Next, we need some basic information about your ability to perceive this study.</p>
+            <div class="text-left text-muted-foreground">
+              <h3 class="text-lg font-bold mb-2">Psychological Information</h3>
+              <p class="text-md text-muted-foreground">Next, we need some basic information about your ability to perceive this study.</p>
             </div>
           </div>
           <div class="flex-1">
-            <div class="border border-gray-300 text-left bg-gray-50 p-6 rounded">
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+            <div class="border border-border text-left bg-muted p-6 rounded-lg">
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2">
                   Do you have normal vision (or corrected to be normal)?
                 </label>
-                <select
-                  v-model="api.persist.forminfo.normal_vision"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select an option</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                  <option value="Unsure">Unsure</option>
-                  <option value="I prefer not to say">I prefer not to say</option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">Do you have normal vision? (required)</p>
+                <Select v-model="api.persist.forminfo.normal_vision">
+                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Yes">Yes</SelectItem>
+                    <SelectItem value="No">No</SelectItem>
+                    <SelectItem value="Unsure">Unsure</SelectItem>
+                    <SelectItem value="I prefer not to say">I prefer not to say</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p class="text-xs text-muted-foreground mt-1">Do you have normal vision? (required)</p>
               </div>
 
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2"> Are you color blind? </label>
-                <select
-                  v-model="api.persist.forminfo.color_blind"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select an option</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                  <option value="Unsure">Unsure</option>
-                  <option value="I prefer not to say">I prefer not to say</option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">Do you have any color blindness? (required)</p>
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2"> Are you color blind? </label>
+                <Select v-model="api.persist.forminfo.color_blind">
+                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Yes">Yes</SelectItem>
+                    <SelectItem value="No">No</SelectItem>
+                    <SelectItem value="Unsure">Unsure</SelectItem>
+                    <SelectItem value="I prefer not to say">I prefer not to say</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p class="text-xs text-muted-foreground mt-1">Do you have any color blindness? (required)</p>
               </div>
 
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2">
                   Have you been diagnosed with a learning disability (e.g., dyslexia, dysclaculia)?
                 </label>
-                <select
-                  v-model="api.persist.forminfo.learning_disability"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select an option</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                  <option value="Unsure">Unsure</option>
-                  <option value="I prefer not to say">I prefer not to say</option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">Do you have a diagnosed learning disability? (required)</p>
+                <Select v-model="api.persist.forminfo.learning_disability">
+                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Yes">Yes</SelectItem>
+                    <SelectItem value="No">No</SelectItem>
+                    <SelectItem value="Unsure">Unsure</SelectItem>
+                    <SelectItem value="I prefer not to say">I prefer not to say</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p class="text-xs text-muted-foreground mt-1">
+                  Do you have a diagnosed learning disability? (required)
+                </p>
               </div>
 
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2">
                   Have you been diagnosed with a neurodevelopmental disorder (e.g., autism, tic disorder)?
                 </label>
-                <select
-                  v-model="api.persist.forminfo.neurodevelopmental_disorder"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select an option</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                  <option value="Unsure">Unsure</option>
-                  <option value="I prefer not to say">I prefer not to say</option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">
+                <Select v-model="api.persist.forminfo.neurodevelopmental_disorder">
+                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Yes">Yes</SelectItem>
+                    <SelectItem value="No">No</SelectItem>
+                    <SelectItem value="Unsure">Unsure</SelectItem>
+                    <SelectItem value="I prefer not to say">I prefer not to say</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p class="text-xs text-muted-foreground mt-1">
                   Do you have a diagnosis of a neurodevelopmental disorder? (required)
                 </p>
               </div>
 
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2">
                   Have you been diagnosed with a psychiatric disorder (e.g., anxiety, depression, OCD)?
                 </label>
-                <select
-                  v-model="api.persist.forminfo.psychiatric_disorder"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select an option</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                  <option value="Unsure">Unsure</option>
-                  <option value="I prefer not to say">I prefer not to say</option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">Do you have diagnosis of a psychiatric disorder? (required)</p>
+                <Select v-model="api.persist.forminfo.psychiatric_disorder">
+                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Yes">Yes</SelectItem>
+                    <SelectItem value="No">No</SelectItem>
+                    <SelectItem value="Unsure">Unsure</SelectItem>
+                    <SelectItem value="I prefer not to say">I prefer not to say</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p class="text-xs text-muted-foreground mt-1">
+                  Do you have diagnosis of a psychiatric disorder? (required)
+                </p>
               </div>
 
-              <hr class="border-gray-300 my-6" />
+              <hr class="border-border my-6" />
 
               <div class="flex justify-between">
                 <Button variant="outline" @click="api.goPrevStep()">
                   <FAIcon icon="fa-solid fa-arrow-left" />
                   Previous
                 </Button>
-                <Button variant="outline" v-if="page_two_complete" @click="api.goNextStep()">
+                <Button variant="outline" :disabled="!page_two_complete" @click="api.goNextStep()">
                   Continue
                   <FAIcon icon="fa-solid fa-arrow-right" />
                 </Button>
@@ -326,288 +363,297 @@ function finish() {
       <div class="mt-10" v-else-if="api.pathString === 'survey_page3'">
         <div class="flex gap-6">
           <div class="w-1/3">
-            <div class="text-left text-gray-600">
-              <h3 class="text-sm font-bold mb-2">Household Info</h3>
-              <p class="text-sm">Finally we need some basic household information.</p>
+            <div class="text-left text-muted-foreground">
+              <h3 class="text-lg font-bold mb-2">Household Info</h3>
+              <p class="text-md text-muted-foreground">Finally we need some basic household information.</p>
             </div>
           </div>
           <div class="flex-1">
-            <div class="border border-gray-300 text-left bg-gray-50 p-6 rounded">
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2"> Country </label>
-                <select
-                  v-model="api.persist.forminfo.country"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select an option</option>
-                  <option value="Afghanistan">Afghanistan</option>
-                  <option value="Albania">Albania</option>
-                  <option value="Algeria">Algeria</option>
-                  <option value="Andorra">Andorra</option>
-                  <option value="Angola">Angola</option>
-                  <option value="Antigua & Deps">Antigua & Deps</option>
-                  <option value="Argentina">Argentina</option>
-                  <option value="Armenia">Armenia</option>
-                  <option value="Australia">Australia</option>
-                  <option value="Austria">Austria</option>
-                  <option value="Azerbaijan">Azerbaijan</option>
-                  <option value="Bahamas">Bahamas</option>
-                  <option value="Bahrain">Bahrain</option>
-                  <option value="Bangladesh">Bangladesh</option>
-                  <option value="Barbados">Barbados</option>
-                  <option value="Belarus">Belarus</option>
-                  <option value="Belgium">Belgium</option>
-                  <option value="Belize">Belize</option>
-                  <option value="Benin">Benin</option>
-                  <option value="Bhutan">Bhutan</option>
-                  <option value="Bolivia">Bolivia</option>
-                  <option value="Bosnia Herzegovina">Bosnia Herzegovina</option>
-                  <option value="Botswana">Botswana</option>
-                  <option value="Brazil">Brazil</option>
-                  <option value="Brunei">Brunei</option>
-                  <option value="Bulgaria">Bulgaria</option>
-                  <option value="Burkina">Burkina</option>
-                  <option value="Burundi">Burundi</option>
-                  <option value="Cambodia">Cambodia</option>
-                  <option value="Cameroon">Cameroon</option>
-                  <option value="Canada">Canada</option>
-                  <option value="Cape Verde">Cape Verde</option>
-                  <option value="Central African Rep">Central African Rep</option>
-                  <option value="Chad">Chad</option>
-                  <option value="Chile">Chile</option>
-                  <option value="China">China</option>
-                  <option value="Colombia">Colombia</option>
-                  <option value="Comoros">Comoros</option>
-                  <option value="Congo">Congo</option>
-                  <option value="Congo {Democratic Rep}">Congo {Democratic Rep}</option>
-                  <option value="Costa Rica">Costa Rica</option>
-                  <option value="Croatia">Croatia</option>
-                  <option value="Cuba">Cuba</option>
-                  <option value="Cyprus">Cyprus</option>
-                  <option value="Czech Republic">Czech Republic</option>
-                  <option value="Denmark">Denmark</option>
-                  <option value="Djibouti">Djibouti</option>
-                  <option value="Dominica">Dominica</option>
-                  <option value="Dominican Republic">Dominican Republic</option>
-                  <option value="East Timor">East Timor</option>
-                  <option value="Ecuador">Ecuador</option>
-                  <option value="Egypt">Egypt</option>
-                  <option value="El Salvador">El Salvador</option>
-                  <option value="Equatorial Guinea">Equatorial Guinea</option>
-                  <option value="Eritrea">Eritrea</option>
-                  <option value="Estonia">Estonia</option>
-                  <option value="Ethiopia">Ethiopia</option>
-                  <option value="Fiji">Fiji</option>
-                  <option value="Finland">Finland</option>
-                  <option value="France">France</option>
-                  <option value="Gabon">Gabon</option>
-                  <option value="Gambia">Gambia</option>
-                  <option value="Georgia">Georgia</option>
-                  <option value="Germany">Germany</option>
-                  <option value="Ghana">Ghana</option>
-                  <option value="Greece">Greece</option>
-                  <option value="Grenada">Grenada</option>
-                  <option value="Guatemala">Guatemala</option>
-                  <option value="Guinea">Guinea</option>
-                  <option value="Guinea-Bissau">Guinea-Bissau</option>
-                  <option value="Guyana">Guyana</option>
-                  <option value="Haiti">Haiti</option>
-                  <option value="Honduras">Honduras</option>
-                  <option value="Hungary">Hungary</option>
-                  <option value="Iceland">Iceland</option>
-                  <option value="India">India</option>
-                  <option value="Indonesia">Indonesia</option>
-                  <option value="Iran">Iran</option>
-                  <option value="Iraq">Iraq</option>
-                  <option value="Ireland {Republic}">Ireland {Republic}</option>
-                  <option value="Israel">Israel</option>
-                  <option value="Italy">Italy</option>
-                  <option value="Ivory Coast">Ivory Coast</option>
-                  <option value="Jamaica">Jamaica</option>
-                  <option value="Japan">Japan</option>
-                  <option value="Jordan">Jordan</option>
-                  <option value="Kazakhstan">Kazakhstan</option>
-                  <option value="Kenya">Kenya</option>
-                  <option value="Kiribati">Kiribati</option>
-                  <option value="Korea North">Korea North</option>
-                  <option value="Korea South">Korea South</option>
-                  <option value="Kosovo">Kosovo</option>
-                  <option value="Kuwait">Kuwait</option>
-                  <option value="Kyrgyzstan">Kyrgyzstan</option>
-                  <option value="Laos">Laos</option>
-                  <option value="Latvia">Latvia</option>
-                  <option value="Lebanon">Lebanon</option>
-                  <option value="Lesotho">Lesotho</option>
-                  <option value="Liberia">Liberia</option>
-                  <option value="Libya">Libya</option>
-                  <option value="Liechtenstein">Liechtenstein</option>
-                  <option value="Lithuania">Lithuania</option>
-                  <option value="Luxembourg">Luxembourg</option>
-                  <option value="Macedonia">Macedonia</option>
-                  <option value="Madagascar">Madagascar</option>
-                  <option value="Malawi">Malawi</option>
-                  <option value="Malaysia">Malaysia</option>
-                  <option value="Maldives">Maldives</option>
-                  <option value="Mali">Mali</option>
-                  <option value="Malta">Malta</option>
-                  <option value="Marshall Islands">Marshall Islands</option>
-                  <option value="Mauritania">Mauritania</option>
-                  <option value="Mauritius">Mauritius</option>
-                  <option value="Mexico">Mexico</option>
-                  <option value="Micronesia">Micronesia</option>
-                  <option value="Moldova">Moldova</option>
-                  <option value="Monaco">Monaco</option>
-                  <option value="Mongolia">Mongolia</option>
-                  <option value="Montenegro">Montenegro</option>
-                  <option value="Morocco">Morocco</option>
-                  <option value="Mozambique">Mozambique</option>
-                  <option value="Myanmar, {Burma}">Myanmar, {Burma}</option>
-                  <option value="Namibia">Namibia</option>
-                  <option value="Nauru">Nauru</option>
-                  <option value="Nepal">Nepal</option>
-                  <option value="Netherlands">Netherlands</option>
-                  <option value="New Zealand">New Zealand</option>
-                  <option value="Nicaragua">Nicaragua</option>
-                  <option value="Niger">Niger</option>
-                  <option value="Nigeria">Nigeria</option>
-                  <option value="Norway">Norway</option>
-                  <option value="Oman">Oman</option>
-                  <option value="Pakistan">Pakistan</option>
-                  <option value="Palau">Palau</option>
-                  <option value="Panama">Panama</option>
-                  <option value="Papua New Guinea">Papua New Guinea</option>
-                  <option value="Paraguay">Paraguay</option>
-                  <option value="Peru">Peru</option>
-                  <option value="Philippines">Philippines</option>
-                  <option value="Poland">Poland</option>
-                  <option value="Portugal">Portugal</option>
-                  <option value="Qatar">Qatar</option>
-                  <option value="Romania">Romania</option>
-                  <option value="Russian Federation">Russian Federation</option>
-                  <option value="Rwanda">Rwanda</option>
-                  <option value="St Kitts & Nevis">St Kitts & Nevis</option>
-                  <option value="St Lucia">St Lucia</option>
-                  <option value="Saint Vincent & the Grenadines">Saint Vincent & the Grenadines</option>
-                  <option value="Samoa">Samoa</option>
-                  <option value="San Marino">San Marino</option>
-                  <option value="Sao Tome & Principe">Sao Tome & Principe</option>
-                  <option value="Saudi Arabia">Saudi Arabia</option>
-                  <option value="Senegal">Senegal</option>
-                  <option value="Serbia">Serbia</option>
-                  <option value="Seychelles">Seychelles</option>
-                  <option value="Sierra Leone">Sierra Leone</option>
-                  <option value="Singapore">Singapore</option>
-                  <option value="Slovakia">Slovakia</option>
-                  <option value="Slovenia">Slovenia</option>
-                  <option value="Solomon Islands">Solomon Islands</option>
-                  <option value="Somalia">Somalia</option>
-                  <option value="South Africa">South Africa</option>
-                  <option value="South Sudan">South Sudan</option>
-                  <option value="Spain">Spain</option>
-                  <option value="Sri Lanka">Sri Lanka</option>
-                  <option value="Sudan">Sudan</option>
-                  <option value="Suriname">Suriname</option>
-                  <option value="Swaziland">Swaziland</option>
-                  <option value="Sweden">Sweden</option>
-                  <option value="Switzerland">Switzerland</option>
-                  <option value="Syria">Syria</option>
-                  <option value="Taiwan">Taiwan</option>
-                  <option value="Tajikistan">Tajikistan</option>
-                  <option value="Tanzania">Tanzania</option>
-                  <option value="Thailand">Thailand</option>
-                  <option value="Togo">Togo</option>
-                  <option value="Tonga">Tonga</option>
-                  <option value="Trinidad & Tobago">Trinidad & Tobago</option>
-                  <option value="Tunisia">Tunisia</option>
-                  <option value="Turkey">Turkey</option>
-                  <option value="Turkmenistan">Turkmenistan</option>
-                  <option value="Tuvalu">Tuvalu</option>
-                  <option value="Uganda">Uganda</option>
-                  <option value="Ukraine">Ukraine</option>
-                  <option value="United Arab Emirates">United Arab Emirates</option>
-                  <option value="United Kingdom">United Kingdom</option>
-                  <option value="United States">United States</option>
-                  <option value="Uruguay">Uruguay</option>
-                  <option value="Uzbekistan">Uzbekistan</option>
-                  <option value="Vanuatu">Vanuatu</option>
-                  <option value="Vatican City">Vatican City</option>
-                  <option value="Venezuela">Venezuela</option>
-                  <option value="Vietnam">Vietnam</option>
-                  <option value="Yemen">Yemen</option>
-                  <option value="Zambia">Zambia</option>
-                  <option value="Zimbabwe">Zimbabwe</option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">Select the country in which you reside. (required)</p>
+            <div class="border border-border text-left bg-muted p-6 rounded-lg">
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2"> Country </label>
+                <Select v-model="api.persist.forminfo.country">
+                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Afghanistan">Afghanistan</SelectItem>
+                    <SelectItem value="Albania">Albania</SelectItem>
+                    <SelectItem value="Algeria">Algeria</SelectItem>
+                    <SelectItem value="Andorra">Andorra</SelectItem>
+                    <SelectItem value="Angola">Angola</SelectItem>
+                    <SelectItem value="Antigua & Deps">Antigua & Deps</SelectItem>
+                    <SelectItem value="Argentina">Argentina</SelectItem>
+                    <SelectItem value="Armenia">Armenia</SelectItem>
+                    <SelectItem value="Australia">Australia</SelectItem>
+                    <SelectItem value="Austria">Austria</SelectItem>
+                    <SelectItem value="Azerbaijan">Azerbaijan</SelectItem>
+                    <SelectItem value="Bahamas">Bahamas</SelectItem>
+                    <SelectItem value="Bahrain">Bahrain</SelectItem>
+                    <SelectItem value="Bangladesh">Bangladesh</SelectItem>
+                    <SelectItem value="Barbados">Barbados</SelectItem>
+                    <SelectItem value="Belarus">Belarus</SelectItem>
+                    <SelectItem value="Belgium">Belgium</SelectItem>
+                    <SelectItem value="Belize">Belize</SelectItem>
+                    <SelectItem value="Benin">Benin</SelectItem>
+                    <SelectItem value="Bhutan">Bhutan</SelectItem>
+                    <SelectItem value="Bolivia">Bolivia</SelectItem>
+                    <SelectItem value="Bosnia Herzegovina">Bosnia Herzegovina</SelectItem>
+                    <SelectItem value="Botswana">Botswana</SelectItem>
+                    <SelectItem value="Brazil">Brazil</SelectItem>
+                    <SelectItem value="Brunei">Brunei</SelectItem>
+                    <SelectItem value="Bulgaria">Bulgaria</SelectItem>
+                    <SelectItem value="Burkina">Burkina</SelectItem>
+                    <SelectItem value="Burundi">Burundi</SelectItem>
+                    <SelectItem value="Cambodia">Cambodia</SelectItem>
+                    <SelectItem value="Cameroon">Cameroon</SelectItem>
+                    <SelectItem value="Canada">Canada</SelectItem>
+                    <SelectItem value="Cape Verde">Cape Verde</SelectItem>
+                    <SelectItem value="Central African Rep">Central African Rep</SelectItem>
+                    <SelectItem value="Chad">Chad</SelectItem>
+                    <SelectItem value="Chile">Chile</SelectItem>
+                    <SelectItem value="China">China</SelectItem>
+                    <SelectItem value="Colombia">Colombia</SelectItem>
+                    <SelectItem value="Comoros">Comoros</SelectItem>
+                    <SelectItem value="Congo">Congo</SelectItem>
+                    <SelectItem value="Congo {Democratic Rep}">Congo {Democratic Rep}</SelectItem>
+                    <SelectItem value="Costa Rica">Costa Rica</SelectItem>
+                    <SelectItem value="Croatia">Croatia</SelectItem>
+                    <SelectItem value="Cuba">Cuba</SelectItem>
+                    <SelectItem value="Cyprus">Cyprus</SelectItem>
+                    <SelectItem value="Czech Republic">Czech Republic</SelectItem>
+                    <SelectItem value="Denmark">Denmark</SelectItem>
+                    <SelectItem value="Djibouti">Djibouti</SelectItem>
+                    <SelectItem value="Dominica">Dominica</SelectItem>
+                    <SelectItem value="Dominican Republic">Dominican Republic</SelectItem>
+                    <SelectItem value="East Timor">East Timor</SelectItem>
+                    <SelectItem value="Ecuador">Ecuador</SelectItem>
+                    <SelectItem value="Egypt">Egypt</SelectItem>
+                    <SelectItem value="El Salvador">El Salvador</SelectItem>
+                    <SelectItem value="Equatorial Guinea">Equatorial Guinea</SelectItem>
+                    <SelectItem value="Eritrea">Eritrea</SelectItem>
+                    <SelectItem value="Estonia">Estonia</SelectItem>
+                    <SelectItem value="Ethiopia">Ethiopia</SelectItem>
+                    <SelectItem value="Fiji">Fiji</SelectItem>
+                    <SelectItem value="Finland">Finland</SelectItem>
+                    <SelectItem value="France">France</SelectItem>
+                    <SelectItem value="Gabon">Gabon</SelectItem>
+                    <SelectItem value="Gambia">Gambia</SelectItem>
+                    <SelectItem value="Georgia">Georgia</SelectItem>
+                    <SelectItem value="Germany">Germany</SelectItem>
+                    <SelectItem value="Ghana">Ghana</SelectItem>
+                    <SelectItem value="Greece">Greece</SelectItem>
+                    <SelectItem value="Grenada">Grenada</SelectItem>
+                    <SelectItem value="Guatemala">Guatemala</SelectItem>
+                    <SelectItem value="Guinea">Guinea</SelectItem>
+                    <SelectItem value="Guinea-Bissau">Guinea-Bissau</SelectItem>
+                    <SelectItem value="Guyana">Guyana</SelectItem>
+                    <SelectItem value="Haiti">Haiti</SelectItem>
+                    <SelectItem value="Honduras">Honduras</SelectItem>
+                    <SelectItem value="Hungary">Hungary</SelectItem>
+                    <SelectItem value="Iceland">Iceland</SelectItem>
+                    <SelectItem value="India">India</SelectItem>
+                    <SelectItem value="Indonesia">Indonesia</SelectItem>
+                    <SelectItem value="Iran">Iran</SelectItem>
+                    <SelectItem value="Iraq">Iraq</SelectItem>
+                    <SelectItem value="Ireland {Republic}">Ireland {Republic}</SelectItem>
+                    <SelectItem value="Israel">Israel</SelectItem>
+                    <SelectItem value="Italy">Italy</SelectItem>
+                    <SelectItem value="Ivory Coast">Ivory Coast</SelectItem>
+                    <SelectItem value="Jamaica">Jamaica</SelectItem>
+                    <SelectItem value="Japan">Japan</SelectItem>
+                    <SelectItem value="Jordan">Jordan</SelectItem>
+                    <SelectItem value="Kazakhstan">Kazakhstan</SelectItem>
+                    <SelectItem value="Kenya">Kenya</SelectItem>
+                    <SelectItem value="Kiribati">Kiribati</SelectItem>
+                    <SelectItem value="Korea North">Korea North</SelectItem>
+                    <SelectItem value="Korea South">Korea South</SelectItem>
+                    <SelectItem value="Kosovo">Kosovo</SelectItem>
+                    <SelectItem value="Kuwait">Kuwait</SelectItem>
+                    <SelectItem value="Kyrgyzstan">Kyrgyzstan</SelectItem>
+                    <SelectItem value="Laos">Laos</SelectItem>
+                    <SelectItem value="Latvia">Latvia</SelectItem>
+                    <SelectItem value="Lebanon">Lebanon</SelectItem>
+                    <SelectItem value="Lesotho">Lesotho</SelectItem>
+                    <SelectItem value="Liberia">Liberia</SelectItem>
+                    <SelectItem value="Libya">Libya</SelectItem>
+                    <SelectItem value="Liechtenstein">Liechtenstein</SelectItem>
+                    <SelectItem value="Lithuania">Lithuania</SelectItem>
+                    <SelectItem value="Luxembourg">Luxembourg</SelectItem>
+                    <SelectItem value="Macedonia">Macedonia</SelectItem>
+                    <SelectItem value="Madagascar">Madagascar</SelectItem>
+                    <SelectItem value="Malawi">Malawi</SelectItem>
+                    <SelectItem value="Malaysia">Malaysia</SelectItem>
+                    <SelectItem value="Maldives">Maldives</SelectItem>
+                    <SelectItem value="Mali">Mali</SelectItem>
+                    <SelectItem value="Malta">Malta</SelectItem>
+                    <SelectItem value="Marshall Islands">Marshall Islands</SelectItem>
+                    <SelectItem value="Mauritania">Mauritania</SelectItem>
+                    <SelectItem value="Mauritius">Mauritius</SelectItem>
+                    <SelectItem value="Mexico">Mexico</SelectItem>
+                    <SelectItem value="Micronesia">Micronesia</SelectItem>
+                    <SelectItem value="Moldova">Moldova</SelectItem>
+                    <SelectItem value="Monaco">Monaco</SelectItem>
+                    <SelectItem value="Mongolia">Mongolia</SelectItem>
+                    <SelectItem value="Montenegro">Montenegro</SelectItem>
+                    <SelectItem value="Morocco">Morocco</SelectItem>
+                    <SelectItem value="Mozambique">Mozambique</SelectItem>
+                    <SelectItem value="Myanmar, {Burma}">Myanmar, {Burma}</SelectItem>
+                    <SelectItem value="Namibia">Namibia</SelectItem>
+                    <SelectItem value="Nauru">Nauru</SelectItem>
+                    <SelectItem value="Nepal">Nepal</SelectItem>
+                    <SelectItem value="Netherlands">Netherlands</SelectItem>
+                    <SelectItem value="New Zealand">New Zealand</SelectItem>
+                    <SelectItem value="Nicaragua">Nicaragua</SelectItem>
+                    <SelectItem value="Niger">Niger</SelectItem>
+                    <SelectItem value="Nigeria">Nigeria</SelectItem>
+                    <SelectItem value="Norway">Norway</SelectItem>
+                    <SelectItem value="Oman">Oman</SelectItem>
+                    <SelectItem value="Pakistan">Pakistan</SelectItem>
+                    <SelectItem value="Palau">Palau</SelectItem>
+                    <SelectItem value="Panama">Panama</SelectItem>
+                    <SelectItem value="Papua New Guinea">Papua New Guinea</SelectItem>
+                    <SelectItem value="Paraguay">Paraguay</SelectItem>
+                    <SelectItem value="Peru">Peru</SelectItem>
+                    <SelectItem value="Philippines">Philippines</SelectItem>
+                    <SelectItem value="Poland">Poland</SelectItem>
+                    <SelectItem value="Portugal">Portugal</SelectItem>
+                    <SelectItem value="Qatar">Qatar</SelectItem>
+                    <SelectItem value="Romania">Romania</SelectItem>
+                    <SelectItem value="Russian Federation">Russian Federation</SelectItem>
+                    <SelectItem value="Rwanda">Rwanda</SelectItem>
+                    <SelectItem value="St Kitts & Nevis">St Kitts & Nevis</SelectItem>
+                    <SelectItem value="St Lucia">St Lucia</SelectItem>
+                    <SelectItem value="Saint Vincent & the Grenadines">Saint Vincent & the Grenadines</SelectItem>
+                    <SelectItem value="Samoa">Samoa</SelectItem>
+                    <SelectItem value="San Marino">San Marino</SelectItem>
+                    <SelectItem value="Sao Tome & Principe">Sao Tome & Principe</SelectItem>
+                    <SelectItem value="Saudi Arabia">Saudi Arabia</SelectItem>
+                    <SelectItem value="Senegal">Senegal</SelectItem>
+                    <SelectItem value="Serbia">Serbia</SelectItem>
+                    <SelectItem value="Seychelles">Seychelles</SelectItem>
+                    <SelectItem value="Sierra Leone">Sierra Leone</SelectItem>
+                    <SelectItem value="Singapore">Singapore</SelectItem>
+                    <SelectItem value="Slovakia">Slovakia</SelectItem>
+                    <SelectItem value="Slovenia">Slovenia</SelectItem>
+                    <SelectItem value="Solomon Islands">Solomon Islands</SelectItem>
+                    <SelectItem value="Somalia">Somalia</SelectItem>
+                    <SelectItem value="South Africa">South Africa</SelectItem>
+                    <SelectItem value="South Sudan">South Sudan</SelectItem>
+                    <SelectItem value="Spain">Spain</SelectItem>
+                    <SelectItem value="Sri Lanka">Sri Lanka</SelectItem>
+                    <SelectItem value="Sudan">Sudan</SelectItem>
+                    <SelectItem value="Suriname">Suriname</SelectItem>
+                    <SelectItem value="Swaziland">Swaziland</SelectItem>
+                    <SelectItem value="Sweden">Sweden</SelectItem>
+                    <SelectItem value="Switzerland">Switzerland</SelectItem>
+                    <SelectItem value="Syria">Syria</SelectItem>
+                    <SelectItem value="Taiwan">Taiwan</SelectItem>
+                    <SelectItem value="Tajikistan">Tajikistan</SelectItem>
+                    <SelectItem value="Tanzania">Tanzania</SelectItem>
+                    <SelectItem value="Thailand">Thailand</SelectItem>
+                    <SelectItem value="Togo">Togo</SelectItem>
+                    <SelectItem value="Tonga">Tonga</SelectItem>
+                    <SelectItem value="Trinidad & Tobago">Trinidad & Tobago</SelectItem>
+                    <SelectItem value="Tunisia">Tunisia</SelectItem>
+                    <SelectItem value="Turkey">Turkey</SelectItem>
+                    <SelectItem value="Turkmenistan">Turkmenistan</SelectItem>
+                    <SelectItem value="Tuvalu">Tuvalu</SelectItem>
+                    <SelectItem value="Uganda">Uganda</SelectItem>
+                    <SelectItem value="Ukraine">Ukraine</SelectItem>
+                    <SelectItem value="United Arab Emirates">United Arab Emirates</SelectItem>
+                    <SelectItem value="United Kingdom">United Kingdom</SelectItem>
+                    <SelectItem value="United States">United States</SelectItem>
+                    <SelectItem value="Uruguay">Uruguay</SelectItem>
+                    <SelectItem value="Uzbekistan">Uzbekistan</SelectItem>
+                    <SelectItem value="Vanuatu">Vanuatu</SelectItem>
+                    <SelectItem value="Vatican City">Vatican City</SelectItem>
+                    <SelectItem value="Venezuela">Venezuela</SelectItem>
+                    <SelectItem value="Vietnam">Vietnam</SelectItem>
+                    <SelectItem value="Yemen">Yemen</SelectItem>
+                    <SelectItem value="Zambia">Zambia</SelectItem>
+                    <SelectItem value="Zimbabwe">Zimbabwe</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p class="text-xs text-muted-foreground mt-1">Select the country in which you reside. (required)</p>
               </div>
 
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2"> Zipcode/Postal Code </label>
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2"> Zipcode/Postal Code </label>
                 <input
                   type="text"
                   v-model="api.persist.forminfo.zipcode"
                   placeholder="Enter zip or postal code"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  class="w-full px-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
                 />
-                <p class="text-xs text-gray-500 mt-1">
+                <p class="text-xs text-muted-foreground mt-1">
                   Select zipcode or postal code of your primary residence. (optional)
                 </p>
               </div>
 
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2"> Highest level of education </label>
-                <select
-                  v-model="api.persist.forminfo.education_level"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select an option</option>
-                  <option value="No Formal Qualifications">No Formal Qualifications</option>
-                  <option value="Secondary Education (ie. GED/GCSE)">Secondary Education (ie. GED/GCSE)</option>
-                  <option value="High School Diploma (A-levels)">High School Diploma (A-levels)</option>
-                  <option value="Technical/Community College">Technical/Community College</option>
-                  <option value="Undergraduate Degree (BA/BS/Other)">Undergraduate Degree (BA/BS/Other)</option>
-                  <option value="Graduate Degree (MA/MS/MPhil/Other)">Graduate Degree (MA/MS/MPhil/Other)</option>
-                  <option value="Doctorate Degree (PhD/Other)">Doctorate Degree (PhD/Other)</option>
-                  <option value="Don't Know/Not Applicable">Don't Know/Not Applicable</option>
-                  <option value="I prefer not to answer">I prefer not to answer</option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2"> Highest level of education </label>
+                <Select v-model="api.persist.forminfo.education_level">
+                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="No Formal Qualifications">No Formal Qualifications</SelectItem>
+                    <SelectItem value="Secondary Education (ie. GED/GCSE)"
+                      >Secondary Education (ie. GED/GCSE)</SelectItem
+                    >
+                    <SelectItem value="High School Diploma (A-levels)">High School Diploma (A-levels)</SelectItem>
+                    <SelectItem value="Technical/Community College">Technical/Community College</SelectItem>
+                    <SelectItem value="Undergraduate Degree (BA/BS/Other)"
+                      >Undergraduate Degree (BA/BS/Other)</SelectItem
+                    >
+                    <SelectItem value="Graduate Degree (MA/MS/MPhil/Other)"
+                      >Graduate Degree (MA/MS/MPhil/Other)</SelectItem
+                    >
+                    <SelectItem value="Doctorate Degree (PhD/Other)">Doctorate Degree (PhD/Other)</SelectItem>
+                    <SelectItem value="Don't Know/Not Applicable">Don't Know/Not Applicable</SelectItem>
+                    <SelectItem value="I prefer not to answer">I prefer not to answer</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p class="text-xs text-muted-foreground mt-1">
                   What is your highest level of schooling that you completed? (required)
                 </p>
               </div>
 
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+              <div class="mb-3">
+                <label class="block text-md font-medium text-foreground mb-2">
                   Enter your approximate household income.
                 </label>
-                <select
-                  v-model="api.persist.forminfo.household_income"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select an option</option>
-                  <option value="Less than $20,000">Less than $20,000</option>
-                  <option value="$20,000–$39,999">$20,000–$39,999</option>
-                  <option value="$40,000–$59,999">$40,000–$59,999</option>
-                  <option value="$60,000–$79,999">$60,000–$79,999</option>
-                  <option value="$80,000–$99,999">$80,000–$99,999</option>
-                  <option value="$100,000–$199,999">$100,000–$199,999</option>
-                  <option value="$200,000–$299,999">$200,000–$299,999</option>
-                  <option value="$300,000–$399,999">$300,000–$399,999</option>
-                  <option value="$400,000–$499,999">$400,000–$499,999</option>
-                  <option value="$500,000+">$500,000+</option>
-                  <option value="I don't know">I don't know</option>
-                  <option value="I prefer not to answer">I prefer not to answer</option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">What is your approximate household income? (required)</p>
+                <Select v-model="api.persist.forminfo.household_income">
+                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Less than $20,000">Less than $20,000</SelectItem>
+                    <SelectItem value="$20,000–$39,999">$20,000–$39,999</SelectItem>
+                    <SelectItem value="$40,000–$59,999">$40,000–$59,999</SelectItem>
+                    <SelectItem value="$60,000–$79,999">$60,000–$79,999</SelectItem>
+                    <SelectItem value="$80,000–$99,999">$80,000–$99,999</SelectItem>
+                    <SelectItem value="$100,000–$199,999">$100,000–$199,999</SelectItem>
+                    <SelectItem value="$200,000–$299,999">$200,000–$299,999</SelectItem>
+                    <SelectItem value="$300,000–$399,999">$300,000–$399,999</SelectItem>
+                    <SelectItem value="$400,000–$499,999">$400,000–$499,999</SelectItem>
+                    <SelectItem value="$500,000+">$500,000+</SelectItem>
+                    <SelectItem value="I don't know">I don't know</SelectItem>
+                    <SelectItem value="I prefer not to answer">I prefer not to answer</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p class="text-xs text-muted-foreground mt-1">What is your approximate household income? (required)</p>
               </div>
 
-              <hr class="border-gray-300 my-6" />
+              <hr class="border-border my-6" />
 
               <div class="flex justify-between">
                 <Button variant="outline" @click="api.goPrevStep()">
                   <FAIcon icon="fa-solid fa-arrow-left" />
                   Previous
                 </Button>
-                <Button variant="default" v-if="page_three_complete" @click="finish()"> That was easy! </Button>
+                <Button variant="default" :disabled="!page_three_complete" @click="finish()"> That was easy! </Button>
               </div>
             </div>
           </div>

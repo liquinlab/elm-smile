@@ -65,17 +65,17 @@ onBeforeUnmount(() => {
 <template>
   <div class="select-none">
     <div class="container mx-auto px-4 py-8">
-      <div class="bg-gray-100 rounded-lg p-6">
+      <div class="bg-muted/50 text-foreground rounded-lg p-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div class="lg:col-span-7">
-            <div class="pt-5">
+            <div class="pt-5 overflow-y-scroll h-[600px] text-foreground">
               <component :is="informedConsentText" />
             </div>
           </div>
           <div class="lg:col-span-5">
             <Card class="mt-8">
               <CardContent class="p-6">
-                <p class="text-left font-semibold text-gray-800 mb-4">
+                <p class="text-left font-semibold text-foreground mb-4">
                   We first must verify that you are participating willingly and know your rights. Please take the time
                   to read the consent form (you can scroll the page).
                 </p>

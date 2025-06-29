@@ -19,8 +19,9 @@ function finish() {
 </script>
 
 <template>
-  <div class="page select-none">
+  <div class="w-3/5 py-10 mx-auto select-none">
     <component :is="debriefText" />
+    <hr class="border-border my-6" />
     <div class="flex justify-end mt-4">
       <Button variant="default" @click="finish()">
         next

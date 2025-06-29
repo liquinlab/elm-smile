@@ -11,7 +11,7 @@ function finish() {
 </script>
 
 <template>
-  <div class="page select-none">
+  <div class="w-4/5 py-10 prevent-select mx-auto ">
     <h1 class="text-2xl font-bold mb-4">Experiment</h1>
     <hr class="border-gray-300 my-4" />
     <div class="flex justify-end">
