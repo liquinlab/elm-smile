@@ -1,5 +1,4 @@
 <script setup>
-import DocsDropDown from '@/dev/developer_mode/DocsDropDown.vue'
 import Stepper from '@/dev/developer_mode/Stepper.vue'
 import RouteInfoButton from '@/dev/developer_mode/RouteInfoButton.vue'
 import ResetButton from '@/dev/developer_mode/ResetButton.vue'
@@ -27,9 +26,12 @@ const api = useAPI()
  *
  * Panel Controls:
  * - Ctrl+1: Toggle sidebar/console panels
- * - Ctrl+2: Cycle through console tabs (Browse -> Log -> Config)
- * - Ctrl+3: Reset local state
- * - Ctrl+4: Connect to database
+ * - Ctrl+2: Cycle through sidebar tabs (Steps -> Random -> DB Info)
+ * - Ctrl+3: Cycle through console tabs (Browse -> Log -> Config)
+ * - Ctrl+R: Reset local state
+ * - Ctrl+D: Connect to database
+ * - Ctrl+A: Autofill current view (if available)
+ * - Ctrl+P: Pin/unpin current route
  */
 onKeyDown((e) => {
   if (e.key === 'ArrowUp') {
@@ -78,32 +80,56 @@ onKeyDown((e) => {
   if (e.ctrlKey && e.key === '2') {
     e.preventDefault()
 
+    if (!api.store.dev.showSideBar) {
+      showTemporaryNotification('Ctrl + 2', 'Sidebar is hidden', 'error')
+      return
+    }
+
+    const currentTab = api.store.dev.sideBarTab
+
+    if (currentTab === 'steps') {
+      api.store.dev.sideBarTab = 'randomization'
+      showTemporaryNotification('Ctrl + 2', 'Switched to Random Tab')
+    } else if (currentTab === 'randomization') {
+      api.store.dev.sideBarTab = 'db'
+      showTemporaryNotification('Ctrl + 2', 'Switched to DB Info Tab')
+    } else {
+      api.store.dev.sideBarTab = 'steps'
+      showTemporaryNotification('Ctrl + 2', 'Switched to Steps Tab')
+    }
+  }
+})
+
+// Modify Ctrl+3 handler
+onKeyDown((e) => {
+  if (e.ctrlKey && e.key === '3') {
+    e.preventDefault()
+
+    if (!api.store.dev.showConsoleBar) {
+      showTemporaryNotification('Ctrl + 3', 'Console is hidden', 'error')
+      return
+    }
+
     const currentTab = api.store.dev.consoleBarTab
 
     if (currentTab === 'browse') {
       api.store.dev.consoleBarTab = 'log'
-      if (api.store.dev.showConsoleBar) {
-        showTemporaryNotification('Ctrl + 2', 'Switched to Log Tab')
-      }
+      showTemporaryNotification('Ctrl + 3', 'Switched to Log Tab')
     } else if (currentTab === 'log') {
       api.store.dev.consoleBarTab = 'config'
-      if (api.store.dev.showConsoleBar) {
-        showTemporaryNotification('Ctrl + 2', 'Switched to Config Tab')
-      }
+      showTemporaryNotification('Ctrl + 3', 'Switched to Config Tab')
     } else {
       api.store.dev.consoleBarTab = 'browse'
-      if (api.store.dev.showConsoleBar) {
-        showTemporaryNotification('Ctrl + 2', 'Switched to Browse Tab')
-      }
+      showTemporaryNotification('Ctrl + 3', 'Switched to Browse Tab')
     }
   }
 })
 
 // Add shortcut for resetting local state
 onKeyDown((e) => {
-  if (e.ctrlKey && e.key === '3') {
+  if (e.ctrlKey && e.key === 'r') {
     e.preventDefault()
-    showTemporaryNotification('Ctrl + 3', 'Resetting Local State')
+    showTemporaryNotification('Ctrl + R', 'Resetting Local State')
     setTimeout(() => {
       api.resetLocalState()
     }, 200)
@@ -112,12 +138,42 @@ onKeyDown((e) => {
 
 // Add shortcut for connecting to database
 onKeyDown((e) => {
-  if (e.ctrlKey && e.key === '4') {
+  if (e.ctrlKey && e.key === 'd') {
     e.preventDefault()
     if (!api.store.browserPersisted.knownUser) {
       api.setKnown()
       api.setConsented()
-      showTemporaryNotification('Ctrl + 4', 'Connected to Database')
+      showTemporaryNotification('Ctrl + D', 'Connected to Database')
+    }
+  }
+})
+
+// Add shortcut for autofill
+onKeyDown((e) => {
+  if (e.ctrlKey && e.key === 'a') {
+    e.preventDefault()
+    if (api.hasAutofill()) {
+      api.autofill()
+      showTemporaryNotification('Ctrl + A', 'Autofilled Current View')
+    } else {
+      showTemporaryNotification('Ctrl + A', 'No Autofill Available', 'error')
+    }
+  }
+})
+
+// Add shortcut for pinning current route
+onKeyDown((e) => {
+  if (e.ctrlKey && e.key === 'p') {
+    e.preventDefault()
+    const currentRoute = api.currentRouteName()
+    const isCurrentlyPinned = api.store.dev.pinnedRoute === currentRoute
+
+    if (isCurrentlyPinned) {
+      api.store.dev.pinnedRoute = null
+      showTemporaryNotification('Ctrl + P', 'Unpinned Route')
+    } else {
+      api.store.dev.pinnedRoute = currentRoute
+      showTemporaryNotification('Ctrl + P', 'Pinned Current Route')
     }
   }
 })
@@ -127,17 +183,20 @@ onKeyDown((e) => {
  *
  * @param {string} command - The command text to display in the notification
  * @param {string} action - The action text to display in the notification
+ * @param {string} type - The type of notification ('default' or 'error')
  *
  * Sets the notification content and shows it by updating reactive refs:
  * - notificationCommand
  * - notificationAction
+ * - notificationType
  * - showNotification
  *
  * Uses setTimeout to automatically hide the notification after 1.5 seconds
  */
-const showTemporaryNotification = (command, action) => {
+const showTemporaryNotification = (command, action, type = 'default') => {
   notificationCommand.value = command
   notificationAction.value = action
+  notificationType.value = type
   showNotification.value = true
   setTimeout(() => {
     showNotification.value = false
@@ -148,6 +207,7 @@ const showTemporaryNotification = (command, action) => {
 const showNotification = ref(false)
 const notificationCommand = ref('')
 const notificationAction = ref('')
+const notificationType = ref('default')
 </script>
 
 <template>
@@ -212,7 +272,12 @@ const notificationAction = ref('')
       </div>
     </div>
   </nav>
-  <KeyCommandNotification :show="showNotification" :command="notificationCommand" :action="notificationAction" />
+  <KeyCommandNotification
+    :show="showNotification"
+    :command="notificationCommand"
+    :action="notificationAction"
+    :type="notificationType"
+  />
 </template>
 
 <style scoped>

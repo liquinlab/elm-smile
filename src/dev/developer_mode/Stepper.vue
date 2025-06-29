@@ -18,7 +18,7 @@ const api = useViewAPI()
             <ChevronLeft />
           </ButtonGroupItem>
         </TooltipTrigger>
-        <TooltipContent side="bottom"> Step back </TooltipContent>
+        <TooltipContent side="bottom"> Step back (Left Arrow) </TooltipContent>
       </Tooltip>
 
       <Tooltip>
@@ -40,7 +40,7 @@ const api = useViewAPI()
             <ChevronRight />
           </ButtonGroupItem>
         </TooltipTrigger>
-        <TooltipContent side="bottom"> Step forward </TooltipContent>
+        <TooltipContent side="bottom"> Step forward (Right Arrow) </TooltipContent>
       </Tooltip>
     </ButtonGroup>
   </TooltipProvider>
