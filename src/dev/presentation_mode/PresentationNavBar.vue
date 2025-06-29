@@ -5,6 +5,7 @@ import { useRouter, useRoute } from 'vue-router'
 import RouteInfoButton from '@/dev/developer_mode/RouteInfoButton.vue'
 import ResetButton from '@/dev/presentation_mode/PresentationModeResetButton.vue'
 import QRCodeButton from '@/dev/presentation_mode/QRCodeButton.vue'
+import DarkModeButton from '@/dev/presentation_mode/DarkModeButton.vue'
 import { Presentation } from 'lucide-vue-next'
 </script>
 
@@ -37,6 +38,11 @@ import { Presentation } from 'lucide-vue-next'
     <!-- Right section - anchored to the right -->
     <div class="flex items-center flex-shrink-0 px-1 py-1 rounded">
       <div class="flex items-center space-x-2.5 border-gray-300 pl-4 rounded-l">
+        <!-- dark mode button -->
+        <div class="flex items-center">
+          <DarkModeButton></DarkModeButton>
+        </div>
+
         <!-- QR code button -->
         <div class="flex items-center">
           <QRCodeButton></QRCodeButton>

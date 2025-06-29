@@ -77,7 +77,7 @@ function getAffiliationIndex(affiliation) {
         <h1 class="text-5xl font-bold text-foreground mb-4 leading-tight">
           {{ title }}
         </h1>
-        <p class="text-xl text-muted-foreground leading-relaxed">
+        <p class="text-2xl text-muted-foreground leading-relaxed">
           {{ subtitle }}
         </p>
       </div>
@@ -167,20 +167,20 @@ function getAffiliationIndex(affiliation) {
     <main class="w-2/3 mx-auto px-6 py-12">
       <!-- Project Description -->
       <div class="prose prose-gray max-w-none mb-12">
-        <p class="text-base text-muted-foreground leading-relaxed mb-4">
+        <p class="text-lg text-muted-foreground leading-relaxed mb-4">
           This is a description of this project. It was a project that took many years to set up. The purpose of this
           site is to document the project and to allow people to experience the task first hand. Presentation mode is a
           nice way to share the experiment with the world. In addition you can use presentation mode a simple
           interface/viewer for your task. It's actually pretty fun.
         </p>
-        <p class="text-base text-muted-foreground leading-relaxed mb-4">
+        <p class="text-lg text-muted-foreground leading-relaxed mb-4">
           Maybe someday we can make this like a full featured scientific writing tool with support for math equations
           and stuff but for now this is just a starter template with a design inspired by the Distill.pub website.
         </p>
-        <p class="text-base text-muted-foreground leading-relaxed mb-4">
+        <p class="text-lg text-muted-foreground leading-relaxed mb-4">
           You can write as much as you want here and then you can include links and other elements from your experiment.
         </p>
-        <p class="text-base text-muted-foreground leading-relaxed">
+        <p class="text-lg text-muted-foreground leading-relaxed">
           Use the links below to navigate to different parts of the experiment, or use the navigation bar at the top of
           the page.
         </p>
@@ -192,8 +192,8 @@ function getAffiliationIndex(affiliation) {
       <div class="space-y-8">
         <!-- Start from beginning -->
         <div>
-          <h3 class="text-lg font-semibold text-foreground mb-3">Start from beginning</h3>
-          <p class="text-sm text-muted-foreground mb-4">
+          <h3 class="text-xl font-semibold text-foreground mb-3">Start from beginning</h3>
+          <p class="text-lg text-muted-foreground mb-4">
             Start the experiment from the very beginning as if you were a real participant. Your data will not be saved,
             though some local storage may be used while you are on the page.
           </p>
@@ -209,8 +209,8 @@ function getAffiliationIndex(affiliation) {
 
         <!-- Instructions -->
         <div>
-          <h3 class="text-lg font-semibold text-foreground mb-3">Instructions</h3>
-          <p class="text-sm text-muted-foreground mb-4">
+          <h3 class="text-xl font-semibold text-foreground mb-3">Instructions</h3>
+          <p class="text-lg text-muted-foreground mb-4">
             Go to the task instructions to learn about how to play the game. After several pages of instructions, you
             can try out the comprehension quiz that real participants must pass to continue.
           </p>
@@ -226,8 +226,8 @@ function getAffiliationIndex(affiliation) {
 
         <!-- Captcha game -->
         <div>
-          <h3 class="text-lg font-semibold text-foreground mb-3">Play captcha game</h3>
-          <p class="text-sm text-muted-foreground mb-4">
+          <h3 class="text-xl font-semibold text-foreground mb-3">Play captcha game</h3>
+          <p class="text-lg text-muted-foreground mb-4">
             Try out the captcha game participants play to ensure that they are human (and that the required software
             loads properly in their browser).
           </p>
