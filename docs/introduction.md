@@ -11,9 +11,10 @@ accomplish more in less time.
 
 ### Highlighted features:
 
-- Fast and fun front-end interface development with [Vue.js](https://vuejs.org)
-  and [Bulma CSS](https://bulma.io). Make complex games, animations, and surveys
-  with ease.
+- Fast and fun front-end interface development with [Vue.js](https://vuejs.org),
+  [Tailwind CSS](https://tailwindcss.com/), and
+  [Shadcn/vue](https://www.shadcn-vue.com/). Make complex games, animations, and
+  surveys with ease.
 - Custom [API](/api) and [developer mode tools](/developing) which provides a
   novel interface for specifying and debugging interactive experiments.
 - Built-in support for [common experiment elements](/views#built-in-views) like
@@ -22,9 +23,8 @@ accomplish more in less time.
 - Participant-friendly features include the ability to withdraw from the
   experiment (while providing feedback), incremental data saving, optimized load
   times, ability to resume from where you left off even if reloading the pages,
-  and graceful error handling.
-  <!-- and a responsive design that works on most/all
-  devices.-->
+  and graceful error handling and a responsive design that works on most/all
+  devices.
 - Developer [mode](/developing) which makes it easier to debug and design
   experiments. Jump quickly between phases and trials in your experiments,
   [autofill forms and generate fake data for testing](/autofill),
@@ -33,10 +33,9 @@ accomplish more in less time.
 - Use Vue's
   [declarative programming and reactive data binding](/components#declarative-rendering-and-reactivity)
   to simplify your coding.
-- Code writing can be greatly accelerated using AI tools like
-  [Cursor](https://www.cursor.com/) because LLMs are trained on extensive
-  codebases covering VueJS, Bulma, and other popular web standards used by the
-  project.
+- Code writing can be greatly accelerated using AI tools because LLMs are
+  trained on extensive codebases covering Vue, Tailwind, and other popular web
+  standards used by the project.
 - Built-in support for multiple [recruitment services](/recruitment) including
   Prolific, MTurk, CloudResearch, and more.
 - Secure data storage and retrieval using a flexible, but easy-to-use

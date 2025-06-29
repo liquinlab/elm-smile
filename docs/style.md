@@ -1,10 +1,3 @@
----
-head:
-  - - link
-    - rel: stylesheet
-      href: /css/bulma-prefixed.min.css
----
-
 # Styling, CSS, and Icons
 
 Styling the look and feel of your experiment elements is often a time-consuming
@@ -30,16 +23,16 @@ before continuing.
 
 ## Global design framework: Bulma
 
-The components in <SmileText/> by default use the [Bulma](https://bulma.io) CSS
-framework. Bulma is a free, open-source framework that provides simple
-components that help you build
+The components in <SmileText/> by default use the
+[Tailwind](https://tailwindcss.com/) CSS framework. Tailwind is a free,
+open-source framework that provides simple components that help you build
 [responsive](https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Responsive_Design)
 web interfaces.
 
 It is already included in the main <SmileText/> application framework so there
 is nothing you need to do to use it in your components.
 
-At its core, Bulma provides a set of CSS classes that you can apply to your
+At its core, Tailwind provides a set of CSS classes that you can apply to your
 elements to help quickly style your display. (It is similar to
 [Bootstrap](https://getbootstrap.com) and [Tailwind](https://tailwindcss.com) if
 you have used these before.)
