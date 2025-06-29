@@ -101,7 +101,7 @@ function finish() {
   <div class="flex items-center justify-center select-none py-8">
     <!-- Show this for each trial -->
     <div class="text-center" v-if="api.path[0] == 'stroop'">
-      <div class="text-sm text-gray-600 mb-4">
+      <div class="text-sm text-muted-foreground mb-4">
         {{ api.blockIndex }} / {{ api.blockLength }}, {{ api.stepIndex }} / {{ api.nSteps }}
       </div>
       <h1
@@ -114,15 +114,19 @@ function finish() {
       >
         {{ api.stepData.word }}
       </h1>
-      <p class="text-lg text-gray-700" id="prompt">Type "R" for Red, "B" for blue, "G" for green.</p>
+      <p class="text-lg text-muted-foreground" id="prompt">Type "R" for Red, "B" for blue, "G" for green.</p>
     </div>
 
     <!-- Show this when you are done with the trials and offer a button
          which will advance to the next route -->
     <div class="text-center" v-else>
-      <p class="text-lg text-gray-700 mb-4" id="prompt">Thanks! You are finished with this task and can move on.</p>
+      <p class="text-lg text-muted-foreground mb-4" id="prompt">
+        Thanks! You are finished with this task and can move on.
+      </p>
       <!-- display the final score -->
-      <p class="text-xl font-semibold text-gray-800 mb-6">Your score was {{ api.persist.finalScore.toFixed(2) }}%</p>
+      <p class="text-xl font-semibold text-muted-foreground mb-6">
+        Your score was {{ api.persist.finalScore.toFixed(2) }}%
+      </p>
       <Button variant="default" size="lg" id="finish" @click="finish()">
         Continue
         <svg class="w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 20 20">

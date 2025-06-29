@@ -1,6 +1,6 @@
 <template>
   <div class="p-3 pt-2 text-left">
-    <h1 class="text-xl font-bold">Informed Consent Statement</h1>
+    <h1 class="text-3xl font-bold"><i-mdi-approve class="inline-block mr-2" />Informed Consent</h1>
     <hr class="mt-2 mb-3 h-px" />
     <p>
       If you agree to be in this study, you will be asked to look at pictures of objects or pictures presented on a
