@@ -122,12 +122,16 @@ class ViewAPI extends SmileAPI {
   /**
    * Advances to the next step in the stepper.
    * Updates the stepper state if a next step exists.
+   * @param {boolean} [resetScroll=true] - Whether to reset scroll position to top after navigation
    * @returns {Object|null} The next state object if one exists, null otherwise
    * @memberof ViewAPI
    * @instance
    */
-  goNextStep() {
+  goNextStep(resetScroll = true) {
     let next = this._stepper.value.next()
+    if (resetScroll) {
+      this.scrollToTop()
+    }
     if (next !== null) {
       this._updateStepperState(next)
     }
@@ -137,12 +141,16 @@ class ViewAPI extends SmileAPI {
   /**
    * Returns to the previous step in the stepper.
    * Updates the stepper state if a previous step exists.
+   * @param {boolean} [resetScroll=true] - Whether to reset scroll position to top after navigation
    * @returns {Object|null} The previous state object if one exists, null otherwise
    * @memberof ViewAPI
    * @instance
    */
-  goPrevStep() {
+  goPrevStep(resetScroll = true) {
     let prev = this._stepper.value.prev()
+    if (resetScroll) {
+      this.scrollToTop()
+    }
     if (prev !== null) {
       this._updateStepperState(prev)
     }
@@ -152,25 +160,33 @@ class ViewAPI extends SmileAPI {
   /**
    * Resets the stepper to its first step.
    * Updates the stepper state after resetting to the initial position.
+   * @param {boolean} [resetScroll=true] - Whether to reset scroll position to top after navigation
    * @returns {void}
    * @memberof ViewAPI
    * @instance
    */
-  goFirstStep() {
+  goFirstStep(resetScroll = true) {
     this._stepper.value.reset()
+    if (resetScroll) {
+      this.scrollToTop()
+    }
     this._updateStepperState(this._stepper.value)
   }
 
   /**
    * Navigates to a specific step by path.
    * Updates the stepper state after navigating to the specified path.
-   * @param {string} path - The path of the step to navigate to
+   * @param {string} path - The path of the step to navigate to (e.g. "trial/block1/step2")
+   * @param {boolean} [resetScroll=true] - Whether to reset scroll position to top after navigation
    * @returns {void}
    * @memberof ViewAPI
    * @instance
    */
-  goToStep(path) {
+  goToStep(path, resetScroll = true) {
     this._stepper.value.goTo(path)
+    if (resetScroll) {
+      this.scrollToTop()
+    }
     this._updateStepperState(this._stepper.value)
   }
 

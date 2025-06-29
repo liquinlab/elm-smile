@@ -659,13 +659,6 @@ them as needed for your study.
 **Base Component**: `@/builtins/navbars/StatusBar.vue`  
 **Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/navbars/StatusBar.vue)
 
-### Progress Bar
-
-**Base Component**: `@/builtins/navbars/ProgressBar.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/navbars/ProgressBar.vue)
-
-Not implemented fully.
-
 ### Withdraw Modal
 
 **Base Component**: `@/builtins/withdraw/WithdrawFormModal.vue`  

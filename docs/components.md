@@ -541,7 +541,6 @@ src/builtins
 ├── mturk
 │   └── MTurkRecruitView.vue
 ├── navbars
-│   ├── ProgressBar.vue
 │   └── StatusBar.vue
 ├── report_issue
 │   └── ReportIssueModal.vue

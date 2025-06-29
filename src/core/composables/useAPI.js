@@ -106,27 +106,51 @@ export class SmileAPI {
   // Router related methods
   /**
    * Navigate to the next view in the timeline sequence
+   * @param {boolean} [resetScroll=true] - Whether to reset scroll position to top after navigation
    * @returns {void}
+   * @memberof SmileAPI
+   * @instance
    */
-  goNextView = () => this.timeline.goNextView()
+  goNextView = (resetScroll = true) => {
+    this.timeline.goNextView(() => {
+      if (resetScroll) {
+        this.scrollToTop()
+      }
+    })
+  }
   /**
    * Navigate to the previous view in the timeline sequence
+   * @param {boolean} [resetScroll=true] - Whether to reset scroll position to top after navigation
    * @returns {void}
+   * @memberof SmileAPI
+   * @instance
    */
-  goPrevView = () => this.timeline.goPrevView()
+  goPrevView = (resetScroll = true) => {
+    this.timeline.goPrevView(() => {
+      if (resetScroll) {
+        this.scrollToTop()
+      }
+    })
+  }
   /**
    * Navigate to a specific view in the application
    * @param {string} view - The name of the view to navigate to
    * @param {boolean} [force=true] - Whether to force navigation by temporarily disabling navigation guards
+   * @param {boolean} [resetScroll=true] - Whether to reset scroll position to top after navigation
    * @returns {Promise<void>}
+   * @memberof SmileAPI
+   * @instance
    */
-  goToView = async (view, force = true) => {
+  goToView = async (view, force = true, resetScroll = true) => {
     if (force) {
       this.store.browserEphemeral.forceNavigate = true
       await this.router.push({ name: view })
       this.store.browserEphemeral.forceNavigate = false
     } else {
       await this.router.push({ name: view })
+    }
+    if (resetScroll) {
+      this.scrollToTop()
     }
   }
 
@@ -154,6 +178,16 @@ export class SmileAPI {
    */
   prevView = () => this.timeline.prevView()
 
+  /**
+   * Scrolls the main content container to the top
+   * @returns {void}
+   */
+  scrollToTop() {
+    const mainContent = document.querySelector('.device-container')
+    if (mainContent) {
+      mainContent.scrollTop = 0
+    }
+  }
   // Randomization utilities
   /**
    * Collection of faker distributions for generating random data

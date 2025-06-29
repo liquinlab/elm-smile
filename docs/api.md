@@ -36,10 +36,18 @@ The following functions are available when using `useViewAPI`:
 
 ### Navigation
 
-- `goNextStep()`: Advances to the next step in the stepper.
-- `goPrevStep()`: Returns to the previous step in the stepper.
-- `goToStep(path)`: Navigates to a specific step by path.
-- `goFirstStep()`: Resets the stepper to its first step.
+- `goNextStep(resetScroll = true)`: Advances to the next step in the stepper.
+  The `resetScroll` parameter controls whether to automatically scroll to the
+  top of the page after navigation.
+- `goPrevStep(resetScroll = true)`: Returns to the previous step in the stepper.
+  The `resetScroll` parameter controls whether to automatically scroll to the
+  top of the page after navigation.
+- `goToStep(path, resetScroll = true)`: Navigates to a specific step by path.
+  The `resetScroll` parameter controls whether to automatically scroll to the
+  top of the page after navigation.
+- `goFirstStep(resetScroll = true)`: Resets the stepper to its first step. The
+  `resetScroll` parameter controls whether to automatically scroll to the top of
+  the page after navigation.
 - `hasNextStep()`: Checks if there's a next step available.
 - `hasPrevStep()`: Checks if there's a previous step available.
 - `hasSteps()`: Checks if the stepper has any steps.
@@ -113,12 +121,48 @@ The following functions are available in both `useAPI` and `useViewAPI`:
 
 ## Navigation
 
-- `goNextView()`: Advances to the next View in the timeline.
-- `goPrevView()`: Returns to the previous View in the timeline.
-- `goToView(view, force = true)`: Navigates to a specific View (by name). The
-  force parameter temporarily disables navigation guards.
+- `goNextView(resetScroll = true)`: Advances to the next View in the timeline.
+  The `resetScroll` parameter controls whether to automatically scroll to the
+  top of the page after navigation.
+- `goPrevView(resetScroll = true)`: Returns to the previous View in the
+  timeline. The `resetScroll` parameter controls whether to automatically scroll
+  to the top of the page after navigation.
+- `goToView(view, force = true, resetScroll = true)`: Navigates to a specific
+  View (by name). The `force` parameter temporarily disables navigation guards.
+  The `resetScroll` parameter controls whether to automatically scroll to the
+  top of the page after navigation.
 - `hasNextView()`: Checks if there's a next View available.
 - `hasPrevView()`: Checks if there's a previous View available.
+
+### Scroll Behavior
+
+All navigation methods in both the base API and view API include an optional
+`resetScroll` parameter that controls automatic scrolling behavior:
+
+- **`resetScroll = true` (default)**: Automatically scrolls the main content
+  container to the top after navigation. This ensures users start at the top of
+  new views/steps.
+- **`resetScroll = false`**: Preserves the current scroll position after
+  navigation. Useful when you want to maintain the user's scroll position.
+
+The scroll behavior targets the `.device-container` element, which is the main
+content wrapper in SMILE applications.
+
+**Example usage:**
+
+```javascript
+// Navigate to next view and scroll to top (default behavior)
+api.goNextView()
+
+// Navigate to next view but preserve scroll position
+api.goNextView(false)
+
+// Navigate to specific step and scroll to top
+api.goToStep('trial/block1/step2')
+
+// Navigate to specific step but preserve scroll position
+api.goToStep('trial/block1/step2', false)
+```
 
 ## State Management
 
