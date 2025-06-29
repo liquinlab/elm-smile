@@ -67,7 +67,7 @@ const getChildVerticalLines = (verticalLines, index, total) => {
       <span class="tree-branch">{{ getBranchType(index, total, depth) }}</span>
       <span class="node-path" :class="{ 'leaf-state': !state.isLeaf }"
         >{{ state.path }} <FAIcon icon="fa-solid fa-house-flag" class="home-icon" v-if="state.isFirstLeaf" />
-        <FAIcon icon="fa-solid fa-leaf" class="leaf-icon" v-else-if="state.isLeaf" />
+        <FAIcon icon="fa-solid fa-leaf" class="text-green-400 dark:text-green-500" v-else-if="state.isLeaf" />
       </span>
     </div>
 
@@ -161,6 +161,10 @@ const getChildVerticalLines = (verticalLines, index, total) => {
 .leaf-icon {
   color: #04a004;
   opacity: 0.35;
+}
+
+.dark.leaf-icon {
+  color: #c7fbb7;
 }
 
 .home-icon {

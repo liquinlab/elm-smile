@@ -57,7 +57,7 @@ const isDarkMode = computed({
           <SidebarMenuButton size="lg" as-child class="md:h-8 md:p-0">
             <a href="#">
               <div
-                class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg"
+                class="mainbutton text-foreground flex aspect-square size-8 items-center justify-center rounded-lg"
               >
                 <i-lucide-smile />
               </div>
@@ -183,3 +183,13 @@ const isDarkMode = computed({
     </SidebarFooter>
   </Sidebar>
 </template>
+
+<style scoped>
+.mainbutton {
+  background-color: rgb(175, 218, 236);
+}
+.dark .mainbutton {
+  background-color: rgb(192, 240, 163);
+  color: rgb(0, 0, 0);
+}
+</style>
