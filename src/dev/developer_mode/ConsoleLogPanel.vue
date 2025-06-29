@@ -207,14 +207,14 @@ function getBgClass(msg) {
 
 /* Keep semantic colors for log types but make them theme-aware */
 .bg-yellow-100 {
-  background-color: hsl(48, 96%, 89%);
+  background-color: var(--log-yellow);
 }
 
 .bg-red-100 {
-  background-color: hsl(0, 84%, 90%);
+  background-color: var(--log-red);
 }
 
 .bg-green-100 {
-  background-color: hsl(142, 76%, 94%);
+  background-color: var(--log-green);
 }
 </style>

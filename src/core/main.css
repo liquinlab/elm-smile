@@ -94,6 +94,11 @@
   --pinned-route: rgb(255, 208, 80);
   --hover-table-row: var(--muted);
 
+  /* Log colors */
+  --log-yellow: oklch(0.985 0 0);
+  --log-red: oklch(0.985 0 0);
+  --log-green: oklch(0.985 0 0);
+
   /* Scrollbar colors for light mode */
   --scrollbar-track: #f1f1f1;
   --scrollbar-thumb: #c1c1c1;
@@ -142,6 +147,11 @@
   --dev-contrast-text: #4d4d4d;
   --pinned-route: rgb(255, 208, 80);
   --hover-table-row: var(--muted);
+
+  /* Log colors */
+  --log-yellow: #adaa5b;
+  --log-red: #976464;
+  --log-green: #6c9659;
 
   /* Scrollbar colors for dark mode */
   --scrollbar-track: #2a2a2a;
