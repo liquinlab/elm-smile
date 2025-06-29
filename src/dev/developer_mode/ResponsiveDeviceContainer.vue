@@ -208,11 +208,12 @@ const deviceWidthPixels = computed(() => api.store.dev.deviceWidth + 'px')
   min-height: 100%;
   max-width: 100%;
   background-image:
-    linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    linear-gradient(color-mix(in srgb, var(--border) 70%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--border) 70%, transparent) 1px, transparent 1px);
   background-size: 20px 20px;
   background-position: -1px 0px;
-  overflow-y: scroll;
-  overflow-x: scroll;
+  overflow-y: auto;
+  overflow-x: auto;
   container-type: inline-size; /* Enable container queries */
 }
 
@@ -309,9 +310,13 @@ const deviceWidthPixels = computed(() => api.store.dev.deviceWidth + 'px')
   display: inline-block;
   width: var(--device-width);
   height: var(--device-height);
-  overflow-x: scroll;
-  overflow-y: scroll;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  overflow-x: auto;
+  overflow-y: auto;
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.15),
+    0 3px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--border);
+  border-radius: 12px;
 }
 
 .resize-handle {

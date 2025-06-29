@@ -47,18 +47,21 @@ const togglePin = () => {
           </ButtonGroupItem>
         </TooltipTrigger>
         <TooltipContent side="bottom">
-          {{ api.hasAutofill() ? 'Autofill' : 'No autofill available' }}
+          {{ api.hasAutofill() ? 'Autofill (Ctrl + A)' : 'No autofill available' }}
         </TooltipContent>
       </Tooltip>
 
       <template v-if="api.hasPrevView()">
         <Tooltip>
           <TooltipTrigger asChild>
-            <ButtonGroupItem v-on:click="api.goToView(api.route?.meta?.prev)">
+            <ButtonGroupItem
+              v-on:click="api.goToView(api.route?.meta?.prev)"
+              :disabled="api.store.dev.pinnedRoute !== null"
+            >
               <i-meteor-icons-angles-left />
             </ButtonGroupItem>
           </TooltipTrigger>
-          <TooltipContent side="bottom"> Previous View </TooltipContent>
+          <TooltipContent side="bottom"> Previous View (Down Arrow)</TooltipContent>
         </Tooltip>
       </template>
       <template v-else>
@@ -70,11 +73,11 @@ const togglePin = () => {
       <template v-if="api.hasNextView()">
         <Tooltip>
           <TooltipTrigger asChild>
-            <ButtonGroupItem v-on:click="api.goNextView()">
+            <ButtonGroupItem v-on:click="api.goNextView()" :disabled="api.store.dev.pinnedRoute !== null">
               <i-meteor-icons-angles-right />
             </ButtonGroupItem>
           </TooltipTrigger>
-          <TooltipContent side="bottom"> Next View </TooltipContent>
+          <TooltipContent side="bottom"> Next View (Up Arrow)</TooltipContent>
         </Tooltip>
       </template>
       <template v-else>
@@ -91,7 +94,7 @@ const togglePin = () => {
               <i-ic-baseline-push-pin v-else />
             </ButtonGroupItem>
           </TooltipTrigger>
-          <TooltipContent side="bottom"> Pin current route </TooltipContent>
+          <TooltipContent side="bottom"> Pin current route (Ctrl + P) </TooltipContent>
         </Tooltip>
       </template>
 

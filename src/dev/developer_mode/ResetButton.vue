@@ -13,7 +13,7 @@ const api = useAPI()
           <i-f7-bolt-fill />
         </Button>
       </TooltipTrigger>
-      <TooltipContent side="bottom"> Reset local state </TooltipContent>
+      <TooltipContent side="bottom"> Reset local state (Ctrl + R) </TooltipContent>
     </Tooltip>
   </TooltipProvider>
 </template>

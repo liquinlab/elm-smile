@@ -13,7 +13,7 @@ const api = useAPI()
           <i-lucide-rotate-ccw :stroke-width="2.5" />
         </Button>
       </TooltipTrigger>
-      <TooltipContent side="bottom"> Reload browser </TooltipContent>
+      <TooltipContent side="bottom"> Reload browser (Cmd + R)</TooltipContent>
     </Tooltip>
   </TooltipProvider>
 </template>
