@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/uikit/components/ui/
 <template>
   <div class="sidebar-container">
     <div class="sidebar-content">
-      <Tabs v-model="api.store.dev.sidebarTab" class="w-full border-t border-border py-2">
+      <Tabs v-model="api.store.dev.sideBarTab" class="w-full border-t border-border py-2">
         <TabsList class="mx-auto text-xs">
           <TabsTrigger value="steps" class="text-[0.75rem] font-mono"> Steps </TabsTrigger>
           <TabsTrigger value="randomization" class="text-[0.75rem] font-mono"> Random </TabsTrigger>

@@ -118,7 +118,7 @@ const initDev = {
   mainView: 'devmode',
   consoleBarHeight: 300, // height of the data bar (transient)
   consoleBarTab: 'browse', // which tab to show in the data bar (transient)
-  sidebarTab: 'steps', // which tab is visible in the dev sidebar (transient)
+  sideBarTab: 'steps', // which tab is visible in the dev sidebar (transient)
   searchParams: '', // search parameters (transient)
   logFilter: 'All', // what level of log messages to show (transient)
   notificationFilter: 'Errors only', // what level of notifications to show (transient)
