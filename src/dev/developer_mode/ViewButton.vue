@@ -131,9 +131,7 @@ const cycleState = () => {
           </svg>
         </Button>
       </TooltipTrigger>
-      <TooltipContent side="bottom">
-        {{ tooltipText }}
-      </TooltipContent>
+      <TooltipContent side="bottom"> {{ tooltipText }} (Ctrl + 1) </TooltipContent>
     </Tooltip>
   </TooltipProvider>
 </template>
