@@ -2,6 +2,7 @@
 import { reactiveOmit } from '@vueuse/core'
 import { SwitchRoot, SwitchThumb, useForwardPropsEmits } from 'reka-ui'
 import { cn } from '@/uikit/lib/utils'
+import { switchVariants } from './index.js'
 
 const props = defineProps({
   defaultValue: { type: Boolean, required: false },
@@ -14,12 +15,13 @@ const props = defineProps({
   name: { type: String, required: false },
   required: { type: Boolean, required: false },
   class: { type: null, required: false },
-  size: { type: String, default: 'default', validator: (value) => ['default', 'sm', 'lg'].includes(value) },
+  size: { type: String, default: 'default', validator: (value) => ['default', 'sm', 'lg', 'xl'].includes(value) },
+  variant: { type: String, default: 'default', validator: (value) => ['default', 'primary', 'info', 'success', 'warning', 'danger'].includes(value) },
 })
 
 const emits = defineEmits(['update:modelValue'])
 
-const delegatedProps = reactiveOmit(props, 'class', 'size')
+const delegatedProps = reactiveOmit(props, 'class', 'size', 'variant')
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
 
@@ -39,6 +41,11 @@ const sizeClasses = {
     thumb: 'w-5 h-5',
     translate: 'data-[state=checked]:translate-x-[25px]',
   },
+  xl: {
+    root: 'h-[1.75rem] w-14',
+    thumb: 'w-6 h-6',
+    translate: 'data-[state=checked]:translate-x-[32px]',
+  },
 }
 </script>
 
@@ -48,7 +55,7 @@ const sizeClasses = {
     v-bind="forwarded"
     :class="
       cn(
-        'peer data-[state=checked]:bg-ring data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 inline-flex shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
+        switchVariants({ variant, size }),
         sizeClasses[size].root,
         props.class
       )

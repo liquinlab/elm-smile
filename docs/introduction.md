@@ -20,6 +20,8 @@ accomplish more in less time.
 - Built-in support for [common experiment elements](/views#built-in-views) like
   consent forms, captchas, instructions, and surveys. Just add your custom
   experiment logic and start collecting data.
+- [Basic component library](/styling/overview) which helps you quickly design
+  and layout elements.
 - Participant-friendly features include the ability to withdraw from the
   experiment (while providing feedback), incremental data saving, optimized load
   times, ability to resume from where you left off even if reloading the pages,

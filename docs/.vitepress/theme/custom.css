@@ -1,9 +1,13 @@
 /**
  * Colors: Solid
  * -------------------------------------------------------------------------- */
-@import 'tailwindcss';
+@import '../../../src/core/main.css';
+/* process the base smile files */
 
-:root {
+@source '../../../docs/**/*.{md,vue,js,ts,css}';
+@source '../../../src/**/*.{md,vue,js,ts,css}';
+
+::root {
   --vp-c-white: #ffffff;
   --vp-c-black: #000000;
 
