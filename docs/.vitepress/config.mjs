@@ -4,6 +4,30 @@ import { sub } from '@mdit/plugin-sub'
 import { defineConfig } from 'vitepress'
 import { version } from '../../package.json'
 import tailwindcss from '@tailwindcss/vite'
+import path from 'path'
+import { fileURLToPath } from 'node:url'
+import fs from 'fs'
+const nodeVersion = fs.readFileSync(new URL('../../.node_version', import.meta.url), 'utf-8').trim()
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+function movePlugin(plugins, pluginAName, order, pluginBName) {
+  const pluginBIndex = plugins.findIndex((p) => p.name === pluginBName)
+  if (pluginBIndex === -1) return
+
+  const pluginAIndex = plugins.findIndex((p) => p.name === pluginAName)
+  if (pluginAIndex === -1) return
+
+  if (order === 'before' && pluginAIndex > pluginBIndex) {
+    const pluginA = plugins.splice(pluginAIndex, 1)[0]
+    plugins.splice(pluginBIndex, 0, pluginA)
+  }
+
+  if (order === 'after' && pluginAIndex < pluginBIndex) {
+    const pluginA = plugins.splice(pluginAIndex, 1)[0]
+    plugins.splice(pluginBIndex, 0, pluginA)
+  }
+}
 
 export default defineConfig({
   lang: 'en-US',
@@ -22,9 +46,23 @@ export default defineConfig({
     },
   },
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [
+      tailwindcss(),
+      {
+        name: 'vp-tw-order-fix',
+        configResolved(c) {
+          movePlugin(c.plugins, 'tailwindcss:scan', 'after', 'vitepress')
+        },
+      },
+    ],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, '../../src'),
+      },
+    },
   },
   themeConfig: {
+    nodeVersion: nodeVersion,
     outline: {
       level: 'deep',
     },
@@ -62,41 +100,41 @@ export default defineConfig({
       {
         text: 'Coding and Testing',
         items: [
-          { text: 'Overview', link: '/experimentdesign' },
-          { text: 'Configuring', link: '/configuration' },
-          { text: 'Developing', link: '/developing' },
-          { text: 'Components', link: '/components' },
-          { text: 'Views', link: '/views' },
-          { text: 'Timeline and Design File', link: '/timeline' },
-          { text: 'Stepping Views', link: '/steps' },
-          { text: 'Autofill', link: '/autofill' },
-          { text: 'Randomization', link: '/randomization' },
-          { text: 'Data storage', link: '/datastorage' },
+          { text: 'Overview', link: '/coding/overview' },
+          { text: 'Configuring', link: '/coding/configuration' },
+          { text: 'Developing', link: '/coding/developing' },
+          { text: 'Components', link: '/coding/components' },
+          { text: 'Views', link: '/coding/views' },
+          { text: 'Timeline and Design File', link: '/coding/timeline' },
+          { text: 'Stepping Views', link: '/coding/steps' },
+          { text: 'Autofill', link: '/coding/autofill' },
+          { text: 'Randomization', link: '/coding/randomization' },
+          { text: 'Data storage', link: '/coding/datastorage' },
           //{ text: '💰 Computing bonuses', link: '/bonuses' },
           //{ text: '🆘 Dealing with Errors', link: '/problems' },
-          { text: 'Automated Testing', link: '/testing' },
+          { text: 'Automated Testing', link: '/coding/testing' },
           //{ text: '🔌 Server-side Computations', link: '/server' },
         ],
       },
       {
         text: 'Styling  Views',
         items: [
-          { text: 'Overview', link: '/styleoverview' },
-          { text: 'Tailwind', link: '/tailwind' },
+          { text: 'Overview', link: '/styling/overview' },
+          { text: 'Tailwind', link: '/styling/tailwind' },
           //{ text: 'Shadcn', link: '/shadcn' },
-          { text: 'Layouts', link: '/layouts' },
-          { text: 'Buttons', link: '/buttons' },
-          { text: 'Forms', link: '/forms' },
-          { text: 'Images and Videos', link: '/imagesvideo.md' },
-          { text: 'Icons', link: '/icons' },
-          { text: 'Animations', link: '/animations' },
+          { text: 'Layouts', link: '/styling/layouts' },
+          { text: 'Buttons', link: '/styling/buttons' },
+          { text: 'Forms', link: '/styling/forms' },
+          { text: 'Images and Videos', link: '/styling/imagesvideo.md' },
+          { text: 'Icons', link: '/styling/icons' },
+          { text: 'Animations', link: '/styling/animations' },
         ],
       },
       {
         text: 'Recruiting participants',
         items: [
-          { text: 'Deploying', link: '/deploying' },
-          { text: 'Recruitment Services', link: '/recruitment' },
+          { text: 'Deploying', link: '/recruit/deploying' },
+          { text: 'Recruitment Services', link: '/recruit/recruitment' },
           //{ text: '📈 Dashboard', link: '/dashboard' },
           //{ text: '😇 Ethical considerations', link: '/ethics' },
         ],

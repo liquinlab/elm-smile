@@ -4,17 +4,13 @@ const text = ref('')
 </script>
 
 <template>
-  <input class="bulma-input" v-model="text" placeholder="Type here" />
+  <div class="border-1 border-gray-800 rounded-md p-2 w-[200px]">
+  <input v-model="text" placeholder="Type here" />
+  </div>
   <p><b>You typed: </b>{{ text }}</p>
 </template>
 
 <style scoped>
-.bulma-input {
-  font-weight: bold;
-  color: black;
-  background-color: #fff;
-}
-
 ::placeholder {
   color: #d1d1d1;
 }

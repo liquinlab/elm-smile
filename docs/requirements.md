@@ -1,3 +1,10 @@
+<script setup>
+import { useData } from 'vitepress'
+
+const { theme } = useData()
+
+</script>
+
 # Required software you will need to install
 
 Before getting started on a <SmileText/> project you will need to install a few
@@ -9,7 +16,8 @@ You will need to install Node.js on your computer. You can download the latest
 version [here](https://nodejs.org/en/download/). After the install completes,
 verify that you have the `npm` command in your terminal program of choice. If
 you already have Node installed, verify that the version of npm is greater than
-or equal to 10.9.2. You can check your installed version by typing `npm -v`.
+or equal to {{ theme.nodeVersion }}. You can check your installed version by
+typing `npm -v`.
 
 ## 2. Create a GitHub account if you haven't and install the command-line tool
 

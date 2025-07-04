@@ -177,7 +177,11 @@ This documentation website is itself built using Vue.js components. As a result,
 we can render the above Vue component directly into this page to see how it
 works. Here is the button component in action:
 
+::: raw
+
 <SimpleButton/>
+
+:::
 
 The way this worked was that at the top of this page we imported the component
 
@@ -209,7 +213,11 @@ For example, writing
 
 will result in:
 
+::: raw
+
 <SimpleButton/><br/><br> <SimpleButton/>
+
+:::
 
 each with a self-contained counter.
 

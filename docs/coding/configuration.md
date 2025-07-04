@@ -452,7 +452,7 @@ the environment variable.
 If you look at the content of `src/config.js` you can see how these items are
 pulled into a global configuration object.
 
-<<< ../src/core/config.js
+<<< ../../src/core/config.js
 
 It is important to keep in mind that variables passed to `src/core/config.js`
 will not necessarily appear in GitHub but **will** be visible to people
