@@ -76,7 +76,7 @@ function submitWithdraw() {
               View consent
             </Button>
             <Button
-              variant="destructive"
+              variant="danger-light"
               size="xs"
               v-if="
                 api.store.browserPersisted.consented &&
@@ -88,7 +88,7 @@ function submitWithdraw() {
               <FAIcon icon="circle-xmark" />
               Withdraw
             </Button>
-            <Button variant="secondary" size="xs" @click="toggleReport()" v-if="false">
+            <Button variant="warning-light" size="xs" @click="toggleReport()" v-if="false">
               <FAIcon icon="hand" />
               Report issue
             </Button>

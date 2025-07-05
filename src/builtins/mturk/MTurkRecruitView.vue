@@ -64,7 +64,7 @@ function submit() {
 </script>
 
 <template>
-  <div class="page">
+  <div class="mt-20 w-4/5 mx-auto">
     <StudyPreviewText :estimated_time="props.estimated_time" :payrate="payrate" v-if="mturkPreview"></StudyPreviewText>
     <div v-else>
       <h1 class="text-2xl font-bold mb-4">Thanks for accepting our HIT</h1>

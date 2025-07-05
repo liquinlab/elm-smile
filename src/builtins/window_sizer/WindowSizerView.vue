@@ -44,7 +44,7 @@ function finish() {
         </div>
         <hr class="border-blue-900 my-4" />
         <div class="mt-8">
-          <Button variant="default" size="lg" @click="finish()">
+          <Button variant="info" size="lg" @click="finish()">
             It is visible now, I'm ready
             <FAIcon icon="fa-solid fa-arrow-right" />
           </Button>

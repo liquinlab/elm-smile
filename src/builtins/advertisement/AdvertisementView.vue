@@ -43,7 +43,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="mt-20 prevent-select flex flex-col items-center">
+  <div class="mt-20 select-none flex flex-col items-center">
     <img ref="logo" src="@/user/assets/brain.svg" width="220" class="brain-logo" />
     <h1 ref="title" class="text-3xl font-bold mb-4">Please help us understand the mind!</h1>
     <p>Take part in a short experiment where you play some games.</p>

@@ -37,10 +37,10 @@ const props = defineProps({
           once, and requires a desktop browser.
         </p>
       </div>
-      <div class="w-2/5">
+      <div class="w-2/5 pl-10">
         <img src="@/user/assets/brain.svg" width="220" class="mb-4" />
-        <article class="border border-gray-300 rounded">
-          <div class="bg-gray-100 px-3 py-2 text-xs font-medium border-b border-gray-300">
+        <article class="border border-gray-300 rounded-lg shadow-lg">
+          <div class="bg-gray-100 px-3 py-2 text-xs font-medium border-b border-gray-300 rounded-t-lg">
             <p><FAIcon icon="bahai" />&nbsp;&nbsp;Who are we?</p>
           </div>
           <div class="p-3 text-xs text-left">

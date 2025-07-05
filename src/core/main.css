@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import './smile.css';
@@ -42,12 +43,45 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  --color-primary-button: var(--primary-button);
+  --color-primary-button-foreground: var(--primary-button-foreground);
+  --color-primary-button-light: var(--primary-button-light);
+  --color-primary-button-light-foreground: var(--primary-button-light-foreground);
+  --color-link-button: var(--link-button);
+  --color-link-button-foreground: var(--link-button-foreground);
+  --color-link-button-light: var(--link-button-light);
+  --color-link-button-light-foreground: var(--link-button-light-foreground);
+  --color-info-button: var(--info-button);
+  --color-info-button-foreground: var(--info-button-foreground);
+  --color-info-button-light: var(--info-button-light);
+  --color-info-button-light-foreground: var(--info-button-light-foreground);
+  --color-success-button: var(--success-button);
+  --color-success-button-foreground: var(--success-button-foreground);
+  --color-success-button-light: var(--success-button-light);
+  --color-success-button-light-foreground: var(--success-button-light-foreground);
+  --color-warning-button: var(--warning-button);
+  --color-warning-button-foreground: var(--warning-button-foreground);
+  --color-warning-button-light: var(--warning-button-light);
+  --color-warning-button-light-foreground: var(--warning-button-light-foreground);
+  --color-danger-button: var(--danger-button);
+  --color-danger-button-foreground: var(--danger-button-foreground);
+  --color-danger-button-light: var(--danger-button-light);
+  --color-danger-button-light-foreground: var(--danger-button-light-foreground);
+
   --dev-bar-bg: var(--dev-bg);
   --dev-bar-text: var(--dev-text);
   --dev-bar-lines: var(--dev-lines);
 
   --page-bg-color: var(--background);
   --page-text-color: var(--foreground);
+}
+
+:root {
+  --font-family-base:
+    'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
+  --font-family-mono: ui-monospace, 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+  font-optical-sizing: auto;
 }
 
 :root {
@@ -85,6 +119,32 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.705 0.015 286.067);
+
+  /* Button variant colors - Light mode */
+  --primary-button: oklch(0.396 0.141 264.376);
+  --primary-button-foreground: oklch(0.985 0 0);
+  --primary-button-light: oklch(0.85 0.05 264.376);
+  --primary-button-light-foreground: oklch(0.396 0.141 264.376);
+  --link-button: oklch(0.396 0.141 264.376);
+  --link-button-foreground: oklch(0.396 0.141 264.376);
+  --link-button-light: oklch(0.85 0.05 264.376);
+  --link-button-light-foreground: oklch(0.396 0.141 264.376);
+  --info-button: oklch(0.5 0.2 220);
+  --info-button-foreground: oklch(0.985 0 0);
+  --info-button-light: oklch(0.85 0.08 220);
+  --info-button-light-foreground: oklch(0.5 0.2 220);
+  --success-button: oklch(0.7 0.18 142);
+  --success-button-foreground: oklch(0.985 0 0);
+  --success-button-light: oklch(0.85 0.07 142);
+  --success-button-light-foreground: oklch(0.5 0.18 142);
+  --warning-button: oklch(0.7 0.2 70);
+  --warning-button-foreground: oklch(0.141 0.005 285.823);
+  --warning-button-light: oklch(0.9 0.08 70);
+  --warning-button-light-foreground: oklch(0.7 0.2 70);
+  --danger-button: oklch(0.577 0.245 27.325);
+  --danger-button-foreground: oklch(0.985 0 0);
+  --danger-button-light: oklch(0.85 0.1 27.325);
+  --danger-button-light-foreground: oklch(0.577 0.245 27.325);
 
   --dev-bg: var(--sidebar);
   --dev-bg-contrast: var(--sidebar-2);
@@ -140,6 +200,32 @@
   --sidebar-border: oklch(0.574 0.006 286.033);
   --sidebar-ring: oklch(0.442 0.017 285.786);
 
+  /* Button variant colors - Dark mode */
+  --primary-button: oklch(0.488 0.243 264.376);
+  --primary-button-foreground: oklch(0.985 0 0);
+  --primary-button-light: oklch(0.3 0.1 264.376);
+  --primary-button-light-foreground: oklch(0.8 0.15 264.376);
+  --link-button: oklch(0.488 0.243 264.376);
+  --link-button-foreground: oklch(0.488 0.243 264.376);
+  --link-button-light: oklch(0.3 0.1 264.376);
+  --link-button-light-foreground: oklch(0.8 0.15 264.376);
+  --info-button: oklch(0.6 0.25 220);
+  --info-button-foreground: oklch(0.985 0 0);
+  --info-button-light: oklch(0.3 0.12 220);
+  --info-button-light-foreground: oklch(0.75 0.2 220);
+  --success-button: oklch(0.7 0.22 142);
+  --success-button-foreground: oklch(0.985 0 0);
+  --success-button-light: oklch(0.3 0.1 142);
+  --success-button-light-foreground: oklch(0.75 0.18 142);
+  --warning-button: oklch(0.8 0.25 70);
+  --warning-button-foreground: oklch(0.141 0.005 285.823);
+  --warning-button-light: oklch(0.35 0.12 70);
+  --warning-button-light-foreground: oklch(0.85 0.2 70);
+  --danger-button: oklch(0.6 0.25 27.325);
+  --danger-button-foreground: oklch(0.985 0 0);
+  --danger-button-light: oklch(0.3 0.12 27.325);
+  --danger-button-light-foreground: oklch(0.8 0.2 27.325);
+
   --dev-bg: var(--sidebar);
   --dev-bg-contrast: var(--sidebar-2);
   --dev-text: #cecece;
@@ -165,6 +251,10 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-family-base);
+    font-synthesis: auto;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
 }
 

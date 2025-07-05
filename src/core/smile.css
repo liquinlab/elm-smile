@@ -3,14 +3,6 @@
  * It is imported into the main.css file.
  */
 
-/* globally provided to prevent selection on some pages */
-.prevent-select {
-  /* needed because selecting the outlines can give away the answer */
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10 and IE 11 */
-  user-select: none; /* Standard syntax */
-}
-
 .page {
   height: 100%;
   width: 80%;

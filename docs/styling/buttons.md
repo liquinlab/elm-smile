@@ -1,3 +1,21 @@
+<script setup>
+import {
+  Plus,
+  Download,
+  Check,
+  AlertTriangle,
+  Trash,
+  Info,
+  Settings,
+  Edit,
+  Heart,
+  ThumbsUp,
+  Clock,
+  X,
+  HelpCircle,
+} from 'lucide-vue-next'
+</script>
+
 # Buttons
 
 ## Badge Examples
@@ -262,6 +280,16 @@ Here are examples of using our uikit ButtonGroup component:
 
 :::
 
+::: raw
+
+<ButtonGroup variant="outline" size="xl">
+  <ButtonGroupItem>Extra Large</ButtonGroupItem>
+  <ButtonGroupItem>Outline</ButtonGroupItem>
+  <ButtonGroupItem>Group</ButtonGroupItem>
+</ButtonGroup>
+
+:::
+
 ### Button Group Color Variants
 
 ::: raw
@@ -391,6 +419,16 @@ Here are examples of using our uikit ButtonGroup component:
 <ButtonGroup variant="warning" size="xs">
   <ButtonGroupItem>Warning</ButtonGroupItem>
   <ButtonGroupItem>Extra Small</ButtonGroupItem>
+  <ButtonGroupItem>Group</ButtonGroupItem>
+</ButtonGroup>
+
+:::
+
+::: raw
+
+<ButtonGroup variant="info" size="xl">
+  <ButtonGroupItem>Info</ButtonGroupItem>
+  <ButtonGroupItem>Extra Large</ButtonGroupItem>
   <ButtonGroupItem>Group</ButtonGroupItem>
 </ButtonGroup>
 
