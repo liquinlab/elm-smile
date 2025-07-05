@@ -5,6 +5,7 @@ import { Button } from '@/uikit/components/ui/button'
 import { Checkbox } from '@/uikit/components/ui/checkbox'
 import { MultiSelect } from '@/uikit/components/ui/multiselect'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
+import { TitleTwoCol } from '@/uikit/layouts'
 const api = useViewAPI()
 
 // read in props
@@ -138,102 +139,107 @@ init()
 </script>
 
 <template>
-  <div class="w-full select-none mx-auto py-10">
-    <div class="w-5/7 mx-auto text-left">
-      <!-- Replace the two quiz page sections with this single dynamic one -->
-      <div class="mt-10" v-if="api.stepIndex < qs.length && /^pages\/pg\d+$/.test(api.pathString)">
-        <div class="mb-10">
-          <h3 class="text-3xl font-bold mb-4">
-            <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
-          </h3>
-          <p class="text-lg mb-8">
-            Using the information provided in the previous pages, please select the correct answer for each question. Do
-            your best! If anything is unclear you can review the instructions again after you submit your response.
-          </p>
-        </div>
-        <div class="flex gap-6">
-          <div class="w-1/3">
-            <div class="text-left text-muted-foreground">
-              <h3 class="text-lg font-bold mb-2">Test your understanding</h3>
-              <p class="text-md font-light text-muted-foreground">You must answer all the questions to move on.</p>
-            </div>
+  <!-- Quiz pages -->
+  <TitleTwoCol v-if="api.stepIndex < qs.length && /^pages\/pg\d+$/.test(api.pathString)" leftFirst leftWidth="w-1/3">
+    <template #title>
+      <h3 class="text-3xl font-bold mb-4">
+        <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
+      </h3>
+      <p class="text-lg mb-8">
+        Using the information provided in the previous pages, please select the correct answer for each question. Do
+        your best! If anything is unclear you can review the instructions again after you submit your response.
+      </p>
+    </template>
+    <template #left>
+      <div class="text-left text-muted-foreground">
+        <h3 class="text-lg font-bold mb-2">Test your understanding</h3>
+        <p class="text-md font-light text-muted-foreground">You must answer all the questions to move on.</p>
+      </div>
+    </template>
+    <template #right>
+      <div class="border border-border text-left bg-muted p-6 rounded-lg">
+        <div
+          v-for="(question, index) in api.stepData.questions"
+          :key="question.id"
+          :class="{ 'mt-0': index === 0, 'mt-9': index > 0 }"
+          class="mb-6"
+        >
+          <label class="block text-md font-semibold text-foreground mb-2">
+            {{ question.question }}
+          </label>
+
+          <!-- Multi-select checkbox -->
+          <div v-if="question.multiSelect" class="mb-9">
+            <MultiSelect
+              :options="question.answers"
+              v-model="api.stepData.questions[index].answer"
+              variant="success"
+              help="Select all that apply"
+              size="lg"
+            />
           </div>
-          <div class="flex-1">
-            <div class="border border-border text-left bg-muted p-6 rounded-lg">
-              <div v-for="(question, index) in api.stepData.questions" :key="question.id" :class="{'mt-0': index === 0, 'mt-9': index > 0}" class="mb-6">
-                <label class="block text-md font-semibold text-foreground mb-2">
-                  {{ question.question }}
-                </label>
 
-                <!-- Multi-select checkbox -->
-                <div v-if="question.multiSelect" class="mb-9">
-                  <MultiSelect
-                    :options="question.answers"
-                    v-model="api.stepData.questions[index].answer"
-                    variant="success"
-                    help="Select all that apply"
-                    size="lg"
-                  />
-                </div>
+          <!-- Single select dropdown -->
+          <Select v-else v-model="api.stepData.questions[index].answer">
+            <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+              <SelectValue placeholder="Select an option" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem v-for="answer in question.answers" :key="answer" :value="answer">
+                {{ answer }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-                
+        <hr class="border-border my-6" />
 
-                
-
-                <!-- Single select dropdown -->
-                <Select v-else v-model="api.stepData.questions[index].answer">
-                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
-                    <SelectValue placeholder="Select an option" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem v-for="answer in question.answers" :key="answer" :value="answer">
-                      {{ answer }}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <hr class="border-border my-6" />
-
-              <div class="flex justify-between">
-                <Button variant="outline" v-if="api.stepIndex >= 1" @click="api.goPrevStep()">
-                  <FAIcon icon="fa-solid fa-arrow-left" />
-                  Previous page
-                </Button>
-                <div v-else></div>
-                <Button
-                  :variant="api.isLastBlockStep() ? 'default' : 'outline'"
-                  :disabled="!currentPageComplete"
-                  @click="api.isLastBlockStep() ? submitQuiz() : api.goNextStep()"
-                >
-                  {{ api.isLastBlockStep() ? 'Submit' : 'Next page' }}
-                  <FAIcon v-if="!api.isLastBlockStep()" icon="fa-solid fa-arrow-right" />
-                </Button>
-              </div>
-            </div>
-          </div>
+        <div class="flex justify-between">
+          <Button variant="outline" v-if="api.stepIndex >= 1" @click="api.goPrevStep()">
+            <FAIcon icon="fa-solid fa-arrow-left" />
+            Previous page
+          </Button>
+          <div v-else></div>
+          <Button
+            :variant="api.isLastBlockStep() ? 'default' : 'outline'"
+            :disabled="!currentPageComplete"
+            @click="api.isLastBlockStep() ? submitQuiz() : api.goNextStep()"
+          >
+            {{ api.isLastBlockStep() ? 'Submit' : 'Next page' }}
+            <FAIcon v-if="!api.isLastBlockStep()" icon="fa-solid fa-arrow-right" />
+          </Button>
         </div>
       </div>
+    </template>
+  </TitleTwoCol>
 
-      <div class="mt-10" v-else-if="api.pathString === 'feedback/success'">
-        <div class="text-center">
-          <h3 class="text-3xl font-bold mb-4"><FAIcon icon="fa-solid fa-square-check" />&nbsp;Congrats! You passed.</h3>
-          <p class="text-lg mb-6">Click here to begin the next phase of the experiment.</p>
-          <Button variant="default" @click="finish">Let's begin.</Button>
-        </div>
+  <!-- Success page -->
+  <TitleTwoCol v-else-if="api.pathString === 'feedback/success'">
+    <template #title>
+      <div class="text-center">
+        <h3 class="text-3xl font-bold mb-4"><FAIcon icon="fa-solid fa-square-check" />&nbsp;Congrats! You passed.</h3>
+        <p class="text-lg mb-6">Click here to begin the next phase of the experiment.</p>
+        <Button variant="default" @click="finish">Let's begin.</Button>
       </div>
+    </template>
+    <template #left></template>
+    <template #right></template>
+  </TitleTwoCol>
 
-      <div class="mt-10" v-else-if="api.pathString === 'feedback/retry'">
-        <div class="text-center">
-          <h3 class="text-3xl font-bold mb-4">
-            <FAIcon icon="fa-solid fa-square-check" />&nbsp;Sorry! You did not get all the answers correct.
-          </h3>
-          <p class="text-lg mb-6">Please re-read the instructions and try again.</p>
-          <Button variant="outline" @click="returnInstructions">Back to Instructions</Button>
-        </div>
+  <!-- Retry page -->
+  <TitleTwoCol v-else-if="api.pathString === 'feedback/retry'">
+    <template #title>
+      <div class="text-center">
+        <h3 class="text-3xl font-bold mb-4">
+          <FAIcon icon="fa-solid fa-square-check" />&nbsp;Sorry! You did not get all the answers correct.
+        </h3>
+        <p class="text-lg mb-6">Please re-read the instructions and try again.</p>
+        <Button variant="outline" @click="returnInstructions">Back to Instructions</Button>
       </div>
-    </div>
-  </div>
+    </template>
+    <template #left></template>
+    <template #right></template>
+  </TitleTwoCol>
 </template>
 
 <style scoped>

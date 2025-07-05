@@ -225,12 +225,16 @@ onMounted(() => {
             </div>
             <template v-else>
               <ResponsiveDeviceContainer v-if="shouldUseResponsiveContainer">
+                <div class="@container">
                 <StatusBar v-if="showStatusBar" />
                 <router-view />
+                </div>
               </ResponsiveDeviceContainer>
               <template v-else>
+                <div class="@container">
                 <StatusBar v-if="showStatusBar" />
                 <router-view />
+                </div>
               </template>
             </template>
           </div>

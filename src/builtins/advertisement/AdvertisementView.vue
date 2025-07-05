@@ -8,6 +8,7 @@ const api = useViewAPI()
 
 // import UIkit components
 import { Button } from '@/uikit/components/ui/button'
+import { CenteredContent } from '@/uikit/layouts'
 
 // animation library
 import { animate } from 'motion'
@@ -43,7 +44,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="mt-20 select-none flex flex-col items-center">
+  <CenteredContent>
     <img ref="logo" src="@/user/assets/brain.svg" width="220" class="brain-logo" />
     <h1 ref="title" class="text-3xl font-bold mb-4">Please help us understand the mind!</h1>
     <p>Take part in a short experiment where you play some games.</p>
@@ -52,7 +53,7 @@ onBeforeUnmount(() => {
       I'm ready!
       <i-lucide-arrow-right />
     </Button>
-  </div>
+  </CenteredContent>
 </template>
 
 <style scoped>

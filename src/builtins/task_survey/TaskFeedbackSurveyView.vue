@@ -6,6 +6,7 @@ import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
 import { Textarea } from '@/uikit/components/ui/textarea'
+import { TitleTwoCol } from '@/uikit/layouts'
 
 const api = useViewAPI()
 
@@ -46,27 +47,25 @@ function finish() {
 </script>
 
 <template>
-  <div class="w-full select-none mx-auto py-10">
-    <div class="w-4/5 mx-auto text-left">
+  <TitleTwoCol leftFirst leftWidth="w-1/3">
+    <template #title>
       <h3 class="text-3xl font-bold mb-4"><FAIcon icon="fa-solid fa-pencil" />&nbsp;Give us feedback</h3>
       <p class="text-lg mb-8">
         Please give us feedback about your experience with the study. Your feedback will help us improve our study and
         we appreciate your effort and thoughts.
       </p>
-
-      <div class="mt-10">
-        <div class="flex gap-6">
-          <div class="w-1/3">
-            <div class="text-left text-muted-foreground">
-              <h3 class="text-lg font-bold mb-2">Important Note</h3>
-              <p class="text-md font-light text-muted-foreground">
-                If this is a paid study your answers to these questions will have
-                <b>no effect on your final payment</b>. We are just interested in your honest answers.
-              </p>
-            </div>
-          </div>
-          <div class="flex-1">
-            <div class="border border-border text-left bg-muted p-6 rounded-lg">
+    </template>
+    <template #left>
+      <div class="text-left text-muted-foreground">
+        <h3 class="text-lg font-bold mb-2">Important Note</h3>
+        <p class="text-md font-light text-muted-foreground">
+          If this is a paid study your answers to these questions will have
+          <b>no effect on your final payment</b>. We are just interested in your honest answers.
+        </p>
+      </div>
+    </template>
+    <template #right>
+      <div class="border border-border text-left bg-muted p-6 rounded-lg">
               <div class="mb-3">
                 <label class="block text-md font-semibold text-foreground mb-2">
                   How difficult was the task over all?
@@ -143,9 +142,6 @@ function finish() {
                 <Button variant="default" :disabled="!complete" @click="finish()"> I'm finished </Button>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+    </template>
+  </TitleTwoCol>
 </template>
