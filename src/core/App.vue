@@ -5,15 +5,8 @@
 
 import { onMounted, ref } from 'vue'
 
-/**
- * Import notification system components and styles
- * @requires notivue Notification library
- */
-import { Notivue, Notification, NotificationProgress } from 'notivue'
-import 'notivue/notification.css' // Only needed if using built-in notifications
-import 'notivue/animations.css' // Only needed if using built-in animations
-import 'notivue/notification-progress.css'
-import { pastelTheme } from 'notivue'
+import { Toaster } from '@/uikit/components/ui/sonner'
+import 'vue-sonner/style.css' // vue-sonner v2 requires this import
 
 import { useColorMode } from '@vueuse/core'
 useColorMode()
@@ -125,11 +118,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Notivue v-slot="item">
-    <Notification :item="item" :theme="pastelTheme">
-      <NotificationProgress :item="item" />
-    </Notification>
-  </Notivue>
+  <Toaster closeButton position="top-left" :rich-colors="true" class="custom-toaster" />
   <SidebarProvider
     :default-open="false"
     :style="{
@@ -142,3 +131,15 @@ onMounted(() => {
     </SidebarInset>
   </SidebarProvider>
 </template>
+
+<style>
+.custom-toaster {
+  --toast-offset-x: 60px;
+  --toast-offset-y: 50px;
+}
+
+.custom-toaster {
+  top: var(--toast-offset-y) !important;
+  left: var(--toast-offset-x) !important;
+}
+</style>
