@@ -56,7 +56,7 @@ function submitWithdraw() {
         <img :src="api.getStaticUrl(appconfig.brandLogoFn)" width="90" class="dark:invert" />
       </a>
       <div class="flex items-center pt-1">
-        <p class="text-xs text-left pl-2.5 text-foreground pt-2 sm:block hidden font-mono">
+        <p class="text-xs text-left pl-2.5 text-foreground pt-2 @[600px]:block hidden font-mono">
           Study: {{ smilestore.config.codeName }}<br />Version: {{ smilestore.config.github.lastCommitHash
           }}{{
             appconfig.mode === 'testing' || appconfig.mode === 'development' || appconfig.mode === 'presentation'
@@ -73,7 +73,7 @@ function submitWithdraw() {
           <div class="flex gap-2">
             <Button variant="outline" size="xs" v-if="api.store.browserPersisted.consented" @click="toggleConsent()">
               <FAIcon icon="magnifying-glass" />
-              View consent
+              <span class="@[400px]:inline hidden">View consent</span>
             </Button>
             <Button
               variant="danger-light"
@@ -86,7 +86,7 @@ function submitWithdraw() {
               @click="toggleWithdraw()"
             >
               <FAIcon icon="circle-xmark" />
-              Withdraw
+              <span class="@[400px]:inline hidden">Withdraw</span>
             </Button>
             <Button variant="warning-light" size="xs" @click="toggleReport()" v-if="false">
               <FAIcon icon="hand" />
