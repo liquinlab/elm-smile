@@ -3,6 +3,7 @@ import { reactive, computed, ref, onMounted, nextTick } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
 import { Checkbox } from '@/uikit/components/ui/checkbox'
+import { MultiSelect } from '@/uikit/components/ui/multiselect'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
 const api = useViewAPI()
 
@@ -159,58 +160,25 @@ init()
           </div>
           <div class="flex-1">
             <div class="border border-border text-left bg-muted p-6 rounded-lg">
-              <div v-for="(question, index) in api.stepData.questions" :key="question.id" class="mb-3">
+              <div v-for="(question, index) in api.stepData.questions" :key="question.id" :class="{'mt-0': index === 0, 'mt-9': index > 0}" class="mb-6">
                 <label class="block text-md font-semibold text-foreground mb-2">
                   {{ question.question }}
                 </label>
 
                 <!-- Multi-select checkbox -->
-                <div v-if="question.multiSelect" class="space-y-3">
-                  <div
-                    v-for="(answer, answerIndex) in question.answers"
-                    :key="answerIndex"
-                    class="flex items-center space-x-2"
-                  >
-                    <Checkbox
-                      :id="`${question.id}-${answerIndex}`"
-                      :checked="
-                        Array.isArray(api.stepData.questions[index].answer) &&
-                        api.stepData.questions[index].answer.includes(answer)
-                      "
-                      @update:checked="
-                        (checked) => {
-                          // Initialize answer as array if it doesn't exist or isn't an array
-                          if (
-                            !api.stepData.questions[index].answer ||
-                            !Array.isArray(api.stepData.questions[index].answer)
-                          ) {
-                            api.stepData.questions[index].answer = []
-                          }
-
-                          // Create a new array to ensure reactivity
-                          const currentAnswers = [...api.stepData.questions[index].answer]
-
-                          if (checked) {
-                            if (!currentAnswers.includes(answer)) {
-                              currentAnswers.push(answer)
-                            }
-                          } else {
-                            const answerIndex = currentAnswers.indexOf(answer)
-                            if (answerIndex > -1) {
-                              currentAnswers.splice(answerIndex, 1)
-                            }
-                          }
-
-                          // Update the reactive data
-                          api.stepData.questions[index].answer = currentAnswers
-                        }
-                      "
-                    />
-                    <label :for="`${question.id}-${answerIndex}`" class="text-sm text-foreground cursor-pointer">
-                      {{ answer }}
-                    </label>
-                  </div>
+                <div v-if="question.multiSelect" class="mb-9">
+                  <MultiSelect
+                    :options="question.answers"
+                    v-model="api.stepData.questions[index].answer"
+                    variant="success"
+                    help="Select all that apply"
+                    size="lg"
+                  />
                 </div>
+
+                
+
+                
 
                 <!-- Single select dropdown -->
                 <Select v-else v-model="api.stepData.questions[index].answer">

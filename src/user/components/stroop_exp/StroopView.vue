@@ -5,6 +5,8 @@
 import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
 
+import { Button } from '@/uikit/components/ui/button'
+
 const api = useViewAPI()
 
 // define the trials for the experiment as a spec
@@ -99,6 +101,7 @@ function finish() {
 
 <template>
   <div class="flex items-center justify-center select-none py-8">
+  <div class="flex items-center justify-center select-none py-8">
     <!-- Show this for each trial -->
     <div class="text-center" v-if="api.path[0] == 'stroop'">
       <div class="text-sm text-muted-foreground mb-4">
@@ -142,5 +145,6 @@ function finish() {
 </template>
 
 <style scoped>
+/* Remove Bulma-specific styles as we're now using Tailwind CSS */
 /* Remove Bulma-specific styles as we're now using Tailwind CSS */
 </style>

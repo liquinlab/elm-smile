@@ -535,7 +535,7 @@ class ViewAPI extends SmileAPI {
       }, {})
     })
 
-    const createRecursiveProxy = (obj) => {
+    const createRecursiveProxy = (obj, path = []) => {
       if (obj === null || typeof obj !== 'object') {
         return obj
       }
@@ -545,14 +545,21 @@ class ViewAPI extends SmileAPI {
           get: (target, prop) => {
             const value = target[prop]
             if (typeof prop === 'string' && !isNaN(prop)) {
-              return createRecursiveProxy(value)
+              return createRecursiveProxy(value, [...path, prop])
             }
             return value
           },
           set: (target, prop, value) => {
-            target[prop] = value
             if (this._stepper.value.currentData) {
-              this._stepper.value.currentData[prop] = value
+              // Navigate to the correct nested location in currentData
+              let current = this._stepper.value.currentData
+              for (let i = 0; i < path.length; i++) {
+                if (current[path[i]] === undefined) {
+                  current[path[i]] = {}
+                }
+                current = current[path[i]]
+              }
+              current[prop] = value
               this._saveStepperState()
             }
             return true
@@ -563,12 +570,19 @@ class ViewAPI extends SmileAPI {
       return new Proxy(obj, {
         get: (target, prop) => {
           const value = target[prop]
-          return createRecursiveProxy(value)
+          return createRecursiveProxy(value, [...path, prop])
         },
         set: (target, prop, value) => {
-          target[prop] = value
           if (this._stepper.value.currentData) {
-            this._stepper.value.currentData[prop] = value
+            // Navigate to the correct nested location in currentData
+            let current = this._stepper.value.currentData
+            for (let i = 0; i < path.length; i++) {
+              if (current[path[i]] === undefined) {
+                current[path[i]] = {}
+              }
+              current = current[path[i]]
+            }
+            current[prop] = value
             this._saveStepperState()
           }
           return true

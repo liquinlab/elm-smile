@@ -54,7 +54,7 @@ echo "# this port might not be correct, but it doesn't really matter" >> $ENV_FI
 if [ "$OWNER" == "NYUCCL" ] && [ "$PROJECT_NAME" == "smile" ] ; then
     echo "VITE_DEV_PORT_NUM           =  3000" >> $ENV_FILE
 else
-    echo "VITE_DEV_PORT_NUM           =  3010" >> $ENV_FILE
+    echo "VITE_DEV_PORT_NUM           =  3020" >> $ENV_FILE
 fi
 
 echo 'VITE_DEPLOY_URL         =  "http://localhost:${VITE_DEV_PORT_NUM}${VITE_DEPLOY_BASE_PATH}"' >> $ENV_FILE
