@@ -4,7 +4,7 @@
 
 /**
  * Core imports for the SMILE application including:
- * - Vue and Vue plugins (FormKit, Router, Pinia, Notivue, Google Analytics)
+ * - Vue and Vue plugins (FormKit, Router, Pinia, Google Analytics)
  * - UI components and styling (FontAwesome, FormKit theme)
  * - Application configuration (timeline, icons)
  */
