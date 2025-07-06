@@ -17,13 +17,13 @@ defineEmits(['toggleConsent'])
 <template>
   <div class="absolute inset-0 z-50 flex items-center justify-center p-8" :class="{ hidden: !show }">
     <div class="absolute inset-0 bg-black bg-opacity-50" @click="$emit('toggleConsent')"></div>
-    <button
+    <Button
       class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
       aria-label="close"
       @click="$emit('toggleConsent')"
     >
       <FAIcon icon="fa-solid fa-xmark" class="text-xl" />
-    </button>
+    </Button>
     <div class="w-[90%] h-[90%] relative bg-white shadow-xl flex flex-col">
       <div class="flex-1 overflow-y-auto p-20 pt-10">
         <div class="select-none w-full">
