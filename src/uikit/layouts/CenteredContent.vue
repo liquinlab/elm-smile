@@ -1,5 +1,14 @@
+<script setup>
+defineProps({
+  class: {
+    type: String,
+    default: '',
+  },
+})
+</script>
+
 <template>
-  <div class="mt-20 mx-10 select-none flex flex-col items-center">
+  <div :class="['mx-10 select-none flex flex-col items-center', $props.class]">
     <slot />
   </div>
 </template>
