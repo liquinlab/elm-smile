@@ -3,6 +3,7 @@ import { reactive, onMounted } from 'vue'
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
+import { CenteredContent } from '@/uikit/layouts'
 const api = useViewAPI()
 const props = defineProps(['triggered'])
 
@@ -15,25 +16,22 @@ function finish() {
 </script>
 
 <template>
-  <div class="page select-none" style="position: relative; min-height: 100vh">
+  <CenteredContent class="mt-5">
     <div
-      class="bg-cyan-100 border-animation"
+      class="bg-cyan-100 border-animation flex items-center justify-center"
       :style="{
         width: api.config.windowsizerRequest.width + 'px',
         height: api.config.windowsizerRequest.height + 'px',
-        position: 'absolute',
-        top: '20px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        minWidth: api.config.windowsizerRequest.width + 'px',
+        minHeight: api.config.windowsizerRequest.height + 'px',
       }"
     >
       <div class="w-2/3 pt-8 mx-auto text-center" v-if="!props.triggered">
         <span class="text-4xl text-blue-900 mb-4 block">
           <FAIcon icon="fa-solid fa-arrows-up-down-left-right"></FAIcon>
         </span>
+        {{ api.config.windowsizerRequest }}
+        {{ api.config.windowsizerAggressive }}
         <h1 class="text-xl font-semibold text-blue-900 mb-4">
           Please adjust the size of your browser window until <b>ALL</b> four edges of this box are visible.
         </h1>
@@ -65,7 +63,7 @@ function finish() {
         </div>
       </div>
     </div>
-  </div>
+  </CenteredContent>
 </template>
 
 <style scoped>
