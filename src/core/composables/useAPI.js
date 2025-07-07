@@ -444,7 +444,11 @@ export class SmileAPI {
    */
   isBrowserTooSmall(width, height) {
     let val = false
-    if (this.store.config.windowsizerAggressive === true && this.store.data.verifiedVisibility === true) {
+    if (
+      this.store.config.windowsizerAggressive === true &&
+      this.store.data.verifiedVisibility === true &&
+      !this.store.browserPersisted.withdrawn
+    ) {
       val =
         width < this.store.config.windowsizerRequest.width + 10 ||
         height < this.store.config.windowsizerRequest.height + 85 // margin for status bar

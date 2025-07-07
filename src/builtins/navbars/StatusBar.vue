@@ -56,7 +56,7 @@ function submitWithdraw() {
         <img :src="api.getStaticUrl(appconfig.brandLogoFn)" width="90" class="dark:invert" />
       </a>
       <div class="flex items-center pt-1">
-        <p class="text-xs text-left pl-2.5 text-foreground pt-2 @[600px]:block hidden font-mono">
+        <p class="text-xs text-left pl-2.5 text-muted-foreground pt-2 @[600px]:block hidden font-mono">
           Study: {{ smilestore.config.codeName }}<br />Version: {{ smilestore.config.github.lastCommitHash
           }}{{
             appconfig.mode === 'testing' || appconfig.mode === 'development' || appconfig.mode === 'presentation'

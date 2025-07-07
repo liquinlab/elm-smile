@@ -16,7 +16,7 @@ const api = useViewAPI()
 <template>
   <div class="px-4 md:px-8 lg:px-12 pt-10 pb-10">
     <div class="mb-8">
-      <h1 class="text-3xl font-bold mb-4">Welcome to Smile 👩‍💻 Developer Mode</h1>
+      <h1 class="text-3xl font-bold mb-4">Welcome to Smile Developer 👩‍💻 Mode</h1>
       <p class="text-lg mb-6">
         You can use this to test your application, read the docs, QA your data, and recruit participants through
         multiple platforms.
