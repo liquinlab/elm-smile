@@ -161,6 +161,7 @@ const initBrowserPersisted = {
 const initBrowserEphemeral = {
   // ephemeral state, resets on browser refresh
   forceNavigate: false,
+  tooSmall: false,
   steppers: {}, // Store for HStepper instances
   dbConnected: false,
   dbChanges: true,

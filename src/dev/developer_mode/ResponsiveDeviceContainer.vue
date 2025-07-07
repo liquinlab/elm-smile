@@ -1,12 +1,17 @@
 <script setup>
 import { ref, computed } from 'vue'
 import useAPI from '@/core/composables/useAPI'
+import MainApp from '@/core/MainApp.vue'
 import ResponsiveDeviceSelect from './ResponsiveDeviceSelect.vue'
 import { Separator } from '@/uikit/components/ui/separator'
 import { Button } from '@/uikit/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
 
 const api = useAPI()
+
+import { useElementSize } from '@vueuse/core'
+const fullScreenDiv = ref(null)
+const { width: fullScreenWidth, height: fullScreenHeight } = useElementSize(fullScreenDiv)
 
 // Initialize device dimensions based on the selected device from store
 const devicePresets = {
@@ -122,14 +127,27 @@ const toggleRotation = () => {
 const toggleFullscreen = () => {
   api.store.dev.isFullscreen = !api.store.dev.isFullscreen
 }
-
-const deviceWidthPixels = computed(() => api.store.dev.deviceWidth + 'px')
+/**
+ * Computed property that determines whether to wrap content in ResponsiveDeviceContainer
+ *
+ * @returns {boolean} True if ResponsiveDeviceContainer should be used, false otherwise
+ * - Returns false if current route is '/' (root route)
+ * - Returns true
+ */
+const shouldUseResponsiveContainer = computed(() => {
+  const routeName = api.currentRouteName()
+  return routeName !== undefined && routeName !== 'recruit' && api.config.mode == 'development'
+})
 </script>
 
 <template>
   <!-- Fullscreen mode - just the slot content -->
-  <div v-if="api.store.dev.isFullscreen" class="fullscreen-container">
-    <slot />
+  <div
+    v-if="api.store.dev.isFullscreen || !shouldUseResponsiveContainer"
+    class="fullscreen-container"
+    ref="fullScreenDiv"
+  >
+    <MainApp :deviceWidth="fullScreenWidth" :deviceHeight="fullScreenHeight" />
   </div>
 
   <!-- Normal device container mode -->
@@ -168,8 +186,8 @@ const deviceWidthPixels = computed(() => api.store.dev.deviceWidth + 'px')
         </div>
       </div>
       <div class="device-wrapper">
-        <div class="device-container">
-          <slot />
+        <div class="device-container" ref="containerDiv">
+          <MainApp :deviceWidth="api.store.dev.deviceWidth" :deviceHeight="api.store.dev.deviceHeight" />
         </div>
 
         <!-- Resize handles -->

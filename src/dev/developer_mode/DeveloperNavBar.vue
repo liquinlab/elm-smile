@@ -219,7 +219,7 @@ const notificationType = ref('default')
           <div class="flex items-center text-xs font-normal"><BugPlay class="size-4 mr-1" /><b>DEVELOPER MODE</b></div>
         </div>
         <div class="block sm:hidden">
-          <div class="flex items-center text-xs font-semibold"><BugPlay class="size-4 mr-1" /><b>DEV</b></div>
+          <div class="flex items-center text-xs font-normal"><BugPlay class="size-4 mr-1" /><b>DEV</b></div>
         </div>
       </div>
     </div>

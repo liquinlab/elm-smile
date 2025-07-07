@@ -2,7 +2,6 @@
 import useAPI from '@/core/composables/useAPI'
 import { Button } from '@/uikit/components/ui/button'
 const api = useAPI()
-//import InformedConsentText from '@/user/components/InformedConsentText.vue'
 
 defineProps({
   show: {

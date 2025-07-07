@@ -117,7 +117,7 @@ function finish() {
 </script>
 
 <template>
-  <TitleTwoCol leftFirst leftWidth="w-1/">
+  <TitleTwoCol leftFirst leftWidth="w-1/3">
     <template #title>
       <h3 class="text-3xl font-bold mb-4"><FAIcon icon="fa-solid fa-person" />&nbsp;Demographic Information</h3>
       <p class="text-lg mb-8">

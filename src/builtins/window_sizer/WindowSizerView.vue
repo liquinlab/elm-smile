@@ -30,8 +30,6 @@ function finish() {
         <span class="text-4xl text-blue-900 mb-4 block">
           <FAIcon icon="fa-solid fa-arrows-up-down-left-right"></FAIcon>
         </span>
-        {{ api.config.windowsizerRequest }}
-        {{ api.config.windowsizerAggressive }}
         <h1 class="text-xl font-semibold text-blue-900 mb-4">
           Please adjust the size of your browser window until <b>ALL</b> four edges of this box are visible.
         </h1>

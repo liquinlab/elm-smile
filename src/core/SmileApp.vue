@@ -13,9 +13,9 @@ import { ref, computed, onMounted, watch } from 'vue'
  * @requires DevSideBar Side bar for developer tools
  */
 import DeveloperNavBar from '@/dev/developer_mode/DeveloperNavBar.vue'
-//import DevConsoleBar from '@/dev/developer_mode/DevConsoleBar.vue'
 import DevConsoleBar from '@/dev/developer_mode/DevConsoleBar.vue'
 import DevSideBar from '@/dev/developer_mode/DevSideBar.vue'
+
 /**
  * Presentation mode components
  * @requires PresentationNavBar Navigation bar for presentation mode
@@ -24,12 +24,8 @@ import PresentationNavBar from '@/dev/presentation_mode/PresentationNavBar.vue'
 import PresentationModeView from '@/dev/presentation_mode/PresentationModeView.vue'
 /**
  * Built-in experiment components
- * @requires StatusBar Status bar component
- * @requires WindowSizerView Window size warning component
+ * @requires ResponsiveDeviceContainer Responsive device container component
  */
-import StatusBar from '@/builtins/navbars/StatusBar.vue'
-import WindowSizerView from '@/builtins/window_sizer/WindowSizerView.vue'
-
 import ResponsiveDeviceContainer from '@/dev/developer_mode/ResponsiveDeviceContainer.vue'
 
 /**
@@ -43,12 +39,6 @@ import useAPI from '@/core/composables/useAPI'
  * @constant {Object} api Global API instance
  */
 const api = useAPI()
-
-/**
- * Reactive reference tracking if browser window is too small
- * @type {import('vue').Ref<boolean>}
- */
-const toosmall = ref(api.isBrowserTooSmall())
 
 /**
  * Reactive reference for dashboard iframe URL
@@ -67,30 +57,6 @@ const dashboardIframe = ref(null)
  * @type {import('vue').ComputedRef<string>}
  */
 const height_pct = computed(() => `${api.store.dev.consoleBarHeight}px`)
-
-/**
- * Computed property that determines whether to show the status bar
- *
- * @returns {boolean} True if status bar should be shown, false otherwise
- * - Returns false if current route is 'data' or 'recruit'
- * - Returns false if app is in presentation mode
- * - Returns true otherwise
- */
-const showStatusBar = computed(() => {
-  return api.currentRouteName() !== 'data' && api.currentRouteName() !== 'recruit' && api.config.mode != 'presentation'
-})
-
-/**
- * Computed property that determines whether to wrap content in ResponsiveDeviceContainer
- *
- * @returns {boolean} True if ResponsiveDeviceContainer should be used, false otherwise
- * - Returns false if current route is '/' (root route)
- * - Returns true otherwise
- */
-const shouldUseResponsiveContainer = computed(() => {
-  const routeName = api.currentRouteName()
-  return routeName !== undefined && routeName !== 'recruit' && api.config.mode == 'development'
-})
 
 /**
  * Computed property that determines if the app is still loading
@@ -212,10 +178,8 @@ onMounted(() => {
       </div>
 
       <!-- Middle row - content and sidebar -->
-      <div class="router" v-if="toosmall">
-        <WindowSizerView triggered="true"></WindowSizerView>
-      </div>
-      <div v-else class="content-wrapper">
+
+      <div class="content-wrapper">
         <div class="content-and-console">
           <!-- Main content - scrollable -->
           <div class="main-content">
@@ -224,18 +188,7 @@ onMounted(() => {
               <p>Loading...</p>
             </div>
             <template v-else>
-              <ResponsiveDeviceContainer v-if="shouldUseResponsiveContainer">
-                <div class="@container">
-                <StatusBar v-if="showStatusBar" />
-                <router-view />
-                </div>
-              </ResponsiveDeviceContainer>
-              <template v-else>
-                <div class="@container">
-                <StatusBar v-if="showStatusBar" />
-                <router-view />
-                </div>
-              </template>
+              <ResponsiveDeviceContainer />
             </template>
           </div>
 

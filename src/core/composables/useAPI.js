@@ -437,15 +437,17 @@ export class SmileAPI {
 
   // Browser checks
   /**
-   * Checks if the browser window is smaller than the required dimensions
+   * Checks if the browser window dimensions are smaller than the required dimensions
+   * @param {number} width - The current width to check against minimum requirements
+   * @param {number} height - The current height to check against minimum requirements
    * @returns {boolean} True if browser window is too small, false otherwise
    */
-  isBrowserTooSmall() {
+  isBrowserTooSmall(width, height) {
     let val = false
     if (this.store.config.windowsizerAggressive === true && this.store.data.verifiedVisibility === true) {
       val =
-        window.innerWidth < this.store.config.windowsizerRequest.width + 40 ||
-        window.innerHeight < this.store.config.windowsizerRequest.height + 40
+        width < this.store.config.windowsizerRequest.width + 10 ||
+        height < this.store.config.windowsizerRequest.height + 85 // margin for status bar
     }
     return val
   }

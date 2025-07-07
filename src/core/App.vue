@@ -36,12 +36,6 @@ import useSmileStore from '@/core/stores/smilestore'
 const smilestore = useSmileStore()
 
 /**
- * Reactive reference tracking if browser window is too small
- * @type {import('vue').Ref<boolean>}
- */
-const toosmall = ref(api.isBrowserTooSmall())
-
-/**
  * Creates a snapshot of the current smilestore data state and subscribes to changes
  *
  * Tracks changes to smilestore.data by:
@@ -79,12 +73,11 @@ smilestore.$subscribe((mutation, newstate) => {
  * Sets up window event listeners when component is mounted
  *
  * Adds event listeners for:
- * - resize: Records window dimensions and updates toosmall flag
+ * - resize: Records window dimensions
  * - focus: Records when window gains focus
  * - blur: Records when window loses focus
  *
  * All events are logged via api.recordWindowEvent()
- * Resize events also update the toosmall reactive ref
  * All listeners use passive mode for better performance
  */
 onMounted(() => {
@@ -94,7 +87,6 @@ onMounted(() => {
     'resize',
     (event) => {
       api.recordWindowEvent('resize', { width: window.innerWidth, height: window.innerHeight })
-      toosmall.value = api.isBrowserTooSmall()
     },
     { passive: true }
   )
