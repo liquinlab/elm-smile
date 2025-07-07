@@ -4,6 +4,7 @@
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
+import { ConstrainedTaskWindow } from '@/uikit/layouts'
 
 const api = useViewAPI()
 
@@ -98,12 +99,9 @@ function finish() {
 </script>
 
 <template>
-  <div class="flex items-center justify-center select-none py-8">
+  <ConstrainedTaskWindow variant="ghost">
     <!-- Show this for each trial -->
     <div class="text-center" v-if="api.path[0] == 'stroop'">
-      <div class="text-sm text-muted-foreground mb-4">
-        {{ api.blockIndex }} / {{ api.blockLength }}, {{ api.stepIndex }} / {{ api.nSteps }}
-      </div>
       <h1
         class="text-6xl font-bold mb-8"
         :class="{
@@ -138,7 +136,7 @@ function finish() {
         </svg>
       </Button>
     </div>
-  </div>
+  </ConstrainedTaskWindow>
 </template>
 
 <style scoped>

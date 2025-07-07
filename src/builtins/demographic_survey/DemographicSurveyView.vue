@@ -10,7 +10,7 @@ import { Calendar } from '@/uikit/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/uikit/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
 import { cn } from '@/uikit/lib/utils'
-import { TitleTwoCol } from '@/uikit/layouts'
+import { TitleTwoCol, ConstrainedPage } from '@/uikit/layouts'
 
 const api = useViewAPI()
 
@@ -117,7 +117,8 @@ function finish() {
 </script>
 
 <template>
-  <TitleTwoCol leftFirst leftWidth="w-1/3">
+  <ConstrainedPage>
+    <TitleTwoCol leftFirst leftWidth="w-1/3">
     <template #title>
       <h3 class="text-3xl font-bold mb-4"><FAIcon icon="fa-solid fa-person" />&nbsp;Demographic Information</h3>
       <p class="text-lg mb-8">
@@ -634,5 +635,6 @@ function finish() {
         </div>
       </div>
     </template>
-  </TitleTwoCol>
+    </TitleTwoCol>
+  </ConstrainedPage>
 </template>

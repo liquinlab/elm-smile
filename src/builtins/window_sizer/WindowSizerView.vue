@@ -16,7 +16,7 @@ function finish() {
 </script>
 
 <template>
-  <CenteredContent class="mt-5">
+  <CenteredContent class="m-2 mt-5">
     <div
       class="bg-cyan-100 border-animation flex items-center justify-center"
       :style="{

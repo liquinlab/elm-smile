@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
+import { ConstrainedTaskWindow } from '@/uikit/layouts'
 const api = useViewAPI()
 
 const trials = api.steps.append([
@@ -58,18 +59,20 @@ function prev() {
 </script>
 
 <template>
-  <div class="page select-none flex flex-col items-center">
-    <h1 class="text-2xl font-bold mb-4">Task 2</h1>
-    <div class="mb-4">{{ api.stepData.sentence }}/{{ api.stepIndex }}</div>
-    <div class="flex gap-4">
-      <Button variant="outline" @click="prev()" v-if="api.stepIndex > 0">
-        <FAIcon icon="fa-solid fa-arrow-left" />
-        prev
-      </Button>
-      <Button variant="default" @click="next()">
-        next
-        <FAIcon icon="fa-solid fa-arrow-right" />
-      </Button>
+  <ConstrainedTaskWindow variant="ghost" class="p-8">
+    <div class="w-[80%] h-[80%] flex flex-col items-center justify-center">
+      <h1 class="text-2xl font-bold mb-4">Task 2</h1>
+      <div class="mb-4">{{ api.stepData.sentence }}/{{ api.stepIndex }}</div>
+      <div class="flex gap-4">
+        <Button variant="outline" @click="prev()" v-if="api.stepIndex > 0">
+          <FAIcon icon="fa-solid fa-arrow-left" />
+          prev
+        </Button>
+        <Button variant="default" @click="next()">
+          next
+          <FAIcon icon="fa-solid fa-arrow-right" />
+        </Button>
+      </div>
     </div>
-  </div>
+  </ConstrainedTaskWindow>
 </template>

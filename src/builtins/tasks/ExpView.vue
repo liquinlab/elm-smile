@@ -2,6 +2,7 @@
 import { onMounted } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
+import { ConstrainedTaskWindow } from '@/uikit/layouts'
 const api = useViewAPI()
 
 function finish() {
@@ -11,14 +12,16 @@ function finish() {
 </script>
 
 <template>
-  <div class="w-4/5 py-10 select-none mx-auto">
-    <h1 class="text-2xl font-bold mb-4">Experiment</h1>
-    <hr class="border-gray-300 my-4" />
-    <div class="flex justify-end">
-      <Button variant="default" @click="finish()">
-        next
-        <FAIcon icon="fa-solid fa-arrow-right" />
-      </Button>
+  <ConstrainedTaskWindow variant="ghost" class="p-8">
+    <div class="w-[80%] h-[80%]">
+      <h1 class="text-2xl font-bold mb-4">Experiment</h1>
+      <hr class="border-gray-300 my-4" />
+      <div class="flex justify-end">
+        <Button variant="default" @click="finish()">
+          next
+          <FAIcon icon="fa-solid fa-arrow-right" />
+        </Button>
+      </div>
     </div>
-  </div>
+  </ConstrainedTaskWindow>
 </template>

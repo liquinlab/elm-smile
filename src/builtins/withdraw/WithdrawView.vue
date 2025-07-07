@@ -1,6 +1,7 @@
 <script setup>
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
+import { ConstrainedTaskWindow } from '@/uikit/layouts'
 import { Card, CardHeader, CardContent } from '@/uikit/components/ui/card'
 import { computed } from 'vue'
 
@@ -27,13 +28,11 @@ const cardContent = {
   },
   citizensci: {
     title: 'Notice about withdraw from our study',
-    message:
-      'You have indicated that you withdrew from the study. Please return the task and we will contact you for partial payment if you are eligible.',
+    message: 'You have indicated that you withdrew from the study. Feel free to close this window.',
   },
   web: {
     title: 'Notice about withdraw from our web study',
-    message:
-      'You have indicated that you withdrew from the study. Please return the task and we will contact you for partial payment if you are eligible.',
+    message: 'You have indicated that you withdrew from the study. Feel free to close this window.',
   },
 }
 
@@ -42,12 +41,13 @@ const content = computed(() => cardContent[currentService.value])
 </script>
 
 <template>
-  <div class="page select-none pt-15">
-    <div class="w-4/5 mx-auto">
+  <ConstrainedTaskWindow variant="ghost">
+    <div class="w-[60%] h-[80%]">
       <Card v-if="api.store.browserPersisted.withdrawn && content" class="border-red-300 bg-red-50">
         <CardHeader>
-          <p class="text-xl font-semibold">
-            <i-icon-park-outline-bye class="text-red-500 inline-block text-5xl mr-2" />{{ content.title }}
+          <p class="text-xl font-semibold text-center">
+            <i-icon-park-outline-bye class="text-red-500 inline-block text-5xl mb-2" />
+            <br />{{ content.title }}
           </p>
         </CardHeader>
         <CardContent>
@@ -55,5 +55,5 @@ const content = computed(() => cardContent[currentService.value])
         </CardContent>
       </Card>
     </div>
-  </div>
+  </ConstrainedTaskWindow>
 </template>

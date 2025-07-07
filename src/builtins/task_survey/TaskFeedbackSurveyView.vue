@@ -6,7 +6,7 @@ import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
 import { Textarea } from '@/uikit/components/ui/textarea'
-import { TitleTwoCol } from '@/uikit/layouts'
+import { TitleTwoCol, ConstrainedPage } from '@/uikit/layouts'
 
 const api = useViewAPI()
 
@@ -47,7 +47,8 @@ function finish() {
 </script>
 
 <template>
-  <TitleTwoCol leftFirst leftWidth="w-1/3">
+  <ConstrainedPage>
+    <TitleTwoCol leftFirst leftWidth="w-1/3">
     <template #title>
       <h3 class="text-3xl font-bold mb-4"><FAIcon icon="fa-solid fa-pencil" />&nbsp;Give us feedback</h3>
       <p class="text-lg mb-8">
@@ -143,5 +144,6 @@ function finish() {
               </div>
             </div>
     </template>
-  </TitleTwoCol>
+    </TitleTwoCol>
+  </ConstrainedPage>
 </template>
