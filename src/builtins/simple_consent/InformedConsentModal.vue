@@ -48,7 +48,7 @@ onUnmounted(() => {
     >
       <FAIcon icon="fa-solid fa-xmark" class="text-xl" />
     </Button>
-    <div class="w-[90%] h-[90%] relative bg-white shadow-xl flex flex-col">
+    <div class="w-[90%] h-[90%] relative bg-background shadow-xl flex flex-col">
       <div class="flex-1 overflow-y-auto p-20 pt-10">
         <div class="select-none w-full">
           <div class="pt-5 text-foreground">
@@ -63,7 +63,7 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
-      <div class="border-t bg-gray-50 px-5 py-4 flex justify-end">
+      <div class="border-t bg-muted px-5 py-4 flex justify-end">
         <Button @click="$emit('toggleConsent')"> Take me back! </Button>
       </div>
     </div>
