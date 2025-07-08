@@ -142,6 +142,7 @@ const initBrowserPersisted = {
   currentViewDone: false,
   consented: false,
   withdrawn: false,
+  verifiedVisibility: false,
   done: false,
   reset: false,
   totalWrites: 0,
@@ -330,6 +331,11 @@ export default defineStore('smilestore', {
       this.data.withdrawn = true
       this.private.withdrawData = forminfo
       this.data.endtime = fsnow()
+    },
+
+    verifyVisibility(value) {
+      this.browserPersisted.verifiedVisibility = value
+      this.data.verifiedVisibility = value
     },
 
     /**

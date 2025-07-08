@@ -404,7 +404,7 @@ export class SmileAPI {
    * @returns {void}
    */
   verifyVisibility(value) {
-    this.store.data.verifiedVisibility = value
+    this.store.verifyVisibility(value)
   }
 
   /**
