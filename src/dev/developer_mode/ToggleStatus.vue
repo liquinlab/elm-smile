@@ -90,6 +90,12 @@ const api = useAPI()
         <tr class="table-row-base table-row-base-bottom">
           <td class="table-cell-base table-cell-left table-cell-small font-mono" colspan="4">
             <div class="flex flex-wrap gap-4 items-center">
+              <div class="flex flex-col items-center">
+                <span>Resp. UI</span>
+                <div class="field">
+                  <Checkbox v-model="api.config.responsiveUI" class="mt-1" />
+                </div>
+              </div>
               <div class="flex flex-col items-left">
                 Service<br />
 

@@ -29,12 +29,25 @@ const containerClasses = computed(() => {
 })
 
 const containerStyle = computed(() => {
-  if (api.config.windowsizerRequest) {
+  if (api.config.windowsizerRequest && !api.config.responsiveUI) {
     return {
       width: api.config.windowsizerRequest.width + 'px',
       height: api.config.windowsizerRequest.height + 'px',
       minWidth: api.config.windowsizerRequest.width + 'px',
       minHeight: api.config.windowsizerRequest.height + 'px',
+    }
+  } else if (api.config.responsiveUI) {
+    return {
+      width: '90vw',
+      height: api.config.windowsizerRequest.height + 'px',
+      maxWidth: api.config.windowsizerRequest.width + 'px',
+      maxHeight: api.config.windowsizerRequest.height + 'px',
+      marginLeft: '20px',
+      marginRight: '20px',
+      paddingLeft: '30px',
+      paddingRight: '30px',
+      paddingTop: '20px',
+      paddingBottom: '20px',
     }
   }
   return {}

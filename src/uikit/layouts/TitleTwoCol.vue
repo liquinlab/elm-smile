@@ -24,12 +24,12 @@ const leftColumnClasses = computed(() => {
   <div class="w-6/7 select-none mx-auto text-left my-10">
     <slot name="title" />
 
-    <div class="mt-10 flex gap-6" :class="leftFirst ? 'flex-col @lg:flex-row' : 'flex-col-reverse @lg:flex-row'">
+    <div class="mt-10 flex gap-6" :class="leftFirst ? 'flex-col @lg:flex-row' : 'flex-col-reverse @lg:flex-row mb-10'">
       <div :class="leftColumnClasses">
         <slot name="left" />
       </div>
 
-      <div class="flex-1">
+      <div class="flex-1" :class="leftFirst ? 'mb-10' : ''">
         <slot name="right" />
       </div>
     </div>

@@ -191,6 +191,9 @@ values (adjust for your situation):
 # allow repeats
 VITE_ALLOW_REPEATS               = false
 
+# should the ui default to allow responsive resizing
+VITE_RESPONSIVE_UI               = true
+
 # window sizing
 VITE_WINDOWSIZER_REQUEST         = 800x600
 VITE_WINDOWSIZER_AGGRESSIVE      = true
@@ -218,6 +221,9 @@ means they are made available to the web application/experiment.
 
 - `VITE_ALLOW_REPEATS` attempts to prevent participants from taking your task
   more than once.
+- `VITE_RESPONSIVE_UI` set to true if you want the default
+  [layout](/styling/layouts) to be responsive or fixed to the windowsizer
+  request
 - `VITE_WINDOWSIZER_REQUEST` configures the requested size of the page for
   rendering content (used by WindowSizerView.vue component)
 - `VITE_WINDOWSIZER_AGGRESSIVE` if set to true and the user resizes the page,

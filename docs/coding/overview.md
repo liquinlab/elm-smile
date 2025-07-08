@@ -1,4 +1,4 @@
-# Overview
+# Coding Overview
 
 The following sections describe how to design experiments using the <SmileText/>
 project. It covers the basic of programming new task elements, configuring the
@@ -12,7 +12,7 @@ it is useful to interact with Smile using a web server running on your local
 computer (i.e., your laptop or desktop). <SmileText/> provides a special local
 developer mode that adds some interface elements to the page that help you debug
 and test your experiment. You can learn more about developer mode
-[here](/developermode). But the TL;DR is
+[here](/coding/developing). But the TL;DR is
 
 ```
 npm run dev

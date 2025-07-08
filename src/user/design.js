@@ -47,6 +47,8 @@ const timeline = new Timeline(api)
 api.setRuntimeConfig('allowRepeats', false)
 api.setRuntimeConfig('colorMode', 'light')
 
+api.setRuntimeConfig('responsiveUI', true)
+
 api.setRuntimeConfig('windowsizerRequest', { width: 800, height: 600 })
 api.setRuntimeConfig('windowsizerAggressive', true)
 
