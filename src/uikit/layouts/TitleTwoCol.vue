@@ -1,6 +1,9 @@
 <script setup>
 import { computed } from 'vue'
 import { getResponsiveWidthClasses } from './layoutUtils.js'
+import useViewAPI from '@/core/composables/useViewAPI'
+
+const api = useViewAPI()
 
 const props = defineProps({
   leftFirst: {
@@ -16,7 +19,14 @@ const props = defineProps({
 })
 
 const leftColumnClasses = computed(() => {
-  return getResponsiveWidthClasses(props.leftWidth)
+  return getResponsiveWidthClasses(props.leftWidth, api.config.responsiveUI)
+})
+
+const containerClasses = computed(() => {
+  if (!api.config.responsiveUI) {
+    return 'mt-10 flex gap-6'
+  }
+  return props.leftFirst ? 'mt-10 flex gap-6 flex-col @lg:flex-row' : 'mt-10 flex gap-6 flex-col-reverse @lg:flex-row mb-10'
 })
 </script>
 
@@ -24,7 +34,7 @@ const leftColumnClasses = computed(() => {
   <div class="w-6/7 select-none mx-auto text-left my-10">
     <slot name="title" />
 
-    <div class="mt-10 flex gap-6" :class="leftFirst ? 'flex-col @lg:flex-row' : 'flex-col-reverse @lg:flex-row mb-10'">
+    <div :class="containerClasses">
       <div :class="leftColumnClasses">
         <slot name="left" />
       </div>

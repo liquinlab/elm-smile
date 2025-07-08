@@ -2,7 +2,12 @@
  * Maps width classes to their responsive versions for layout components
  * This ensures Tailwind includes all these classes in the build
  */
-export const getResponsiveWidthClasses = (leftWidth) => {
+export const getResponsiveWidthClasses = (leftWidth, responsiveUI = true) => {
+  if (!responsiveUI) {
+    // Return the fixed width class without responsive behavior
+    return leftWidth || 'w-1/3'
+  }
+  
   const widthMap = {
     'w-1/12': 'w-full @xl:w-1/12',
     'w-1/6': 'w-full @xl:w-1/6',
