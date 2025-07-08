@@ -21,6 +21,7 @@ const df = new DateFormatter('en-US', {
 })
 
 const dateValue = ref()
+const isPopoverOpen = ref(false)
 
 // persists the form info in local storage, otherwise initialize
 if (!api.persist.isDefined('forminfo')) {
@@ -48,6 +49,7 @@ watch(dateValue, (newValue) => {
   if (newValue) {
     const date = newValue.toDate(getLocalTimeZone())
     api.persist.forminfo.dob = date.toISOString().split('T')[0] // Format as YYYY-MM-DD
+    isPopoverOpen.value = false // Close popover when date is selected
   }
 })
 
@@ -151,7 +153,7 @@ function finish() {
         <div v-if="api.pathString === 'survey_page1'" class="border border-border text-left bg-muted p-6 rounded-lg">
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2"> Date of Birth </label>
-            <Popover>
+            <Popover v-model:open="isPopoverOpen">
               <PopoverTrigger as-child>
                 <Button
                   variant="secondary"
