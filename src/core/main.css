@@ -68,6 +68,22 @@
   --color-danger-button-light: var(--danger-button-light);
   --color-danger-button-light-foreground: var(--danger-button-light-foreground);
 
+  --color-window-sizer-bg: var(--window-sizer-bg);
+  --color-window-sizer-text: var(--window-sizer-text);
+  --color-window-sizer-border: var(--window-sizer-border);
+  --color-window-sizer-input: var(--window-sizer-input);
+  --color-window-sizer-ring: var(--window-sizer-ring);
+
+  --color-withdraw-bg: var(--withdraw-bg);
+  --color-withdraw-text: var(--withdraw-text);
+  --color-withdraw-border: var(--withdraw-border);
+  --color-withdraw-ring: var(--withdraw-ring);
+
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-text: var(--warning-text);
+  --color-warning-border: var(--warning-border);
+  --color-warning-ring: var(--warning-ring);
+
   --dev-bar-bg: var(--dev-bg);
   --dev-bar-text: var(--dev-text);
   --dev-bar-lines: var(--dev-lines);
@@ -145,6 +161,21 @@
   --danger-button-foreground: oklch(0.985 0 0);
   --danger-button-light: oklch(0.85 0.1 27.325);
   --danger-button-light-foreground: oklch(0.577 0.245 27.325);
+
+  --window-sizer-bg: #c2e9f4;
+  --window-sizer-text: #025a72;
+  --window-sizer-border: #0f96bb;
+  --window-sizer-ring: #0f96bb;
+
+  --withdraw-bg: #f8d7da;
+  --withdraw-text: #721c24;
+  --withdraw-border: #f5c6cb;
+  --withdraw-ring: #f1aeb5;
+
+  --warning-bg: #fff3cd;
+  --warning-text: #856404;
+  --warning-border: #ffeeba;
+  --warning-ring: #ffe8a1;
 
   --dev-bg: var(--sidebar);
   --dev-bg-contrast: var(--sidebar-2);
@@ -225,6 +256,21 @@
   --danger-button-foreground: oklch(0.985 0 0);
   --danger-button-light: oklch(0.3 0.12 27.325);
   --danger-button-light-foreground: oklch(0.8 0.2 27.325);
+
+  --window-sizer-bg: #5c818c;
+  --window-sizer-text: #174957;
+  --window-sizer-border: #3c575f;
+  --window-sizer-ring: #0f96bb;
+
+  --withdraw-bg: #f8d7da;
+  --withdraw-text: #721c24;
+  --withdraw-border: #f5c6cb;
+  --withdraw-ring: #f1aeb5;
+
+  --warning-bg: #fff3cd;
+  --warning-text: #856404;
+  --warning-border: #ffeeba;
+  --warning-ring: #ffe8a1;
 
   --dev-bg: var(--sidebar);
   --dev-bg-contrast: var(--sidebar-2);
