@@ -53,7 +53,7 @@ function submitWithdraw() {
   <div class="flex flex-row items-stretch relative px-5" role="navigation" aria-label="main navigation">
     <div class="flex items-stretch flex-shrink-0 min-h-[3.25rem]">
       <a class="flex items-center pt-3" :href="appconfig.labURL" target="_new" v-if="!appconfig.anonymousMode">
-        <img :src="api.getStaticUrl(appconfig.brandLogoFn)" width="90" class="dark:invert" />
+        <img :src="api.getStaticUrl(appconfig.brandLogoFn)" width="90" class="dark-aware-img" />
       </a>
       <div class="flex items-center pt-1">
         <p class="text-xs text-left pl-2.5 text-muted-foreground pt-2 @[600px]:block hidden font-mono">
@@ -127,7 +127,3 @@ function submitWithdraw() {
   </div>
   -->
 </template>
-
-<style scoped>
-/* All styling has been converted to Tailwind classes */
-</style>

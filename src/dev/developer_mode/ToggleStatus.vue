@@ -7,6 +7,13 @@ import useAPI from '@/core/composables/useAPI'
 import { Button } from '@/uikit/components/ui/button'
 import { Checkbox } from '@/uikit/components/ui/checkbox'
 const api = useAPI()
+
+const darkMode = computed({
+  get: () => api.config.colorMode === 'dark',
+  set: (value) => {
+    api.config.colorMode = value ? 'dark' : 'light'
+  },
+})
 </script>
 
 <template>
@@ -94,6 +101,12 @@ const api = useAPI()
                 <span>Resp. UI</span>
                 <div class="field">
                   <Checkbox v-model="api.config.responsiveUI" class="mt-1" />
+                </div>
+              </div>
+              <div class="flex flex-col items-center">
+                <span>Dark</span>
+                <div class="field">
+                  <Checkbox v-model="darkMode" class="mt-1" />
                 </div>
               </div>
               <div class="flex flex-col items-left">

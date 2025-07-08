@@ -182,7 +182,10 @@ onMounted(() => {
       <div class="content-wrapper">
         <div class="content-and-console">
           <!-- Main content - scrollable -->
-          <div class="main-content">
+          <div
+            class="main-content bg-background text-foreground"
+            :class="api.store.dev.isFullscreen && api.config.colorMode === 'dark' ? 'dark' : 'light'"
+          >
             <div v-if="isLoading" class="loading-container">
               <div class="loading-spinner"></div>
               <p>Loading...</p>
@@ -212,12 +215,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.router {
-  height: 100vh;
-  height: v-bind(total_height);
-  background-color: var(--background);
-}
-
 .app-container {
   display: flex;
   flex-direction: column;

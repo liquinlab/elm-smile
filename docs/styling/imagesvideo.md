@@ -120,6 +120,36 @@ use the following code:
 <video></video>
 ```
 
+## Dark mode and images
+
+When your experiment supports dark mode, images may need special handling to
+ensure they remain visible and appropriate in both light and dark themes. Some
+images (like logos, icons, or diagrams) may appear too dark or too light
+depending on the current color scheme.
+
+<SmileText/> provides a helper class `dark-aware-img` that automatically applies
+a CSS `invert` filter to images when dark mode is active. This is particularly
+useful for images that are designed for light backgrounds but need to be visible
+in dark mode.
+
+To use this helper class, simply add it to your image elements:
+
+```html
+<img src="@/user/assets/logo.png" alt="logo" class="dark-aware-img" />
+```
+
+This will automatically invert the image colors when dark mode is enabled,
+making dark images appear light and vice versa. This is especially helpful for:
+
+- **Icons and logos** that are designed with dark colors for light backgrounds
+- **Simple graphics and diagrams** that need to maintain contrast in both modes
+- **UI elements** that should adapt to the current theme
+
+Note that this inversion works best with images that have simple color schemes.
+Complex photographs or images with many colors may not look ideal when inverted.
+For such cases, consider providing separate light and dark versions of the image
+and conditionally displaying them based on the current color mode.
+
 ## Preloading
 
 Preloading refers to asking the browser to load an image or video before it is

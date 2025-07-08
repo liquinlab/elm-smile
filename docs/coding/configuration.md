@@ -81,6 +81,9 @@ file).
 ```js
 api.setRuntimeConfig('allowRepeats', false)
 
+api.setRuntimeConfig('colorMode', 'light')
+api.setRuntimeConfig('responsiveUI', true)
+
 api.setRuntimeConfig('windowsizerRequest', { width: 800, height: 600 })
 api.setRuntimeConfig('windowsizerAggressive', true)
 
@@ -191,6 +194,10 @@ values (adjust for your situation):
 # allow repeats
 VITE_ALLOW_REPEATS               = false
 
+# color mode (light, dark or system)
+VITE_COLOR_MODE                  = light
+
+
 # should the ui default to allow responsive resizing
 VITE_RESPONSIVE_UI               = true
 
@@ -221,6 +228,9 @@ means they are made available to the web application/experiment.
 
 - `VITE_ALLOW_REPEATS` attempts to prevent participants from taking your task
   more than once.
+- `VITE_COLOR_MODE` sets the color mode of the experiment. Can be 'light',
+  'dark', or 'system' (where system attempts to ask the browser what the setting
+  should be based on the users OS)
 - `VITE_RESPONSIVE_UI` set to true if you want the default
   [layout](/styling/layouts) to be responsive or fixed to the windowsizer
   request

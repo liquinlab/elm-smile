@@ -100,7 +100,8 @@
   font-optical-sizing: auto;
 }
 
-:root {
+:root,
+.light {
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
@@ -289,6 +290,26 @@
   --scrollbar-track: #2a2a2a;
   --scrollbar-thumb: #555555;
   --scrollbar-thumb-hover: #777777;
+}
+
+/* Default light theme */
+.dark-aware-img {
+  filter: invert(0);
+}
+
+/* Dark theme override */
+.dark .dark-aware-img {
+  filter: invert(1);
+}
+
+/* Light theme override when nested inside dark */
+.dark .light .dark-aware-img {
+  filter: invert(0) !important;
+}
+
+/* Dark theme override when nested inside light */
+.light .dark .dark-aware-img {
+  filter: invert(1) !important;
 }
 
 @layer base {

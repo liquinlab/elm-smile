@@ -3,12 +3,6 @@
  * It is imported into the main.css file.
  */
 
-.page {
-  height: 100%;
-  width: 80%;
-  margin: 0 auto;
-}
-
 :root {
   --purple: #8a4d76;
   --pink: #e88f9e;

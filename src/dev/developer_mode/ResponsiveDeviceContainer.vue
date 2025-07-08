@@ -127,6 +127,11 @@ const toggleRotation = () => {
 const toggleFullscreen = () => {
   api.store.dev.isFullscreen = !api.store.dev.isFullscreen
 }
+
+const toggleColorMode = () => {
+  api.config.colorMode = api.config.colorMode === 'light' ? 'dark' : 'light'
+}
+
 /**
  * Computed property that determines whether to wrap content in ResponsiveDeviceContainer
  *
@@ -144,8 +149,8 @@ const shouldUseResponsiveContainer = computed(() => {
   <!-- Fullscreen mode - just the slot content -->
   <div
     v-if="api.store.dev.isFullscreen || !shouldUseResponsiveContainer"
-    class="fullscreen-container"
     ref="fullScreenDiv"
+    class="fullscreen-container bg-background text-foreground"
   >
     <MainApp :deviceWidth="fullScreenWidth" :deviceHeight="fullScreenHeight" />
   </div>
@@ -174,6 +179,21 @@ const shouldUseResponsiveContainer = computed(() => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
+                <Button variant="ghost" size="xs" @click="toggleColorMode">
+                  <i-lucide-moon v-if="api.config.colorMode === 'light'" />
+                  <i-lucide-sun v-else />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p v-if="api.config.colorMode === 'light'">Dark Mode</p>
+                <p v-else>Light Mode</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <Button variant="ghost" size="xs" @click="toggleFullscreen">
                   <i-ic-outline-fullscreen />
                 </Button>
@@ -185,8 +205,8 @@ const shouldUseResponsiveContainer = computed(() => {
           </TooltipProvider>
         </div>
       </div>
-      <div class="device-wrapper">
-        <div class="device-container" ref="containerDiv">
+      <div class="device-wrapper" :class="api.config.colorMode === 'dark' ? 'dark' : 'light'">
+        <div class="device-container bg-background text-foreground" ref="containerDiv">
           <MainApp :deviceWidth="api.store.dev.deviceWidth" :deviceHeight="api.store.dev.deviceHeight" />
         </div>
 

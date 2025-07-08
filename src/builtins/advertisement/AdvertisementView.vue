@@ -45,7 +45,7 @@ onBeforeUnmount(() => {
 
 <template>
   <ConstrainedTaskWindow variant="ghost">
-    <img ref="logo" src="@/user/assets/brain.svg" width="220" class="brain-logo" />
+    <img ref="logo" src="@/user/assets/brain.svg" width="220" class="dark-aware-img" />
     <h1 ref="title" class="text-3xl font-bold mb-4">Please help us understand the mind!</h1>
     <p>Take part in a short experiment where you play some games.</p>
     <br />
@@ -55,13 +55,3 @@ onBeforeUnmount(() => {
     </Button>
   </ConstrainedTaskWindow>
 </template>
-
-<style scoped>
-.brain-logo {
-  filter: invert(0);
-}
-
-.dark .brain-logo {
-  filter: invert(1);
-}
-</style>

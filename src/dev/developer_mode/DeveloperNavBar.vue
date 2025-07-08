@@ -3,6 +3,7 @@ import Stepper from '@/dev/developer_mode/Stepper.vue'
 import RouteInfoButton from '@/dev/developer_mode/RouteInfoButton.vue'
 import ResetButton from '@/dev/developer_mode/ResetButton.vue'
 import ReloadButton from '@/dev/developer_mode/ReloadButton.vue'
+import ColorModeButton from '@/dev/developer_mode/ColorModeButton.vue'
 import DataBarButton from '@/dev/developer_mode/DataBarButton.vue'
 import FullScreenButton from '@/dev/developer_mode/FullScreenButton.vue'
 import ViewButton from '@/dev/developer_mode/ViewButton.vue'
@@ -247,7 +248,12 @@ const notificationType = ref('default')
           <ResetButton></ResetButton>
         </div>
 
-        <!-- reset button -->
+        <!-- color mode button -->
+        <div class="flex items-center" v-if="api.store.dev.isFullscreen">
+          <ColorModeButton></ColorModeButton>
+        </div>
+
+        <!--fullscreen button -->
         <div class="flex items-center" v-if="api.currentRouteName() !== 'recruit'">
           <FullScreenButton></FullScreenButton>
         </div>
