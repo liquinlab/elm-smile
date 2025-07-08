@@ -29,16 +29,16 @@ presents will likely present a different image when the page is refreshed.
 always present the same image when re-visited by the same participant.
 
 In <SmileText />, seeding happens automatically when the website is first
-launched, then again upon entry into each **View** (see [Timeline](/timeline)
-for more on Views and navigation between them). Seeds have two components. The
-first component is a random character string we'll call the "seed ID," generated
-for each participant. The second is the name of the route that is currently
-being displayed. Each time a given route is entered (or re-entered), the random
-number generator will be seeded with the route-specific, participant-specific
-seed. This means that the study will be fully randomized for each participant
-with a new, unique seed. As a result, everything will be fully randomized
-_across_ participants, but completely reproducible _within_ a participant's
-session.
+launched, then again upon entry into each **View** (see
+[Timeline](/coding/timeline) for more on Views and navigation between them).
+Seeds have two components. The first component is a random character string
+we'll call the "seed ID," generated for each participant. The second is the name
+of the route that is currently being displayed. Each time a given route is
+entered (or re-entered), the random number generator will be seeded with the
+route-specific, participant-specific seed. This means that the study will be
+fully randomized for each participant with a new, unique seed. As a result,
+everything will be fully randomized _across_ participants, but completely
+reproducible _within_ a participant's session.
 
 So for example, for a participant with seed ID
 `a5c40328-0625-4353-bab1-05612539dcc3` who enters the route `instructions`, the
@@ -63,12 +63,12 @@ lodash.shuffle([1, 2, 3])
 ```
 
 **Warning:** Be careful with Views that step through multiple trials using the
-[stepper](/steps). Generally, if a single View steps through multiple trials,
-each of which require a random number, you should generate all random numbers
-for that route at the beginning of the View (rather than within each specific
-trial). Here's why: If the participant refreshes the page, you want them to go
-back to the trial where they left off. If you set all random numbers at the
-beginning, the participant can easily pick up from trial 10 with the same
+[stepper](/coding/steps). Generally, if a single View steps through multiple
+trials, each of which require a random number, you should generate all random
+numbers for that route at the beginning of the View (rather than within each
+specific trial). Here's why: If the participant refreshes the page, you want
+them to go back to the trial where they left off. If you set all random numbers
+at the beginning, the participant can easily pick up from trial 10 with the same
 randomization (all random numbers are regenerated upon refresh, and the stepper
 will correctly point to the 10th random number for the 10th trial). However, if
 you set random numbers within each trial, the partcipant will get a different
@@ -131,7 +131,8 @@ exist yet.
 
 You may also want to do your own custom randomization, outside of condition
 assignment. For example, maybe you want to randomize the order of trials that
-you give to the [trial stepper](/steps), or only display a subset of trials.
+you give to the [trial stepper](/coding/steps), or only display a subset of
+trials.
 
 <SmileText /> [API](/api) includes the following built-in randomization
 functions for these situations:
@@ -238,7 +239,7 @@ const all_trial_types = api.expandProduct(stimuli, prompts, backgroundColors)
 ### Random timeline routes
 
 It is possible to randomize the order of routes in the timeline. See
-[Timeline](/timeline) for further details.
+[Timeline](/coding/timeline) for further details.
 
 ## "Unseeded" random number generation
 
@@ -266,13 +267,13 @@ api.randomSeed(12344)
 
 As mentioned, <SmileText /> automatically generates a seed ID, which is used to
 set all local seeds throughout the experiment. When in dev mode (see
-[Developing](/developing)), you can also override the seed ID. By doing so, you
-can recreate exactly what a participant saw when they completed the experiment
-(or what you yourself saw in a previous run of the experiment). To do so, in the
-dev toolbar randomization dropdown, replace the contents of the textbox with the
-seed ID you'd like to use. Then click the arrow button to the right of the
-textbox. You will now be viewing the experiment using randomization with that
-seed.
+[Developing](/coding/developing)), you can also override the seed ID. By doing
+so, you can recreate exactly what a participant saw when they completed the
+experiment (or what you yourself saw in a previous run of the experiment). To do
+so, in the dev toolbar randomization dropdown, replace the contents of the
+textbox with the seed ID you'd like to use. Then click the arrow button to the
+right of the textbox. You will now be viewing the experiment using randomization
+with that seed.
 
 ![Seed override](/images/seedoverride.png)
 

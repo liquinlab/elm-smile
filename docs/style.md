@@ -12,7 +12,7 @@ clicking, dragging, etc...).[^vue]
 
 [^vue]:
     Interestingly these are roughly the same as the three sections of a
-    [Single-file Component in Vue](/components).
+    [Single-file Component in Vue](/coding/components).
 
 In this document, we will focus mostly on the CSS side of things: how you make
 things look nice by choosing colors, layouts, spacing, and typography for your

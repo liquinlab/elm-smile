@@ -8,7 +8,7 @@ sequenced events _within_ a View.
 
 ::: tip Steps are like builds in a Keynote/Powerpoint animation
 
-By way of analogy, think of different [Views](/views) as slides in a
+By way of analogy, think of different [Views](/coding/views) as slides in a
 Keynote/Powerpoint presentation while a step is like a build or animation
 **within** a slide.
 
@@ -33,7 +33,7 @@ always completing the set of steps/trials assigned to them and are not able to
 start the task over (possibly introducing biased data from practice effects or
 exposure to different manipulations). You can learn more about this feature by
 reading about how to [persist stepper state](#persisting-stepper-state). The
-stepper also integrates with the [developer mode](/developing) interface.
+stepper also integrates with the [developer mode](/coding/developing) interface.
 
 ## Create a stepped View
 
@@ -872,7 +872,7 @@ trials.push()
 The `shuffle()` method allows you to randomize the order of trials. This is
 particularly useful for counterbalancing trial order across participants. The
 shuffle operation respects the seeded random number generation system (see
-[Randomization](/randomization) for more details).
+[Randomization](/coding/randomization) for more details).
 
 ```js
 const stepper = api.useHStepper()
@@ -916,7 +916,8 @@ trials.push()
 
 The shuffle operation uses the same seeded random number generation system as
 the rest of Smile. When no seed is provided, it uses the current route-specific
-seed (see [Randomization](/randomization) for details). This ensures that:
+seed (see [Randomization](/coding/randomization) for details). This ensures
+that:
 
 1. Each participant gets a unique but reproducible order
 2. The order remains consistent if the page is refreshed
@@ -928,7 +929,7 @@ seed (see [Randomization](/randomization) for details). This ensures that:
 
 The `sample()` method provides various ways to sample from your trials, all of
 which respect Smile's seeded randomization system (see
-[Randomization](/randomization) for details). The method supports several
+[Randomization](/coding/randomization) for details). The method supports several
 sampling types:
 
 ```js

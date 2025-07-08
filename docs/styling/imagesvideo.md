@@ -53,9 +53,10 @@ You could then be able to link to this image on another website like this:
 ```
 
 where the specific link depends on the final build destination of your
-experiment (see [this](/deploying#what-url-do-you-send-participants-to)). (If
-you tried linking to content in the assets folder, it might change the filename
-from one build to the next).
+experiment (see
+[this](/recruit/deploying#what-url-do-you-send-participants-to)). (If you tried
+linking to content in the assets folder, it might change the filename from one
+build to the next).
 
 ## Referring to static assets using code
 

@@ -1,6 +1,6 @@
 <script setup>
-import SimpleButton from './components/SimpleButton.vue'
-import TextInput from './components/TextInput.vue'
+import SimpleButton from '/coding/components/SimpleButton.vue'
+import TextInput from '/coding/components/TextInput.vue'
 </script>
 
 # Components
@@ -45,14 +45,15 @@ debugging much easier.
 ### How are components used in <SmileText/>?
 
 Typically in <SmileText/>, components are used to define
-[phases of an experiment](/views) (e.g., consent, instructions, etc.), Smile
-provides several [built-in components](/views#built-in-views) (which we refer to
-as "Views") that implement nicely designed components that collect informed
-consent or show instructions. Components are also used to define the individual
-trials of an experiment (i.e., the logic and flow of what is shown in a given
-trial). Some trials might be complex and composed of other components that
-define the look and layout of stimuli, buttons, etc. In addition, Smile provides
-a simple API which makes it easy to [step through sequences of trials](/steps).
+[phases of an experiment](/coding/views) (e.g., consent, instructions, etc.),
+Smile provides several [built-in components](/coding/views#built-in-views)
+(which we refer to as "Views") that implement nicely designed components that
+collect informed consent or show instructions. Components are also used to
+define the individual trials of an experiment (i.e., the logic and flow of what
+is shown in a given trial). Some trials might be complex and composed of other
+components that define the look and layout of stimuli, buttons, etc. In
+addition, Smile provides a simple API which makes it easy to
+[step through sequences of trials](/coding/steps).
 
 ## Vue.js components
 

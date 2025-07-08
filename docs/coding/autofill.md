@@ -17,8 +17,8 @@ To autofill a form with fake data we register a function with the [API](/api)
 that will be called when the autofill button is clicked. This function should
 set the values of the form fields to the desired values. The function is pure
 JavaScript and can be as simple or complex as needed. For example in the
-[demographic survey View](/views#demographic-survey) we might want to autofill
-the form with some common values:
+[demographic survey View](/coding/views#demographic-survey) we might want to
+autofill the form with some common values:
 
 ```js
 <script setup>
@@ -47,9 +47,9 @@ In this example the `autofill()` function sets the values of the form fields to
 deterministic "standin" values. Then we call `api.setAutofill(autofill)` to
 register this function as available.
 
-When a [View](/views) has an autofill function registered a special button will
-appear in the [developer tools](/developermode) menu bar that, when clicked,
-will autofill the form values using this function.
+When a [View](/coding/views) has an autofill function registered a special
+button will appear in the [developer tools](/coding/developing) menu bar that,
+when clicked, will autofill the form values using this function.
 
 You can call `api.removeAutofill()` to remove the autofill function from the
 developer tools if needed. When you navigate on the timeline to a new View the
@@ -148,7 +148,7 @@ is clicked after it is registered `api.setAutofill(autofill)`. Inside this
 function is steps through each trial, rendering the data for that trial, saving
 it to the smilestore database, then advancing to the next step. The rendering
 step calls the `api.faker.*()` methods as defined and makes "fake" data for the
-trial. This data is then [recorded to the database](/datastorage) using
+trial. This data is then [recorded to the database](/coding/datastorage) using
 `api.recordData()`.
 
 ## The Autofill API
@@ -167,8 +167,8 @@ desired values. The function should have no arguments.
 ### `api.removeAutofill()`
 
 This removes the autofill function from the developer tools menu bar. This
-called automatically when each [view](/views) is advanced on the
-[timeline](/timeline).
+called automatically when each [view](/coding/views) is advanced on the
+[timeline](/coding/timeline).
 
 ## The Faker API
 

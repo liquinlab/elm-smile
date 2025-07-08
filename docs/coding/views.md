@@ -4,10 +4,10 @@
 
 # Views
 
-[Components](/components) are the basic building blocks of a <SmileText/>
+[Components](/coding/components) are the basic building blocks of a <SmileText/>
 experiment. However, components can play different roles. In <SmileText />, each
 major phase of an experiment is associated with its own special
-[component](/components) called a "View". (We will refer to Views using a
+[component](/coding/components) called a "View". (We will refer to Views using a
 capital 'V' to distinguish them from ordinary uses of the word "view."). Other
 packages might refer to View elements as "pages", "routes", "sections", "parts",
 or "phases."
@@ -36,7 +36,7 @@ Views are a useful way of thinking about bigger parts or phases of an
 experiment. Views tend be to modular and reusable "sections" of an experiment
 that you might use in different experiments or different parts of the same
 experiment. The sequencing of different Views is controlled by the
-[**Timeline**](/timeline) (and more specifically `@/user/design.js`).
+[**Timeline**](/coding/timeline) (and more specifically `@/user/design.js`).
 
 ## Built-in Views
 
@@ -432,7 +432,7 @@ questions will be randomized in the same way each time the quiz is taken.
 
 ```js
 // import the quiz questions
-import { QUIZ_QUESTIONS } from './components/quizQuestions'
+import { QUIZ_QUESTIONS } from '/coding/components/quizQuestions'
 // instructions quiz
 timeline.pushSeqView({
   name: 'quiz',

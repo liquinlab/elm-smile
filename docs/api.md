@@ -1,8 +1,9 @@
 # Smile API
 
-Smile provides a common API which is accessed in user [Views](./views.md) and
-[Components](./components.md). This API provides a set of methods and properties
-which enable things like navigation, state management, data access, and more.
+Smile provides a common API which is accessed in user [Views](/coding/views) and
+[Components](/coding/components). This API provides a set of methods and
+properties which enable things like navigation, state management, data access,
+and more.
 
 ## Usage
 
@@ -294,8 +295,8 @@ Complex JavaScript objects (like functions, classes, or objects with circular
 references) must be converted to Firestore-safe formats before saving.
 
 - `recordForm(name, myFirestoreSafeObject)`: Saves form data for any arbitrarily
-  named form (see [DemographicSurvey](views#demographic-survey) for an example).
-  The object must be Firestore-safe.
+  named form (see [DemographicSurvey](/coding/views#demographic-survey) for an
+  example). The object must be Firestore-safe.
 - `recordProperty(name, FirestoreSafeObject)`: Saves a Firestore-safe object at
   the top level of the data object. This does not save the data to the database,
   but it does record it in the local state. The next call to `saveData()` will

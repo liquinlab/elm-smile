@@ -29,11 +29,11 @@ configure the timeline of your experiment. You can take a look at the
 [default version](https://github.com/NYUCCL/smile/blob/main/src/user/design.js)
 of this file which is short, self-explanatory, and well commented.
 
-The design file sets up the sequence of [Views](/views) that the participant
-will encounter, and it can configure
-[Branching/Randomized Flows](/timeline#branching-and-randomized-flows) if needed
-to create different timelines for different experimental conditions. **It is
-very likely you will need to edit this file to create your experiment**!
+The design file sets up the sequence of [Views](/coding/views) that the
+participant will encounter, and it can configure
+[Branching/Randomized Flows](/coding/timeline#branching-and-randomized-flows) if
+needed to create different timelines for different experimental conditions. **It
+is very likely you will need to edit this file to create your experiment**!
 
 The following sections of this page describe the technical details of the
 Timeline object and how to configure your design file.
@@ -59,9 +59,9 @@ which is a powerful open-source project built for routing in
 [Vue](https://vuejs.org) applications.
 
 <SmileText/> does all of the router set-up for you, so
-[all you need to do](/timeline#timeline) is provide a list of Views, as well as
-any logic that connects them to each other. However, if you want to learn more
-about the Vue router, you can check out the Vue Router
+[all you need to do](/coding/timeline#timeline) is provide a list of Views, as
+well as any logic that connects them to each other. However, if you want to
+learn more about the Vue router, you can check out the Vue Router
 [documentation](https://router.vuejs.org/guide/#javascript).
 
 ## URLs and Routes
@@ -72,7 +72,7 @@ protocol (`http://`), the domain (`exps.gureckislab.org`), as well as subfolders
 (`/ghuser/repo/branch/`) etc... For example, `http://exps.gureckislab.org/`
 might be the base path. This is configured via the `VITE_CODE_NAME_DEPLOY_URL`
 or `VITE_DEPLOY_URL` in the `env/.env.git` file (see the docs on
-[configuration](/configuration)).
+[configuration](/coding/configuration)).
 
 Routes are configured beneath this base URL so `/` means the original base URL
 but `/about` means `http://exps.gureckislab.org/#/about`. The base URL can also
@@ -106,10 +106,10 @@ configure).[^hash]
     the `#` navigation strategy.
 
 In <SmileText/>, key steps in the experiment are indexed by routes that map to
-page-level components called [Views](/views). So `/consent` would load the
-consent View and `/debrief` would load the debriefing View. This is good
-organization but also helpful for [debugging/developing](/developermode) since
-you can easily jump to different sections of the task.
+page-level components called [Views](/coding/views). So `/consent` would load
+the consent View and `/debrief` would load the debriefing View. This is good
+organization but also helpful for [debugging/developing](/coding/developing)
+since you can easily jump to different sections of the task.
 
 ## Timeline
 
@@ -146,7 +146,8 @@ example, the path in the example above would be set to `/my_name`. See details
 in the `vue-router`
 [documentation](https://router.vuejs.org/guide/essentials/named-routes.html) for
 more information on `name` vs. `path`. The `component` field specifies the
-[View component](/views) that should be loaded when the route is requested.
+[View component](/coding/views) that should be loaded when the route is
+requested.
 
 If you'd like to specify a different path (that doesn't match the name), you can
 do that:
@@ -210,7 +211,7 @@ Pushes a new View (specified in `view_obj`) into the sequential timeline. The
 first call to this function will make the configured View the first View in the
 sequence, the second call will make it the second View in the sequence, and so
 on. The format of `view_obj` should correspond to the
-[View object](/timeline#the-view-object) discussed above.
+[View object](/coding/timeline#the-view-object) discussed above.
 
 ### `timeline.registerView(view_obj)`
 
@@ -272,7 +273,7 @@ timeline.build()
 During development you can, of course, comment out certain Views to help isolate
 and test particular aspects of your experiment. In addition, since Views are
 mapped to distinct URLs, it is easy to jump between sections of your experiment
-during development (especially using the [developer mode](/developermode)
+during development (especially using the [developer mode](/coding/developing)
 tools).
 
 ## Branching and randomized flows
@@ -281,7 +282,7 @@ tools).
 
 Sometimes you need timeline structures a little more complex than a simple
 sequence. For example, there might be multiple initial landing pages depending
-on if you come in from a particular [recruitment](/recruitment) service:
+on if you come in from a particular [recruitment](/recruit/recruitment) service:
 
 <img src="/images/timeline-flows.png" width="500" alt="timeline example" style="margin: auto;">
 
@@ -420,9 +421,9 @@ would generate the same distribution.
 #### Conditional nodes
 
 The View order can also be set by which condition the participant is assigned
-to, using [random condition assignment](/randomization). This can be more useful
-than a simple randomized node if other aspects of the experiment will depend on
-the condition. Here's an example:
+to, using [random condition assignment](/coding/randomization). This can be more
+useful than a simple randomized node if other aspects of the experiment will
+depend on the condition. Here's an example:
 
 ```js
 import Timeline from '@/core/timeline'
@@ -563,16 +564,16 @@ One important feature of these navigation functions are that they calls
 `saveData()` on the global store prior to View changes. So as a result, you can
 trust that your data will be saved/synchronized with the persistent store
 (Firestore) whenever you navigated between sequential Views. See the data
-storage docs on [automatic saving](/datastorage.html#automatic-saving). This
-only works if you use the API to advance between Views.
+storage docs on [automatic saving](/coding/datastorage.html#automatic-saving).
+This only works if you use the API to advance between Views.
 
 :::
 
 ### Navigation permissions
 
-In [developer mode](/developing) any View can be accessed in any order. However,
-in live mode (when a participant is accessing the experiment), the timeline
-enforces a strict order of Views. This is to prevent participants from
+In [developer mode](/coding/developing) any View can be accessed in any order.
+However, in live mode (when a participant is accessing the experiment), the
+timeline enforces a strict order of Views. This is to prevent participants from
 re-starting the experiment or skipping ahead to the end. However, there are some
 exceptions to this rule. For example, it is possible to configure any particular
 View to the reachable from any other View using the `meta` field

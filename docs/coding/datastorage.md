@@ -88,14 +88,15 @@ in. Data is organized into documents and collections which act similar to
 folders and files on your computer. At the top (root) level of a <SmileText />
 project is two collections called `real` and `testing`. The `testing` collection
 is where data goes anytime you are running your experiment in
-[development mode](/developing). The `real` collection is where data goes
-anytime you are running your experiment on a live [deployment](/deploying).
+[development mode](/coding/developing). The `real` collection is where data goes
+anytime you are running your experiment on a live
+[deployment](/recruit/deploying).
 
 Under the top level collection is a list of documents, one for each experiment
 in the lab. The names of these documents reflect the
 `${VITE_GIT_OWNER}-${VITE_GIT_REPO_NAME}-${VITE-GIT-BRANCH}` for your project.
 Refer to the documentation on
-[organizing versions of your experiment](/deploying.html#organizing-versions-of-your-experiment)
+[organizing versions of your experiment](/recruit/deploying.html#organizing-versions-of-your-experiment)
 for more information. Suffice to say that this is automatically configured and
 places your data into "folders" based on the current branch of your code in
 which you are working or deployed.
@@ -157,14 +158,15 @@ distributed into different modules which generally have different properties.
 
 ### Local states, global state, and persistance
 
-A <SmileText /> experiment is made up of various [components](/components) which
-are controlled programmatically. Each component has what is known as **state**
-which is data reflecting the current component. Ideally, state is local to each
-component allowing for modularity (users of a component don't have to know the
-internal workings). Example of local state might be "is the participant on page
-1, 2, or 3 of the instructions?" Or "what are the values of various form
-fields?" or "What is the x,y position of the mouse currently?" In most cases
-these types of values do not need to be globally available all components.
+A <SmileText /> experiment is made up of various
+[components](/coding/components) which are controlled programmatically. Each
+component has what is known as **state** which is data reflecting the current
+component. Ideally, state is local to each component allowing for modularity
+(users of a component don't have to know the internal workings). Example of
+local state might be "is the participant on page 1, 2, or 3 of the
+instructions?" Or "what are the values of various form fields?" or "What is the
+x,y position of the mouse currently?" In most cases these types of values do not
+need to be globally available all components.
 
 However, there are times where it makes sense for there to be a **global state**
 which is shared by all components. You can think of this as a global

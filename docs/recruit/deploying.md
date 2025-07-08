@@ -11,7 +11,8 @@ The steps to deploy are...
 In response, GitHub will automatically
 
 1. **Build your project**
-1. **Upload your files** to the [configured](/configuration) server location
+1. **Upload your files** to the [configured](/coding/configuration) server
+   location
 1. **Notify a bot** in your lab slack (e.g., `#smile-deploy`) about the final
    URL of your project (or if there is an error)
 
@@ -77,7 +78,7 @@ where there is one "product". However, in behavioral research, we often have
 multiple development paths (experiments) and they have conceptual meanings that
 are not well served by a numbering system.
 
-![branching nature of experiments](./images/branchingexps.png)
+![branching nature of experiments](../images/branchingexps.png)
 
 Instead, <SmileText/> uses GitHub as a project organizing tool.
 
@@ -162,7 +163,7 @@ individual commits) this is possible. Go to your repository on github:
 username and the name of your project repo). This will present you with a list
 of past commits you can navigate which looks like this:
 
-![github commit history](./images/githubcommithistory.png)
+![github commit history](../images/githubcommithistory.png)
 
 Find the commit you want to deploy publically and click the button with two
 boxes to copy the full hash value for that commit to your clickboard. Then run
@@ -191,7 +192,7 @@ messages.
 
 Second, make sure you have a set of `.env.*.local` files in the `env/` folder
 (created using `git secret reveal`) and have run the `npm run upload_config`
-command (refer back to the [initial setup instructions](starting)). This latter
+command (refer back to the [initial setup instructions](/starting)). This latter
 command uploads some specific configuration options to GitHub which are needed
 for your deployment to run. You can verify these have been set by going to your
 repository on the GitHub website, clicking Settings, then "Secrets". There
@@ -208,16 +209,17 @@ click the "Actions" tab. This will show a history of recent "workflow" runs.
 Runs that fail will have a red :x: next to them. Clicking on this will lead to a
 "transcript" of the run which can provide some debugging hints.
 
-![debugging github actions](./images/githubactions.png)
+![debugging github actions](../images/githubactions.png)
 
 ## Understanding the deployment steps
 
 Deployment is **continuous and automatic** by design. The purpose of continuous
 deployment is so that new changes to the code are always placed into a live
-server environment (which is then helpful for [integration testing](/testing)).
-The purpose of automating deployment is to make it one less thing you need to
-think about. However, if something goes wrong, or you need to customize things,
-it can be helpful to understand the steps.
+server environment (which is then helpful for
+[integration testing](/coding/testing)). The purpose of automating deployment is
+to make it one less thing you need to think about. However, if something goes
+wrong, or you need to customize things, it can be helpful to understand the
+steps.
 
 Deploying a website involves several steps: triggering the GitHub Actions
 deployment process, configuring the site, building the site, and uploading the
@@ -255,8 +257,8 @@ Next, the GitHub action uploads the files to the server using rsync. The remote
 host, folder, and other options are set using GitHub Secrets which are encrypted
 environment variables that you configure on the repository settings. Generally
 these will be set for you when your [lab base repo](/labconfig) is configured,
-but read more about [configuration options](configuration) to customize or
-adjust.
+but read more about [configuration options](/coding/configuration) to customize
+or adjust.
 
 ### Notifying the Slack bot
 
@@ -298,11 +300,11 @@ which can verify that your settings will be respected by at least Google.
 ## Deploying in development mode
 
 In some cases it might be helpful to deploy a live version of your project in
-[developer mode](/developing). This will allow you to share a version of your
-experiment with other people with the
-[developer bar](/developing.html#smile-developer-bar) enabled. To do this create
-a new branch for public sharing. Then edit `src/core/config.js` so that the line
-the by default reads
+[developer mode](/coding/developing). This will allow you to share a version of
+your experiment with other people with the
+[developer bar](/coding/developing.html#smile-developer-bar) enabled. To do this
+create a new branch for public sharing. Then edit `src/core/config.js` so that
+the line the by default reads
 
 ```
     mode: import.meta.env.MODE,

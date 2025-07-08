@@ -33,7 +33,8 @@ developing and launching experiments relatively painless.
   [Google Firestore](https://firebase.google.com/docs/firestore) database.
   Firestore is a robust schema-less database solution ideally suited for the
   web. The cost is low for even fairly large experiments and datasets (although
-  there are some technical limits, see [here](/datastorage) for more info).
+  there are some technical limits, see [here](/coding/datastorage) for more
+  info).
 
 - **Slack** (weakly required).  
   In order to notify you and your other lab members when certain tasks are
@@ -68,10 +69,10 @@ The general overview of how these services interact is shown below:
 ![Overview of services](/images/service-overview.png)
 
 You push code to Github. Each time this happens, your code is
-[deployed](/deploying) to your web (i.e., http) server. In addition, a message
-is posted to Slack to let you know that deployment was successful (or to let you
-know that there were errors preventing deployment). Participants access your
-task via their web browser, which is able to write to the Google Firebase
+[deployed](/recruit/deploying) to your web (i.e., http) server. In addition, a
+message is posted to Slack to let you know that deployment was successful (or to
+let you know that there were errors preventing deployment). Participants access
+your task via their web browser, which is able to write to the Google Firebase
 database.
 
 The following sections walk you through configuring each of these services. This
@@ -212,8 +213,9 @@ Here is an example of the rules file that works well with Smile experiments (in
 When you're developing an experiment and push changed to Github, your experiment
 code goes through a pre-processing step, which optimizes the speed at which the
 code is delievered to participants. Also, when your code builds successfully it
-is deployed to a unique URL (see [deploy](/deploying) docs for full details). If
-things go wrong in this process, it is helpful to get a notification.
+is deployed to a unique URL (see [deploy](/recruit/deploying) docs for full
+details). If things go wrong in this process, it is helpful to get a
+notification.
 
 **If you don't want to use Slack, skip these instructions and go to the next
 section.**

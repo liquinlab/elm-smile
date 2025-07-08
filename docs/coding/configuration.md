@@ -288,7 +288,7 @@ VITE_GOOGLE_ANALYTICS            = xxxx
 ```
 
 - There several `VITE_FIREBASE_` options for configuring Google's Firestore
-  backend (see [data storage](/datastorage) for more info).
+  backend (see [data storage](/coding/datastorage) for more info).
 - `VITE_GOOGLE_ANALYTICS` is the Google Analytics ID for your experiment
   (optional)
 
@@ -342,7 +342,7 @@ Options include
 - `VITE_GIT_LAST_MSG` is the last commit message
 - `VITE_DEPLOY_BASE_PATH` is the most important variable in the file because it
   configures your
-  [deployment path](/deploying.html#using-github-as-a-project-organizing-tool)
+  [deployment path](/recruit/deploying.html#using-github-as-a-project-organizing-tool)
   or where you code will appear on the server. It is built up out of the
   configuration options above.
 - `VITE_CODE_NAME` is a unique hash of `VITE_DEPLOY_BASE_PATH`` using human
