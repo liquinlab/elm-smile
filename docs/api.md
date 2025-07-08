@@ -64,9 +64,8 @@ The following functions are available when using `useViewAPI`:
   data without including parent block data.
 - `queryStepData`, `queryStepDataLeaf`: See
   [Data Query Methods](#data-query-methods).
-- `pathData`: Getter for the raw data array of all steps in the current path.
+- `dataAlongPath`: Getter for the raw data array of all steps in the current path.
   This is useful when you need to access the raw data structure of the path.
-- `pathData`: Returns the current data path with component resolution.
 - `stepIndex`: Returns the current step index among leaf nodes.
 - `blockIndex`: Returns the current block index.
 - `pathString`: Returns the current path as a string.
@@ -99,10 +98,8 @@ The following functions are available when using `useViewAPI`:
 
 - `clear()`: Clears the stepper state and component registry.
 - `clearCurrentStepData()`: Clears the data for the current step in the stepper.
-  filtered by path pattern.
 - `updateStepper()`: Updates the internal stepper state.
-- `_visualizeStateMachine()`: Returns a visualization of the current state
-  machine.
+- `recordStep()`: Records the current step data to the experiment data store.
 
 ### Event Handling
 
@@ -134,6 +131,8 @@ The following functions are available in both `useAPI` and `useViewAPI`:
   top of the page after navigation.
 - `hasNextView()`: Checks if there's a next View available.
 - `hasPrevView()`: Checks if there's a previous View available.
+- `nextView()`: Returns the next view object in the navigation sequence.
+- `prevView()`: Returns the previous view object in the navigation sequence.
 
 ### Scroll Behavior
 
@@ -185,6 +184,9 @@ api.goToStep('trial/block1/step2', false)
   `code`.
 - `connectDB()`: Ensures the user is known and has consented, setting these
   states if needed.
+- `completeConsent()`: Completes the consent process by setting consented status
+  and known user if needed.
+- `reloadBrowser()`: Reloads the current browser window/page.
 
 ## Component and Configuration Management
 
@@ -197,17 +199,22 @@ api.goToStep('trial/block1/step2', false)
 
 ## Data and Configuration Access
 
-- `config`: Accesses the configuration.
-- `data`: Accesses the data store.
-- `private`: Accesses private data store.
-- `all_data`: Accesses combined private and data stores.
-- `all_config`: Accesses combined local, dev, github and main configs.
-- `browserPersisted`: Accesses browser persisted state.
-- `browserEphemeral`: Accesses browser ephemeral state.
-- `dev`: Accesses development-only settings.
-- `route`: Accesses the current route.
-- `router`: Accesses the router object.
-- `urls`: Accesses URL configurations.
+- `store`: Accesses the Smile store instance containing:
+  - `store.browserPersisted`: Browser persisted state
+  - `store.browserEphemeral`: Browser ephemeral state
+  - `store.data`: Main data store
+  - `store.private`: Private data store
+  - `store.config`: Configuration settings
+- `data`: Direct access to the data store (alias for `store.data`)
+- `private`: Direct access to private data store (alias for `store.private`)
+- `config`: Direct access to configuration (alias for `store.config`)
+- `all_data`: Accesses combined private and data stores
+- `all_config`: Accesses combined local, dev, github and main configs
+- `urls`: Accesses URL configurations
+- `logStore`: Accesses the logging store
+- `route`: Accesses the current route
+- `router`: Accesses the router object
+- `timeline`: Accesses the timeline instance
 
 ## Utility Functions
 
@@ -229,6 +236,7 @@ api.goToStep('trial/block1/step2', false)
   `src/user/assets/`.
 - `getCoreStaticUrl(path)`: Returns the public URL for a static asset provided
   by the smile library in `src/assets`.
+- `scrollToTop()`: Scrolls the main content container to the top.
 
 ## Randomization Functions
 
@@ -236,37 +244,11 @@ api.goToStep('trial/block1/step2', false)
   in use until the next route.
 - `randomAssignCondition(conditionObject)`: Randomly assigns a condition based
   on the provided condition object. Supports weighted randomization.
-- `shuffle(options)`: Shuffles the current states using the Fisher-Yates
-  algorithm. If a seed is provided, ensures deterministic shuffling.
-
-**Parameters:**
-
-- `options` (Object|string): Either a string seed or an options object
-  - `seed` (string, optional): Seed for deterministic shuffling
-  - `always` (boolean, optional): If true, allows shuffling even if already
-    shuffled. Defaults to false.
-
-**Returns:**
-
-- Returns the Stepper instance for method chaining
-
-**Example:**
-
-```javascript
-// Shuffle with a seed (only shuffles if not already shuffled)
-stepper.shuffle('seed123')
-
-// Shuffle with options
-stepper.shuffle({ seed: 'seed123', always: false }) // Only shuffles if not already shuffled
-stepper.shuffle({ seed: 'seed123', always: true }) // Always shuffles
-stepper.shuffle({ always: true }) // Always shuffles without a seed
-```
-
-**Notes:**
-
-- The shuffle operation is tracked internally. Once shuffled, subsequent calls
-  to shuffle will be ignored unless `always` is set to true.
-- If there is only one or zero states, the shuffle operation is skipped.
+- `randomInt(min, max)`: Generate a random integer between min and max (inclusive).
+- `shuffle(array)`: Randomly reorder elements in an array using Fisher-Yates algorithm.
+- `sampleWithReplacement(array, n, weights)`: Sample elements from an array with replacement.
+- `sampleWithoutReplacement(array, n)`: Sample elements from an array without replacement.
+- `faker`: Collection of faker distributions for generating random data.
 
 ## Logging and Debugging
 
@@ -347,21 +329,12 @@ const allLeafData = api.queryStepDataLeaf()
 const trialData = api.queryStepDataLeaf('trial/block*')
 ```
 
-#### `queryStepDataMerge(pathFilter = null)`
+The difference between these methods:
 
-Gets merged data for all leaf nodes in the stepper, optionally filtered by path
-pattern. Similar to `queryStepData` but returns the merged data for each leaf
-node (including parent block data).
+- `queryStepData()` returns the merged data for each leaf node (including parent block data)
+- `queryStepDataLeaf()` returns only the data directly from each leaf node (without parent block data)
 
-```javascript
-// Get merged data for all leaf nodes
-const allMergedData = api.queryStepDataMerge()
-
-// Get merged data for nodes matching a pattern
-const trialData = api.queryStepDataMerge('trial/block*')
-```
-
-The difference between these methods can be illustrated with an example:
+Example:
 
 ```javascript
 // Given a structure:
@@ -369,10 +342,15 @@ The difference between these methods can be illustrated with an example:
 //   trial1 (response: 'A')
 //   trial2 (response: 'B')
 
-// queryStepData() returns:
-;[{ response: 'A' }, { response: 'B' }][
-  // queryStepDataMerge() returns:
-  ({ blockType: 'practice', response: 'A' },
-  { blockType: 'practice', response: 'B' })
+// queryStepData() returns (merged data):
+[
+  { blockType: 'practice', response: 'A' },
+  { blockType: 'practice', response: 'B' }
+]
+
+// queryStepDataLeaf() returns (leaf data only):
+[
+  { response: 'A' },
+  { response: 'B' }
 ]
 ```
