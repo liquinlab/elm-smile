@@ -42,6 +42,8 @@ available extensions.
 
 It is highly recommended that you use [VS Code](https://code.visualstudio.com/),
 the [Vue](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
-extension, and the
+extension, the
+[Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss),
+and the
 [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 extension. These tools will help you write and debug your code more easily.
