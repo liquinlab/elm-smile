@@ -1,16 +1,41 @@
 <script setup>
+import { watch, onUnmounted } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 import { Button } from '@/uikit/components/ui/button'
 const api = useAPI()
 
-defineProps({
+const props = defineProps({
   show: {
     type: Boolean,
     default: false,
   },
 })
 
-defineEmits(['toggleConsent'])
+const emit = defineEmits(['toggleConsent'])
+
+// Disable scrolling on main-content when modal is shown
+watch(
+  () => props.show,
+  (isVisible) => {
+    const mainContent = document.querySelector('.main-content')
+    if (mainContent) {
+      if (isVisible) {
+        mainContent.style.overflow = 'hidden'
+      } else {
+        mainContent.style.overflow = ''
+      }
+    }
+  },
+  { immediate: true }
+)
+
+// Clean up on component unmount
+onUnmounted(() => {
+  const mainContent = document.querySelector('.main-content')
+  if (mainContent) {
+    mainContent.style.overflow = ''
+  }
+})
 </script>
 
 <template>
@@ -39,7 +64,7 @@ defineEmits(['toggleConsent'])
         </div>
       </div>
       <div class="border-t bg-gray-50 px-5 py-4 flex justify-end">
-        <Button @click="$emit('toggleConsent')"> Thanks, take me back to the study! </Button>
+        <Button @click="$emit('toggleConsent')"> Take me back! </Button>
       </div>
     </div>
   </div>

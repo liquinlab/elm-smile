@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, onMounted } from 'vue'
+import { reactive, onMounted, watch, onUnmounted } from 'vue'
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
 import { Button } from '@/uikit/components/ui/button'
@@ -47,6 +47,30 @@ function withdraw() {
   api.saveData(true) // force a data save
   emit('submitWithdraw')
 }
+
+// Disable scrolling on main-content when modal is shown
+watch(
+  () => props.show,
+  (isVisible) => {
+    const mainContent = document.querySelector('.main-content')
+    if (mainContent) {
+      if (isVisible) {
+        mainContent.style.overflow = 'hidden'
+      } else {
+        mainContent.style.overflow = ''
+      }
+    }
+  },
+  { immediate: true }
+)
+
+// Clean up on component unmount
+onUnmounted(() => {
+  const mainContent = document.querySelector('.main-content')
+  if (mainContent) {
+    mainContent.style.overflow = ''
+  }
+})
 </script>
 
 <template>

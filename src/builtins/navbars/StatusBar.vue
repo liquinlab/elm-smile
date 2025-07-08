@@ -109,7 +109,7 @@ function submitWithdraw() {
     @submit-withdraw="submitWithdraw()"
   />
 
-  <!-- modal for reporting issues -->
+  <!-- modal for reporting issues 
   <div class="absolute inset-0 z-50 flex items-center justify-center p-8" :class="{ hidden: !showreportissuemodal }">
     <div class="absolute inset-0 bg-black bg-opacity-50" @click="toggleReport()"></div>
     <div class="relative bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -125,6 +125,7 @@ function submitWithdraw() {
       ×
     </button>
   </div>
+  -->
 </template>
 
 <style scoped>
