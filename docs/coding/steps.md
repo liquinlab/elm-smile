@@ -14,17 +14,6 @@ Keynote/Powerpoint presentation while a step is like a build or animation
 
 :::
 
-The trial stepper system consists of two main components:
-
-1. A **step controller** that manages navigation through your trials (moving
-   forward/backward)
-2. A powerful **table builder** that helps you create complex sequences of
-   trials
-
-This separation allows you to first build up your trial sequence using the
-powerful table API, and then control how you move through those trials using the
-step controller.
-
 A key feature of stepped Views is that their state persists in the browser
 through the use of local storage. This means that if the subject reloads the
 page, or navigates to a different site and then returns, the task will resume
@@ -35,310 +24,406 @@ exposure to different manipulations). You can learn more about this feature by
 reading about how to [persist stepper state](#persisting-stepper-state). The
 stepper also integrates with the [developer mode](/coding/developing) interface.
 
-## Create a stepped View
+## Creating a stepped View
 
-To create a stepped view, you need to import the SmileAPI and initialize the
-stepper. Here's how to do it:
-
-### Import and Initialize
-
-In your `<script setup>` section, import the SmileAPI and initialize it. Then
-use the `useHStepper` method to get the stepper:
+All views are stepped by default in Smile. However, if you don't register any
+steps, the the functionality is disabled. To register steps, use the `.steps`
+method to get access to the stepper structure. A common pattern is to use
+`api.steps.append()` to add a list of steps:
 
 ```vue
 <script setup>
-import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
+import useViewAPI from '@/core/composables/useViewAPI'
+const api = useViewAPI()
 
-// Get the stepper
-const stepper = api.useHStepper()
+// Add a series of steps to the experiment
+const trials = api.steps.append([
+  { id: 'a', word: 'SHIP', color: 'red', condition: 'unrelated' },
+  { id: 'b', word: 'MONKEY', color: 'green', condition: 'unrelated' },
+  { id: 'c', word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
+  { id: 'd', word: 'RED', color: 'red', condition: 'congruent' },
+  ...
+])
 </script>
 ```
 
-The `stepper` object provides methods for controlling trial navigation:
+## Hierarchical Steps
 
-- `goNextStep()` - Advance to the next trial. Returns the index of the next
-  state (0, 1, 2, etc.) or `null` if at the end
-- `goPrevStep()` - Go back to the previous trial. Returns the index of the
-  previous state or `null` if at the beginning
-- `reset()` - Reset to the beginning, positioning at the first trial
-- `stepData` - An array of data objects along the current path (e.g.,
-  `[{ shape: 'circle', color: 'red' }]`)
-- `index` - The path to the current trial as a string (e.g., "0" for first
-  trial, "0-0" for nested trials)
+Steps can be nested within each other. This can be useful to break up sections
+of a task. For example, your View might have several trials then a summary
+feedback page. It might make sense to group the trials separately from the
+feedback page like this:
 
-For example:
+```vue
+<script setup>
+import useViewAPI from '@/core/composables/useViewAPI'
+const api = useViewAPI()
 
-```js
-const stepper = api.useHStepper()
+const trials = api.steps.append([{ id: 'stroop' }, { id: 'summary' }])
 
-// Create and push some trials
-const trials = stepper.t.append([
-  { shape: 'circle', color: 'red' },
-  { shape: 'square', color: 'blue' },
+trials[0].append([
+  { id: 'a', word: 'SHIP', color: 'red', condition: 'unrelated' },
+  { id: 'b', word: 'MONKEY', color: 'green', condition: 'unrelated' },
+  { id: 'c', word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
+  { id: 'd', word: 'RED', color: 'red', condition: 'congruent' },
 ])
-stepper.addSpec(trials)
-
-// After push(), we're at the first trial
-console.log(stepper.current) // [{ shape: 'circle', color: 'red' }]
-console.log(stepper.index) // "0"
-
-// Move to next trial
-stepper.goNextStep()
-console.log(stepper.current) // [{ shape: 'square', color: 'blue' }]
-console.log(stepper.index) // "1"
-
-// Go back
-stepper.goPrevStep()
-console.log(stepper.current) // [{ shape: 'circle', color: 'red' }]
-console.log(stepper.index) // "0"
-
-// Reset always goes to the first trial
-stepper.goFirstStep()
-console.log(stepper.current) // [{ shape: 'circle', color: 'red' }]
-console.log(stepper.index) // "0"
+</script>
 ```
 
-With nested trials, the `index` property shows the full path:
+The resulting structure is:
+
+```
+├── id: stroop
+|   ├── {id: 'a', word: 'SHIP', color: 'red', condition: 'unrelated'}
+|   ├── {id: 'b', word: 'MONKEY', color: 'green', condition: 'unrelated'}
+|   ├── {id: 'c', word: 'ZAMBONI', color: 'blue', condition: 'unrelated'}
+|   └── {id: 'd', word: 'RED', color: 'red', condition: 'congruent'}
+└── id: summary
+```
+
+Importantly only the leaf nodes of the tree are considered steps. This means
+that the structure above has 6 nodes but only 5 steps (the stroop node is nested
+and so is ignored).
+
+This also shows how you can access rows of the steps using array-like indexing:
 
 ```js
-const stepper = api.useHStepper()
-const trials = stepper.spec().range(2) // Create parent trials
+const trials = api.steps.append([{ id: 'stroop' }, { id: 'summary' }])
 
-// Add nested trials to first parent
-trials[0].spec().append([{ type: 'stim' }, { type: 'feedback' }])
-
-trials.push()
-
-console.log(stepper.current) // [{ range: 0 }, { type: 'stim' }]
-console.log(stepper.index) // "0-0"
-
-stepper.goNextStep()
-console.log(stepper.current) // [{ range: 0 }, { type: 'feedback' }]
-console.log(stepper.index) // "0-1"
+trials[0] // { id: 'stroop' }
+trials[1] // { id: 'summary' }
 ```
 
-Both `current` and `index` are reactive properties that automatically update
-when you navigate through trials. You can use them directly in your Vue
-templates:
+## Accessing the data per step via the .stepData object
+
+Each step has a `.stepData` object that contains the data for that step. For
+example, when the stepper is on the first step, the `.stepData` object will
+contain the data for that step. When the stepper is on the second step, the
+`.stepData` object will contain the data for that step.
+
+```js
+// on first step
+api.stepData.word // 'SHIP'
+
+api.goNextStep()
+
+// now we are on second step
+api.stepData.word // 'MONKEY'
+```
+
+A common use case then would be to use the `<template>` section of your View to
+display the current steps data:
 
 ```vue
 <template>
-  <div>
-    Current trial data: {{ stepper.current }}
-    <!-- Returns array of data objects -->
-    Current path: {{ stepper.index }}
-    <!-- Returns path string like "0" or "0-0" -->
-  </div>
+  <h1
+    class="text-6xl font-bold mb-8"
+    :class="{
+      'text-red-500': api.stepData.color === 'red',
+      'text-blue-500': api.stepData.color === 'blue',
+      'text-green-500': api.stepData.color === 'green',
+    }"
+  >
+    {{ api.stepData.word }}
+  </h1>
 </template>
 ```
 
-The `stepper` also provides methods for building trial sequences through its
-`table()` method, which we'll cover next.
+## Advanced uses of Hierarchical Steps
 
-### Building Trial Tables
+When a step is nested within another step, the `.stepData` object will contain
+the data for that step and the ones above it (it's parents) via a merge
+operation.
 
-The stepper provides a powerful API for creating and manipulating trial
-sequences. You start by calling `table()` or `t()` to create a fresh table, then
-use various chainable methods to build up your sequence:
+### Merge Behavior
+
+The merge uses a **merge-right** approach, meaning that if a key or property is
+defined at a lower level node, it replaces the one from the higher level. This
+allows for inheritance of data from parent blocks while still allowing
+individual steps to override specific values.
+
+For example, if you have a nested structure like:
+
+```
+trial/
+  ├── block1/
+  │   ├── step1 (has data: {response: 'A', score: 10})
+  │   └── step2 (has data: {response: 'B', score: 20})
+  └── block2/
+      └── step3 (has data: {response: 'C', score: 30})
+```
+
+When you're at `trial/block1/step2`, the `api.stepData` will contain:
+
+- Data from `trial` (if any)
+- Data from `trial/block1` (if any)
+- Data from `trial/block1/step2` (if any)
+
+All merged together, with lower-level data taking precedence over higher-level
+data.
+
+### stepData vs stepDataLeaf
+
+The ViewAPI provides two ways to access step data:
+
+- `api.stepData`: Gets merged data from all steps in the current path (parent
+  blocks + current step)
+- `api.stepDataLeaf`: Gets data for only the current step (leaf node)
 
 ```js
-const stepper = api.useHStepper()
+// Get merged data from current path (includes parent block data)
+const data = api.stepData
+console.log(data.blockType) // Access block-level property
+console.log(data.response) // Access step-level property
 
-// Create a new table and append some trials
-const trials = stepper.spec().append([
-  { shape: 'circle', color: 'red' },
-  { shape: 'square', color: 'green' },
+// Get data from only current step
+const leafData = api.stepDataLeaf
+console.log(leafData.response) // Only current step data
+
+// Set data on current step
+api.stepDataLeaf.response = 'some value'
+
+// Modify merged data (changes are saved to current step)
+api.stepData.response = 'new value'
+```
+
+```js
+const api = useViewAPI()
+
+// define the trials for the experiment as a spec
+const trials = api.steps.append([
+  {
+    id: 'stroop',
+    rt: () => api.faker.rnorm(500, 50), // add the autofill/expected data fields
+    hit: () => api.faker.rbinom(1, 0.8),
+    response: () => api.faker.rchoice(['r', 'g', 'b']),
+  },
 ])
 
-// Push the trials
-trials.push()
+trials[0]
+  .append([
+    { id: 'a', word: 'SHIP', color: 'red', condition: 'unrelated' },
+    { id: 'b', word: 'MONKEY', color: 'green', condition: 'unrelated' },
+    { id: 'c', word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
+    { id: 'd', word: 'RED', color: 'red', condition: 'congruent' },
+    { id: 'e', word: 'GREEN', color: 'green', condition: 'congruent' },
+    { id: 'f', word: 'BLUE', color: 'blue', condition: 'congruent' },
+    { id: 'g', word: 'GREEN', color: 'red', condition: 'incongruent' },
+    { id: 'h', word: 'BLUE', color: 'green', condition: 'incongruent' },
+    { id: 'i', word: 'RED', color: 'blue', condition: 'incongruent' },
+  ])
+  .shuffle()
+
+trials.append([{ id: 'summary' }])
 ```
 
-The API for building tables is similar to libraries like [D3](https://d3js.org/)
-where different operations are chained together in a easy to read manner. Many
-functions are provided to make it easy to build up complex trial sequences.
+### Abstract Dependent Variable Definition
 
-#### Saving Tables with push()
+The merge-right behavior enables a powerful pattern for defining expected
+dependent variables abstractly at parent nodes. This allows you to specify what
+data should be collected at the step level without having to repeat the
+definition for each individual trial.
 
-The `push()` method is used to save your completed trial table to the state
-machine. Think of it as a "save" or "commit" operation that writes your trial
-sequence into the stepper's state:
+In the example above, the parent node (`stroop`) defines abstract expected
+values for `rt`, `hit`, and `response` using faker functions:
 
 ```js
-const stepper = api.useHStepper()
-
-const trials = stepper.t
-  .append({ shape: 'circle', color: 'red' })
-  .append({ shape: 'square', color: 'green' })
-  .push() // Save the trials to the state machine
+{
+  id: 'stroop',
+  // Define expected dependent variables using faker functions
+  rt: () => api.faker.rnorm(500, 50),    // Expected response time
+  hit: () => api.faker.rbinom(1, 0.8),   // Expected accuracy (hit/miss)
+  response: () => api.faker.rchoice(['r', 'g', 'b']), // Expected response
+}
 ```
 
-::: warning Read-Only After Push
+Each leaf node (individual trials) inherits these definitions. When a leaf node
+records a real value (e.g., `api.stepData.rt = 450`), it replaces the abstract
+definition. This makes it very efficient to see what data is expected to be
+collected at each step.
 
-After calling `push()`, the table becomes read-only. You can still perform read
-operations like:
+### Benefits of This Pattern
 
-- Getting the number of rows with `table.length`
-- Printing the table contents with `table.print()`
-- Reading rows with array indexing like `table[0]`
-- Using the spread operator like `[...table]`
-- Searching for rows with `table.indexOf(row)`
+1. **Clear Data Schema**: You can see at a glance what dependent variables are
+   expected from each step
+2. **Automatic Documentation**: The faker functions serve as both expected
+   values and documentation
+3. **Efficient Development**: You don't need to repeat variable definitions for
+   each trial
+4. **Flexible Override**: Individual trials can still override the abstract
+   definitions with real values
+5. **Data Validation**: You can compare expected vs. actual values during
+   analysis
 
-:::
-
-::: tip Length Property Behavior
-
-The `length` property behaves differently for tables and entries:
-
-- For a table: Returns the number of rows in the table
-- For an entry with a nested table: Returns the number of rows in the nested
-  table
-- For an entry without a nested table: Returns `null` since it's a single node,
-  not a list
-
-For example:
+### Example with Real Data Collection
 
 ```js
-const trials = stepper.spec().range(2)
-trials[0].spec().append([{ type: 'stim' }, { type: 'feedback' }])
+// At the trial level, record real participant data
+api.stepData.rt = 450 // Real response time
+api.stepData.hit = 1 // Real accuracy (1 = correct)
+api.stepData.response = 'r' // Real response
 
-console.log(trials.length) // 2 (number of rows in parent table)
-console.log(trials[0].length) // 2 (number of rows in nested table)
-console.log(trials[0][0].length) // null (single node, not a list)
+// The abstract definitions from the parent are now replaced with real values
+console.log(api.stepData.rt) // 450 (real value)
+console.log(api.stepData.hit) // 1 (real value)
+console.log(api.stepData.response) // 'r' (real value)
 ```
 
-:::
+This construction makes it very efficient to see what data is expected to be
+collected on each step, while allowing for flexible data collection and
+analysis. This is a key enabling of the [Autofill](/coding/autofill) function.
 
-But you cannot perform any modifications like:
+## Blocks and Block-Level Addressing
 
-- Adding new rows with `append()`
-- Shuffling rows with `shuffle()`
-- Sampling rows with `sample()`
-- Repeating rows with `repeat()`
-- Zipping with other tables using `zip()`
-- Creating outer products with `outer()`
-- Creating ranges with `range()`
-- Taking head/tail with `head()`/`tail()`
-- Modifying rows with `forEach()`
+Blocks provide ways of addressing the current cluster of trials at the same
+level. In the stroop example, you might want to know what trial you are on
+within the stroop trials, ignoring the summary leaf node.
 
-If you need to modify your trials after pushing, you'll need to create a new
-table.
+### Block-Level Properties
 
-:::
+The ViewAPI provides several properties for working with blocks:
 
-#### Nested Tables
+- `api.blockLength` - The number of steps in the current block
+- `api.blockIndex` - The index of the current step within the current block
+- `api.isLastBlockStep()` - Whether the current step is the last step in the
+  current block
 
-You can create nested tables within individual rows. This is particularly useful
-when you want to create hierarchical trial structures or when each trial needs
-its own sequence of sub-trials.
-
-Each row in a table can have its own nested table, which you can access using
-array-like indexing:
+### Example Usage
 
 ```js
-const stepper = api.useHStepper()
+// In the stroop example structure:
+// ├── id: stroop (block)
+// │   ├── {id: 'a', word: 'SHIP', color: 'red', condition: 'unrelated'}
+// │   ├── {id: 'b', word: 'MONKEY', color: 'green', condition: 'unrelated'}
+// │   ├── {id: 'c', word: 'ZAMBONI', color: 'blue', condition: 'unrelated'}
+// │   ├── {id: 'd', word: 'RED', color: 'red', condition: 'congruent'}
+// │   ├── {id: 'e', word: 'GREEN', color: 'green', condition: 'congruent'}
+// │   ├── {id: 'f', word: 'BLUE', color: 'blue', condition: 'congruent'}
+// │   ├── {id: 'g', word: 'GREEN', color: 'red', condition: 'incongruent'}
+// │   ├── {id: 'h', word: 'BLUE', color: 'green', condition: 'incongruent'}
+// │   └── {id: 'i', word: 'RED', color: 'blue', condition: 'incongruent'}
+// └── id: summary
 
-// Create a parent table with 3 trials
-const trials = stepper.spec().range(3)
+// When on the first stroop trial (id: 'a'):
+console.log(api.blockLength) // 9 (total stroop trials)
+console.log(api.blockIndex) // 0 (first trial in block)
+console.log(api.isLastBlockStep()) // false
 
-// Create nested tables for specific trials
-trials[0].spec().range(3) // First trial gets 3 sub-trials
-trials[1].spec().range(5) // Second trial gets 5 sub-trials
+// When on the last stroop trial (id: 'i'):
+console.log(api.blockLength) // 9 (total stroop trials)
+console.log(api.blockIndex) // 8 (last trial in block)
+console.log(api.isLastBlockStep()) // true
 
-// Access nested table rows using array indexing
-console.log(trials[0][0]) // First row of first trial's nested table
-console.log(trials[1][2]) // Third row of second trial's nested table
-
-// You can chain operations on nested tables
-trials[0].t
-  .range(3)
-  .forEach((row) => ({ ...row, type: 'test' }))
-  .append([{ index: 3, type: 'extra' }])
+// When on the summary step:
+console.log(api.blockLength) // 1 (only the summary step)
+console.log(api.blockIndex) // 0 (first and only step in block)
+console.log(api.isLastBlockStep()) // true
 ```
 
-::: tip Multiple Nested Tables
+### Block-Level Navigation
 
-Each row can only have one nested table at a time. Creating a new nested table
-will overwrite any existing one:
-
-```js
-const stepper = api.useHStepper()
-
-// Create two nested tables for the first trial
-const trials = stepper.spec().range(2)
-trials[0].spec().range(2) // First nested table
-trials[0].spec().range(3) // Second nested table overwrites the first
-
-// The second table (with 3 rows) is now accessible
-console.log(trials[0][0]) // First row of the nested table
-console.log(trials[0][1]) // Second row of the nested table
-console.log(trials[0][2]) // Third row of the nested table
-```
-
-:::
-
-::: warning Data Serialization
-
-Nested tables follow the same serialization rules as regular tables. When
-storing nested tables, make sure all data is serializable according to the
-guidelines in the
-[Data Serialization Limitations](#data-serialization-limitations) section.
-
-:::
-
-::: warning Dimensionality Changes
-
-Once you create nested tables within a parent table, you cannot modify the
-dimensionality of the parent table. Operations that would change the number of
-rows (like `sample()`, `head()`, `tail()`, and `slice()`) will throw an error
-with a message like "Cannot sample/take head/take tail/slice a table that has
-nested tables. This would break the relationship between parent and child
-tables."
-
-This restriction exists because changing the parent table's dimensionality could
-leave nested tables referencing rows that no longer exist. Instead, make sure to
-finalize your parent table's structure before creating any nested tables.
-
-:::
-
-#### Array-like Access
-
-Tables provide array-like access to their rows:
+You can also navigate within blocks:
 
 ```js
-const stepper = api.useHStepper()
-
-const trials = stepper.spec().append([
-  { shape: 'circle', color: 'red' },
-  { shape: 'square', color: 'green' },
-])
-
-// Access rows by index
-console.log(trials[0]) // { shape: 'circle', color: 'red' }
-
-// Get length
-console.log(trials.length) // 2
-
-// Iterate over rows
-for (const row of trials) {
-  console.log(row)
+// Check if you're at the end of the current block
+if (api.isLastBlockStep()) {
+  // Do something when finishing a block
+  console.log('Finished stroop block!')
 }
 
-// Use array methods
-console.log(trials.indexOf({ shape: 'circle', color: 'red' })) // 0
-console.log(trials.slice(0, 1)) // [{ shape: 'circle', color: 'red' }]
+// Get progress within current block
+const progress = (api.blockIndex + 1) / api.blockLength
+console.log(`Trial ${api.blockIndex + 1} of ${api.blockLength}`)
 ```
 
-#### Combining Trials with zip()
+## Navigating through steps
+
+The ViewAPI object provides methods for controlling trial navigation:
+
+- `api.goNextStep(resetScroll = true)` - Advance to the next trial. Returns the
+  index of the next state (0, 1, 2, etc.) or `null` if at the end. The
+  `resetScroll` parameter controls whether to automatically scroll to the top of
+  the page after navigation.
+- `api.goPrevStep(resetScroll = true)` - Go back to the previous trial. Returns
+  the index of the previous state or `null` if at the beginning. The
+  `resetScroll` parameter controls whether to automatically scroll to the top of
+  the page after navigation.
+- `api.stepData` - An array of data objects along the current path (e.g.,
+  `[{ shape: 'circle', color: 'red' }]`)
+- `api.stepIndex` - The index of the current step in the stepper (i.e., the
+  current index of leaf node)
+- `api.blockIndex` - The index of the current block in the stepper (i.e., the
+  current index of the block node)
+- `api.pathString` - The path to the current step as a string (e.g., "0" for
+  first trial, "0-0" for nested trials)
+- `api.path` - The path to the current step as an array (e.g., ["0", "0"] for
+  nested trials)
+- `api.length` - The number of steps in the stepper
+- `api.blockLength` - The number of steps in the current block
+- `api.stepLength/api.nSteps` - The number of steps in the current step
+- `api.isLastStep()` - Whether the current step is the last step in the stepper
+- `api.isLastBlockStep()` - Whether the current step is the last step in the
+  current block
+
+## Recording data from a step
+
+There is one easy to use function for recording data from the current step into
+the firestore data store.
+
+- `api.recordStep()` - Record the current step data to the state machine
+
+When you record data using `api.recordStep()`, the data is immediately saved to
+the local browser storage and persisted across page reloads. However, the data
+is not immediately sent to Firestore - it's queued for synchronization until the
+next View navigation occurs. This design provides both immediate local
+persistence and efficient batch synchronization. Since step data is persisted
+locally and survives browser reloads, the data is effectively saved and ready
+for syncing to Firestore when the participant navigates to the next View. This
+approach ensures data integrity while optimizing network requests by batching
+multiple step recordings together.
+
+## Persisting data for the view (not just a step)
+
+All the data for the steps are persisted in the browser's local storage. This
+means that if the subject reloads the page, or navigates to a different site and
+then returns, the task will resume from the same step. This is nice because it
+helps ensure that subjects are always completing the set of steps/trials
+assigned to them and are not able to start the task over (possibly introducing
+biased data from practice effects or exposure to different manipulations).
+
+The ViewAPI object provides a `.persist` object that can be used to persist data
+for the view that is not associated with a step. This data is stored in the
+browser's local storage and is available even after the page is reloaded.
+
+```js
+api.persist.myVar = 'value'
+```
+
+This variable will now be available in the View even after the page is reloaded.
+It is also visible in the developer tools side panel.
+
+## Methods of defining steps
+
+### append()
+
+The `append()` method is used to add a list of steps to the stepper.
+
+```js
+const trials = api.steps.append([
+  { id: 'a', word: 'SHIP', color: 'red', condition: 'unrelated' },
+  { id: 'b', word: 'MONKEY', color: 'green', condition: 'unrelated' },
+  { id: 'c', word: 'ZAMBONI', color: 'blue', condition: 'unrelated' },
+  { id: 'd', word: 'RED', color: 'red', condition: 'congruent' },
+])
+```
+
+### zip()
 
 The `zip()` method combines multiple arrays of values into trial objects,
 pairing values by their position:
 
 ```js
-const stepper = api.useHStepper()
-
-const trials = stepper.spec().zip({
+const trials = api.steps.zip({
   shape: ['circle', 'square', 'triangle'],
   color: ['red', 'green', 'blue'],
 })
@@ -349,9 +434,6 @@ const trials = stepper.spec().zip({
 //   { shape: 'square', color: 'green' },
 //   { shape: 'triangle', color: 'blue' }
 // ]
-
-// Push the trials
-trials.push()
 ```
 
 By default, `zip()` requires all arrays to have the same length. If the arrays
@@ -359,10 +441,8 @@ have different lengths, you must specify how to handle this using the `method`
 option:
 
 ```js
-const stepper = api.useHStepper()
-
 // Loop shorter arrays
-const trials1 = stepper.spec().zip(
+const trials1 = api.steps.zip(
   {
     shape: ['circle', 'square'],
     color: ['red', 'green', 'blue'],
@@ -377,7 +457,7 @@ const trials1 = stepper.spec().zip(
 // ]
 
 // Pad with a specific value
-const trials2 = stepper.spec().zip(
+const trials2 = api.steps.zip(
   {
     shape: ['circle', 'square'],
     color: ['red', 'green', 'blue'],
@@ -392,7 +472,7 @@ const trials2 = stepper.spec().zip(
 // ]
 
 // Repeat the last value
-const trials3 = stepper.spec().zip(
+const trials3 = api.steps.zip(
   {
     shape: ['circle', 'square'],
     color: ['red', 'green', 'blue'],
@@ -407,19 +487,7 @@ const trials3 = stepper.spec().zip(
 // ]
 ```
 
-::: warning Different Lengths
-
-When using `zip()`, if the arrays have different lengths:
-
-- By default, it will throw an error
-- You must specify a `method` to handle the difference:
-  - `'loop'`: Repeats the shorter array values
-  - `'pad'`: Fills with a specified `padValue` (required)
-  - `'last'`: Repeats the last value of each shorter array
-
-:::
-
-::: tip Non-Array Values
+Non-Array Values
 
 The `zip()` method can handle non-array values by treating them as
 single-element arrays:
@@ -441,21 +509,26 @@ const trials = stepper.spec().zip(
 //   { shape: 'circle', color: 'green' },
 //   { shape: 'circle', color: 'blue' }
 // ]
-
-// Push the trials
-trials.push()
 ```
+
+::: warning Warning: Dealing with different lengths
+
+When using `zip()`, if the arrays have different lengths:
+
+- By default, it will throw an error
+- You must specify a `method` to handle the difference:
+  - `'loop'`: Repeats the shorter array values
+  - `'pad'`: Fills with a specified `padValue` (required)
+  - `'last'`: Repeats the last value of each shorter array
 
 :::
 
-#### Creating All Combinations with outer()
+### outer()
 
 The `outer()` method creates all possible combinations of values:
 
 ```js
-const stepper = api.useHStepper()
-
-const trials = stepper.spec().outer({
+const trials = api.steps.outer({
   shape: ['circle', 'square'],
   color: ['red', 'green'],
 })
@@ -467,28 +540,13 @@ const trials = stepper.spec().outer({
 //   { shape: 'square', color: 'red' },
 //   { shape: 'square', color: 'green' }
 // ]
-
-// Push the trials
-trials.push()
 ```
-
-::: warning Safety Limit
-
-The `outer()` method has a safety limit of 5000 combinations to prevent
-accidentally creating too many trials. If you exceed this limit, it will throw
-an error.
-
-:::
-
-::: tip Non-Array Values
 
 Like `zip()`, the `outer()` method can handle non-array values by treating them
 as single-element arrays:
 
 ```js
-const stepper = api.useHStepper()
-
-const trials = stepper.spec().outer({
+const trials = api.steps.outer({
   shape: 'circle', // Treated as ['circle']
   color: ['red', 'green'],
 })
@@ -498,354 +556,22 @@ const trials = stepper.spec().outer({
 //   { shape: 'circle', color: 'red' },
 //   { shape: 'circle', color: 'green' }
 // ]
-
-// Push the trials
-trials.push()
 ```
+
+::: warning Warning: safety Limit
+
+The `outer()` method has a safety limit of 5000 combinations to prevent
+accidentally creating too many trials. If you exceed this limit, it will throw
+an error.
 
 :::
 
-#### Repeating Blocks of Trials
-
-The `repeat()` method allows you to repeat all trials a specified number of
-times, in order:
-
-```js
-const stepper = api.useHStepper()
-
-const trials = stepper.t
-  .append([
-    { shape: 'circle', color: 'red' },
-    { shape: 'square', color: 'green' },
-  ])
-  .repeat(2)
-
-// Results in:
-// [
-//   { shape: 'circle', color: 'red' },
-//   { shape: 'square', color: 'green' },
-//   { shape: 'circle', color: 'red' },
-//   { shape: 'square', color: 'green' }
-// ]
-
-// Push the trials
-trials.push()
-```
-
-#### Creating Sequences with range()
-
-The `range()` method allows you to create a sequence of trials with incrementing
-index values. This is particularly useful when you need to create a series of
-numbered trials or when you want to build a sequence that you'll modify later:
-
-```js
-const stepper = api.useHStepper()
-
-const trials = stepper.spec().range(3)
-
-// Results in:
-// [
-//   { range: 0 },
-//   { range: 1 },
-//   { range: 2 }
-// ]
-
-// Push the trials
-trials.push()
-```
-
-You can combine `range()` with other methods like `forEach()` to create more
-complex sequences:
-
-```js
-const stepper = api.useHStepper()
-
-const trials = stepper
-  .spec()
-  .range(2)
-  .forEach((row) => ({
-    ...row,
-    condition: row.range % 2 === 0 ? 'A' : 'B',
-  }))
-
-// Results in:
-// [
-//   { range: 0, condition: 'A' },
-//   { range: 1, condition: 'B' }
-// ]
-
-// Push the trials
-trials.push()
-```
-
-::: warning Positive Numbers Only
-
-The `range()` method requires a positive integer as its argument. It will throw
-an error if called with zero or a negative number.
-
-:::
-
-#### Printing Table Contents with print()
-
-The `print()` method provides a convenient way to inspect the contents of your
-trial table, including any nested tables. This is particularly useful during
-development and debugging:
-
-```js
-const stepper = api.useHStepper()
-
-const trials = stepper.spec().append([
-  { shape: 'circle', color: 'red' },
-  { shape: 'square', color: 'blue' },
-])
-
-trials.print()
-// Output:
-// Table with 2 rows:
-// [0]: { shape: 'circle', color: 'red' }
-// [1]: { shape: 'square', color: 'blue' }
-
-// Push the trials
-trials.push()
-```
-
-The `print()` method also handles nested tables with proper indentation:
-
-```js
-const stepper = api.useHStepper()
-
-const trials = stepper.spec().range(2)
-trials[0].spec().append([
-  { type: 'stim', value: 1 },
-  { type: 'feedback', value: 2 },
-])
-trials[1].spec().append([{ type: 'stim', value: 3 }])
-
-trials.print()
-// Output:
-// Table with 2 rows:
-// [0]: { range: 0 }
-//   Table with 2 rows:
-//   [0]: { type: 'stim', value: 1 }
-//   [1]: { type: 'feedback', value: 2 }
-// [1]: { range: 1 }
-//   Table with 1 rows:
-//   [0]: { type: 'stim', value: 3 }
-
-// Push the trials
-trials.push()
-```
-
-::: tip Method Chaining
-
-The `print()` method returns the table object, allowing it to be chained with
-other methods:
-
-```js
-const stepper = api.useHStepper()
-
-const trials = stepper.t
-  .append({ shape: 'circle' })
-  .print() // Print current state
-  .append({ shape: 'square' })
-  .print() // Print updated state
-
-// Push the trials
-trials.push()
-```
-
-:::
-
-#### Interleaving Trials with interleave()
-
-The `interleave()` method combines two sets of trials by alternating between
-them. This is useful when you want to create a sequence that alternates between
-different trial types:
-
-```js
-const stepper = api.useHStepper()
-
-const trials1 = stepper.spec().append([
-  { type: 'stim', id: 1 },
-  { type: 'stim', id: 2 },
-])
-
-const trials2 = stepper.spec().append([
-  { type: 'feedback', id: 3 },
-  { type: 'feedback', id: 4 },
-])
-
-const trials = trials1.interleave(trials2)
-// Results in:
-// [
-//   { type: 'stim', id: 1 },
-//   { type: 'feedback', id: 3 },
-//   { type: 'stim', id: 2 },
-//   { type: 'feedback', id: 4 }
-// ]
-
-// Push the trials
-trials.push()
-```
-
-The method can handle tables of different lengths, arrays, or single objects:
-
-```js
-const stepper = api.useHStepper()
-
-// Different length tables
-const trials1 = stepper.spec().append([
-  { type: 'stim', id: 1 },
-  { type: 'stim', id: 2 },
-  { type: 'stim', id: 3 },
-])
-
-const trials2 = stepper.spec().append([
-  { type: 'feedback', id: 4 },
-  { type: 'feedback', id: 5 },
-])
-
-const trials = trials1.interleave(trials2)
-// Results in:
-// [
-//   { type: 'stim', id: 1 },
-//   { type: 'feedback', id: 4 },
-//   { type: 'stim', id: 2 },
-//   { type: 'feedback', id: 5 },
-//   { type: 'stim', id: 3 }
-// ]
-
-// Push the trials
-trials.push()
-
-// Array input
-const trialsWithArray = trials1.interleave([
-  { type: 'feedback', id: 4 },
-  { type: 'feedback', id: 5 },
-])
-
-// Single object
-const trialsWithObject = trials1.interleave({ type: 'feedback', id: 4 })
-```
-
-::: warning Safety Limit
-
-Like other table operations, `interleave()` has a safety limit of 5000 rows to
-prevent accidentally creating too many trials. If the combined length would
-exceed this limit, it will throw an error.
-
-:::
-
-::: tip Method Chaining
-
-The `interleave()` method returns the table object, allowing it to be chained
-with other methods:
-
-```js
-const stepper = api.useHStepper()
-
-const trials = stepper.t
-  .append([
-    { type: 'stim', id: 1 },
-    { type: 'stim', id: 2 },
-  ])
-  .interleave([
-    { type: 'feedback', id: 3 },
-    { type: 'feedback', id: 4 },
-  ])
-  .forEach((row) => ({ ...row, condition: 'test' }))
-
-// Push the trials
-trials.push()
-```
-
-:::
-
-#### Taking First or Last Elements with head() and tail()
-
-The `head()` and `tail()` methods allow you to take a subset of trials from the
-beginning or end of your trial table:
-
-```js
-const stepper = api.useHStepper()
-
-// Take the first 3 trials
-const trials1 = stepper.spec().range(5).head(3)
-
-// Results in:
-// [
-//   { range: 0 },
-//   { range: 1 },
-//   { range: 2 }
-// ]
-
-// Push the trials
-trials1.push()
-
-// Take the last 3 trials
-const trials2 = stepper.spec().range(5).tail(3)
-
-// Results in:
-// [
-//   { range: 2 },
-//   { range: 3 },
-//   { range: 4 }
-// ]
-
-// Push the trials
-trials2.push()
-```
-
-Both methods maintain the original order of the trials. When using `tail()`, the
-last n elements are returned in their original sequence (not reversed).
-
-You can combine these methods with other operations:
-
-```js
-const stepper = api.useHStepper()
-
-const trials = stepper.t
-  .range(5)
-  .tail(3)
-  .forEach((row) => ({ ...row, condition: 'test' }))
-
-// Results in:
-// [
-//   { range: 2, condition: 'test' },
-//   { range: 3, condition: 'test' },
-//   { range: 4, condition: 'test' }
-// ]
-
-// Push the trials
-trials.push()
-```
-
-::: warning Positive Numbers Only
-
-Both `head()` and `tail()` require a positive integer as their argument. They
-will throw an error if called with zero or a negative number.
-
-:::
-
-::: tip Handling Large n
-
-If n is greater than the length of the trial table:
-
-- `head(n)` will return all trials from the beginning
-- `tail(n)` will return all trials from the end
-
-In both cases, the original order of trials is preserved.
-
-:::
-
-#### Modifying Trials with forEach()
+### forEach()
 
 The `forEach()` method allows you to modify each trial:
 
 ```js
-const stepper = api.useHStepper()
-
-const trials = stepper.t
+const trials = api.steps
   .append([
     { shape: 'circle', color: 'red' },
     { shape: 'square', color: 'green' },
@@ -862,102 +588,16 @@ const trials = stepper.t
 //   { shape: 'circle', color: 'blue' },
 //   { shape: 'square', color: 'green' }
 // ]
-
-// Push the trials
-trials.push()
 ```
 
-#### Shuffling Trials
-
-The `shuffle()` method allows you to randomize the order of trials. This is
-particularly useful for counterbalancing trial order across participants. The
-shuffle operation respects the seeded random number generation system (see
-[Randomization](/coding/randomization) for more details).
-
-```js
-const stepper = api.useHStepper()
-
-const trials = stepper.t
-  .append([
-    { shape: 'circle', color: 'red' },
-    { shape: 'square', color: 'green' },
-    { shape: 'triangle', color: 'blue' },
-  ])
-  .shuffle()
-
-// Results in a randomly ordered array of the same trials
-// The order will be deterministic based on the current seed
-
-// Push the trials
-trials.push()
-```
-
-You can also provide a specific seed to the shuffle operation for custom
-randomization:
-
-```js
-const stepper = api.useHStepper()
-
-const trials = stepper.t
-  .append([
-    { shape: 'circle', color: 'red' },
-    { shape: 'square', color: 'green' },
-    { shape: 'triangle', color: 'blue' },
-  ])
-  .shuffle('custom-seed-123')
-
-// Results in a deterministically ordered array based on the provided seed
-
-// Push the trials
-trials.push()
-```
-
-::: tip Seeded Randomization
-
-The shuffle operation uses the same seeded random number generation system as
-the rest of Smile. When no seed is provided, it uses the current route-specific
-seed (see [Randomization](/coding/randomization) for details). This ensures
-that:
-
-1. Each participant gets a unique but reproducible order
-2. The order remains consistent if the page is refreshed
-3. You can recreate any participant's exact trial order using their seed ID
-
-:::
-
-#### Sampling Trials
-
-The `sample()` method provides various ways to sample from your trials, all of
-which respect Smile's seeded randomization system (see
-[Randomization](/coding/randomization) for details). The method supports several
-sampling types:
-
-```js
-const stepper = api.useHStepper()
-
-const trials = stepper.spec().append([
-  { id: 1, shape: 'circle', color: 'red' },
-  { id: 2, shape: 'square', color: 'green' },
-  { id: 3, shape: 'triangle', color: 'blue' },
-  { id: 4, shape: 'star', color: 'yellow' },
-])
-
-// Push the trials
-trials.push()
-```
-
-#### Special Data Fields
-
-##### The `id` Field
+## The `id` Field
 
 When building trial tables, you can use a special `id` field in your trial data
 to explicitly control the node identifiers in the state machine. This is useful
 when you need specific path values rather than the default sequential numbering:
 
 ```js
-const stepper = api.useHStepper()
-
-const trials = stepper.spec().append([
+const trials = api.steps.append([
   { id: 'intro', type: 'instruction' },
   { id: 'practice', type: 'trial' },
   { id: 'main', type: 'trial' },
@@ -971,18 +611,13 @@ const trials = stepper.spec().append([
 // - "0"
 // - "1"
 // - "2"
-
-// Push the trials
-trials.push()
 ```
 
 This also works with nested tables:
 
 ```js
-const stepper = api.useHStepper()
-
-const trials = stepper.spec().append({ id: 'block1' })
-trials[0].spec().append([
+const trials = api.steps.append({ id: 'block1' })
+trials[0].append([
   { id: 'stim', type: 'stimulus' },
   { id: 'feedback', type: 'feedback' },
 ])
@@ -990,9 +625,6 @@ trials[0].spec().append([
 // Results in paths:
 // - "block1/stim"
 // - "block1/feedback"
-
-// Push the trials
-trials.push()
 ```
 
 If no `path` field is provided, the stepper will use default sequential

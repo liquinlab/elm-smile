@@ -465,5 +465,3 @@ Then you simply open the URL labeled "Local" in your browser.
 Critically, when running in development mode, Smile provides a GUI "overlay"
 which allows you to see and explore the current state and flow of the
 experiment. The dev mode tools are best explained in this video:
-
-## Next steps

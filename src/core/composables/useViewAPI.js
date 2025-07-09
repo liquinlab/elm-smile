@@ -679,8 +679,8 @@ class ViewAPI extends SmileAPI {
   /**
    * Gets data for all leaf nodes in the stepper, optionally filtered by path pattern.
    * Returns only the data directly associated with each leaf node, without merging parent block data.
-   * @param {string|null} pathFilter - Optional path pattern to filter nodes (e.g. 'trial/block*')
-   * @returns {Array} Array of data objects for each matching leaf node
+   * @param {string|null} [pathFilter=null] - Optional path pattern to filter nodes (e.g. 'trial/block*')
+   * @returns {Array<Object>} Array of data objects for each matching leaf node
    * @memberof ViewAPI
    * @instance
    * @example
@@ -714,18 +714,18 @@ class ViewAPI extends SmileAPI {
   }
 
   /**
-   * Gets merged data for all leaf nodes in the stepper, optionally filtered by path pattern.
-   * Similar to queryStepData but returns the merged data for each leaf node (including parent block data).
+   * Gets data for all leaf nodes in the stepper, optionally filtered by path pattern.
+   * Returns only the data directly associated with each leaf node, excluding global variables.
    * @param {string|null} pathFilter - Optional path pattern to filter nodes (e.g. 'trial/block*')
-   * @returns {Array} Array of merged data objects for each matching leaf node
+   * @returns {Array} Array of data objects for each matching leaf node, with gvars removed
    * @memberof ViewAPI
    * @instance
    * @example
-   * // Get merged data for all leaf nodes
-   * const allMergedData = api.queryStepDataMerge()
+   * // Get data for all leaf nodes
+   * const allData = api.queryStepData()
    *
-   * // Get merged data for nodes matching a pattern
-   * const trialData = api.queryStepDataMerge('trial/block*')
+   * // Get data for nodes matching a pattern
+   * const trialData = api.queryStepData('trial/block*')
    */
   queryStepData(pathFilter = null) {
     const matchesFilter = (path, filter) => {

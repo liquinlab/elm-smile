@@ -38,6 +38,144 @@ that you might use in different experiments or different parts of the same
 experiment. The sequencing of different Views is controlled by the
 [**Timeline**](/coding/timeline) (and more specifically `@/user/design.js`).
 
+## ViewAPI
+
+Smile provides a custom API for Views called the ViewAPI. This API is available
+in the `<script setup>` section of your View component. It is accessed via the
+`useViewAPI` composable.
+
+```vue
+<script setup>
+import useViewAPI from '@/core/composables/useViewAPI'
+const api = useViewAPI()
+</script>
+```
+
+The ViewAPI is fully documented in the [API](/api) section. It provides a very
+large number of methods for controlling Smile applications. However, perhaps the
+most important are the methods which help navigate between views.
+
+- `api.goNextView(resetScroll = true)`: Advances to the next View in the
+  timeline. The `resetScroll` parameter controls whether to automatically scroll
+  to the top of the page after navigation (_The scroll behavior targets the
+  `.device-container` element, which is the main content wrapper in Smile
+  applications._)
+- `api.goPrevView(resetScroll = true)`: Returns to the previous View in the
+  timeline. The `resetScroll` parameter controls whether to automatically scroll
+  to the top of the page after navigation.
+- `api.goToView(view, force = true, resetScroll = true)`: Navigates to a
+  specific View (by name). The `force` parameter temporarily disables navigation
+  guards. The `resetScroll` parameter controls whether to automatically scroll
+  to the top of the page after navigation.
+- `api.hasNextView()`: Checks if there's a next View available.
+- `api.hasPrevView()`: Checks if there's a previous View available.
+- `api.nextView()`: Returns the next view object in the navigation sequence.
+- `api.prevView()`: Returns the previous view object in the navigation sequence.
+
+There is more information on view navigation in the
+[timeline](/coding/timeline.html#navigating-between-views) section. One
+important point is that `goNextView()`, `goPrevView()`, and `goToView()` also
+automatically call `saveData()` on the global store prior to View changes. So as
+a result, you can trust that your data will be saved/synchronized with the
+persistent store (Firestore) whenever you navigated between Views.
+
+## Persisting data for the view
+
+The ViewAPI object provides a `.persist` object that can be used to persist data
+for the view. This data is stored in the browser's local storage and is
+available even after the page is reloaded.
+
+```js
+api.persist.myVar = 'value'
+```
+
+This variable will now be available in the View even after the page is reloaded.
+It is also visible in the developer tools side panel.
+
+This can be used to track persistent variables like accuracy/score, etc... in a
+view that is not tied to a particular _step_ of a view:
+
+```js
+// if hits not defined yet then initialize it and timer.
+if (!api.persist.isDefined('hits')) {
+  api.persist.hits = 0
+  api.persist.attempts = 0
+  api.persist.finalScore = 0
+}
+```
+
+## Timing functions in a view
+
+The ViewAPI provides several timing functions that allow you to track elapsed
+time during experiments. These functions are useful for measuring response
+times, task duration, and other time-based metrics.
+
+### Basic Timing Functions
+
+The timing functions use persisted variables to store timestamps, so they work
+across browser reloads and view navigation:
+
+- `api.startTimer(name)`: Starts a named timer by storing the current timestamp
+- `api.isTimerStarted(name)`: Checks if a named timer has been started
+- `api.elapsedTime(name)`: Gets elapsed time in milliseconds since timer started
+- `api.elapsedTimeInSeconds(name)`: Gets elapsed time in seconds since timer
+  started
+- `api.elapsedTimeInMinutes(name)`: Gets elapsed time in minutes since timer
+  started
+
+### Example Usage
+
+```js
+// Start a timer when the view loads
+api.startTimer('taskTimer')
+
+// Later, check elapsed time
+const seconds = api.elapsedTimeInSeconds('taskTimer')
+console.log(`Task has been running for ${seconds} seconds`)
+
+// Check if timer exists before starting
+// This starts a timer if it doesn't already
+// exit meaning it records from the first page load rather than the most recent
+// page load
+if (!api.isTimerStarted('responseTimer')) {
+  api.startTimer('responseTimer')
+}
+
+// Multiple timers can run simultaneously
+api.startTimer('overallTimer')
+api.startTimer('currentTrialTimer')
+```
+
+### Timer Names
+
+By default, timers use the name `'default'` if no name is provided. You can use
+any string as a timer name to track different events:
+
+```js
+// Start multiple named timers
+api.startTimer('experimentStart')
+api.startTimer('currentBlock')
+api.startTimer('currentTrial')
+
+// Check specific timers
+const experimentTime = api.elapsedTimeInMinutes('experimentStart')
+const blockTime = api.elapsedTimeInSeconds('currentBlock')
+```
+
+Timer data is stored in the persisted variables system, so timers will continue
+running even if the participant navigates between views or reloads the page.
+This makes them ideal for tracking overall experiment duration and other
+long-running measurements.
+
+## Designing and Styling Views
+
+In addition to the ViewAPI, Smile provides a number of tools for designing and
+styling Views. These are described in the [styling](/styling/styleoverview)
+section. The most important of these is the [UIKit](/styling/uikit) and
+[layouts](/styling/layouts) which provide a library of components that can be
+used to design and style your Views. This can save you a lot of time when
+developing tasks and help improve the consistency of the design.
+
 ## Built-in Views
 
 When you [setup](/starting) the default <SmileText /> project you automatically
@@ -47,21 +185,13 @@ include things like obtaining [informed consent](#informed-consent), presenting
 This section describes these default built-in Views and provides an overview of
 how to customize them for your experiment.
 
-### Side effects
+### Props
 
-Views sometimes have "side-effects" which are changes to the state of the
-overall application as a result of the operation of the view. For example, the
-Informed Consent View might present the text of the consent form and ask the
-participant if they agree to participate. If they do, then a flag is set by the
-[API](/api) to indicate that the participant has consented. Subsequent Views
-might check this flag to verify that the subject has consented.
-
-Programmers call these "side-effects" because they break the apparent modularity
-of the View. For example, if your experiment needs to know if the participant
-has consented, and you remove the Informed Consent View, then you will need to
-add some other way to set the consent flag.
-
-Below, we describe each built-in View, including the side-effects of each View.
+Each View can be configured with a set of
+[props](https://vuejs.org/guide/components/props) (basically input parameters)
+that control the behavior of the View. These props will be configured in the
+`@/user/design.js`. Examples on all of the props will be shown in the below
+examples.
 
 ### Metadata options
 
@@ -73,22 +203,22 @@ and more information can be found
 
 ## Overview of Built-in Views
 
-| Name                                                | Side&nbsp;effect? | Description                                                                                                                               |
-| --------------------------------------------------- | :---------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
-| [Recruitment Ad](#recruitment-advertisement)        | No                | Landing page for participants                                                                                                             |
-| [MTurk Ad](#mturk-recruitment)                      | No                | Interacts with the MTurk system                                                                                                           |
-| [Simple Informed Consent](#simple-informed-consent) | Yes               | Collects informed consent using a simple checkbox                                                                                         |
-| [CAPTCHA](#the-smile-captcha)                       | No                | Fun tasks to verify human-ness and attention                                                                                              |
-| [Window Sizer](#window-sizer)                       | Yes               | Verifies a given area of the screen is visible (with a more aggressive option that hides page content if the window is resized too small) |
-| [Simple Instructions](#simple-instructions)         | No                | A simple sequence of pages for instructions                                                                                               |
-| [Instructions Quiz](#instructions-quiz)             | No                | A basic instructions quiz                                                                                                                 |
-| [Demographic Survey](#demographic-survey)           | Yes               | A survey which collects some demographic info                                                                                             |
-| [Device Survey](#device-survey)                     | No                | A survey which collects some self-report about computer/device                                                                            |
-| [Withdraw](#withdraw)                               | Yes               | A survey which processes a participant's request to withdraw from study                                                                   |
-| [Debrief](#debrief)                                 | No                | A simple text View which describes the purpose of study                                                                                   |
-| [Feedback](#feedback)                               | No                | A survey for soliciting structured and unstructured feedback on the study                                                                 |
-| [Thanks Page](#thanks)                              | Yes               | A thank you page                                                                                                                          |
-| [Report Issue](#report-issue)                       | Yes               | A form to report a bug/issue with the experiment                                                                                          |
+| Name                                                | Props | Description                                                                                                                               |
+| --------------------------------------------------- | :---- | :---------------------------------------------------------------------------------------------------------------------------------------- |
+| [Recruitment Ad](#recruitment-advertisement)        | No    | Landing page for participants                                                                                                             |
+| [MTurk Ad](#mturk-recruitment)                      | Yes   | Interacts with the MTurk system                                                                                                           |
+| [Simple Informed Consent](#simple-informed-consent) | Yes   | Collects informed consent using a simple checkbox                                                                                         |
+| [CAPTCHA](#the-smile-captcha)                       | No    | Fun tasks to verify human-ness and attention                                                                                              |
+| [Window Sizer](#window-sizer)                       | Yes   | Verifies a given area of the screen is visible (with a more aggressive option that hides page content if the window is resized too small) |
+| [Simple Instructions](#simple-instructions)         | No    | A simple sequence of pages for instructions                                                                                               |
+| [Instructions Quiz](#instructions-quiz)             | No    | A basic instructions quiz                                                                                                                 |
+| [Demographic Survey](#demographic-survey)           | Yes   | A survey which collects some demographic info                                                                                             |
+| [Device Survey](#device-survey)                     | No    | A survey which collects some self-report about computer/device                                                                            |
+| [Withdraw](#withdraw)                               | Yes   | A survey which processes a participant's request to withdraw from study                                                                   |
+| [Debrief](#debrief)                                 | No    | A simple text View which describes the purpose of study                                                                                   |
+| [Feedback](#feedback)                               | No    | A survey for soliciting structured and unstructured feedback on the study                                                                 |
+| [Thanks Page](#thanks)                              | Yes   | A thank you page                                                                                                                          |
+| [Report Issue](#report-issue)                       | Yes   | A form to report a bug/issue with the experiment                                                                                          |
 
 These components are located in the `src/builtins` directory. In <SmileText/> a
 short-hand for the src folder is '@' so for instance '@/builtins' refers to the
@@ -100,9 +230,8 @@ short-hand for the src folder is '@' so for instance '@/builtins' refers to the
 
 **Base Component**: `@/builtins/recruitment/AdvertisementView.vue`  
 **Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/recruitment/AdvertisementView.vue)  
-**Side
-effects**: None  
-**Typical accessibility**: `{allowAlways: true}`
+**Typical
+accessibility**: `{allowAlways: true}`
 
 Before a participant can begin a study, they must first be recruited. The
 landing page for your experiment is the Advertisement View. This is the first
@@ -169,9 +298,8 @@ and CloudResearch.
 
 **Base Component**: `@/builtins/mturk/MTurkRecruitView.vue`  
 **Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/mturk/MTurkRecruitView.vue)  
-**Side
-effects**: None  
-**Typical accessibility**: `{allowAlways: true}`
+**Typical
+accessibility**: `{allowAlways: true}`
 
 On the Mechanical Turk, the platform lists possible HITs (Human Intelligence
 Tasks) and workers can choose to complete them. When browsing the listing
@@ -187,7 +315,6 @@ text. When the assignmentId is not available the participant sees the
 HIT, they then see a new page with a button which will launch the <SmileText/>
 experiment in a new browser window.
 
-- There are no side effects, and nothing is recorded.
 - The template can be edited to change the text.
 - The logo image imports from `@/user/assets/brain.svg`.
 
@@ -199,6 +326,10 @@ this.registerView({
   path: '/mturk',
   name: 'mturk',
   component: MTurk,
+  props: {
+    estimated_time: api.getConfig('estimated_time'),
+    payrate: api.getConfig('payrate'),
+  },
   meta: { allowAlways: true, requiresConsent: false },
   beforeEnter: (to) => {
     processQuery(to.query, 'mturk')

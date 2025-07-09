@@ -31,7 +31,7 @@ accomplish more in less time.
   devices.
 - Developer [mode](/coding/developing) which makes it easier to debug and design
   experiments. Jump quickly between phases and trials in your experiments,
-  [autofill forms and generate fake data for testing](/coding/autofill),
+  [autofill forms and generate mock data for testing](/coding/autofill),
   [hot-reload](/coding/developing#hot-module-replacement) the code you are
   working on without restarting the entire experiment, and more!
 - Use Vue's

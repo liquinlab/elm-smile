@@ -64,7 +64,9 @@ including [React](https://reactjs.org/), [Angular](https://angular.io/), and
 
 ::: info Why Vue.js?
 
+<div class="m-4">
 <a href="https://vuejs.org"><img src="/images/vuelogo.png" width="150" align="right"></a>
+</div>
 
 Vue.js was chosen for <SmileText/> because it is easy to learn, opensource and
 free, has a large and active community, and is one of the few web frameworks not
