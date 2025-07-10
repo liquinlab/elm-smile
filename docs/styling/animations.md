@@ -7,18 +7,22 @@ animations with a simple API.
 ## What is Motion?
 
 Motion is a library that makes it easy to add animations to your Vue components.
-It provides:
-
-- **Simple API**: Easy-to-use animation functions
-- **Performance**: Optimized animations that don't block the UI
-- **Flexibility**: Support for various animation types
-- **Vue Integration**: Native Vue 3 support with composables
+It provides a simple API with easy-to-use animation functions, optimized
+performance that doesn't block the UI, flexibility to support various animation
+types, and native Vue 3 support through composables.
 
 ## Basic Example
 
 Here's a simple example of using Motion to animate a button:
 
 ```vue
+<script setup>
+import { ref } from 'vue'
+import { Motion } from 'motion/vue'
+
+const isVisible = ref(true)
+</script>
+
 <template>
   <div>
     <button
@@ -38,13 +42,6 @@ Here's a simple example of using Motion to animate a button:
     </Motion>
   </div>
 </template>
-
-<script setup>
-import { ref } from 'vue'
-import { Motion } from 'motion/vue'
-
-const isVisible = ref(true)
-</script>
 ```
 
 ## Animation Properties

@@ -90,16 +90,16 @@ This also shows how you can access rows of the steps using array-like indexing:
 ```js
 const trials = api.steps.append([{ id: 'stroop' }, { id: 'summary' }])
 
-trials[0] // { id: 'stroop' }
-trials[1] // { id: 'summary' }
+trials[0].data // { id: 'stroop' }
+trials[1].data // { id: 'summary' }
 ```
 
 ## Accessing the data per step via the .stepData object
 
-Each step has a `.stepData` object that contains the data for that step. For
-example, when the stepper is on the first step, the `.stepData` object will
-contain the data for that step. When the stepper is on the second step, the
-`.stepData` object will contain the data for that step.
+The API provides a getter method `.stepData` that returns the data for the
+current step. For example, when the stepper is on the first step, the
+`.stepData` object will contain the data for that step. When the stepper is on
+the second step, the `.stepData` object will contain the data for that step.
 
 ```js
 // on first step
@@ -242,20 +242,7 @@ records a real value (e.g., `api.stepData.rt = 450`), it replaces the abstract
 definition. This makes it very efficient to see what data is expected to be
 collected at each step.
 
-### Benefits of This Pattern
-
-1. **Clear Data Schema**: You can see at a glance what dependent variables are
-   expected from each step
-2. **Automatic Documentation**: The faker functions serve as both expected
-   values and documentation
-3. **Efficient Development**: You don't need to repeat variable definitions for
-   each trial
-4. **Flexible Override**: Individual trials can still override the abstract
-   definitions with real values
-5. **Data Validation**: You can compare expected vs. actual values during
-   analysis
-
-### Example with Real Data Collection
+In a real expermient we might update the data like this:
 
 ```js
 // At the trial level, record real participant data

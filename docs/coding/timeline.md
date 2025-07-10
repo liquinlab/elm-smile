@@ -54,11 +54,11 @@ Because SPAs load the entire app from a single URL, the solution to this for
 SPAs is known as a **router**. A router is a piece of software running in the
 browser which interprets URL requests and programmatically changes the visible
 content on the webpage, mimicking normal browser requests for specific pages. In
-<SmileText/>, routing is handled by the [Vue Router](https://router.vuejs.org),
-which is a powerful open-source project built for routing in
-[Vue](https://vuejs.org) applications.
+Smile, routing is handled by the [Vue Router](https://router.vuejs.org), which
+is a powerful open-source project built for routing in [Vue](https://vuejs.org)
+applications.
 
-<SmileText/> does all of the router set-up for you, so
+Smile does all of the router set-up for you, so
 [all you need to do](/coding/timeline#timeline) is provide a list of Views, as
 well as any logic that connects them to each other. However, if you want to
 learn more about the Vue router, you can check out the Vue Router

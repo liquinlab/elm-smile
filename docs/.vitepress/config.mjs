@@ -4,11 +4,14 @@ import { sub } from '@mdit/plugin-sub'
 import { defineConfig } from 'vitepress'
 import { version } from '../../package.json'
 import tailwindcss from '@tailwindcss/vite'
+import Icons from 'unplugin-icons/vite'
+import Components from 'unplugin-vue-components/vite'
+import IconsResolver from 'unplugin-icons/resolver'
 import path from 'path'
 import { fileURLToPath } from 'node:url'
 import fs from 'fs'
 const nodeVersion = fs.readFileSync(new URL('../../.node_version', import.meta.url), 'utf-8').trim()
-
+const resolve = (dir) => (dir ? path.resolve(__dirname, '../', dir) : __dirname)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 function movePlugin(plugins, pluginAName, order, pluginBName) {
@@ -48,10 +51,21 @@ export default defineConfig({
   vite: {
     plugins: [
       tailwindcss(),
+      Components({
+        dirs: [resolve('.vitepress/theme/components')],
+        include: [/\.vue$/, /\.vue\?vue/, /\.md$/],
+        resolvers: [IconsResolver({ prefix: 'i' })],
+      }),
+      Icons({
+        compiler: 'vue3',
+        autoInstall: true,
+      }),
       {
-        name: 'vp-tw-order-fix',
+        name: 'vp-plugin-order-fix',
         configResolved(c) {
           movePlugin(c.plugins, 'tailwindcss:scan', 'after', 'vitepress')
+          movePlugin(c.plugins, 'unplugin-icons', 'after', 'tailwindcss:scan')
+          movePlugin(c.plugins, 'unplugin-vue-components', 'after', 'unplugin-icons')
         },
       },
     ],
@@ -112,7 +126,7 @@ export default defineConfig({
           { text: 'Data storage', link: '/coding/datastorage' },
           //{ text: '💰 Computing bonuses', link: '/bonuses' },
           //{ text: '🆘 Dealing with Errors', link: '/problems' },
-          { text: 'Automated Testing', link: '/coding/testing' },
+          //{ text: 'Automated Testing', link: '/coding/testing' },
           //{ text: '🔌 Server-side Computations', link: '/server' },
         ],
       },
@@ -127,8 +141,7 @@ export default defineConfig({
           { text: 'Icons', link: '/styling/icons' },
           { text: 'Forms and Quizes', link: '/styling/forms' },
           { text: 'Images and Videos', link: '/styling/imagesvideo.md' },
-
-          { text: 'Animations', link: '/styling/animations' },
+          //{ text: 'Animations', link: '/styling/animations' },
         ],
       },
       {

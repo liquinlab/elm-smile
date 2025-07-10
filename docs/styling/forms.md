@@ -1,32 +1,27 @@
 # Forms and Quizes
 
 Forms are a critical component of many psychological experiments and research
-studies. Whether you're collecting demographic information, gathering post-task
-feedback, or implementing comprehension checks, forms help researchers capture
-structured data from participants. Smile provides a comprehensive set of form
-components and patterns that make it easy to build everything from simple
-feedback surveys to complex multi-step questionnaires.
+studies. Smile provides several tools which can make developing quizes and forms
+easy.
 
 ## Building a Feedback Survey: TaskFeedbackSurveyView Example
 
-The `TaskFeedbackSurveyView` built-in component demonstrates how to build a
-comprehensive feedback form in Smile. This component collects both quantitative
-ratings and qualitative feedback about a participant's experience with a task,
-representing a common pattern in experimental research where researchers want
-both structured and open-ended responses.
+The `TaskFeedbackSurveyView.vue` built-in component demonstrates how to build a
+comprehensive feedback form in Smile. Click
+[here](https://github.com/NYUCCL/smile/blob/main/src/builtins/instructions_quiz/InstructionsQuiz.vue)
+to see the entire code structure before continuing.
+
+This component collects both quantitative ratings and qualitative feedback about
+a participant's experience with a task, representing a common pattern in
+experimental research where researchers want both structured and open-ended
+responses.
 
 ### Component Architecture and State Management
 
-The form uses several important Smile components working together. The `Select`
-components handle rating scales, `Textarea` components capture open-ended
-responses, and the `TitleTwoCol` layout provides an organized presentation that
-separates instructions from the actual form fields. The useViewAPI composable
-manages data persistence and navigation, ensuring that form data survives page
-reloads and integrates with the broader experimental flow.
-
-Form state management in smile-ui follows a persistence-first approach. Rather
+The first thing to note is that it follows a persistence-first approach. Rather
 than using temporary component state that could be lost, the form data is stored
-in the persistent API store from the moment the component initializes:
+in the [persistent API store](/coding/views.html#persisting-data-for-the-view)
+from the moment the component initializes:
 
 ```javascript
 if (!api.persist.isDefined('forminfo')) {
@@ -69,7 +64,7 @@ submit button becomes enabled as soon as all requirements are met.
 
 ### Form Field Implementation
 
-The rating scale implementation uses smile-ui's Select component system, which
+The rating scale implementation uses Smile's Select component system, which
 provides a consistent dropdown interface with proper accessibility support. Each
 rating scale presents a clear range of options with descriptive labels rather
 than just numbers:
@@ -104,7 +99,7 @@ clear guidance about what kind of response is expected:
 ### Data Recording and Navigation
 
 When participants complete the form, the finish function handles the submission
-process. This function demonstrates smile-ui's approach to data recording, which
+process. This function demonstrates Smile's approach to data recording, which
 separates the act of recording form data from the navigation to the next
 experimental phase:
 
@@ -124,7 +119,7 @@ next view in the experimental sequence.
 
 ### Development and Testing Support
 
-The component includes an autofill function that demonstrates smile-ui's support
+The component includes an autofill function that demonstrates Smile's support
 for development workflows. This function allows developers to quickly test form
 submission without manually filling out fields during development:
 
@@ -145,255 +140,120 @@ completion while still testing the submission and navigation logic.
 
 ## Interactive Quiz Component: InstructionsQuiz
 
-The InstructionsQuiz component represents a more sophisticated form pattern that
-goes beyond simple data collection. This component implements interactive
-comprehension checks with multiple question types, automatic scoring, and retry
-functionality. It's commonly used to ensure participants understand experimental
-instructions before beginning the main task.
+The InstructionsQuiz component provides comprehension checks with multiple
+question types, automatic scoring, and retry functionality. It's commonly used
+to ensure participants understand experimental instructions before beginning the
+main task.
 
-### Component Design and Configuration
+Key features include
 
-The quiz component demonstrates how smile-ui handles complex, multi-step form
-interactions. Unlike simple surveys, this component manages question
-randomization, multiple response types, and branching logic based on participant
-performance. The component accepts several configuration options that allow
-researchers to customize the behavior:
+- Participants must answer all questions on each page before proceeding
+- The quiz automatically scores responses and shows success/failure feedback
+- Failed attempts return participants to the specified view for review
+- All responses and attempt counts are automatically recorded for analysis
+
+### Adding to Timeline
+
+Add the quiz to your experiment timeline by importing and including it in your
+views:
 
 ```javascript
-const props = defineProps({
-  questions: {
-    type: Object,
-    required: true,
-  },
-  returnTo: {
-    type: String,
-    default: 'instructions',
-  },
-  randomizeQandA: {
-    type: Boolean,
-    default: true,
+import InstructionsQuiz from '@/components/InstructionsQuiz.vue'
+
+// import the quiz questions
+import { QUIZ_QUESTIONS } from './components/quizQuestions'
+// instructions quiz
+timeline.pushSeqView({
+  name: 'quiz',
+  component: InstructionsQuiz,
+  props: {
+    questions: QUIZ_QUESTIONS,
+    returnTo: 'instructions',
+    randomizeQandA: true,
   },
 })
 ```
 
-The questions prop contains the quiz content, while the returnTo prop specifies
-where participants should go if they fail the quiz. The randomizeQandA prop
-controls whether questions and answer choices are shuffled, which helps reduce
-order effects that could bias participant responses.
+The component accepts three props to customize its behavior:
 
-### Question Structure and Randomization
+- **questions** (required): Object containing the quiz questions and answers
+- **returnTo** (optional): View name to return to if participant fails the quiz
+  (default: 'instructions')
+- **randomizeQandA** (optional): Whether to randomize question and answer order
+  (default: true). This happens per-page so questions remain on the same page.
 
-The quiz supports both single-select and multi-select questions, allowing
-researchers to test different types of comprehension. Single-select questions
-work well for testing recall of specific facts, while multi-select questions can
-assess understanding of more complex concepts that have multiple correct
-aspects.
+### Question File Structure
 
-The randomization system uses smile-ui's built-in shuffle function with a
-consistent random seed, ensuring that while the order varies between
-participants, the randomization is reproducible for debugging and analysis:
+Create a separate JavaScript file to define your questions. The file should
+export an array of **pages**, where each page contains multiple questions that
+are displayed together:
 
 ```javascript
-function getRandomizedQuestions() {
-  api.randomSeed()
-  return props.questions.map((page) => ({
-    ...page,
-    questions: api.shuffle(
-      page.questions.map((q) => ({
-        ...q,
-        answers: api.shuffle(q.answers),
-      }))
-    ),
-  }))
-}
+// questions/instruction-quiz.js
+export const QUIZ_QUESTIONS = [
+  {
+    id: 'pg1',
+    questions: [
+      {
+        id: 'example1',
+        question: 'What color is the sky?',
+        multiSelect: false,
+        answers: ['red', 'blue', 'yellow', 'rainbow'],
+        correctAnswer: ['blue'],
+      },
+      {
+        id: 'example2',
+        question: 'How many days are in a non-leap year?',
+        multiSelect: false,
+        answers: ['365', '100', '12', '31', '60'],
+        correctAnswer: ['365'],
+      },
+    ],
+  },
+  {
+    id: 'pg2',
+    questions: [
+      {
+        id: 'example3',
+        question: 'What comes next: North, South, East, ___',
+        multiSelect: false,
+        answers: ['Southeast', 'Left', 'West'],
+        correctAnswer: ['West'],
+      },
+      {
+        id: 'example4',
+        question: "What's 7 x 7?",
+        multiSelect: false,
+        answers: ['63', '59', '49', '14'],
+        correctAnswer: ['49'],
+      },
+      {
+        id: 'example5',
+        question: "Who is in Todd's lab?",
+        multiSelect: true,
+        answers: ['Pat', 'Ellen', 'Jimbo', 'Roger'],
+        correctAnswer: ['Pat', 'Ellen'],
+      },
+    ],
+  },
+]
 ```
 
-This approach randomizes both the order of questions within each page and the
-order of answer choices within each question. The nested structure preserves the
-logical grouping of questions while still providing the benefits of
-randomization.
+**Structure Overview:**
 
-### Multi-Step Navigation and State Management
+- **Pages**: The top-level array contains page objects. Each page groups related
+  questions that are shown together. Each page has an id.
+- **Questions per page**: Each page can contain multiple questions. Participants
+  must answer all questions on a page before proceeding to the next page.
+- **Page navigation**: The quiz automatically handles navigation between pages
+  and shows progress.
 
-The quiz uses smile-ui's stepper system to manage multi-page navigation. The
-initialization function sets up the step structure, creating separate sections
-for the quiz pages and the feedback pages:
+### Question Properties
 
-```javascript
-function init() {
-  const sections = api.steps.append([{ id: 'pages' }, { id: 'feedback' }])
-  sections[0].append(qs)
-  sections[1].append([{ id: 'success' }, { id: 'retry' }])
-}
-```
+Each question object should include:
 
-This structure allows the quiz to handle both the question-answering phase and
-the result-display phase within the same component. The stepper system manages
-navigation between pages while maintaining the state of all responses.
-
-### Question Types and Response Collection
-
-The component handles different question types with appropriate UI components.
-Single-select questions use the Select component to provide a dropdown
-interface, while multi-select questions use the MultiSelect component to allow
-participants to choose multiple options:
-
-```vue
-<!-- Single-select questions -->
-<Select v-model="api.stepData.questions[index].answer">
-  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
-    <SelectValue placeholder="Select an option" />
-  </SelectTrigger>
-  <SelectContent>
-    <SelectItem v-for="answer in question.answers" :key="answer" :value="answer">
-      {{ answer }}
-    </SelectItem>
-  </SelectContent>
-</Select>
-
-<!-- Multi-select questions -->
-<MultiSelect
-  :options="question.answers"
-  v-model="api.stepData.questions[index].answer"
-  variant="success"
-  help="Select all that apply"
-  size="lg"
-/>
-```
-
-The choice of component depends on the question type, but both integrate
-seamlessly with Vue's v-model system to provide reactive data binding.
-
-### Scoring and Validation Logic
-
-The quiz implements sophisticated scoring logic that handles both single-select
-and multi-select questions appropriately. For single-select questions, the
-scoring is straightforward comparison, but for multi-select questions, the logic
-must verify that the participant selected exactly the right combination of
-options:
-
-```javascript
-const quizCorrect = computed(() => {
-  const allQuestions = api
-    .queryStepData('pages*')
-    .flatMap((page) => page.questions || [])
-
-  return allQuestions.every((question) => {
-    if (Array.isArray(question.correctAnswer)) {
-      const selectedAnswers = Array.isArray(question.answer)
-        ? question.answer
-        : [question.answer]
-      return (
-        question.correctAnswer.length === selectedAnswers.length &&
-        question.correctAnswer.every((answer) =>
-          selectedAnswers.includes(answer)
-        )
-      )
-    }
-    return question.answer === question.correctAnswer[0]
-  })
-})
-```
-
-This scoring system ensures that participants must demonstrate complete
-understanding rather than partial knowledge. For multi-select questions,
-selecting only some of the correct answers or selecting incorrect answers along
-with correct ones will result in a failed attempt.
-
-### Progress Validation and User Experience
-
-Each quiz page validates completion before allowing progression to the next
-page. This validation ensures that participants don't accidentally skip
-questions and provides immediate feedback about their progress:
-
-```javascript
-const currentPageComplete = computed(() => {
-  if (!api.stepData?.questions) return false
-
-  return api.stepData.questions.every((question) => {
-    if ('answer' in question) {
-      if (question.multiSelect) {
-        return Array.isArray(question.answer) && question.answer.length > 0
-      }
-      return true
-    }
-    return false
-  })
-})
-```
-
-The validation logic is sensitive to question type, requiring at least one
-selection for multi-select questions while accepting any non-empty response for
-single-select questions. This approach prevents participants from advancing with
-incomplete responses while avoiding overly restrictive validation.
-
-### Result Handling and Retry Logic
-
-The quiz provides different outcomes based on participant performance. When
-participants complete all questions, the component evaluates their responses and
-directs them to either a success page or a retry page:
-
-```javascript
-function submitQuiz() {
-  api.recordData({
-    phase: 'INSTRUCTIONS_QUIZ',
-    questions: api.queryStepData('pages*'),
-    persist: api.persist,
-  })
-
-  if (quizCorrect.value) {
-    api.goToStep('feedback/success')
-  } else {
-    api.goToStep('feedback/retry')
-  }
-}
-```
-
-The success path congratulates participants and allows them to proceed to the
-next experimental phase. The retry path provides feedback about the failure and
-returns participants to the instructions for review. This branching logic
-ensures that only participants who demonstrate adequate understanding proceed to
-the main experimental task.
-
-### Attempt Tracking and Data Recording
-
-The component tracks how many times participants attempt the quiz, which can
-provide valuable insights into instruction effectiveness and participant
-engagement:
-
-```javascript
-if (!api.persist.isDefined('attempts')) {
-  api.persist.attempts = 1
-}
-
-function returnInstructions() {
-  api.goFirstStep()
-  api.clear()
-  api.persist.attempts = api.persist.attempts + 1
-  api.goToView(props.returnTo)
-}
-```
-
-When participants fail the quiz, the component clears their previous answers to
-prevent carryover effects, increments the attempt counter, and returns them to
-the instructions. This approach provides a clean slate for each attempt while
-maintaining important metadata about participant performance.
-
-## Form Design Principles in smile-ui
-
-Building effective forms in smile-ui requires understanding both the technical
-capabilities and the research context. The persistent data approach ensures that
-participant responses are never lost, even if technical issues occur during data
-collection. The validation patterns provide immediate feedback to participants
-while ensuring data quality for researchers.
-
-The component architecture promotes reusability and maintainability. By
-separating concerns between data management, validation, and presentation, the
-form components can be easily adapted for different research contexts. The
-integration with smile-ui's navigation system ensures that forms fit seamlessly
-into the broader experimental flow.
-
-These patterns demonstrate how smile-ui bridges the gap between simple survey
-tools and sophisticated experimental software, providing the control and
-flexibility that research demands while maintaining the ease of use that makes
-development efficient.
+- **id**: Unique identifier for the question
+- **question**: The question text to display
+- **answers**: Array of possible answer choices
+- **correctAnswer**: Array containing the correct answer(s)
+- **multiSelect**: Boolean indicating if multiple answers can be selected

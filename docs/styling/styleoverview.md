@@ -52,9 +52,3 @@ Many experiments present videos or images to participants. We describe how to
 distribute [images and videos](/styling/imagesvideo) with your Smile project,
 how to preload them so that they appear immediately when needed, and how to
 display them in your experiment.
-
-## Animations
-
-Smile provides a number of animations to help you style your experiments. We
-describe how to use these animations in your experiments
-[here](/styling/animations).

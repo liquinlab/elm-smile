@@ -64,9 +64,10 @@ most important are the methods which help navigate between views.
   timeline. The `resetScroll` parameter controls whether to automatically scroll
   to the top of the page after navigation.
 - `api.goToView(view, force = true, resetScroll = true)`: Navigates to a
-  specific View (by name). The `force` parameter temporarily disables navigation
-  guards. The `resetScroll` parameter controls whether to automatically scroll
-  to the top of the page after navigation.
+  specific View (by name). The `force` parameter temporarily disables
+  [navigation guards](/coding/timeline.html#navigation-permissions). The
+  `resetScroll` parameter controls whether to automatically scroll to the top of
+  the page after navigation.
 - `api.hasNextView()`: Checks if there's a next View available.
 - `api.hasPrevView()`: Checks if there's a previous View available.
 - `api.nextView()`: Returns the next view object in the navigation sequence.

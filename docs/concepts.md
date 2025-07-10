@@ -101,10 +101,9 @@ api.steps.append([
 <style scoped></style>
 ```
 
-This defines four steps in the experiment. Each step has a `word` property that
-is displayed to the user. This is incomplete though because it doesn't actually
-show the word to the user. We'd like to step through these steps each time the
-user presses the spacebar.
+This defines four steps in the experiment. Each step has a `word` property. This
+is incomplete though because it doesn't actually show the word to the user. We'd
+like to advance through these steps each time the user presses the spacebar.
 
 ```vue{13-15}
 <script setup>

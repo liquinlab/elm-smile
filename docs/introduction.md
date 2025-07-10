@@ -48,10 +48,6 @@ accomplish more in less time.
 - Automatic and highly reproducible [deployment](/recruit/deploying) of the
   latest code to the web using
   [GitHub Actions](https://github.com/features/actions).
-- Automated [testing](/coding/testing) framework including unit tests via
-  [vitest](https://vitest.dev/) and end-to-end tests using
-  [Cypress.io](https://www.cypress.io/) helps experimenters ensure code is
-  reliable and bug-free.
 - Integrates with the rest of your research life including
   [Slack notifications](/recruit/deploying#notifying-the-slack-bot), automatic
   generation of QR codes for
