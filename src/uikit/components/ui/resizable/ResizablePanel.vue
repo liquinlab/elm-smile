@@ -1,5 +1,6 @@
 <script setup>
-import { SplitterPanel, useForwardPropsEmits } from "reka-ui";
+import { SplitterPanel, useForwardPropsEmits } from 'reka-ui'
+import { ref } from 'vue'
 
 const props = defineProps({
   collapsedSize: { type: Number, required: false },
@@ -11,14 +12,44 @@ const props = defineProps({
   order: { type: Number, required: false },
   asChild: { type: Boolean, required: false },
   as: { type: null, required: false },
-});
-const emits = defineEmits(["collapse", "expand", "resize"]);
+})
+const emits = defineEmits(['collapse', 'expand', 'resize'])
 
-const forwarded = useForwardPropsEmits(props, emits);
+const forwarded = useForwardPropsEmits(props, emits)
+
+const splitterPanelRef = ref()
+
+const resize = (size) => {
+  splitterPanelRef.value?.resize(size)
+}
+
+const collapse = () => {
+  splitterPanelRef.value?.collapse()
+}
+
+const expand = () => {
+  splitterPanelRef.value?.expand()
+}
+
+const getSize = () => {
+  return splitterPanelRef.value?.getSize()
+}
+
+const isCollapsed = () => {
+  return splitterPanelRef.value?.isCollapsed
+}
+
+defineExpose({
+  resize,
+  collapse,
+  expand,
+  getSize,
+  isCollapsed
+})
 </script>
 
 <template>
-  <SplitterPanel data-slot="resizable-panel" v-bind="forwarded">
+  <SplitterPanel ref="splitterPanelRef" data-slot="resizable-panel" v-bind="forwarded">
     <slot />
   </SplitterPanel>
 </template>
