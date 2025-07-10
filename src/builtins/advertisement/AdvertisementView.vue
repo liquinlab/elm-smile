@@ -44,7 +44,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <ConstrainedTaskWindow variant="ghost">
+  <ConstrainedTaskWindow
+    variant="ghost"
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+  >
     <img ref="logo" src="@/user/assets/brain.svg" width="220" class="dark-aware-img" />
     <h1 ref="title" class="text-3xl font-bold mb-4">Please help us understand the mind!</h1>
     <p>Take part in a short experiment where you play some games.</p>

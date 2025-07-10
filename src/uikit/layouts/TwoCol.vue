@@ -1,9 +1,6 @@
 <script setup>
 import { computed } from 'vue'
 import { getResponsiveWidthClasses } from './layoutUtils.js'
-import useViewAPI from '@/core/composables/useViewAPI'
-
-const api = useViewAPI()
 
 const props = defineProps({
   leftFirst: {
@@ -16,14 +13,19 @@ const props = defineProps({
     default: 'w-1/3',
     description: 'Tailwind width class for the left column (e.g., w-1/3, w-1/2, w-2/5)',
   },
+  responsiveUI: {
+    type: Boolean,
+    default: true,
+    description: 'Whether to use responsive layout behavior',
+  },
 })
 
 const leftColumnClasses = computed(() => {
-  return getResponsiveWidthClasses(props.leftWidth, api.config.responsiveUI)
+  return getResponsiveWidthClasses(props.leftWidth, props.responsiveUI)
 })
 
 const containerClasses = computed(() => {
-  if (!api.config.responsiveUI) {
+  if (!props.responsiveUI) {
     return 'flex gap-6'
   }
   return props.leftFirst ? 'flex gap-6 flex-col @xl:flex-row' : 'flex gap-6 flex-col-reverse @xl:flex-row mb-10'

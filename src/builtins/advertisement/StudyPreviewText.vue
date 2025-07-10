@@ -17,7 +17,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <TwoCol leftWidth="w-3/5" leftFirst>
+  <TwoCol leftWidth="w-3/5" leftFirst :responsiveUI="api.config.responsiveUI">
     <template #left>
       <h1 class="text-3xl font-bold mb-4">Welcome to our study!</h1>
       <p class="text-lg text-left mb-4">

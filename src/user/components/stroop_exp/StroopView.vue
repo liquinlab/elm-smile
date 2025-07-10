@@ -99,7 +99,12 @@ function finish() {
 </script>
 
 <template>
-  <ConstrainedTaskWindow variant="ghost">
+  <ConstrainedTaskWindow
+    variant="ghost"
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+  >
     <!-- Show this for each trial -->
     <div class="text-center" v-if="api.path[0] == 'stroop'">
       <h1

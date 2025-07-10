@@ -58,8 +58,12 @@ function finish() {
 </script>
 
 <template>
-  <ConstrainedPage>
-    <TitleTwoCol leftFirst leftWidth="w-1/3">
+  <ConstrainedPage
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+  >
+    <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
       <template #title>
         <h3 class="text-3xl font-bold mb-4">
           <i-fa6-solid-desktop class="inline mr-2" />&nbsp;Computer/Device Information

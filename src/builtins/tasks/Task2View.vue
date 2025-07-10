@@ -59,7 +59,13 @@ function prev() {
 </script>
 
 <template>
-  <ConstrainedTaskWindow variant="ghost" class="p-8">
+  <ConstrainedTaskWindow
+    variant="ghost"
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+    class="p-8"
+  >
     <div class="w-[80%] h-[80%] flex flex-col items-center justify-center">
       <h1 class="text-2xl font-bold mb-4">Task 2</h1>
       <div class="mb-4">{{ api.stepData.sentence }}/{{ api.stepIndex }}</div>

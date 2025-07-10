@@ -48,7 +48,12 @@ const content = computed(() => {
 </script>
 
 <template>
-  <ConstrainedTaskWindow variant="ghost">
+  <ConstrainedTaskWindow
+    variant="ghost"
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+  >
     <div class="w-[60%] h-[80%]">
       <Card
         v-if="api.store.browserPersisted.withdrawn && content"

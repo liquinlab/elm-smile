@@ -1,13 +1,25 @@
 <script setup>
 import { computed } from 'vue'
-import useViewAPI from '@/core/composables/useViewAPI'
-
-const api = useViewAPI()
 
 const props = defineProps({
   class: {
     type: String,
     default: '',
+  },
+  responsiveUI: {
+    type: Boolean,
+    default: true,
+    description: 'Whether to use responsive layout behavior',
+  },
+  width: {
+    type: Number,
+    default: 800,
+    description: 'Width of the page in pixels',
+  },
+  height: {
+    type: Number,
+    default: 600,
+    description: 'Height of the page in pixels',
   },
 })
 
@@ -18,20 +30,19 @@ const containerClasses = computed(() => {
 })
 
 const containerStyle = computed(() => {
-  if (api.config.windowsizerRequest && !api.config.responsiveUI) {
+  if (!props.responsiveUI) {
     return {
-      width: api.config.windowsizerRequest.width + 'px',
-      minWidth: api.config.windowsizerRequest.width + 'px',
+      width: props.width + 'px',
+      minWidth: props.width + 'px',
     }
-  } else if (api.config.responsiveUI) {
+  } else {
     return {
       width: '90vw',
-      height: api.config.windowsizerRequest.height + 'px',
-      maxWidth: api.config.windowsizerRequest.width + 'px',
-      maxHeight: api.config.windowsizerRequest.height + 'px',
+      height: props.height + 'px',
+      maxWidth: props.width + 'px',
+      maxHeight: props.height + 'px',
     }
   }
-  return {}
 })
 </script>
 

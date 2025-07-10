@@ -1,8 +1,5 @@
 <script setup>
 import { computed } from 'vue'
-import useViewAPI from '@/core/composables/useViewAPI'
-
-const api = useViewAPI()
 
 const props = defineProps({
   class: {
@@ -13,6 +10,21 @@ const props = defineProps({
     type: String,
     default: 'default',
     validator: (value) => ['default', 'ghost', 'game', 'outline'].includes(value),
+  },
+  responsiveUI: {
+    type: Boolean,
+    default: true,
+    description: 'Whether to use responsive layout behavior',
+  },
+  width: {
+    type: Number,
+    default: 800,
+    description: 'Width of the task window in pixels',
+  },
+  height: {
+    type: Number,
+    default: 600,
+    description: 'Height of the task window in pixels',
   },
 })
 
@@ -29,19 +41,19 @@ const containerClasses = computed(() => {
 })
 
 const containerStyle = computed(() => {
-  if (api.config.windowsizerRequest && !api.config.responsiveUI) {
+  if (!props.responsiveUI) {
     return {
-      width: api.config.windowsizerRequest.width + 'px',
-      height: api.config.windowsizerRequest.height + 'px',
-      minWidth: api.config.windowsizerRequest.width + 'px',
-      minHeight: api.config.windowsizerRequest.height + 'px',
+      width: props.width + 'px',
+      height: props.height + 'px',
+      minWidth: props.width + 'px',
+      minHeight: props.height + 'px',
     }
-  } else if (api.config.responsiveUI) {
+  } else {
     return {
       width: '90vw',
-      height: api.config.windowsizerRequest.height + 'px',
-      maxWidth: api.config.windowsizerRequest.width + 'px',
-      maxHeight: api.config.windowsizerRequest.height + 'px',
+      height: props.height + 'px',
+      maxWidth: props.width + 'px',
+      maxHeight: props.height + 'px',
       marginLeft: '20px',
       marginRight: '20px',
       paddingLeft: '30px',
@@ -50,7 +62,6 @@ const containerStyle = computed(() => {
       paddingBottom: '20px',
     }
   }
-  return {}
 })
 </script>
 

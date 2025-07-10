@@ -140,8 +140,13 @@ init()
 
 <template>
   <!-- Quiz pages -->
-  <ConstrainedPage v-if="api.stepIndex < qs.length && /^pages\/pg\d+$/.test(api.pathString)">
-    <TitleTwoCol leftFirst leftWidth="w-1/3">
+  <ConstrainedPage
+    v-if="api.stepIndex < qs.length && /^pages\/pg\d+$/.test(api.pathString)"
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+  >
+    <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
       <template #title>
         <h3 class="text-3xl font-bold mb-4">
           <i-fa6-solid-square-check class="inline mr-2" />&nbsp;Did we explain things clearly?
@@ -216,7 +221,13 @@ init()
   </ConstrainedPage>
 
   <!-- Success page -->
-  <ConstrainedTaskWindow v-else-if="api.pathString === 'feedback/success'" variant="ghost">
+  <ConstrainedTaskWindow
+    v-else-if="api.pathString === 'feedback/success'"
+    variant="ghost"
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+  >
     <div class="text-center items-center justify-center">
       <h3 class="text-3xl font-bold mb-4">
         <div class="flex justify-center mb-2">
@@ -230,7 +241,13 @@ init()
   </ConstrainedTaskWindow>
 
   <!-- Retry page -->
-  <ConstrainedTaskWindow v-else-if="api.pathString === 'feedback/retry'" variant="ghost">
+  <ConstrainedTaskWindow
+    v-else-if="api.pathString === 'feedback/retry'"
+    variant="ghost"
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+  >
     <div class="text-center items-center justify-center">
       <h3 class="text-3xl font-bold mb-4">
         <div class="flex justify-center mb-2">

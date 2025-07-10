@@ -20,7 +20,13 @@ function finish() {
 </script>
 
 <template>
-  <ConstrainedTaskWindow variant="ghost" class="p-8">
+  <ConstrainedTaskWindow
+    variant="ghost"
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+    class="p-8"
+  >
     <div class="w-[80%] h-[80%]">
       <component :is="debriefText" />
       <hr class="border-border my-6" />

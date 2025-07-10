@@ -85,7 +85,7 @@ onUnmounted(() => {
     </Button>
     <div class="w-[90%] h-[90%] relative bg-background border border-border flex flex-col overflow-hidden">
       <div class="flex-1 overflow-y-auto">
-        <TitleTwoCol>
+        <TitleTwoCol :responsiveUI="api.config.responsiveUI">
           <template #title>
             <h3 class="text-3xl font-semibold">
               <i-ph-hand-withdraw-thin class="text-red-500 inline-block mr-2" />Withdraw from study?

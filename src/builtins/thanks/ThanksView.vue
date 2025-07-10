@@ -62,7 +62,7 @@ onMounted(() => {
   <div class="w-full mx-auto py-10">
     <div class="w-4/5 mx-auto text-left">
       <div v-if="api.getRecruitmentService() == 'prolific'">
-        <TitleTwoCol leftFirst leftWidth="w-1/3">
+        <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
           <template #title>
             <h1 class="text-3xl font-bold mb-4">
               <i-fa6-solid-square-check class="inline mr-2" />&nbsp;Thanks, let's begin the payment process!
@@ -97,7 +97,7 @@ onMounted(() => {
       </div>
 
       <div v-if="api.getRecruitmentService() == 'cloudresearch'">
-        <TitleTwoCol leftFirst leftWidth="w-1/3">
+        <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
           <template #title>
             <h1 class="text-3xl font-bold mb-4">
               <i-fa6-solid-square-check class="inline mr-2" />&nbsp;Thanks, let's begin the payment process!
@@ -132,7 +132,7 @@ onMounted(() => {
       </div>
 
       <div v-if="api.getRecruitmentService() == 'mturk'">
-        <TitleTwoCol leftFirst leftWidth="w-1/3">
+        <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
           <template #title>
             <h1 class="text-3xl font-bold mb-4">
               <i-fa6-solid-square-check class="inline mr-2" />&nbsp;Thanks, let's begin the payment process!
@@ -168,7 +168,7 @@ onMounted(() => {
       </div>
 
       <div v-if="api.getRecruitmentService() == 'citizensci'">
-        <TitleTwoCol leftFirst leftWidth="w-1/3">
+        <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
           <template #title>
             <h1 class="text-3xl font-bold mb-4">
               <i-fa6-solid-square-check class="inline mr-2" />&nbsp;Thanks, let's begin the payment process!
@@ -197,7 +197,7 @@ onMounted(() => {
       </div>
 
       <div v-if="api.getRecruitmentService() == 'web'">
-        <TitleTwoCol leftFirst leftWidth="w-1/3">
+        <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
           <template #title>
             <h1 class="text-3xl font-bold mb-4">
               <i-fa6-solid-square-check class="inline mr-2" />&nbsp;Thanks for your contribution to science!

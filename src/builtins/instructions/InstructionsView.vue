@@ -29,7 +29,12 @@ function finish(goto) {
 </script>
 
 <template>
-  <ConstrainedTaskWindow variant="ghost">
+  <ConstrainedTaskWindow
+    variant="ghost"
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+  >
     <div class="w-[80%] h-[80%]">
       <h1 class="text-2xl font-bold mb-4">
         <i-material-symbols-integration-instructions class="inline-block mr-2 text-3xl" /> Instructions

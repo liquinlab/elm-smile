@@ -61,7 +61,11 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <ConstrainedPage>
+  <ConstrainedPage
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+  >
     <TwoCol rightFirst leftWidth="w-3/5">
       <template #left>
         <div class="text-foreground">
