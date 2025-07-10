@@ -1,17 +1,36 @@
+<script setup>
+import TwoColBasicExample from '../examples/TwoColBasicExample.vue'
+import TwoColBasicExampleRaw from '../examples/TwoColBasicExample.vue?raw'
+import TitleTwoColLeftFirstExample from '../examples/TitleTwoColLeftFirstExample.vue'
+import TitleTwoColLeftFirstExampleRaw from '../examples/TitleTwoColLeftFirstExample.vue?raw'
+import TitleTwoColRightFirstExample from '../examples/TitleTwoColRightFirstExample.vue'
+import TitleTwoColRightFirstExampleRaw from '../examples/TitleTwoColRightFirstExample.vue?raw'
+import ConstrainedTaskWindowGhostExample from '../examples/ConstrainedTaskWindowGhostExample.vue'
+import ConstrainedTaskWindowGhostExampleRaw from '../examples/ConstrainedTaskWindowGhostExample.vue?raw'
+import ConstrainedTaskWindowGameExample from '../examples/ConstrainedTaskWindowGameExample.vue'
+import ConstrainedTaskWindowGameExampleRaw from '../examples/ConstrainedTaskWindowGameExample.vue?raw'
+import SimpleExample from '../examples/SimpleExample.vue'
+import SimpleExampleRaw from '../examples/SimpleExample.vue?raw'
+</script>
+
 # Layouts
 
-The UIKit provides several layout components to help structure your experiment views consistently.
+The UIKit provides several layout components to help structure your experiment
+views consistently.
 
 ## TwoCol
 
-A responsive two-column layout component that stacks columns vertically on mobile and arranges them horizontally on larger screens.
+A responsive two-column layout component that stacks columns vertically on
+mobile and arranges them horizontally on larger screens.
 
 ### Props
 
-- `leftFirst` - Boolean: Whether the left column appears first on mobile (default: false)
-- `leftWidth` - String: Tailwind width class for the left column (default: 'w-1/3')
+- `leftFirst` - Boolean: Whether the left column appears first on mobile
+  (default: false)
+- `leftWidth` - String: Tailwind width class for the left column (default:
+  'w-1/3')
 
-### Usage
+### Example
 
 ```vue
 <script setup>
@@ -30,47 +49,18 @@ import { TwoCol } from '@/uikit/layouts'
 </template>
 ```
 
-### Interactive Example
-
-<script setup>
-import ComponentViewer from '../.vitepress/theme/components/ComponentViewer.vue'
-import TwoColExample from '../.vitepress/theme/components/examples/TwoColExample.vue'
-
-const twoColCode = `<script setup>
-import { TwoCol } from '@/uikit/layouts'
-import { ref } from 'vue'
-
-const leftWidth = ref('w-1/3')
-<\/script>
-
-<template>
-  <TwoCol :left-width="leftWidth" left-first>
-    <template #left>
-      <div class="bg-blue-100 dark:bg-blue-900 p-4 rounded-lg">
-        <h3 class="font-semibold mb-2">Left Column<\/h3>
-        <p class="text-sm">
-          This column's width is controlled by the leftWidth prop.
-        <\/p>
-      <\/div>
-    <\/template>
-    <template #right>
-      <div class="bg-green-100 dark:bg-green-900 p-4 rounded-lg">
-        <h3 class="font-semibold mb-2">Right Column<\/h3>
-        <p class="text-sm">
-          This column takes up the remaining space.
-        <\/p>
-      <\/div>
-    <\/template>
-  <\/TwoCol>
-<\/template>`
-</script>
+::: raw
 
 <ComponentViewer 
-  name="TwoCol"
-  description="Responsive two-column layout with configurable left width"
-  :code="twoColCode"
-  :component="TwoColExample"
-/>
+  name="TwoCol" 
+  description="Responsive two-column layout with configurable left width" 
+  :raw-code="TwoColBasicExampleRaw">
+
+  <TwoColBasicExample />
+
+</ComponentViewer>
+
+:::
 
 ### Width Options
 
@@ -91,6 +81,7 @@ Similar to TwoCol but includes an additional title slot above the columns.
 ### Props
 
 Same as TwoCol, plus:
+
 - All TwoCol props
 - Additional `title` slot for header content
 
@@ -110,3 +101,79 @@ Same as TwoCol, plus:
   </template>
 </TitleTwoCol>
 ```
+
+::: raw
+
+<ComponentViewer name="TitleTwoCol" description="Two-column layout with title
+section" :raw-code="TitleTwoColLeftFirstExampleRaw">
+
+<TitleTwoColLeftFirstExample />
+ 
+ 
+ </ComponentViewer>
+
+:::
+
+This show what happens when the right column is first.
+
+::: raw
+
+<ComponentViewer name="TitleTwoCol" description="Two-column layout with right
+column first" :raw-code="TitleTwoColRightFirstExampleRaw">
+
+<TitleTwoColRightFirstExample />
+
+</ComponentViewer>
+
+:::
+
+## ConstrainedTaskWindow
+
+A constrained task window is a layout component that is used to constrain the
+task window to a certain width.
+
+### Props
+
+- `width` - String: Tailwind width class for the task window (default: 'w-1/2')
+
+::: raw
+
+<ComponentViewer name="ConstrainedTaskWindow" description="Constrained task
+window with ghost variant and responsive UI"
+:raw-code="ConstrainedTaskWindowGhostExampleRaw">
+
+<ConstrainedTaskWindowGhostExample />
+ 
+ </ComponentViewer>
+
+:::
+
+## File Path Example
+
+Here's an example using the ComponentViewer with a file path to automatically
+load and display the component code:
+
+::: raw
+
+<ComponentViewer name="SimpleExample" description="Simple example component with
+automatic code loading" :raw-code="SimpleExampleRaw">
+
+<SimpleExample />
+ 
+</ComponentViewer>
+
+:::
+
+This shows the constrained task window with responsive UI disabled:
+
+::: raw
+
+<ComponentViewer name="ConstrainedTaskWindow" description="Constrained task
+window with game variant and responsive UI disabled"
+:raw-code="ConstrainedTaskWindowGameExampleRaw">
+
+<ConstrainedTaskWindowGameExample />
+ 
+</ComponentViewer>
+
+:::

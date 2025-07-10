@@ -3,6 +3,7 @@ import DefaultTheme from 'vitepress/theme'
 import DarkModeImage from './DarkModeImage.vue'
 import GureckisLabText from './GureckisLabText.vue'
 import SmileText from './SmileText.vue'
+import { TwoCol, TitleTwoCol, ConstrainedTaskWindow, ConstrainedPage } from '@/uikit/layouts'
 import { Button } from '@/uikit/components/ui/button'
 import { Badge } from '@/uikit/components/ui/badge'
 import { ButtonGroup, ButtonGroupItem } from '@/uikit/components/ui/button-group'
@@ -37,6 +38,12 @@ export default {
     app.component('ButtonGroupItem', ButtonGroupItem)
     app.component('Checkbox', Checkbox)
     app.component('Switch', Switch)
+
+    // layouts
+    app.component('TwoCol', TwoCol)
+    app.component('TitleTwoCol', TitleTwoCol)
+    app.component('ConstrainedTaskWindow', ConstrainedTaskWindow)
+    app.component('ConstrainedPage', ConstrainedPage)
 
     // Register Lucide icons
     app.component('Plus', Plus)

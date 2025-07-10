@@ -1,3 +1,38 @@
+<script setup>
+import ButtonVariantsExample from '../examples/ButtonVariantsExample.vue'
+import ButtonVariantsExampleRaw from '../examples/ButtonVariantsExample.vue?raw'
+import ButtonColorVariantsExample from '../examples/ButtonColorVariantsExample.vue'
+import ButtonColorVariantsExampleRaw from '../examples/ButtonColorVariantsExample.vue?raw'
+import ButtonSizesExample from '../examples/ButtonSizesExample.vue'
+import ButtonSizesExampleRaw from '../examples/ButtonSizesExample.vue?raw'
+import ButtonIconsExample from '../examples/ButtonIconsExample.vue'
+import ButtonIconsExampleRaw from '../examples/ButtonIconsExample.vue?raw'
+import ButtonGroupExample from '../examples/ButtonGroupExample.vue'
+import ButtonGroupExampleRaw from '../examples/ButtonGroupExample.vue?raw'
+import ButtonGroupSizesExample from '../examples/ButtonGroupSizesExample.vue'
+import ButtonGroupSizesExampleRaw from '../examples/ButtonGroupSizesExample.vue?raw'
+import CheckboxExample from '../examples/CheckboxExample.vue'
+import CheckboxExampleRaw from '../examples/CheckboxExample.vue?raw'
+import SwitchExample from '../examples/SwitchExample.vue'
+import SwitchExampleRaw from '../examples/SwitchExample.vue?raw'
+import BadgeExample from '../examples/BadgeExample.vue'
+import BadgeExampleRaw from '../examples/BadgeExample.vue?raw'
+
+
+import TwoColBasicExample from '../examples/TwoColBasicExample.vue'
+import TwoColBasicExampleRaw from '../examples/TwoColBasicExample.vue?raw'
+import TitleTwoColLeftFirstExample from '../examples/TitleTwoColLeftFirstExample.vue'
+import TitleTwoColLeftFirstExampleRaw from '../examples/TitleTwoColLeftFirstExample.vue?raw'
+import TitleTwoColRightFirstExample from '../examples/TitleTwoColRightFirstExample.vue'
+import TitleTwoColRightFirstExampleRaw from '../examples/TitleTwoColRightFirstExample.vue?raw'
+import ConstrainedTaskWindowGhostExample from '../examples/ConstrainedTaskWindowGhostExample.vue'
+import ConstrainedTaskWindowGhostExampleRaw from '../examples/ConstrainedTaskWindowGhostExample.vue?raw'
+import ConstrainedTaskWindowGameExample from '../examples/ConstrainedTaskWindowGameExample.vue'
+import ConstrainedTaskWindowGameExampleRaw from '../examples/ConstrainedTaskWindowGameExample.vue?raw'
+import SimpleExample from '../examples/SimpleExample.vue'
+import SimpleExampleRaw from '../examples/SimpleExample.vue?raw'
+</script>
+
 # UIKit Components
 
 Smile provides a library of built-in lower level components which are styled and
@@ -27,156 +62,75 @@ import { Switch } from '@/uikit/components/switch'
 The Button component is the primary interactive element for user actions. It
 supports various styles, sizes, and can include icons.
 
-```vue
-<Button>Default Button</Button>
-
-<Button variant="destructive">Destructive Button</Button>
-
-<Button variant="outline">Outline Button</Button>
-
-<Button variant="secondary">Secondary Button</Button>
-
-<Button variant="ghost">Ghost Button</Button>
-
-<Button variant="link">Link Button</Button>
-```
-
 ::: raw
 
-<Button>Default Button</Button><br><br>
+<ComponentViewer 
+  name="Button Variants" 
+  description="Different visual styles for buttons" 
+  :raw-code="ButtonVariantsExampleRaw"
+  :responsive="false"
+  height="150px"
+  preview-classes="p-8">
 
-<Button variant="destructive">Destructive Button</Button><br><br>
+  <ButtonVariantsExample />
 
-<Button variant="outline">Outline Button</Button><br><br>
-
-<Button variant="secondary">Secondary Button</Button><br><br>
-
-<Button variant="ghost">Ghost Button</Button><br><br>
-
-<Button variant="link">Link Button</Button><br><br>
+</ComponentViewer>
 
 :::
 
 There are also many color variants controlled by the main Tailwind theme sheet
 (`src/core/main.css`)/
 
-```vue
-<Button variant="primary">Primary Button</Button>
-
-<Button variant="primary-light">Primary Light Button</Button>
-
-<Button variant="button-link">Button Link</Button>
-
-<Button variant="button-link-light">Button Link Light</Button>
-
-<Button variant="info">Info Button</Button>
-
-<Button variant="info-light">Info Light Button</Button>
-
-<Button variant="success">Success Button</Button>
-
-<Button variant="success-light">Success Light Button</Button>
-
-<Button variant="warning">Warning Button</Button>
-
-<Button variant="warning-light">Warning Light Button</Button>
-
-<Button variant="danger">Danger Button</Button>
-
-<Button variant="danger-light">Danger Light Button</Button>
-```
-
 ::: raw
 
-<Button variant="primary">Primary Button</Button><br><br>
+<ComponentViewer 
+  name="Button Color Variants" 
+  description="Themed color variants for buttons" 
+  :raw-code="ButtonColorVariantsExampleRaw"
+  :responsive="false"
+  height="250px"
+  preview-classes="p-8">
 
-<Button variant="primary-light">Primary Light Button</Button><br><br>
+  <ButtonColorVariantsExample />
 
-<Button variant="button-link">Button Link</Button><br><br>
-
-<Button variant="button-link-light">Button Link Light</Button><br><br>
-
-<Button variant="info">Info Button</Button><br><br>
-
-<Button variant="info-light">Info Light Button</Button><br><br>
-
-<Button variant="success">Success Button</Button><br><br>
-
-<Button variant="success-light">Success Light Button</Button><br><br>
-
-<Button variant="warning">Warning Button</Button><br><br>
-
-<Button variant="warning-light">Warning Light Button</Button><br><br>
-
-<Button variant="danger">Danger Button</Button><br><br>
-
-<Button variant="danger-light">Danger Light Button</Button>
+</ComponentViewer>
 
 :::
 
 There are also many sizes:
 
-```vue
-<Button size="xs">Extra Small Button</Button>
-
-<Button size="sm">Small Button</Button>
-
-<Button size="default">Default Button</Button>
-
-<Button size="lg">Large Button</Button>
-
-<Button size="xl">Extra Large Button</Button>
-
-<Button size="icon">🔥</Button>
-
-<Button size="menu">Menu Button</Button>
-```
-
 ::: raw
 
-<Button size="xs">Extra Small Button</Button><br><br>
+<ComponentViewer 
+  name="Button Sizes" 
+  description="Different sizes for buttons" 
+  :raw-code="ButtonSizesExampleRaw"
+  :responsive="false"
+  height="180px"
+  preview-classes="p-8">
 
-<Button size="sm">Small Button</Button><br><br>
+  <ButtonSizesExample />
 
-<Button size="default">Default Button</Button><br><br>
-
-<Button size="lg">Large Button</Button><br><br>
-
-<Button size="xl">Extra Large Button</Button><br><br>
-
-<Button size="icon">🔥</Button><br><br>
-
-<Button size="menu">Menu Button</Button>
+</ComponentViewer>
 
 :::
 
 Buttons can include icons alongside text. Icons should ideally be placed before
 the text content:
 
-```vue
-<Button>
-  <i-lucide-plus />
-  Add Item
-</Button>
-```
-
 ::: raw
 
-<Button><Plus />Add Item</Button>
+<ComponentViewer 
+  name="Buttons with Icons" 
+  description="Buttons with various icons and variants" 
+  :raw-code="ButtonIconsExampleRaw"
+  :responsive="false"
+  height="200px"
+  preview-classes="p-8">
 
-<Button variant="primary"><Download />Download</Button>
+  <ButtonIconsExample />
 
-<Button variant="success"><Check />Complete</Button>
-
-<Button variant="warning"><AlertTriangle />Warning</Button>
-
-<Button variant="danger"><Trash />Delete</Button>
-
-<Button variant="info"><Info />Info</Button>
-
-<Button variant="outline"><Settings />Settings</Button>
-
-<Button variant="ghost"><Edit />Edit</Button>
+</ComponentViewer>
 
 :::
 
@@ -195,125 +149,37 @@ text or `menu` for menu-style buttons. Other standard sizes are also available.
 The ButtonGroup component creates a connected group of buttons, useful for
 related actions or options.
 
-```vue
-<ButtonGroup>
-  <ButtonGroupItem>Left</ButtonGroupItem>
-  <ButtonGroupItem>Middle</ButtonGroupItem>
-  <ButtonGroupItem>Right</ButtonGroupItem>
-</ButtonGroup>
-```
-
 ::: raw
 
-<ButtonGroup>
-  <ButtonGroupItem>Left</ButtonGroupItem>
-  <ButtonGroupItem>Middle</ButtonGroupItem>
-  <ButtonGroupItem>Right</ButtonGroupItem>
-</ButtonGroup>
+<ComponentViewer 
+  name="ButtonGroup" 
+  description="Connected group of buttons" 
+  :raw-code="ButtonGroupExampleRaw"
+  :responsive="false"
+  height="220px"
+  preview-classes="p-8">
 
-:::
+  <ButtonGroupExample />
 
-```vue
-<ButtonGroup variant="outline">
-  <ButtonGroupItem>Option 1</ButtonGroupItem>
-  <ButtonGroupItem>Option 2</ButtonGroupItem>
-  <ButtonGroupItem>Option 3</ButtonGroupItem>
-</ButtonGroup>
-```
-
-::: raw
-
-<ButtonGroup variant="outline">
-  <ButtonGroupItem>Option 1</ButtonGroupItem>
-  <ButtonGroupItem>Option 2</ButtonGroupItem>
-  <ButtonGroupItem>Option 3</ButtonGroupItem>
-</ButtonGroup>
+</ComponentViewer>
 
 :::
 
 ButtonGroup supports different sizes:
 
-```vue
-<ButtonGroup size="xs">
-  <ButtonGroupItem>Extra Small</ButtonGroupItem>
-  <ButtonGroupItem>XS</ButtonGroupItem>
-  <ButtonGroupItem>Tiny</ButtonGroupItem>
-</ButtonGroup>
-
-<ButtonGroup size="sm">
-  <ButtonGroupItem>Small</ButtonGroupItem>
-  <ButtonGroupItem>SM</ButtonGroupItem>
-  <ButtonGroupItem>Compact</ButtonGroupItem>
-</ButtonGroup>
-
-<ButtonGroup size="default">
-  <ButtonGroupItem>Default</ButtonGroupItem>
-  <ButtonGroupItem>Normal</ButtonGroupItem>
-  <ButtonGroupItem>Regular</ButtonGroupItem>
-</ButtonGroup>
-
-<ButtonGroup size="lg">
-  <ButtonGroupItem>Large</ButtonGroupItem>
-  <ButtonGroupItem>LG</ButtonGroupItem>
-  <ButtonGroupItem>Big</ButtonGroupItem>
-</ButtonGroup>
-
-<ButtonGroup size="xl">
-  <ButtonGroupItem>Extra Large</ButtonGroupItem>
-  <ButtonGroupItem>XL</ButtonGroupItem>
-  <ButtonGroupItem>Huge</ButtonGroupItem>
-</ButtonGroup>
-```
-
 ::: raw
 
-<ButtonGroup size="xs">
-  <ButtonGroupItem>Extra Small</ButtonGroupItem>
-  <ButtonGroupItem>XS</ButtonGroupItem>
-  <ButtonGroupItem>Tiny</ButtonGroupItem>
-</ButtonGroup>
+<ComponentViewer 
+  name="ButtonGroup Sizes" 
+  description="Different sizes for button groups" 
+  :raw-code="ButtonGroupSizesExampleRaw"
+  :responsive="false"
+  height="500px"
+  preview-classes="p-8">
 
-:::
+  <ButtonGroupSizesExample />
 
-::: raw
-
-<br>
-<ButtonGroup size="sm">
-  <ButtonGroupItem>Small</ButtonGroupItem>
-  <ButtonGroupItem>SM</ButtonGroupItem>
-  <ButtonGroupItem>Compact</ButtonGroupItem>
-</ButtonGroup>
-
-:::
-
-::: raw
-
-<br>
-<ButtonGroup size="default"> <ButtonGroupItem>Default</ButtonGroupItem>
-<ButtonGroupItem>Normal</ButtonGroupItem>
-<ButtonGroupItem>Regular</ButtonGroupItem> </ButtonGroup>
-
-:::
-
-::: raw
-
-<br>
-<ButtonGroup size="lg">
-  <ButtonGroupItem>Large</ButtonGroupItem>
-  <ButtonGroupItem>LG</ButtonGroupItem>
-  <ButtonGroupItem>Big</ButtonGroupItem>
-</ButtonGroup>
-
-:::
-
-::: raw
-
-<br>
-<ButtonGroup size="xl">
-  <ButtonGroupItem>Extra Large</ButtonGroupItem>
-  <ButtonGroupItem>XL</ButtonGroupItem>
-  <ButtonGroupItem>Huge</ButtonGroupItem>
-</ButtonGroup>
+</ComponentViewer>
 
 :::
 
@@ -328,97 +194,19 @@ ButtonGroup supports different sizes:
 The Checkbox component provides a standard checkbox input with various styling
 options.
 
-```vue
-<Checkbox />
-
-<Checkbox :modelValue="true" />
-
-<Checkbox disabled />
-
-<Checkbox :modelValue="true" disabled />
-```
-
 ::: raw
 
-<Checkbox />
+<ComponentViewer 
+  name="Checkbox" 
+  description="Checkbox component with variants, sizes, and states" 
+  :raw-code="CheckboxExampleRaw"
+  :responsive="false"
+  height="250px"
+  preview-classes="p-8">
 
-:::
+  <CheckboxExample />
 
-::: raw
-
-<Checkbox :modelValue="true" />
-
-:::
-
-::: raw
-
-<Checkbox disabled />
-
-:::
-
-::: raw
-
-<Checkbox :modelValue="true" disabled />
-
-:::
-
-Checkbox supports different color variants:
-
-```vue
-<Checkbox variant="default" />
-
-<Checkbox variant="primary" />
-
-<Checkbox variant="info" />
-
-<Checkbox variant="success" />
-
-<Checkbox variant="warning" />
-
-<Checkbox variant="danger" />
-```
-
-::: raw
-
-<Checkbox variant="default" :modelValue="true"/>
-
-<Checkbox variant="primary" :modelValue="true"/>
-
-<Checkbox variant="info" :modelValue="true"/>
-
-<Checkbox variant="success" :modelValue="true"/>
-
-<Checkbox variant="warning" :modelValue="true"/>
-
-<Checkbox variant="danger" :modelValue="true"/>
-
-:::
-
-Checkbox comes in different sizes:
-
-```vue
-<Checkbox size="xs" />
-
-<Checkbox size="sm" />
-
-<Checkbox size="default" />
-
-<Checkbox size="lg" />
-
-<Checkbox size="xl" />
-```
-
-::: raw
-
-<Checkbox size="xs" :modelValue="true"/>
-
-<Checkbox size="sm" :modelValue="true"/>
-
-<Checkbox size="default" :modelValue="true"/>
-
-<Checkbox size="lg" :modelValue="true"/>
-
-<Checkbox size="xl" :modelValue="true"/>
+</ComponentViewer>
 
 :::
 
@@ -437,89 +225,19 @@ Checkbox comes in different sizes:
 
 The Switch component provides a toggle switch input, ideal for on/off states.
 
-```vue
-<Switch />
-
-<Switch :modelValue="true" />
-
-<Switch size="sm" />
-
-<Switch size="lg" />
-
-<Switch size="xl" />
-
-<Switch disabled />
-
-<Switch :modelValue="true" disabled />
-```
-
 ::: raw
 
-<Switch />
+<ComponentViewer 
+  name="Switch" 
+  description="Switch component with variants, sizes, and states" 
+  :raw-code="SwitchExampleRaw"
+  :responsive="false"
+  height="270px"
+  preview-classes="p-8">
 
-:::
+  <SwitchExample />
 
-::: raw
-
-<Switch :modelValue="true" />
-
-:::
-
-::: raw
-
-<Switch size="sm" />
-
-:::
-
-::: raw
-
-<Switch size="lg" />
-
-:::
-
-::: raw
-
-<Switch size="xl" />
-
-:::
-
-::: raw
-
-<Switch disabled />
-
-:::
-
-::: raw
-
-<Switch :modelValue="true" disabled />
-
-:::
-
-Switch supports different color variants:
-
-```vue
-<Switch variant="primary" />
-
-<Switch variant="info" />
-
-<Switch variant="success" />
-
-<Switch variant="warning" />
-
-<Switch variant="danger" />
-```
-
-::: raw
-
-<Switch variant="primary" :modelValue="true"/>
-
-<Switch variant="info" :modelValue="true"/>
-
-<Switch variant="success" :modelValue="true"/>
-
-<Switch variant="warning" :modelValue="true"/>
-
-<Switch variant="danger" :modelValue="true"/>
+</ComponentViewer>
 
 :::
 
@@ -539,25 +257,19 @@ Switch supports different color variants:
 The Badge component is used to display small pieces of information, such as
 status indicators, labels, or counts.
 
-```vue
-<Badge>Default Badge</Badge>
-
-<Badge variant="secondary">Secondary Badge</Badge>
-
-<Badge variant="destructive">Destructive Badge</Badge>
-
-<Badge variant="outline">Outline Badge</Badge>
-```
-
 ::: raw
 
-<Badge>Default Badge</Badge>
+<ComponentViewer 
+  name="Badge" 
+  description="Badge component with different variants" 
+  :raw-code="BadgeExampleRaw"
+  :responsive="false"
+  height="80px"
+  preview-classes="p-8">
 
-<Badge variant="secondary">Secondary Badge</Badge>
+  <BadgeExample />
 
-<Badge variant="destructive">Destructive Badge</Badge>
-
-<Badge variant="outline">Outline Badge</Badge>
+</ComponentViewer>
 
 :::
 
@@ -565,3 +277,168 @@ status indicators, labels, or counts.
 
 `variant` (string): The visual style variant can be `default`, `secondary`,
 `destructive`, or `outline`.
+
+# Layouts
+
+The UIKit provides several layout components to help structure your experiment
+views consistently.
+
+## TwoCol
+
+A responsive two-column layout component that stacks columns vertically on
+mobile and arranges them horizontally on larger screens.
+
+### Props
+
+- `leftFirst` - Boolean: Whether the left column appears first on mobile
+  (default: false)
+- `leftWidth` - String: Tailwind width class for the left column (default:
+  'w-1/3')
+
+### Example
+
+```vue
+<script setup>
+import { TwoCol } from '@/uikit/layouts'
+</script>
+
+<template>
+  <TwoCol leftWidth="w-1/2" leftFirst>
+    <template #left>
+      <!-- Left column content -->
+    </template>
+    <template #right>
+      <!-- Right column content -->
+    </template>
+  </TwoCol>
+</template>
+```
+
+::: raw
+
+<ComponentViewer 
+  name="TwoCol" 
+  description="Responsive two-column layout with configurable left width" 
+  :raw-code="TwoColBasicExampleRaw">
+
+  <TwoColBasicExample />
+
+</ComponentViewer>
+
+:::
+
+### Width Options
+
+The `leftWidth` prop accepts any Tailwind width class:
+
+- `w-1/4` - 25% width
+- `w-1/3` - 33% width (default)
+- `w-2/5` - 40% width
+- `w-1/2` - 50% width
+- `w-3/5` - 60% width
+- `w-2/3` - 67% width
+- `w-3/4` - 75% width
+
+## TitleTwoCol
+
+Similar to TwoCol but includes an additional title slot above the columns.
+
+### Props
+
+Same as TwoCol, plus:
+
+- All TwoCol props
+- Additional `title` slot for header content
+
+### Usage
+
+```vue
+<TitleTwoCol leftWidth="w-1/3" leftFirst>
+  <template #title>
+    <h1>Page Title</h1>
+    <p>Page description</p>
+  </template>
+  <template #left>
+    <!-- Left column content -->
+  </template>
+  <template #right>
+    <!-- Right column content -->
+  </template>
+</TitleTwoCol>
+```
+
+::: raw
+
+<ComponentViewer name="TitleTwoCol" description="Two-column layout with title
+section" :raw-code="TitleTwoColLeftFirstExampleRaw">
+
+<TitleTwoColLeftFirstExample />
+ 
+ 
+ </ComponentViewer>
+
+:::
+
+This show what happens when the right column is first.
+
+::: raw
+
+<ComponentViewer name="TitleTwoCol" description="Two-column layout with right
+column first" :raw-code="TitleTwoColRightFirstExampleRaw">
+
+<TitleTwoColRightFirstExample />
+
+</ComponentViewer>
+
+:::
+
+## ConstrainedTaskWindow
+
+A constrained task window is a layout component that is used to constrain the
+task window to a certain width.
+
+### Props
+
+- `width` - String: Tailwind width class for the task window (default: 'w-1/2')
+
+::: raw
+
+<ComponentViewer name="ConstrainedTaskWindow" description="Constrained task
+window with ghost variant and responsive UI"
+:raw-code="ConstrainedTaskWindowGhostExampleRaw">
+
+<ConstrainedTaskWindowGhostExample />
+ 
+ </ComponentViewer>
+
+:::
+
+## File Path Example
+
+Here's an example using the ComponentViewer with a file path to automatically
+load and display the component code:
+
+::: raw
+
+<ComponentViewer name="SimpleExample" description="Simple example component with
+automatic code loading" :raw-code="SimpleExampleRaw">
+
+<SimpleExample />
+ 
+</ComponentViewer>
+
+:::
+
+This shows the constrained task window with responsive UI disabled:
+
+::: raw
+
+<ComponentViewer name="ConstrainedTaskWindow" description="Constrained task
+window with game variant and responsive UI disabled"
+:raw-code="ConstrainedTaskWindowGameExampleRaw">
+
+<ConstrainedTaskWindowGameExample />
+ 
+</ComponentViewer>
+
+:::
