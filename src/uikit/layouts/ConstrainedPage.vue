@@ -34,11 +34,13 @@ const containerStyle = computed(() => {
     return {
       width: props.width + 'px',
       minWidth: props.width + 'px',
+      height: props.height + 'px',
+      minHeight: props.height + 'px',
     }
   } else {
     return {
       width: '90vw',
-      height: props.height + 'px',
+      minHeight: props.height + 'px',
       maxWidth: props.width + 'px',
       maxHeight: props.height + 'px',
     }

@@ -136,6 +136,7 @@ export default defineConfig({
           { text: 'Overview', link: '/styling/styleoverview' },
           { text: 'Tailwind CSS', link: '/styling/tailwind' },
           { text: 'Dark Mode', link: '/styling/darkmode' },
+          { text: 'UIKit Layouts', link: '/styling/layouts' },
           { text: 'UIKit Components', link: '/styling/uikit' },
           { text: 'Icons', link: '/styling/icons' },
           { text: 'Forms and Quizes', link: '/styling/forms' },

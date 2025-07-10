@@ -23,18 +23,18 @@ appealing to participants. We describe how to enable dark mode in your
 experiments [here](/styling/darkmode). (_Dark mode is of course optional and
 only makes sense for some research questions._)
 
+## UIKit Layouts
+
+Smile provides a number of layouts to help you structure your Views. We describe
+how to use layouts in your experiments [here](/styling/layouts). This can help
+you save time and ensure that your Views are consistent and easy to understand.
+
 ## UIKit Components
 
 Smile provides a number of built in components to help you style your
 experiments. We describe how to use these components in your experiments
 [here](/styling/uikit). These components build upon Radix UI and Shadcn-Vue
 which provides high levels of accessibility and design consistency.
-
-## Layouts
-
-Smile provides a number of layouts to help you structure your Views. We describe
-how to use layouts in your experiments [here](/styling/layouts). This can help
-you save time and ensure that your Views are consistent and easy to understand.
 
 ## Icons
 

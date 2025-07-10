@@ -18,6 +18,11 @@ const props = defineProps({
     default: true,
     description: 'Whether to use responsive layout behavior',
   },
+  class: {
+    type: String,
+    default: '',
+    description: 'Additional CSS classes to apply to the container',
+  },
 })
 
 const leftColumnClasses = computed(() => {
@@ -35,7 +40,7 @@ const containerClasses = computed(() => {
 </script>
 
 <template>
-  <div class="w-6/7 select-none mx-auto text-left my-10">
+  <div :class="['w-6/7 select-none mx-auto text-left my-10', props.class]">
     <slot name="title" />
 
     <div :class="containerClasses">
