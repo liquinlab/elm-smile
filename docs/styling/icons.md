@@ -179,22 +179,20 @@ Google's comprehensive icon set with many variants.
 You can control icon size using Tailwind CSS classes:
 
 ```vue
-<template>
-  <!-- Extra small -->
-  <i-lucide-home class="w-3 h-3" />
+<!-- Extra small -->
+<i-lucide-home class="w-3 h-3" />
 
-  <!-- Small -->
-  <i-lucide-home class="w-4 h-4" />
+<!-- Small -->
+<i-lucide-home class="w-4 h-4" />
 
-  <!-- Default -->
-  <i-lucide-home class="w-5 h-5" />
+<!-- Default -->
+<i-lucide-home class="w-5 h-5" />
 
-  <!-- Large -->
-  <i-lucide-home class="w-6 h-6" />
+<!-- Large -->
+<i-lucide-home class="w-6 h-6" />
 
-  <!-- Extra large -->
-  <i-lucide-home class="w-8 h-8" />
-</template>
+<!-- Extra large -->
+<i-lucide-home class="w-8 h-8" />
 ```
 
   <!-- Extra small -->
@@ -217,19 +215,17 @@ You can control icon size using Tailwind CSS classes:
 Icons inherit the text color by default, but you can customize them:
 
 ```vue
-<template>
-  <!-- Inherit text color -->
-  <i-lucide-home />
+<!-- Inherit text color -->
+<i-lucide-home />
 
-  <!-- Specific color -->
-  <i-lucide-heart class="text-red-500" />
+<!-- Specific color -->
+<i-lucide-heart class="text-red-500" />
 
-  <!-- Multiple colors -->
-  <i-lucide-star class="text-yellow-400" />
-  <i-lucide-check class="text-green-500" />
-  <i-lucide-alert-triangle class="text-orange-500" />
-  <i-lucide-x class="text-red-500" />
-</template>
+<!-- Multiple colors -->
+<i-lucide-star class="text-yellow-400" />
+<i-lucide-check class="text-green-500" />
+<i-lucide-alert-triangle class="text-orange-500" />
+<i-lucide-x class="text-red-500" />
 ```
 
   <i-lucide-home />
