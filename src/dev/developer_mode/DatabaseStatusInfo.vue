@@ -96,7 +96,7 @@ const showServiceSelect = ref(false)
           {{ api.store.browserPersisted.docRef }}&nbsp;&nbsp;<a
             v-if="api.store.browserPersisted.docRef"
             @click.prevent="open_firebase_console(firebase_url)"
-            ><FAIcon icon="fa-solid fa-square-up-right"
+            ><i-fa6-solid-square-up-right
           /></a>
         </td>
       </tr>

@@ -72,7 +72,7 @@ function submitWithdraw() {
         <div class="flex items-center pt-1" v-if="!appconfig.anonymousMode">
           <div class="flex gap-2">
             <Button variant="outline" size="xs" v-if="api.store.browserPersisted.consented" @click="toggleConsent()">
-              <FAIcon icon="magnifying-glass" />
+              <i-fa6-solid-magnifying-glass />
               <span class="@[400px]:inline hidden">View consent</span>
             </Button>
             <Button
@@ -85,11 +85,11 @@ function submitWithdraw() {
               "
               @click="toggleWithdraw()"
             >
-              <FAIcon icon="circle-xmark" />
+              <i-fa6-solid-circle-xmark />
               <span class="@[400px]:inline hidden">Withdraw</span>
             </Button>
             <Button variant="warning-light" size="xs" @click="toggleReport()" v-if="false">
-              <FAIcon icon="hand" />
+              <i-fa6-solid-hand />
               Report issue
             </Button>
           </div>

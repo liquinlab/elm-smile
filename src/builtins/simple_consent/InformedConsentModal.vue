@@ -46,7 +46,7 @@ onUnmounted(() => {
       aria-label="close"
       @click="$emit('toggleConsent')"
     >
-      <FAIcon icon="fa-solid fa-xmark" class="text-xl" />
+      <i-fa6-solid-xmark class="text-xl" />
     </Button>
     <div class="w-[90%] h-[90%] relative bg-background shadow-xl flex flex-col">
       <div class="flex-1 overflow-y-auto p-20 pt-10">

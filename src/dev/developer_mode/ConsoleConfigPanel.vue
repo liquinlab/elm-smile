@@ -94,7 +94,7 @@ function resetDevState() {
             <BreadcrumbItem :key="index">
               <BreadcrumbLink as="button" @click="panel_jump(index)" class="flex items-center text-xs">
                 <template v-if="option == '/'">
-                  <FAIcon icon="fa-solid fa-home" />
+                  <i-fa6-solid-house />
                 </template>
                 <template v-else>{{ option }}</template>
               </BreadcrumbLink>

@@ -144,7 +144,7 @@ init()
     <TitleTwoCol leftFirst leftWidth="w-1/3">
       <template #title>
         <h3 class="text-3xl font-bold mb-4">
-          <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
+          <i-fa6-solid-square-check class="inline mr-2" />&nbsp;Did we explain things clearly?
         </h3>
         <p class="text-lg mb-8">
           Using the information provided in the previous pages, please select the correct answer for each question. Do
@@ -197,7 +197,7 @@ init()
 
           <div class="flex justify-between">
             <Button variant="outline" v-if="api.stepIndex >= 1" @click="api.goPrevStep()">
-              <FAIcon icon="fa-solid fa-arrow-left" />
+              <i-fa6-solid-arrow-left />
               Previous page
             </Button>
             <div v-else></div>
@@ -207,7 +207,7 @@ init()
               @click="api.isLastBlockStep() ? submitQuiz() : api.goNextStep()"
             >
               {{ api.isLastBlockStep() ? 'Submit' : 'Next page' }}
-              <FAIcon v-if="!api.isLastBlockStep()" icon="fa-solid fa-arrow-right" />
+              <i-fa6-solid-arrow-right v-if="!api.isLastBlockStep()" />
             </Button>
           </div>
         </div>
@@ -220,7 +220,7 @@ init()
     <div class="text-center items-center justify-center">
       <h3 class="text-3xl font-bold mb-4">
         <div class="flex justify-center mb-2">
-          <FAIcon icon="fa-solid fa-square-check" class="text-[4rem]" />
+          <i-fa6-solid-square-check class="text-[4rem]" />
         </div>
         Congrats! You passed.
       </h3>

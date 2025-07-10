@@ -8,7 +8,6 @@
  * - UI components and styling (FontAwesome, FormKit theme)
  * - Application configuration (timeline, icons)
  */
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { useRouter, addGuards } from '@/core/router'
 import { pinia } from '@/core/stores/createPinia'
 
@@ -16,7 +15,6 @@ import timeline from '@/user/design'
 import App from '@/core/App.vue'
 import { createApp } from 'vue'
 import VueGtag from 'vue-gtag'
-import '@/core/utils/icons'
 import '@/core/main.css'
 
 /**
@@ -56,9 +54,6 @@ app.use(
   },
   router
 )
-
-// Register global components
-app.component('FAIcon', FontAwesomeIcon) // Font Awesome icons available globally
 
 // Mount the application
 app.mount('#app')

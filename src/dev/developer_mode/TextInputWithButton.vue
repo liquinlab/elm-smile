@@ -10,7 +10,7 @@ const emit = defineEmits(['action'])
       :data-tooltip="tooltip"
       @click="$emit('action')"
     >
-      <FAIcon icon="fa-solid fa-arrow-right" />
+      <i-fa6-solid-arrow-right />
     </button>
   </div>
 </template>

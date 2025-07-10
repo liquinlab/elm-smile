@@ -552,7 +552,7 @@ function finish(goto) {
   <div class="page">
     <h1 class="title is-3">Experiment</h1>
     <button class="button is-success is-light" id="finish" @click="finish()">
-      next &nbsp;<FAIcon icon="fa-solid fa-arrow-right" />
+      next &nbsp;<i-fa6-solid-arrow-right />
     </button>
   </div>
 </template>

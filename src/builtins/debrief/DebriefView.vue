@@ -27,7 +27,7 @@ function finish() {
       <div class="flex justify-end mt-4">
         <Button variant="default" @click="finish()">
           next
-          <FAIcon icon="fa-solid fa-arrow-right" />
+          <i-fa6-solid-arrow-right />
         </Button>
       </div>
     </div>

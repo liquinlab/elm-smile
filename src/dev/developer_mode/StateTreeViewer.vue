@@ -256,7 +256,7 @@ watch(
           class="has-tooltip-arrow has-tooltip-bottom"
           data-tooltip="Delete Global Variables"
         >
-          <FAIcon icon="fa-solid fa-trash" />
+          <i-fa6-solid-trash />
         </Button>
       </div>
       <div class="global-data-display">
@@ -275,7 +275,7 @@ watch(
           class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
           data-tooltip="Delete Nodes"
         >
-          <span><FAIcon icon="fa-solid fa-trash" /></span>
+          <span><i-fa6-solid-trash" /></span>
         </button>
         -->
         <DataPathViewer :data="api.stepData" v-if="api.nSteps !== 0" />

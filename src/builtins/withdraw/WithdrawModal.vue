@@ -81,7 +81,7 @@ onUnmounted(() => {
       aria-label="close"
       @click="$emit('toggleWithdraw')"
     >
-      <FAIcon icon="fa-solid fa-xmark" class="text-xl" />
+      <i-fa6-solid-xmark class="text-xl" />
     </Button>
     <div class="w-[90%] h-[90%] relative bg-background border border-border flex flex-col overflow-hidden">
       <div class="flex-1 overflow-y-auto">

@@ -44,11 +44,11 @@ function option_selected(option) {
 </script>
 
 <template>
-  <aside class="w-full h-full flex flex-col config-list-container bg-background" >
+  <aside class="w-full h-full flex flex-col config-list-container bg-background">
     <!-- Header -->
     <div v-if="header" class="bg-muted text-dev-text px-3 py-2 text-xs font-medium border-b border-dev-lines">
       <template v-if="header == '/'">
-        <FAIcon icon="fa-solid fa-home" class="mr-1" />
+        <i-fa6-solid-house class="mr-1" />
       </template>
       <template v-else
         ><span class="font-mono">{{ header }}</span></template
@@ -93,7 +93,7 @@ function option_selected(option) {
           >
             <div class="flex items-center justify-between">
               <span class="font-semibold text-foreground item-key">{{ truncateText(key) }}</span>
-              <FAIcon icon="fa-solid fa-angle-right" class="text-gray-400 text-xs" />
+              <i-fa6-solid-angle-right class="text-gray-400 text-xs" />
             </div>
           </button>
         </li>

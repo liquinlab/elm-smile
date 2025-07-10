@@ -49,101 +49,101 @@ function finish() {
 <template>
   <ConstrainedPage>
     <TitleTwoCol leftFirst leftWidth="w-1/3">
-    <template #title>
-      <h3 class="text-3xl font-bold mb-4"><FAIcon icon="fa-solid fa-pencil" />&nbsp;Give us feedback</h3>
-      <p class="text-lg mb-8">
-        Please give us feedback about your experience with the study. Your feedback will help us improve our study and
-        we appreciate your effort and thoughts.
-      </p>
-    </template>
-    <template #left>
-      <div class="text-left text-muted-foreground">
-        <h3 class="text-lg font-bold mb-2">Important Note</h3>
-        <p class="text-md font-light text-muted-foreground">
-          If this is a paid study your answers to these questions will have
-          <b>no effect on your final payment</b>. We are just interested in your honest answers.
+      <template #title>
+        <h3 class="text-3xl font-bold mb-4"><i-fa6-solid-pencil class="inline mr-2" />&nbsp;Give us feedback</h3>
+        <p class="text-lg mb-8">
+          Please give us feedback about your experience with the study. Your feedback will help us improve our study and
+          we appreciate your effort and thoughts.
         </p>
-      </div>
-    </template>
-    <template #right>
-      <div class="border border-border text-left bg-muted p-6 rounded-lg">
-              <div class="mb-3">
-                <label class="block text-md font-semibold text-foreground mb-2">
-                  How difficult was the task over all?
-                </label>
-                <Select v-model="api.persist.forminfo.difficulty_rating">
-                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
-                    <SelectValue placeholder="Select an option" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0 - Very Easy">0 - Very Easy</SelectItem>
-                    <SelectItem value="1 - Easy">1 - Easy</SelectItem>
-                    <SelectItem value="2 - Somewhat Easy">2 - Somewhat Easy</SelectItem>
-                    <SelectItem value="3 - Neutral">3 - Neutral</SelectItem>
-                    <SelectItem value="4 - Somewhat Difficult">4 - Somewhat Difficult</SelectItem>
-                    <SelectItem value="5 - Difficult">5 - Difficult</SelectItem>
-                    <SelectItem value="6 - Very Difficult">6 - Very Difficult</SelectItem>
-                    <SelectItem value="I'd rather not say">I'd rather not say</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p class="text-xs text-muted-foreground mt-1">Select your rating</p>
-              </div>
+      </template>
+      <template #left>
+        <div class="text-left text-muted-foreground">
+          <h3 class="text-lg font-bold mb-2">Important Note</h3>
+          <p class="text-md font-light text-muted-foreground">
+            If this is a paid study your answers to these questions will have
+            <b>no effect on your final payment</b>. We are just interested in your honest answers.
+          </p>
+        </div>
+      </template>
+      <template #right>
+        <div class="border border-border text-left bg-muted p-6 rounded-lg">
+          <div class="mb-3">
+            <label class="block text-md font-semibold text-foreground mb-2">
+              How difficult was the task over all?
+            </label>
+            <Select v-model="api.persist.forminfo.difficulty_rating">
+              <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0 - Very Easy">0 - Very Easy</SelectItem>
+                <SelectItem value="1 - Easy">1 - Easy</SelectItem>
+                <SelectItem value="2 - Somewhat Easy">2 - Somewhat Easy</SelectItem>
+                <SelectItem value="3 - Neutral">3 - Neutral</SelectItem>
+                <SelectItem value="4 - Somewhat Difficult">4 - Somewhat Difficult</SelectItem>
+                <SelectItem value="5 - Difficult">5 - Difficult</SelectItem>
+                <SelectItem value="6 - Very Difficult">6 - Very Difficult</SelectItem>
+                <SelectItem value="I'd rather not say">I'd rather not say</SelectItem>
+              </SelectContent>
+            </Select>
+            <p class="text-xs text-muted-foreground mt-1">Select your rating</p>
+          </div>
 
-              <div class="mb-3">
-                <label class="block text-md font-semibold text-foreground mb-2">
-                  How enjoyable/fun was the task over all?
-                </label>
-                <Select v-model="api.persist.forminfo.enjoyment_rating">
-                  <SelectTrigger class="w-full bg-background dark:bg-background text-base">
-                    <SelectValue placeholder="Select an option" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0 - Very Boring">0 - Very Boring</SelectItem>
-                    <SelectItem value="1 - Boring">1 - Boring</SelectItem>
-                    <SelectItem value="2 - Somewhat Boring">2 - Somewhat Boring</SelectItem>
-                    <SelectItem value="3 - Neutral">3 - Neutral</SelectItem>
-                    <SelectItem value="4 - Somewhat Fun">4 - Somewhat Fun</SelectItem>
-                    <SelectItem value="5 - Fun">5 - Fun</SelectItem>
-                    <SelectItem value="6 - Very Fun">6 - Very Fun</SelectItem>
-                    <SelectItem value="I'd rather not say">I'd rather not say</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p class="text-xs text-muted-foreground mt-1">Select your rating</p>
-              </div>
+          <div class="mb-3">
+            <label class="block text-md font-semibold text-foreground mb-2">
+              How enjoyable/fun was the task over all?
+            </label>
+            <Select v-model="api.persist.forminfo.enjoyment_rating">
+              <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0 - Very Boring">0 - Very Boring</SelectItem>
+                <SelectItem value="1 - Boring">1 - Boring</SelectItem>
+                <SelectItem value="2 - Somewhat Boring">2 - Somewhat Boring</SelectItem>
+                <SelectItem value="3 - Neutral">3 - Neutral</SelectItem>
+                <SelectItem value="4 - Somewhat Fun">4 - Somewhat Fun</SelectItem>
+                <SelectItem value="5 - Fun">5 - Fun</SelectItem>
+                <SelectItem value="6 - Very Fun">6 - Very Fun</SelectItem>
+                <SelectItem value="I'd rather not say">I'd rather not say</SelectItem>
+              </SelectContent>
+            </Select>
+            <p class="text-xs text-muted-foreground mt-1">Select your rating</p>
+          </div>
 
-              <div class="mb-3">
-                <label class="block text-md font-semibold text-foreground mb-2">
-                  Any general feedback for the study team?
-                </label>
-                <Textarea
-                  v-model="api.persist.forminfo.feedback"
-                  placeholder="Please provide general thoughts, reactions, or ideas here."
-                  class="w-full bg-background dark:bg-background text-base resize-vertical"
-                  rows="4"
-                />
-                <p class="text-xs text-muted-foreground mt-1">Share your general thoughts and reactions</p>
-              </div>
+          <div class="mb-3">
+            <label class="block text-md font-semibold text-foreground mb-2">
+              Any general feedback for the study team?
+            </label>
+            <Textarea
+              v-model="api.persist.forminfo.feedback"
+              placeholder="Please provide general thoughts, reactions, or ideas here."
+              class="w-full bg-background dark:bg-background text-base resize-vertical"
+              rows="4"
+            />
+            <p class="text-xs text-muted-foreground mt-1">Share your general thoughts and reactions</p>
+          </div>
 
-              <div class="mb-3">
-                <label class="block text-md font-semibold text-foreground mb-2">
-                  Any specific issues to report that might improve the study?
-                </label>
-                <Textarea
-                  v-model="api.persist.forminfo.issues"
-                  placeholder="Please report any specific issues you had, if any"
-                  class="w-full bg-background dark:bg-background text-base resize-vertical"
-                  rows="4"
-                />
-                <p class="text-xs text-muted-foreground mt-1">Report any specific issues or suggestions</p>
-              </div>
+          <div class="mb-3">
+            <label class="block text-md font-semibold text-foreground mb-2">
+              Any specific issues to report that might improve the study?
+            </label>
+            <Textarea
+              v-model="api.persist.forminfo.issues"
+              placeholder="Please report any specific issues you had, if any"
+              class="w-full bg-background dark:bg-background text-base resize-vertical"
+              rows="4"
+            />
+            <p class="text-xs text-muted-foreground mt-1">Report any specific issues or suggestions</p>
+          </div>
 
-              <hr class="border-border my-6" />
+          <hr class="border-border my-6" />
 
-              <div class="flex justify-end">
-                <Button variant="default" :disabled="!complete" @click="finish()"> I'm finished </Button>
-              </div>
-            </div>
-    </template>
+          <div class="flex justify-end">
+            <Button variant="default" :disabled="!complete" @click="finish()"> I'm finished </Button>
+          </div>
+        </div>
+      </template>
     </TitleTwoCol>
   </ConstrainedPage>
 </template>

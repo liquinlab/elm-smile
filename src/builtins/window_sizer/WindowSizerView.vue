@@ -24,7 +24,7 @@ function finish() {
     >
       <div class="w-2/3 pt-8 mx-auto text-center" v-if="!props.triggered">
         <span class="text-4xl text-window-sizer-text mb-4 block">
-          <FAIcon icon="fa-solid fa-arrows-up-down-left-right"></FAIcon>
+          <i-fa6-solid-arrows-up-down-left-right class="inline" />
         </span>
         <h1 class="text-xl font-semibold text-window-sizer-text mb-4">
           Please adjust the size of your browser window until <b>ALL</b> four edges of this box are visible.
@@ -42,13 +42,13 @@ function finish() {
             @click="finish()"
           >
             It is visible now, I'm ready
-            <FAIcon icon="fa-solid fa-arrow-right" />
+            <i-fa6-solid-arrow-right />
           </Button>
         </div>
       </div>
       <div class="w-2/3 pt-8 mx-auto text-center" v-else>
         <span class="text-4xl text-window-sizer-text mb-4 block">
-          <FAIcon icon="fa-solid fa-arrows-up-down-left-right"></FAIcon>
+          <i-fa6-solid-arrows-up-down-left-right></i-fa6-solid-arrows-up-down-left-right>
         </span>
         <h1 class="text-xl font-semibold text-window-sizer-text mb-4">
           <b>We don't want you to miss anything!</b><br />Please re-adjust the size of your browser window until

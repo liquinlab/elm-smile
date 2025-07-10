@@ -65,12 +65,12 @@ function prev() {
       <div class="mb-4">{{ api.stepData.sentence }}/{{ api.stepIndex }}</div>
       <div class="flex gap-4">
         <Button variant="outline" @click="prev()" v-if="api.stepIndex > 0">
-          <FAIcon icon="fa-solid fa-arrow-left" />
+          <i-fa6-solid-arrow-left />
           prev
         </Button>
         <Button variant="default" @click="next()">
           next
-          <FAIcon icon="fa-solid fa-arrow-right" />
+          <i-fa6-solid-arrow-right />
         </Button>
       </div>
     </div>

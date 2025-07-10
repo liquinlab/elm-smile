@@ -28,8 +28,7 @@ const api = useViewAPI()
         <CardHeader>
           <CardTitle>Prolific</CardTitle>
           <CardDescription
-            ><a href="https://www.prolific.co">Prolific.ac</a> is a platform for online experiments with slightly higher
-            overall quality than AMT.</CardDescription
+            ><a href="https://www.prolific.co">Prolific.ac</a> is a platform for online experiments.</CardDescription
           >
         </CardHeader>
         <CardContent class="flex justify-end flex-1 items-end">

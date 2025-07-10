@@ -120,13 +120,13 @@ function getBgClass(msg) {
             >
               <div class="flex items-start gap-1 min-w-0">
                 <div class="flex-shrink-0 mt-0.5">
-                  <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
-                  <FAIcon icon="fa-solid fa-database" v-else-if="msg.message.includes('SMILESTORE')" />
-                  <FAIcon icon="fa-solid fa-gear" v-else-if="msg.message.includes('DEV MODE')" />
-                  <FAIcon icon="fa-solid fa-clock" v-else-if="msg.message.includes('TIMELINE STEPPER')" />
-                  <FAIcon icon="fa-regular fa-clock" v-else-if="msg.message.includes('TRIAL STEPPER')" />
+                  <i-fa6-solid-code-branch v-if="msg.message.includes('ROUTER GUARD')" />
+                  <i-fa6-solid-database v-else-if="msg.message.includes('SMILESTORE')" />
+                  <i-fa6-solid-gear v-else-if="msg.message.includes('DEV MODE')" />
+                  <i-fa6-solid-clock v-else-if="msg.message.includes('TIMELINE STEPPER')" />
+                  <i-fa6-regular-clock v-else-if="msg.message.includes('TRIAL STEPPER')" />
                   <img src="/src/assets/dev/firebase-bw.svg" width="15" v-else-if="msg.message.includes('FIRESTORE')" />
-                  <FAIcon icon="fa-solid fa-angle-right" v-else />
+                  <i-fa6-solid-angle-right v-else />
                 </div>
                 <div class="min-w-0 flex-1">
                   <div class="font-semibold break-words break-all">{{ msg.time }} {{ msg.message }}</div>
@@ -147,13 +147,13 @@ function getBgClass(msg) {
             >
               <div class="flex items-start gap-1 min-w-0">
                 <div class="flex-shrink-0 mt-0.5">
-                  <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
-                  <FAIcon icon="fa-solid fa-database" v-else-if="msg.message.includes('SMILESTORE')" />
-                  <FAIcon icon="fa-solid fa-gear" v-else-if="msg.message.includes('DEV MODE')" />
-                  <FAIcon icon="fa-solid fa-clock" v-else-if="msg.message.includes('TIMELINE STEPPER')" />
-                  <FAIcon icon="fa-regular fa-clock" v-else-if="msg.message.includes('TRIAL STEPPER')" />
+                  <i-fa6-solid-code-branch v-if="msg.message.includes('ROUTER GUARD')" />
+                  <i-fa6-solid-database v-else-if="msg.message.includes('SMILESTORE')" />
+                  <i-fa6-solid-gear v-else-if="msg.message.includes('DEV MODE')" />
+                  <i-fa6-solid-clock v-else-if="msg.message.includes('TIMELINE STEPPER')" />
+                  <i-fa6-regular-clock v-else-if="msg.message.includes('TRIAL STEPPER')" />
                   <img src="/src/assets/dev/firebase-bw.svg" width="15" v-else-if="msg.message.includes('FIRESTORE')" />
-                  <FAIcon icon="fa-solid fa-angle-right" v-else />
+                  <i-fa6-solid-angle-right v-else />
                 </div>
                 <div class="min-w-0 flex-1">
                   <div class="font-semibold break-words break-all">{{ msg.time }} {{ msg.message }}</div>

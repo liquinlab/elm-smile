@@ -122,7 +122,7 @@ function finish() {
   <ConstrainedPage>
     <TitleTwoCol leftFirst leftWidth="w-1/3">
       <template #title>
-        <h3 class="text-3xl font-bold mb-4"><FAIcon icon="fa-solid fa-person" />&nbsp;Demographic Information</h3>
+        <h3 class="text-3xl font-bold mb-4"><i-fa6-solid-person class="inline mr-2" />Demographic Information</h3>
         <p class="text-lg mb-8">
           We request some information about you which we can use to understand aggregate differences between
           individuals. Your privacy will be maintained and the data will not be linked to your online identity (e.g.,
@@ -248,7 +248,7 @@ function finish() {
           <div class="flex justify-end">
             <Button variant="outline" :disabled="!page_one_complete" @click="api.goNextStep()">
               Continue
-              <FAIcon icon="fa-solid fa-arrow-right" />
+              <i-fa6-solid-arrow-right />
             </Button>
           </div>
         </div>
@@ -353,12 +353,12 @@ function finish() {
 
           <div class="flex justify-between">
             <Button variant="outline" @click="api.goPrevStep()">
-              <FAIcon icon="fa-solid fa-arrow-left" />
+              <i-fa6-solid-arrow-left />
               Previous
             </Button>
             <Button variant="outline" :disabled="!page_two_complete" @click="api.goNextStep()">
               Continue
-              <FAIcon icon="fa-solid fa-arrow-right" />
+              <i-fa6-solid-arrow-right />
             </Button>
           </div>
         </div>
@@ -641,7 +641,7 @@ function finish() {
 
           <div class="flex justify-between">
             <Button variant="outline" @click="api.goPrevStep()">
-              <FAIcon icon="fa-solid fa-arrow-left" />
+              <i-fa6-solid-arrow-left />
               Previous
             </Button>
             <Button variant="default" :disabled="!page_three_complete" @click="finish()"> That was easy! </Button>

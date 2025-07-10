@@ -66,8 +66,8 @@ const getChildVerticalLines = (verticalLines, index, total) => {
       <span class="vertical-lines">{{ getVerticalPrefix(verticalLines) }}</span>
       <span class="tree-branch">{{ getBranchType(index, total, depth) }}</span>
       <span class="node-path" :class="{ 'leaf-state': !state.isLeaf }"
-        >{{ state.path }} <FAIcon icon="fa-solid fa-house-flag" class="home-icon" v-if="state.isFirstLeaf" />
-        <FAIcon icon="fa-solid fa-leaf" class="text-green-400 dark:text-green-500" v-else-if="state.isLeaf" />
+        >{{ state.path }} <i-fa6-solid-house-flag class="home-icon inline" v-if="state.isFirstLeaf" />
+        <i-fa6-solid-leaf class="text-green-400 dark:text-green-500 inline" v-else-if="state.isLeaf" />
       </span>
     </div>
 

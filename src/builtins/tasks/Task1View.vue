@@ -32,7 +32,7 @@ function finish() {
         <div class="mt-4 pt-2.5 text-right">
           <Button variant="default" @click="finish()">
             next
-            <FAIcon icon="fa-solid fa-arrow-right" />
+            <i-fa6-solid-arrow-right />
           </Button>
         </div>
       </div>

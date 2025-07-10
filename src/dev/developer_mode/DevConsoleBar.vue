@@ -75,7 +75,7 @@ const api = useAPI()
                 }"
                 @click="api.store.dev.consoleBarTab = 'config'"
               >
-                <FAIcon icon="fa-solid fa-gear" class="w-4 h-4" />
+                <i-fa6-solid-gear class="w-4 h-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="right">

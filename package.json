@@ -42,11 +42,6 @@
   },
   "dependencies": {
     "@codenamize/codenamize": "1.1.1",
-    "@fortawesome/fontawesome-svg-core": "^6.7.2",
-    "@fortawesome/free-brands-svg-icons": "^6.7.2",
-    "@fortawesome/free-regular-svg-icons": "^6.7.2",
-    "@fortawesome/free-solid-svg-icons": "^6.7.2",
-    "@fortawesome/vue-fontawesome": "^3.0.8",
     "@google-cloud/storage": "^7.15.0",
     "@svgdotjs/svg.js": "^3.2.4",
     "@tailwindcss/vite": "^4.1.10",

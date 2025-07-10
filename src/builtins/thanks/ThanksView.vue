@@ -65,7 +65,7 @@ onMounted(() => {
         <TitleTwoCol leftFirst leftWidth="w-1/3">
           <template #title>
             <h1 class="text-3xl font-bold mb-4">
-              <FAIcon icon="fa-solid fa-square-check" />&nbsp;Thanks, let's begin the payment process!
+              <i-fa6-solid-square-check class="inline mr-2" />&nbsp;Thanks, let's begin the payment process!
             </h1>
             <p class="text-lg mb-8">
               Please click the button below to begin the process of payment. This will notify Prolific you successfully
@@ -89,7 +89,7 @@ onMounted(() => {
                 :href="`https://app.prolific.co/submissions/complete?cc=${completionCode}`"
               >
                 Submit my work to Prolific
-                <FAIcon icon="fa-solid fa-arrow-right" />
+                <i-fa6-solid-arrow-right />
               </Button>
             </div>
           </template>
@@ -100,7 +100,7 @@ onMounted(() => {
         <TitleTwoCol leftFirst leftWidth="w-1/3">
           <template #title>
             <h1 class="text-3xl font-bold mb-4">
-              <FAIcon icon="fa-solid fa-square-check" />&nbsp;Thanks, let's begin the payment process!
+              <i-fa6-solid-square-check class="inline mr-2" />&nbsp;Thanks, let's begin the payment process!
             </h1>
             <p class="text-lg mb-8">
               Please copy the code displayed below (or click the button) and paste it into the Mechanical Turk window to
@@ -123,7 +123,7 @@ onMounted(() => {
                 <Input v-model="completionCode" readonly class="text-3xl completioncode-cloudresearch" />
                 <Button variant="default" data-clipboard-target=".completioncode-cloudresearch">
                   Copy Code
-                  <FAIcon icon="fa-solid fa-clipboard" />
+                  <i-fa6-solid-clipboard />
                 </Button>
               </div>
             </div>
@@ -135,7 +135,7 @@ onMounted(() => {
         <TitleTwoCol leftFirst leftWidth="w-1/3">
           <template #title>
             <h1 class="text-3xl font-bold mb-4">
-              <FAIcon icon="fa-solid fa-square-check" />&nbsp;Thanks, let's begin the payment process!
+              <i-fa6-solid-square-check class="inline mr-2" />&nbsp;Thanks, let's begin the payment process!
             </h1>
             <p class="text-lg mb-8">
               Please verify the code displayed below is visible in the form on the Mechanical Turk website. If it is not
@@ -159,7 +159,7 @@ onMounted(() => {
                 <Input v-model="completionCode" readonly class="text-2xl completioncode-mturk" />
                 <Button variant="default" data-clipboard-target=".completioncode-mturk">
                   Copy Code
-                  <FAIcon icon="fa-solid fa-clipboard" />
+                  <i-fa6-solid-clipboard />
                 </Button>
               </div>
             </div>
@@ -171,7 +171,7 @@ onMounted(() => {
         <TitleTwoCol leftFirst leftWidth="w-1/3">
           <template #title>
             <h1 class="text-3xl font-bold mb-4">
-              <FAIcon icon="fa-solid fa-square-check" />&nbsp;Thanks, let's begin the payment process!
+              <i-fa6-solid-square-check class="inline mr-2" />&nbsp;Thanks, let's begin the payment process!
             </h1>
             <p class="text-lg mb-8">This still needs to be implemented</p>
           </template>
@@ -189,7 +189,7 @@ onMounted(() => {
                 :href="!appconfig.anonymousMode ? 'http://gureckislab.org' : 'http://google.com'"
               >
                 Submit my work
-                <FAIcon icon="fa-solid fa-arrow-right" />
+                <i-fa6-solid-arrow-right />
               </Button>
             </div>
           </template>
@@ -200,7 +200,7 @@ onMounted(() => {
         <TitleTwoCol leftFirst leftWidth="w-1/3">
           <template #title>
             <h1 class="text-3xl font-bold mb-4">
-              <FAIcon icon="fa-solid fa-square-check" />&nbsp;Thanks for your contribution to science!
+              <i-fa6-solid-square-check class="inline mr-2" />&nbsp;Thanks for your contribution to science!
             </h1>
             <p class="text-lg mb-8">
               Your data have been successfully recorded and you can close this window or navigate to another page.

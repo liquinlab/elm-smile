@@ -23,11 +23,11 @@ const props = defineProps({
       <p class="text-lg text-left mb-4">
         We are offering a paid research study looking at how people learn and make decisions. In this study you will
         look at various shapes
-        <FAIcon icon="shapes" /> and pictures
-        <FAIcon icon="image" />
+        <i-fa6-solid-shapes /> and pictures
+        <i-fa6-solid-image />
         and make decisions similar to a video game. You may earn points for making good decisions that will convert to
         money
-        <FAIcon icon="sack-dollar" />
+        <i-fa6-solid-sack-dollar />
         that we will pay you at the end of the study ({{ payrate }}). The study should take about
         {{ estimated_time }} of your time. You'll be asked to digitally sign a constent form and (optionally) provide
         some non-identifiable demographic information during the study. Your data will be kept anonymous.
@@ -42,7 +42,7 @@ const props = defineProps({
       <img src="@/user/assets/brain.svg" width="220" class="mb-4 hidden @xl:block" />
       <article class="border border-gray-300 rounded-lg shadow-lg">
         <div class="bg-gray-100 px-3 py-2 text-xs font-medium border-b border-gray-300 rounded-t-lg">
-          <p><FAIcon icon="bahai" />&nbsp;&nbsp;Who are we?</p>
+          <p><i-fa6-solid-bahai />&nbsp;&nbsp;Who are we?</p>
         </div>
         <div class="p-3 text-xs text-left">
           <div v-if="!appconfig.anonymousMode">
