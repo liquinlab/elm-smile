@@ -3,8 +3,13 @@
  * @fileoverview Main SmileApp component that handles the core application layout and mode-specific components
  */
 
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
+import { Toaster } from '@/uikit/components/ui/sonner'
+import 'vue-sonner/style.css' // vue-sonner v2 requires this import
+
+import DevAppSidebar from '@/dev/DevAppSidebar.vue'
+import { SidebarInset, SidebarProvider } from '@/uikit/components/ui/sidebar'
 /**
  * Developer mode components for debugging and development tools
  * @requires DeveloperNavBar Navigation bar for developer mode
@@ -134,82 +139,115 @@ onMounted(() => {
 })
 </script>
 <template>
-  <div class="app-container">
-    <!-- Analyze Mode - Clean full-screen dashboard -->
-    <div v-if="api.store.dev.mainView === 'dashboard'" class="analyze-container">
-      <iframe
-        ref="dashboardIframe"
-        :src="dashboardUrl"
-        class="dashboard-iframe"
-        frameborder="0"
-        title="Dashboard"
-        @load="onIframeLoad"
-      ></iframe>
-    </div>
-
-    <!-- Recruit Mode - Clean full-screen recruit page -->
-    <div v-else-if="api.store.dev.mainView === 'recruit'" class="recruit-container">
-      <iframe :src="api.getPublicUrl('recruit.html')" class="recruit-iframe" frameborder="0" title="Recruit"></iframe>
-    </div>
-
-    <!-- Docs Mode - Clean full-screen documentation -->
-    <div v-else-if="api.store.dev.mainView === 'docs'" class="docs-container">
-      <iframe src="https://smile.gureckislab.org" class="docs-iframe" frameborder="0" title="Documentation"></iframe>
-    </div>
-
-    <!-- Presentation Mode - Clean full-screen presentation -->
-    <template v-else-if="api.store.dev.mainView === 'presentation'">
-      <!-- Top toolbar -->
-      <div class="toolbar">
-        <PresentationNavBar />
-      </div>
-
-      <!-- Middle row - content and sidebar -->
-      <div class="presentation-content-wrapper">
-        <PresentationModeView />
-      </div>
-    </template>
-
-    <!-- Developer Mode - Full interface with toolbar, sidebar, console -->
-    <template v-else>
-      <!-- Top toolbar -->
-      <div class="toolbar">
-        <DeveloperNavBar />
-      </div>
-
-      <!-- Middle row - content and sidebar -->
-
-      <div class="content-wrapper">
-        <div class="content-and-console">
-          <!-- Main content - scrollable -->
-          <div class="main-content bg-background text-foreground">
-            <div v-if="isLoading" class="loading-container">
-              <div class="loading-spinner"></div>
-              <p>Loading...</p>
-            </div>
-            <template v-else>
-              <ResponsiveDeviceContainer />
-            </template>
-          </div>
-
-          <!-- Bottom console - can be toggled -->
-          <Transition name="console-slide">
-            <div v-if="api.config.mode == 'development' && api.store.dev.showConsoleBar" class="console">
-              <DevConsoleBar />
-            </div>
-          </Transition>
+  <Toaster closeButton position="top-left" :rich-colors="true" class="custom-toaster" />
+  <SidebarProvider
+    :default-open="false"
+    :style="{
+      '--sidebar-width': '48px',
+    }"
+  >
+    <DevAppSidebar />
+    <SidebarInset>
+      <div class="app-container">
+        <!-- Analyze Mode - Clean full-screen dashboard -->
+        <div v-if="api.store.dev.mainView === 'dashboard'" class="analyze-container">
+          <iframe
+            ref="dashboardIframe"
+            :src="dashboardUrl"
+            class="dashboard-iframe"
+            frameborder="0"
+            title="Dashboard"
+            @load="onIframeLoad"
+          ></iframe>
         </div>
 
-        <!-- Sidebar - can be toggled, transitions in/out -->
-        <Transition name="sidebar-slide">
-          <div v-if="api.config.mode == 'development' && api.store.dev.showSideBar" class="sidebar">
-            <DevSideBar />
+        <!-- Recruit Mode - Clean full-screen recruit page -->
+        <div v-else-if="api.store.dev.mainView === 'recruit'" class="recruit-container">
+          <iframe
+            :src="api.getPublicUrl('recruit.html')"
+            class="recruit-iframe"
+            frameborder="0"
+            title="Recruit"
+          ></iframe>
+        </div>
+
+        <!-- Docs Mode - Clean full-screen documentation -->
+        <div v-else-if="api.store.dev.mainView === 'docs'" class="docs-container">
+          <iframe
+            src="https://smile.gureckislab.org"
+            class="docs-iframe"
+            frameborder="0"
+            title="Documentation"
+          ></iframe>
+        </div>
+
+        <!-- Presentation Mode - Clean full-screen presentation -->
+        <template v-else-if="api.store.dev.mainView === 'presentation'">
+          <!-- Top toolbar -->
+          <div class="toolbar">
+            <PresentationNavBar />
           </div>
-        </Transition>
+
+          <!-- Middle row - content and sidebar -->
+          <div class="presentation-content-wrapper">
+            <PresentationModeView />
+          </div>
+        </template>
+
+        <!-- Developer Mode - Full interface with toolbar, sidebar, console -->
+        <template v-else>
+          <!-- Top toolbar -->
+          <div class="toolbar">
+            <DeveloperNavBar />
+          </div>
+
+          <!-- Middle row - content and sidebar -->
+
+          <div class="content-wrapper">
+            <div class="content-and-console">
+              <!-- Main content - scrollable -->
+              <div class="main-content bg-background text-foreground">
+                <div v-if="isLoading" class="loading-container">
+                  <div class="loading-spinner"></div>
+                  <p>Loading...</p>
+                </div>
+                <template v-else>
+                  <ResponsiveDeviceContainer />
+                </template>
+              </div>
+
+              <!-- Bottom console - can be toggled -->
+              <Transition name="console-slide">
+                <div v-if="api.config.mode == 'development' && api.store.dev.showConsoleBar" class="console">
+                  <DevConsoleBar />
+                </div>
+              </Transition>
+            </div>
+
+            <!-- Sidebar - can be toggled, transitions in/out -->
+            <Transition name="sidebar-slide">
+              <div v-if="api.config.mode == 'development' && api.store.dev.showSideBar" class="sidebar">
+                <DevSideBar />
+              </div>
+            </Transition>
+          </div>
+        </template>
       </div>
-    </template>
-  </div>
+    </SidebarInset>
+  </SidebarProvider>
 </template>
+
+<style>
+.custom-toaster {
+  --toast-offset-x: 60px;
+  --toast-offset-y: 50px;
+}
+
+.custom-toaster {
+  top: var(--toast-offset-y) !important;
+  left: var(--toast-offset-x) !important;
+}
+</style>
 
 <style scoped>
 .app-container {

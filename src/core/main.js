@@ -12,7 +12,7 @@ import { useRouter, addGuards } from '@/core/router'
 import { pinia } from '@/core/stores/createPinia'
 
 import timeline from '@/user/design'
-import App from '@/core/App.vue'
+import App from '@/core/SmileApp.vue'
 import { createApp } from 'vue'
 import VueGtag from 'vue-gtag'
 import '@/core/main.css'
@@ -26,6 +26,7 @@ import '@/core/main.css'
  * - Navigation guards for route protection
  * - Full application routing functionality
  */
+
 const app = createApp(App) // create the app
 const router = useRouter(timeline) // use the router
 addGuards(router) // add guards to the router

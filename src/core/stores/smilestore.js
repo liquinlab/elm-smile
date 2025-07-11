@@ -126,6 +126,8 @@ const initDev = {
   dataPath: null, // path to the data (transient)
   configPath: null, // path to the config (transient)
   selectedDevice: 'desktop2', // selected device for responsive design mode
+  deviceWidth: 1024, // device width for responsive design mode
+  deviceHeight: 768, // device height for responsive design mode
   isRotated: false, // device rotation state for responsive design mode
   isFullscreen: false, // fullscreen state for responsive design mode
   // panel locations (transient)
