@@ -151,6 +151,7 @@ const shouldUseResponsiveContainer = computed(() => {
     v-if="api.store.dev.isFullscreen || !shouldUseResponsiveContainer"
     ref="fullScreenDiv"
     class="fullscreen-container bg-background text-foreground"
+    :class="api.currentRouteName() !== 'recruit' ? (api.config.colorMode === 'dark' ? 'dark' : 'light') : ''"
   >
     <MainApp :deviceWidth="fullScreenWidth" :deviceHeight="fullScreenHeight" />
   </div>
@@ -205,7 +206,10 @@ const shouldUseResponsiveContainer = computed(() => {
           </TooltipProvider>
         </div>
       </div>
-      <div class="device-wrapper" :class="api.config.colorMode === 'dark' ? 'dark' : 'light'">
+      <div
+        class="device-wrapper"
+        :class="api.currentRouteName() !== 'recruit' ? (api.config.colorMode === 'dark' ? 'dark' : 'light') : ''"
+      >
         <div class="device-container bg-background text-foreground" ref="containerDiv">
           <MainApp :deviceWidth="api.store.dev.deviceWidth" :deviceHeight="api.store.dev.deviceHeight" />
         </div>

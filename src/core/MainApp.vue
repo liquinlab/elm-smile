@@ -54,7 +54,7 @@ const deviceTooSmall = computed(() => {
 </script>
 
 <template>
-  <div class="@container" ref="containerDiv" :class="api.config.colorMode === 'dark' ? 'dark' : 'light'">
+  <div class="@container" ref="containerDiv">
     <StatusBar v-if="showStatusBar" />
     <div class="bg-background" v-if="deviceTooSmall">
       <WindowSizerView triggered="true"></WindowSizerView>

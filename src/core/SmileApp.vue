@@ -182,10 +182,7 @@ onMounted(() => {
       <div class="content-wrapper">
         <div class="content-and-console">
           <!-- Main content - scrollable -->
-          <div
-            class="main-content bg-background text-foreground"
-            :class="api.store.dev.isFullscreen && api.config.colorMode === 'dark' ? 'dark' : 'light'"
-          >
+          <div class="main-content bg-background text-foreground">
             <div v-if="isLoading" class="loading-container">
               <div class="loading-spinner"></div>
               <p>Loading...</p>
