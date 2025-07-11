@@ -23,9 +23,9 @@ function finish() {
       }"
     >
       <div class="w-2/3 pt-8 mx-auto text-center" v-if="!props.triggered">
-        <span class="text-4xl text-window-sizer-text mb-4 block">
-          <i-fa6-solid-arrows-up-down-left-right class="inline" />
-        </span>
+        <div class="text-4xl text-window-sizer-text mb-4 flex justify-center">
+          <i-fa6-solid-arrows-up-down-left-right />
+        </div>
         <h1 class="text-xl font-semibold text-window-sizer-text mb-4">
           Please adjust the size of your browser window until <b>ALL</b> four edges of this box are visible.
         </h1>
@@ -47,8 +47,8 @@ function finish() {
         </div>
       </div>
       <div class="w-2/3 pt-8 mx-auto text-center" v-else>
-        <span class="text-4xl text-window-sizer-text mb-4 block">
-          <i-fa6-solid-arrows-up-down-left-right></i-fa6-solid-arrows-up-down-left-right>
+        <span class="text-4xl text-window-sizer-text mb-4 flex justify-center">
+          <i-fa6-solid-arrows-up-down-left-right />
         </span>
         <h1 class="text-xl font-semibold text-window-sizer-text mb-4">
           <b>We don't want you to miss anything!</b><br />Please re-adjust the size of your browser window until
