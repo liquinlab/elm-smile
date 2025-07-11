@@ -1,11 +1,6 @@
 <template>
   <div class="@container w-full h-full px-5">
-    <TitleTwoCol leftWidth="w-4/5" rightFirst>
-      <template #title>
-        <div class="bg-blue-200 rounded-lg p-2">
-          <h1>Title</h1>
-        </div>
-      </template>
+    <TwoCol leftWidth="w-1/4" rightFirst>
       <template #left>
         <!-- Left column content -->
         <div class="bg-emerald-200 rounded-lg h-[200px] p-4">
@@ -18,10 +13,10 @@
           <p>Right column content</p>
         </div>
       </template>
-    </TitleTwoCol>
+    </TwoCol>
   </div>
 </template>
 
 <script setup>
-import { TitleTwoCol } from '@/uikit/layouts'
+import { TwoCol } from '@/uikit/layouts'
 </script>

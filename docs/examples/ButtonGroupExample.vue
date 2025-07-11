@@ -1,16 +1,12 @@
 <template>
-  <div class="space-y-6">
-    <div>
-      <h4 class="text-sm font-medium mb-2">Default ButtonGroup</h4>
+  <div class="space-y-4">
+    <div class="flex flex-wrap items-center gap-4">
       <ButtonGroup>
         <ButtonGroupItem>Left</ButtonGroupItem>
         <ButtonGroupItem>Middle</ButtonGroupItem>
         <ButtonGroupItem>Right</ButtonGroupItem>
       </ButtonGroup>
-    </div>
-    
-    <div>
-      <h4 class="text-sm font-medium mb-2">Outline ButtonGroup</h4>
+
       <ButtonGroup variant="outline">
         <ButtonGroupItem>Option 1</ButtonGroupItem>
         <ButtonGroupItem>Option 2</ButtonGroupItem>

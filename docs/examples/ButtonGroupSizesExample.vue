@@ -1,47 +1,29 @@
 <template>
-  <div class="space-y-6">
-    <div>
-      <h4 class="text-sm font-medium mb-2">Extra Small</h4>
+  <div class="space-y-4">
+    <div class="flex flex-wrap items-center gap-4">
       <ButtonGroup size="xs">
-        <ButtonGroupItem>Extra Small</ButtonGroupItem>
         <ButtonGroupItem>XS</ButtonGroupItem>
-        <ButtonGroupItem>Tiny</ButtonGroupItem>
+        <ButtonGroupItem>Extra Small</ButtonGroupItem>
       </ButtonGroup>
-    </div>
-    
-    <div>
-      <h4 class="text-sm font-medium mb-2">Small</h4>
+
       <ButtonGroup size="sm">
-        <ButtonGroupItem>Small</ButtonGroupItem>
         <ButtonGroupItem>SM</ButtonGroupItem>
-        <ButtonGroupItem>Compact</ButtonGroupItem>
+        <ButtonGroupItem>Small</ButtonGroupItem>
       </ButtonGroup>
-    </div>
-    
-    <div>
-      <h4 class="text-sm font-medium mb-2">Default</h4>
+
       <ButtonGroup size="default">
         <ButtonGroupItem>Default</ButtonGroupItem>
         <ButtonGroupItem>Normal</ButtonGroupItem>
-        <ButtonGroupItem>Regular</ButtonGroupItem>
       </ButtonGroup>
-    </div>
-    
-    <div>
-      <h4 class="text-sm font-medium mb-2">Large</h4>
+
       <ButtonGroup size="lg">
-        <ButtonGroupItem>Large</ButtonGroupItem>
         <ButtonGroupItem>LG</ButtonGroupItem>
-        <ButtonGroupItem>Big</ButtonGroupItem>
+        <ButtonGroupItem>Large</ButtonGroupItem>
       </ButtonGroup>
-    </div>
-    
-    <div>
-      <h4 class="text-sm font-medium mb-2">Extra Large</h4>
+
       <ButtonGroup size="xl">
-        <ButtonGroupItem>Extra Large</ButtonGroupItem>
         <ButtonGroupItem>XL</ButtonGroupItem>
-        <ButtonGroupItem>Huge</ButtonGroupItem>
+        <ButtonGroupItem>Extra Large</ButtonGroupItem>
       </ButtonGroup>
     </div>
   </div>
