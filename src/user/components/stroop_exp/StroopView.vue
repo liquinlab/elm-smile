@@ -3,6 +3,9 @@
 
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
+import { Button } from '@/uikit/components/ui/button'
+import { ConstrainedTaskWindow } from '@/uikit/layouts'
+
 const api = useViewAPI()
 
 // define the trials for the experiment as a spec
@@ -96,39 +99,52 @@ function finish() {
 </script>
 
 <template>
-  <div class="page prevent-select">
+  <ConstrainedTaskWindow
+    variant="ghost"
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+  >
     <!-- Show this for each trial -->
-    <div class="strooptrial" v-if="api.path[0] == 'stroop'">
-      {{ api.blockIndex }} / {{ api.blockLength }}, {{ api.stepIndex }} / {{ api.nSteps }}
-      <h1 class="title is-1 is-huge" :class="api.stepData.color">{{ api.stepData.word }}</h1>
-      <p id="prompt">Type "R" for Red, "B" for blue, "G" for green.</p>
+    <div class="text-center" v-if="api.path[0] == 'stroop'">
+      <h1
+        class="text-6xl font-bold mb-8"
+        :class="{
+          'text-red-500': api.stepData.color === 'red',
+          'text-blue-500': api.stepData.color === 'blue',
+          'text-green-500': api.stepData.color === 'green',
+        }"
+      >
+        {{ api.stepData.word }}
+      </h1>
+      <p class="text-lg text-muted-foreground" id="prompt">Type "R" for Red, "B" for blue, "G" for green.</p>
     </div>
 
     <!-- Show this when you are done with the trials and offer a button
          which will advance to the next route -->
-    <div class="endoftask" v-else>
-      <p id="prompt">Thanks! You are finished with this task and can move on.</p>
+    <div class="text-center" v-else>
+      <p class="text-lg text-muted-foreground mb-4" id="prompt">
+        Thanks! You are finished with this task and can move on.
+      </p>
       <!-- display the final score -->
-      <p>Your score was {{ api.persist.finalScore.toFixed(2) }}%</p>
-      <button class="button is-success" id="finish" @click="finish()">
-        Continue &nbsp;
-        <FAIcon icon="fa-solid fa-arrow-right" />
-      </button>
+      <p class="text-xl font-semibold text-muted-foreground mb-6">
+        Your score was {{ api.persist.finalScore.toFixed(2) }}%
+      </p>
+      <Button variant="default" size="lg" id="finish" @click="finish()">
+        Continue
+        <svg class="w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </Button>
     </div>
-  </div>
+  </ConstrainedTaskWindow>
 </template>
 
 <style scoped>
-/*  pick your colors for the stroop design here */
-.red {
-  color: rgb(240, 75, 75);
-}
-
-.blue {
-  color: rgb(118, 193, 237);
-}
-
-.green {
-  color: rgb(123, 199, 123);
-}
+/* Remove Bulma-specific styles as we're now using Tailwind CSS */
+/* Remove Bulma-specific styles as we're now using Tailwind CSS */
 </style>

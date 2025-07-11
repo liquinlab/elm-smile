@@ -3,12 +3,13 @@
  * @fileoverview Main SmileApp component that handles the core application layout and mode-specific components
  */
 
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 
 /**
  * Developer mode components for debugging and development tools
  * @requires DeveloperNavBar Navigation bar for developer mode
  * @requires DevConsoleBar Console bar for developer tools
+ * @requires DevConsoleBarTailwind Console bar for developer tools
  * @requires DevSideBar Side bar for developer tools
  */
 import DeveloperNavBar from '@/dev/developer_mode/DeveloperNavBar.vue'
@@ -20,14 +21,12 @@ import DevSideBar from '@/dev/developer_mode/DevSideBar.vue'
  * @requires PresentationNavBar Navigation bar for presentation mode
  */
 import PresentationNavBar from '@/dev/presentation_mode/PresentationNavBar.vue'
-
+import PresentationModeView from '@/dev/presentation_mode/PresentationModeView.vue'
 /**
  * Built-in experiment components
- * @requires StatusBar Status bar component
- * @requires WindowSizerView Window size warning component
+ * @requires ResponsiveDeviceContainer Responsive device container component
  */
-import StatusBar from '@/builtins/navbars/StatusBar.vue'
-import WindowSizerView from '@/builtins/window_sizer/WindowSizerView.vue'
+import ResponsiveDeviceContainer from '@/dev/developer_mode/ResponsiveDeviceContainer.vue'
 
 /**
  * Import API and notification components
@@ -42,10 +41,16 @@ import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
 /**
- * Reactive reference tracking if browser window is too small
- * @type {import('vue').Ref<boolean>}
+ * Reactive reference for dashboard iframe URL
+ * @type {import('vue').Ref<string>}
  */
-const toosmall = ref(api.isBrowserTooSmall())
+const dashboardUrl = ref('')
+
+/**
+ * Reactive reference for dashboard iframe element
+ * @type {import('vue').Ref<HTMLIFrameElement|null>}
+ */
+const dashboardIframe = ref(null)
 
 /**
  * Computed property for console bar height in pixels
@@ -54,80 +59,208 @@ const toosmall = ref(api.isBrowserTooSmall())
 const height_pct = computed(() => `${api.store.dev.consoleBarHeight}px`)
 
 /**
- * Computed property that determines whether to show the status bar
+ * Computed property that determines if the app is still loading
  *
- * @returns {boolean} True if status bar should be shown, false otherwise
- * - Returns false if current route is 'data' or 'recruit'
- * - Returns false if app is in presentation mode
- * - Returns true otherwise
+ * @returns {boolean} True if the route name is not yet available, false otherwise
  */
-const showStatusBar = computed(() => {
-  return api.currentRouteName() !== 'data' && api.currentRouteName() !== 'recruit' && api.config.mode != 'presentation'
+const isLoading = computed(() => {
+  return api.currentRouteName() === undefined
+})
+
+/**
+ * Initialize dashboard URL from localStorage or default
+ */
+function initializeDashboardUrl() {
+  const savedUrl = localStorage.getItem('smile-dashboard-url')
+  if (savedUrl) {
+    dashboardUrl.value = savedUrl
+  } else {
+    dashboardUrl.value = api.getPublicUrl('dashboard.html')
+  }
+}
+
+/**
+ * Save dashboard URL to localStorage
+ */
+function saveDashboardUrl(url) {
+  localStorage.setItem('smile-dashboard-url', url)
+  dashboardUrl.value = url
+}
+
+/**
+ * Monitor iframe URL changes and persist them
+ */
+function monitorIframeUrl() {
+  if (!dashboardIframe.value) return
+
+  try {
+    // Check if iframe content is accessible (same-origin)
+    const iframeDoc = dashboardIframe.value.contentDocument || dashboardIframe.value.contentWindow?.document
+    if (iframeDoc) {
+      const currentUrl = dashboardIframe.value.contentWindow.location.href
+      if (currentUrl !== dashboardUrl.value) {
+        saveDashboardUrl(currentUrl)
+      }
+    }
+  } catch (error) {
+    // Cross-origin restriction, can't access iframe content
+    console.log('Cannot access iframe content (cross-origin)')
+  }
+}
+
+/**
+ * Set up iframe monitoring when iframe loads
+ */
+function onIframeLoad() {
+  if (!dashboardIframe.value) return
+
+  // Monitor URL changes periodically
+  const interval = setInterval(() => {
+    if (api.store.dev.mainView !== 'dashboard') {
+      clearInterval(interval)
+      return
+    }
+    monitorIframeUrl()
+  }, 1000)
+
+  // Also monitor on focus events
+  if (dashboardIframe.value.contentWindow) {
+    dashboardIframe.value.contentWindow.addEventListener('focus', monitorIframeUrl)
+  }
+}
+
+onMounted(() => {
+  initializeDashboardUrl()
 })
 </script>
 <template>
   <div class="app-container">
-    <!-- Top toolbar - always visible, 30px tall, full width -->
-    <div class="toolbar">
-      <DeveloperNavBar v-if="api.config.mode == 'development'"> </DeveloperNavBar>
-      <PresentationNavBar v-if="api.config.mode == 'presentation'"> </PresentationNavBar>
+    <!-- Analyze Mode - Clean full-screen dashboard -->
+    <div v-if="api.store.dev.mainView === 'dashboard'" class="analyze-container">
+      <iframe
+        ref="dashboardIframe"
+        :src="dashboardUrl"
+        class="dashboard-iframe"
+        frameborder="0"
+        title="Dashboard"
+        @load="onIframeLoad"
+      ></iframe>
     </div>
 
-    <!-- Middle row - content and sidebar -->
-    <div class="router" v-if="toosmall">
-      <WindowSizerView triggered="true"></WindowSizerView>
+    <!-- Recruit Mode - Clean full-screen recruit page -->
+    <div v-else-if="api.store.dev.mainView === 'recruit'" class="recruit-container">
+      <iframe :src="api.getPublicUrl('recruit.html')" class="recruit-iframe" frameborder="0" title="Recruit"></iframe>
     </div>
-    <div v-else class="content-wrapper">
-      <div class="content-and-console">
-        <!-- Main content - scrollable -->
-        <div class="main-content">
-          <StatusBar v-if="showStatusBar" />
-          <router-view />
+
+    <!-- Docs Mode - Clean full-screen documentation -->
+    <div v-else-if="api.store.dev.mainView === 'docs'" class="docs-container">
+      <iframe src="https://smile.gureckislab.org" class="docs-iframe" frameborder="0" title="Documentation"></iframe>
+    </div>
+
+    <!-- Presentation Mode - Clean full-screen presentation -->
+    <template v-else-if="api.store.dev.mainView === 'presentation'">
+      <!-- Top toolbar -->
+      <div class="toolbar">
+        <PresentationNavBar />
+      </div>
+
+      <!-- Middle row - content and sidebar -->
+      <div class="presentation-content-wrapper">
+        <PresentationModeView />
+      </div>
+    </template>
+
+    <!-- Developer Mode - Full interface with toolbar, sidebar, console -->
+    <template v-else>
+      <!-- Top toolbar -->
+      <div class="toolbar">
+        <DeveloperNavBar />
+      </div>
+
+      <!-- Middle row - content and sidebar -->
+
+      <div class="content-wrapper">
+        <div class="content-and-console">
+          <!-- Main content - scrollable -->
+          <div
+            class="main-content bg-background text-foreground"
+            :class="api.store.dev.isFullscreen && api.config.colorMode === 'dark' ? 'dark' : 'light'"
+          >
+            <div v-if="isLoading" class="loading-container">
+              <div class="loading-spinner"></div>
+              <p>Loading...</p>
+            </div>
+            <template v-else>
+              <ResponsiveDeviceContainer />
+            </template>
+          </div>
+
+          <!-- Bottom console - can be toggled -->
+          <Transition name="console-slide">
+            <div v-if="api.config.mode == 'development' && api.store.dev.showConsoleBar" class="console">
+              <DevConsoleBar />
+            </div>
+          </Transition>
         </div>
 
-        <!-- Bottom console - can be toggled -->
-        <Transition name="console-slide">
-          <div v-if="api.config.mode == 'development' && api.store.dev.showConsoleBar" class="console">
-            <DevConsoleBar />
+        <!-- Sidebar - can be toggled, transitions in/out -->
+        <Transition name="sidebar-slide">
+          <div v-if="api.config.mode == 'development' && api.store.dev.showSideBar" class="sidebar">
+            <DevSideBar />
           </div>
         </Transition>
       </div>
-
-      <!-- Sidebar - can be toggled, transitions in/out -->
-      <Transition name="sidebar-slide">
-        <div v-if="api.config.mode == 'development' && api.store.dev.showSideBar" class="sidebar">
-          <DevSideBar />
-        </div>
-      </Transition>
-    </div>
+    </template>
   </div>
 </template>
 
 <style scoped>
-.router {
-  height: 100vh;
-  height: v-bind(total_height);
-  background-color: var(--page-bg-color);
-}
-
 .app-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  width: 100vw;
+  width: 100%;
+}
+
+.analyze-container {
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.recruit-container {
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.docs-container {
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
 }
 
 .toolbar {
-  height: 33px;
-  width: calc(100% - 14px); /* Account for typical scrollbar width */
-  background-color: var(--dev-bar-light-grey);
+  margin-top: auto;
+  margin-bottom: auto;
+  height: 36px;
+  width: full; /* Account for typical scrollbar width */
+  background-color: var(--dev-bar-bg);
 }
 
 .content-wrapper {
   display: flex;
   flex: 1;
   overflow: hidden;
-  width: calc(100% - 14px);
+  width: 100%;
+}
+
+.presentation-content-wrapper {
+  display: flex;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .content-and-console {
@@ -135,6 +268,8 @@ const showStatusBar = computed(() => {
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .main-content {
@@ -144,22 +279,54 @@ const showStatusBar = computed(() => {
   overflow-y: auto;
   overflow-x: auto;
   min-height: 0;
+  min-width: 0;
 }
 
 .sidebar {
-  flex: 0 0 280px;
+  flex: 0 0 300px;
   height: 100%;
   overflow-y: auto;
-  border-left: var(--dev-bar-lines);
-  background-color: var(--dev-bar-background);
+  border-left: 1px solid var(--border);
+  background-color: var(--dev-bg);
 }
 
 .console {
   height: v-bind(height_pct);
   width: 100%;
-  background-color: #6798c8;
+  background-color: #adadad;
   overflow: hidden;
   overflow-x: hidden;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.analyze-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+}
+
+.dashboard-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  overflow: hidden;
+}
+
+.recruit-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  overflow: hidden;
+}
+
+.docs-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  overflow: hidden;
 }
 
 /* Transition effects */
@@ -184,5 +351,34 @@ const showStatusBar = computed(() => {
 .console-slide-enter-from,
 .console-slide-leave-to {
   height: 0;
+}
+
+/* Loading styles */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 200px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

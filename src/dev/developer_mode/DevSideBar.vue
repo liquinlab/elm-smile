@@ -1,16 +1,43 @@
 <script setup>
 import StateTreeViewer from '@/dev/developer_mode/StateTreeViewer.vue'
-import DatabaseInfoSidebarPanel from '@/dev/developer_mode/DatabaseInfoSidebarPanel.vue'
+import ToggleStatus from '@/dev/developer_mode/ToggleStatus.vue'
+import DatabaseStatusInfo from '@/dev/developer_mode/DatabaseStatusInfo.vue'
 import RandomizationSidebarPanel from '@/dev/developer_mode/RandomizationSidebarPanel.vue'
+import StudyInfo from '@/dev/developer_mode/StudyInfo.vue'
+import ProgressSteps from '@/dev/developer_mode/ProgressSteps.vue'
+
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/uikit/components/ui/tabs'
 </script>
 
 <template>
   <div class="sidebar-container">
-    <DatabaseInfoSidebarPanel />
-    <RandomizationSidebarPanel />
-    <StateTreeViewer />
+    <div class="sidebar-content">
+      <Tabs v-model="api.store.dev.sideBarTab" class="w-full border-t border-border py-2">
+        <TabsList class="mx-auto text-xs">
+          <TabsTrigger value="steps" class="text-[0.75rem] font-mono"> Steps </TabsTrigger>
+          <TabsTrigger value="randomization" class="text-[0.75rem] font-mono"> Random </TabsTrigger>
+          <TabsTrigger value="db" class="text-[0.75rem] font-mono"> Info </TabsTrigger>
+        </TabsList>
+        <TabsContent value="steps">
+          <StateTreeViewer />
+        </TabsContent>
+        <TabsContent value="randomization">
+          <RandomizationSidebarPanel />
+        </TabsContent>
+        <TabsContent value="db">
+          <DatabaseStatusInfo />
+        </TabsContent>
+      </Tabs>
+    </div>
 
-    <div class="sidebar-footer"></div>
+    <div class="sidebar-footer">
+      <ToggleStatus />
+
+      <ProgressSteps />
+      <StudyInfo />
+    </div>
   </div>
 </template>
 
@@ -18,18 +45,17 @@ import RandomizationSidebarPanel from '@/dev/developer_mode/RandomizationSidebar
 .sidebar-container {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
-  background-color: #f1f3f3;
+  height: 100%;
+  max-height: 100%;
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
 }
 
 .sidebar-footer {
-  border-top: 1px solid #e4e4e4;
   margin-top: auto;
-}
-/* DatabaseInfoSidebarPanel will take its natural height */
-:deep(.tree-viewer-container),
-:deep(.tree-viewer-container-empty) {
-  flex: 1;
-  min-height: 0; /* Important for flex child to shrink properly */
+  padding-top: 1rem;
 }
 </style>

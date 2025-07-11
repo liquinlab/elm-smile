@@ -3,6 +3,10 @@ import { reactive, computed } from 'vue'
 
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
+import { Button } from '@/uikit/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
+import { TitleTwoCol, ConstrainedPage } from '@/uikit/layouts'
+
 const api = useViewAPI()
 
 api.steps.append([{ id: 'device_page1' }, { id: 'device_page2' }])
@@ -54,227 +58,214 @@ function finish() {
 </script>
 
 <template>
-  <div class="page prevent-select">
-    <div class="formcontent">
-      <h3 class="is-size-3 has-text-weight-bold"><FAIcon icon="fa-solid fa-desktop" /> Computer/Device Information</h3>
-      <p class="is-size-6">
-        We request some basic information about the computer you are using right now. We also can use this information
-        to improve the quality of our experiments in the future.
-      </p>
-
-      <div class="formstep" v-if="api.pathString === 'device_page1'">
-        <div class="columns">
-          <div class="column is-one-third">
-            <div class="formsectionexplainer">
-              <h3 class="is-size-6 has-text-weight-bold">Important Note</h3>
-              <p class="is-size-6">
-                If this is a paid study your answers to these questions will have
-                <b>no effect on your final payment</b>. We are just interested in your honest answers.
-              </p>
-            </div>
+  <ConstrainedPage
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+  >
+    <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
+      <template #title>
+        <h3 class="text-3xl font-bold mb-4">
+          <i-fa6-solid-desktop class="inline mr-2" />&nbsp;Computer/Device Information
+        </h3>
+        <p class="text-lg mb-8">
+          We request some basic information about the computer you are using right now. We also can use this information
+          to improve the quality of our experiments in the future.
+        </p>
+      </template>
+      <template #left>
+        <div class="text-left text-muted-foreground">
+          <h3 class="text-lg font-bold mb-2">Important Note</h3>
+          <p class="text-md font-light text-muted-foreground">
+            If this is a paid study your answers to these questions will have
+            <b>no effect on your final payment</b>. We are just interested in your honest answers.
+          </p>
+        </div>
+      </template>
+      <template #right>
+        <div v-if="api.pathString === 'device_page1'" class="border border-border text-left bg-muted p-6 rounded-lg">
+          <div class="mb-3">
+            <label class="block text-md font-semibold text-foreground mb-2">
+              What best describes the computer you are using right now?
+            </label>
+            <Select v-model="api.persist.forminfo.device_type">
+              <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Laptop Computer">Laptop Computer</SelectItem>
+                <SelectItem value="Desktop Computer">Desktop Computer</SelectItem>
+                <SelectItem value="iPad/Tablet">iPad/Tablet</SelectItem>
+                <SelectItem value="Smartphone">Smartphone</SelectItem>
+                <SelectItem value="Television">Television</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+                <SelectItem value="I'm not sure">I'm not sure</SelectItem>
+                <SelectItem value="I'd rather not say">I'd rather not say</SelectItem>
+              </SelectContent>
+            </Select>
+            <p class="text-xs text-muted-foreground mt-1">Enter your computer type (choose the best match)</p>
           </div>
-          <div class="column">
-            <div class="box is-shadowless formbox">
-              <FormKit
-                type="select"
-                label="What best describes the computer you are using right now?"
-                name="connection"
-                help="Enter your computer type (choose the best match)"
-                placeholder="Select an option"
-                :options="[
-                  'Laptop Computer',
-                  'Desktop Computer',
-                  'iPad/Tablet',
-                  'Smartphone',
-                  'Television',
-                  'Other',
-                  'I\'m not sure',
-                  'I\'d rather not say',
-                ]"
-                v-model="api.persist.forminfo.device_type"
-              />
-              <FormKit
-                type="select"
-                label="What type of Internet connection are you using right now?"
-                name="connection"
-                help="Enter your internet connection type"
-                placeholder="Select an option"
-                :options="[
-                  'Ethernet',
-                  'Wifi',
-                  'Cellular (5G)',
-                  'Cellular (4G/LTE)',
-                  'Cellular (3G)',
-                  'DSL',
-                  'Dialup Modem',
-                  'Other',
-                  'I\'m not sure',
-                  'I\'d rather not say',
-                ]"
-                v-model="api.persist.forminfo.connection"
-              />
-              <FormKit
-                type="select"
-                label="How would you rate you Internet connection quality today?"
-                name="browser"
-                help="How would you rate your Internet connection"
-                placeholder="Select an option"
-                :options="[
-                  'Fast',
-                  'Moderate',
-                  'Slow but reliable',
-                  'Very slow, unreliable',
-                  'I\'m not sure',
-                  'I\'d rather not say',
-                ]"
-                v-model="api.persist.forminfo.connection_quality"
-              />
-              <FormKit
-                type="select"
-                label="What web browser are you using?"
-                name="connection"
-                help="Enter your internet browser type"
-                placeholder="Select an option"
-                :options="[
-                  'Safari (Mac)',
-                  'Chrome',
-                  'Firefox',
-                  'Opera',
-                  'Microsoft Edge',
-                  'Microsoft Internet Explorer',
-                  'UC Browser',
-                  'Samsung Internet',
-                  'ARC',
-                  'Chromium',
-                  'Other',
-                  'I\'m not sure',
-                  'I\'d rather not say',
-                ]"
-                v-model="api.persist.forminfo.browser"
-              />
-              <hr />
-              <div class="columns">
-                <div class="column">
-                  <div class="has-text-right">
-                    <button class="button is-warning" id="finish" v-if="page_one_complete" @click="api.goNextStep()">
-                      Continue &nbsp;
-                      <FAIcon icon="fa-solid fa-arrow-right" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+
+          <div class="mb-3">
+            <label class="block text-md font-semibold text-foreground mb-2">
+              What type of Internet connection are you using right now?
+            </label>
+            <Select v-model="api.persist.forminfo.connection">
+              <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Ethernet">Ethernet</SelectItem>
+                <SelectItem value="Wifi">Wifi</SelectItem>
+                <SelectItem value="Cellular (5G)">Cellular (5G)</SelectItem>
+                <SelectItem value="Cellular (4G/LTE)">Cellular (4G/LTE)</SelectItem>
+                <SelectItem value="Cellular (3G)">Cellular (3G)</SelectItem>
+                <SelectItem value="DSL">DSL</SelectItem>
+                <SelectItem value="Dialup Modem">Dialup Modem</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+                <SelectItem value="I'm not sure">I'm not sure</SelectItem>
+                <SelectItem value="I'd rather not say">I'd rather not say</SelectItem>
+              </SelectContent>
+            </Select>
+            <p class="text-xs text-muted-foreground mt-1">Enter your internet connection type</p>
+          </div>
+
+          <div class="mb-3">
+            <label class="block text-md font-semibold text-foreground mb-2">
+              How would you rate you Internet connection quality today?
+            </label>
+            <Select v-model="api.persist.forminfo.connection_quality">
+              <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Fast">Fast</SelectItem>
+                <SelectItem value="Moderate">Moderate</SelectItem>
+                <SelectItem value="Slow but reliable">Slow but reliable</SelectItem>
+                <SelectItem value="Very slow, unreliable">Very slow, unreliable</SelectItem>
+                <SelectItem value="I'm not sure">I'm not sure</SelectItem>
+                <SelectItem value="I'd rather not say">I'd rather not say</SelectItem>
+              </SelectContent>
+            </Select>
+            <p class="text-xs text-muted-foreground mt-1">How would you rate your Internet connection</p>
+          </div>
+
+          <div class="mb-3">
+            <label class="block text-md font-semibold text-foreground mb-2"> What web browser are you using? </label>
+            <Select v-model="api.persist.forminfo.browser">
+              <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Safari (Mac)">Safari (Mac)</SelectItem>
+                <SelectItem value="Chrome">Chrome</SelectItem>
+                <SelectItem value="Firefox">Firefox</SelectItem>
+                <SelectItem value="Opera">Opera</SelectItem>
+                <SelectItem value="Microsoft Edge">Microsoft Edge</SelectItem>
+                <SelectItem value="Microsoft Internet Explorer">Microsoft Internet Explorer</SelectItem>
+                <SelectItem value="UC Browser">UC Browser</SelectItem>
+                <SelectItem value="Samsung Internet">Samsung Internet</SelectItem>
+                <SelectItem value="ARC">ARC</SelectItem>
+                <SelectItem value="Chromium">Chromium</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+                <SelectItem value="I'm not sure">I'm not sure</SelectItem>
+                <SelectItem value="I'd rather not say">I'd rather not say</SelectItem>
+              </SelectContent>
+            </Select>
+            <p class="text-xs text-muted-foreground mt-1">Enter your internet browser type</p>
+          </div>
+
+          <hr class="border-border my-6" />
+
+          <div class="flex justify-end">
+            <Button variant="outline" :disabled="!page_one_complete" @click="api.goNextStep()">
+              Continue
+              <i-fa6-solid-arrow-right />
+            </Button>
           </div>
         </div>
-      </div>
 
-      <div class="formstep" v-else-if="api.pathString === 'device_page2'">
-        <div class="columns">
-          <div class="column is-one-third">
-            <div class="formsectionexplainer">
-              <h3 class="is-size-6 has-text-weight-bold">Important Note</h3>
-              <p class="is-size-6">
-                If this is a paid study your answers to these questions will have
-                <b>no effect on your final payment</b>. We are just interested in your honest answers.
-              </p>
-            </div>
+        <div
+          v-else-if="api.pathString === 'device_page2'"
+          class="border border-border text-left bg-muted p-6 rounded-lg"
+        >
+          <div class="mb-3">
+            <label class="block text-md font-semibold text-foreground mb-2">
+              What best descries how you moved the cursor, clicked, or scrolled things during this experiment?
+            </label>
+            <Select v-model="api.persist.forminfo.pointer">
+              <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Mouse">Mouse</SelectItem>
+                <SelectItem value="Trackpad">Trackpad</SelectItem>
+                <SelectItem value="Scrollwheel">Scrollwheel</SelectItem>
+                <SelectItem value="Touchscreen/Finger">Touchscreen/Finger</SelectItem>
+                <SelectItem value="Trackpoint/pointing stick">Trackpoint/pointing stick</SelectItem>
+                <SelectItem value="Stylus/Pen/Pencil">Stylus/Pen/Pencil</SelectItem>
+                <SelectItem value="Keyboard Only">Keyboard Only</SelectItem>
+                <SelectItem value="Game Controller">Game Controller</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+                <SelectItem value="I'm not sure">I'm not sure</SelectItem>
+                <SelectItem value="I'd rather not say">I'd rather not say</SelectItem>
+              </SelectContent>
+            </Select>
+            <p class="text-xs text-muted-foreground mt-1">Enter your input type</p>
           </div>
-          <div class="column">
-            <div class="box is-shadowless formbox">
-              <FormKit
-                type="select"
-                label="What best descries how you moved the cursor, clicked, or scrolled things during this experiment?"
-                name="connection"
-                help="Enter your input type"
-                placeholder="Select an option"
-                :options="[
-                  'Mouse',
-                  'Trackpad',
-                  'Scrollwheel',
-                  'Touchscreen/Finger',
-                  'Trackpoint/pointing stick',
-                  'Stylus/Pen/Pencil',
-                  'Keyboard Only',
-                  'Game Controller',
-                  'Other',
-                  'I\'m not sure',
-                  'I\'d rather not say',
-                ]"
-                v-model="api.persist.forminfo.pointer"
-              />
-              <FormKit
-                type="select"
-                label="Are you using any assistive technologies?"
-                name="browser"
-                help="Examples include screen readers, screen magnifiers, or voice input systems."
-                placeholder="Select an option"
-                :options="['No', 'Yes', 'I\'m not sure', 'I\'d rather not say']"
-                v-model="api.persist.forminfo.assistive_technology"
-              />
-              <FormKit
-                type="select"
-                label="Did you use any tools to help you complete this experiment?"
-                name="browser"
-                help="Examples include browser extensions that help you fill forms, enter text, or navigate the web or copying answers from AI/Large Language Models."
-                placeholder="Select an option"
-                :options="['No', 'Yes', 'I\'m not sure', 'I\'d rather not say']"
-                v-model="api.persist.forminfo.tools"
-              />
-              <hr />
-              <div class="columns">
-                <div class="column">
-                  <div class="has-text-left">
-                    <button class="button is-warning" id="finish" @click="api.goPrevStep()">
-                      <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous
-                    </button>
-                  </div>
-                </div>
-                <div class="column">
-                  <div class="has-text-right">
-                    <button class="button is-success" id="finish" v-if="page_two_complete" @click="finish()">
-                      I'm done!
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+
+          <div class="mb-3">
+            <label class="block text-md font-semibold text-foreground mb-2">
+              Are you using any assistive technologies?
+            </label>
+            <Select v-model="api.persist.forminfo.assistive_technology">
+              <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="No">No</SelectItem>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="I'm not sure">I'm not sure</SelectItem>
+                <SelectItem value="I'd rather not say">I'd rather not say</SelectItem>
+              </SelectContent>
+            </Select>
+            <p class="text-xs text-muted-foreground mt-1">
+              Examples include screen readers, screen magnifiers, or voice input systems.
+            </p>
+          </div>
+
+          <div class="mb-3">
+            <label class="block text-md font-semibold text-foreground mb-2">
+              Did you use any AI or other tools to help you complete this experiment?
+            </label>
+            <Select v-model="api.persist.forminfo.tools">
+              <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="No">No</SelectItem>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="I'm not sure">I'm not sure</SelectItem>
+                <SelectItem value="I'd rather not say">I'd rather not say</SelectItem>
+              </SelectContent>
+            </Select>
+            <p class="text-xs text-muted-foreground mt-1">
+              Examples include browser extensions that help you fill forms, enter text, or navigate the web or copying
+              answers from AI/Large Language Models.
+            </p>
+          </div>
+
+          <hr class="border-border my-6" />
+
+          <div class="flex justify-between">
+            <Button variant="outline" @click="api.goPrevStep()">
+              <i-fa6-solid-arrow-left />
+              Previous
+            </Button>
+            <Button variant="default" :disabled="!page_two_complete" @click="finish()"> I'm done! </Button>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
+      </template>
+    </TitleTwoCol>
+  </ConstrainedPage>
 </template>
-
-<style>
-.formstep {
-  margin-top: 40px;
-}
-
-:root {
-  --fk-bg-input: #fff;
-  --fk-max-width-input: 100%;
-}
-
-.formbox {
-  border: 1px solid #dfdfdf;
-  text-align: left;
-  background-color: rgb(248, 248, 248);
-}
-
-.formkit-input select {
-  background-color: #fff;
-}
-
-.formcontent {
-  width: 80%;
-  margin: auto;
-  margin-bottom: 40px;
-  padding-bottom: 200px;
-  text-align: left;
-}
-
-.formsectionexplainer {
-  text-align: left;
-  color: #777;
-}
-</style>

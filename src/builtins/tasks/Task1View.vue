@@ -2,6 +2,8 @@
 import { ref } from 'vue'
 // import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
+import { Button } from '@/uikit/components/ui/button'
+import { ConstrainedTaskWindow } from '@/uikit/layouts'
 const api = useViewAPI()
 const ntrials = ref(1)
 
@@ -12,42 +14,28 @@ function finish() {
 </script>
 
 <template>
-  <div class="page prevent-select">
-    <h1 class="title is-3">Task 1</h1>
+  <ConstrainedTaskWindow variant="ghost" class="p-8">
+    <div class="w-[80%] h-[80%]">
+      <h1 class="text-2xl font-bold mb-4">Task 1</h1>
 
-    <div class="formcontent">
-      <FormKit
-        type="text"
-        name="zipcode"
-        label="Number of trials"
-        placeholder="Enter zip or postal code"
-        validation="optional"
-        v-model="ntrials"
-        help="How many trials do you want to do?"
-      />
+      <div class="w-1/4 mx-auto mb-10 pb-52 text-left">
+        <FormKit
+          type="text"
+          name="zipcode"
+          label="Number of trials"
+          placeholder="Enter zip or postal code"
+          validation="optional"
+          v-model="ntrials"
+          help="How many trials do you want to do?"
+        />
 
-      <div class="formbutton">
-        <button class="button is-success" id="finish" @click="finish()">
-          next &nbsp;
-          <FAIcon icon="fa-solid fa-arrow-right" />
-        </button>
+        <div class="mt-4 pt-2.5 text-right">
+          <Button variant="default" @click="finish()">
+            next
+            <i-fa6-solid-arrow-right />
+          </Button>
+        </div>
       </div>
     </div>
-  </div>
+  </ConstrainedTaskWindow>
 </template>
-
-<style scoped>
-.formcontent {
-  width: 25%;
-  margin: auto;
-  margin-bottom: 40px;
-  padding-bottom: 200px;
-  text-align: left;
-}
-
-.formbutton {
-  margin-top: 1px solid #ccc;
-  padding-top: 10px;
-  text-align: right;
-}
-</style>

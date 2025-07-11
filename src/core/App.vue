@@ -5,16 +5,14 @@
 
 import { onMounted, ref } from 'vue'
 
-/**
- * Import notification system components and styles
- * @requires notivue Notification library
- */
-import { Notivue, Notification, NotificationProgress } from 'notivue'
-import 'notivue/notification.css' // Only needed if using built-in notifications
-import 'notivue/animations.css' // Only needed if using built-in animations
-import 'notivue/notification-progress.css'
-import { pastelTheme } from 'notivue'
+import { Toaster } from '@/uikit/components/ui/sonner'
+import 'vue-sonner/style.css' // vue-sonner v2 requires this import
 
+import { useColorMode } from '@vueuse/core'
+useColorMode()
+
+import DevAppSidebar from '@/dev/DevAppSidebar.vue'
+import { SidebarInset, SidebarProvider } from '@/uikit/components/ui/sidebar'
 /**
  * Import main application component
  * @requires SmileApp Main SMILE application component
@@ -36,12 +34,6 @@ const api = useAPI()
  */
 import useSmileStore from '@/core/stores/smilestore'
 const smilestore = useSmileStore()
-
-/**
- * Reactive reference tracking if browser window is too small
- * @type {import('vue').Ref<boolean>}
- */
-const toosmall = ref(api.isBrowserTooSmall())
 
 /**
  * Creates a snapshot of the current smilestore data state and subscribes to changes
@@ -81,12 +73,11 @@ smilestore.$subscribe((mutation, newstate) => {
  * Sets up window event listeners when component is mounted
  *
  * Adds event listeners for:
- * - resize: Records window dimensions and updates toosmall flag
+ * - resize: Records window dimensions
  * - focus: Records when window gains focus
  * - blur: Records when window loses focus
  *
  * All events are logged via api.recordWindowEvent()
- * Resize events also update the toosmall reactive ref
  * All listeners use passive mode for better performance
  */
 onMounted(() => {
@@ -96,7 +87,6 @@ onMounted(() => {
     'resize',
     (event) => {
       api.recordWindowEvent('resize', { width: window.innerWidth, height: window.innerHeight })
-      toosmall.value = api.isBrowserTooSmall()
     },
     { passive: true }
   )
@@ -120,10 +110,28 @@ onMounted(() => {
 </script>
 
 <template>
-  <Notivue v-slot="item">
-    <Notification :item="item" :theme="pastelTheme">
-      <NotificationProgress :item="item" />
-    </Notification>
-  </Notivue>
-  <SmileApp />
+  <Toaster closeButton position="top-left" :rich-colors="true" class="custom-toaster" />
+  <SidebarProvider
+    :default-open="false"
+    :style="{
+      '--sidebar-width': '48px',
+    }"
+  >
+    <DevAppSidebar />
+    <SidebarInset>
+      <SmileApp />
+    </SidebarInset>
+  </SidebarProvider>
 </template>
+
+<style>
+.custom-toaster {
+  --toast-offset-x: 60px;
+  --toast-offset-y: 50px;
+}
+
+.custom-toaster {
+  top: var(--toast-offset-y) !important;
+  left: var(--toast-offset-x) !important;
+}
+</style>

@@ -3,40 +3,40 @@
     <div class="dropdown-trigger">
       | &nbsp; Docs:
       <a alt="Skip sections">
-        <FAIcon icon="fa-solid fa-book" />
+        <i-fa6-solid-book />
       </a>
     </div>
     <div class="dropdown-menu pt-25" id="dropdown-menu" role="menu">
       <div class="dropdown-content">
         <a href="https://smile.gureckislab.org" class="dropdown-item" target="_new">
-          <FAIcon icon="fa-solid fa-globe" /> Smile Docs
+          <i-fa6-solid-globe /> Smile Docs
         </a>
 
         <a href="https://github.com/NYUCCL/smile" class="dropdown-item" target="_new">
-          <FAIcon icon="fa-solid fa-globe" /> Smile GitHub
+          <i-fa6-solid-globe /> Smile GitHub
         </a>
         <a href="https://github.com/NYUCCL/smile/issues" class="dropdown-item" target="_new">
-          <FAIcon icon="fa-solid fa-globe" /> Smile GitHub Issues
+          <i-fa6-solid-globe /> Smile GitHub Issues
         </a>
         <hr class="dropdown-divider" />
         <a href="https://vuejs.org" class="dropdown-item" target="_new"> <FAIcon icon="fa-solid fa-globe" /> Vuejs </a>
         <a href="https://sfc.vuejs.org" class="dropdown-item" target="_new">
-          <FAIcon icon="fa-solid fa-globe" /> Vuejs SFC Playground
+          <i-fa6-solid-globe /> Vuejs SFC Playground
         </a>
         <a href="https://devtools.vuejs.org/" class="dropdown-item" target="_new">
-          <FAIcon icon="fa-solid fa-globe" /> Vue Dev Tools (Chrome)
+          <i-fa6-solid-globe /> Vue Dev Tools (Chrome)
         </a>
         <hr class="dropdown-divider" />
         <a href="https://bulma.io" class="dropdown-item" target="_new"> <FAIcon icon="fa-solid fa-globe" /> Bulma </a>
         <a href="https://fontawesome.com" class="dropdown-item" target="_new">
-          <FAIcon icon="fa-solid fa-globe" /> FontAwesome
+          <i-fa6-solid-globe /> FontAwesome
         </a>
         <hr class="dropdown-divider" />
         <a href="https://www.internetingishard.com" class="dropdown-item" target="_new">
-          <FAIcon icon="fa-solid fa-globe" /> Interneting is hard
+          <i-fa6-solid-globe /> Interneting is hard
         </a>
         <a href="https://javascript.info" class="dropdown-item" target="_new">
-          <FAIcon icon="fa-solid fa-globe" /> The Modern Javascript Tutorial
+          <i-fa6-solid-globe /> The Modern Javascript Tutorial
         </a>
       </div>
     </div>

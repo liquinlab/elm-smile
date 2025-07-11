@@ -2,6 +2,13 @@
 import { reactive, computed, onMounted } from 'vue'
 import DatabaseList from '@/dev/developer_mode/DatabaseList.vue'
 import SmileAPI from '@/core/composables/useAPI'
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+} from '@/uikit/components/ui/breadcrumb'
 const api = SmileAPI()
 
 const browse_panels = reactive({ path: ['/', null, null] })
@@ -77,21 +84,26 @@ function panel_jump(index) {
 </script>
 <template>
   <!-- content of panel here -->
-  <div class="contentpanel">
-    <nav class="breadcrumb has-arrow-separator" aria-label="breadcrumbs">
-      <ul>
-        <template v-for="(option, index) in browse_panels.path">
-          <li v-if="option !== null" :class="{ 'is-active': index == n_active_panels - 1 }">
-            <a @click="panel_jump(index)">
-              <template v-if="option == '/'"><FAIcon icon="fa-solid fa-home" />&nbsp;</template>
-              <template v-else>{{ option }}</template>
-            </a>
-          </li>
+  <div class="h-full p-0 m-0">
+    <Breadcrumb class="bg-muted border-b border-t border-dev-lines px-3 py-2 font-mono">
+      <BreadcrumbList>
+        <template v-for="(option, index) in browse_panels.path" :key="index">
+          <template v-if="option !== null">
+            <BreadcrumbItem>
+              <BreadcrumbLink as="button" @click="panel_jump(index)" class="flex items-center text-xs">
+                <template v-if="option == '/'">
+                  <i-fa6-solid-house />
+                </template>
+                <template v-else>{{ option }}</template>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator v-if="index < n_active_panels - 1" />
+          </template>
         </template>
-      </ul>
-    </nav>
-    <div class="columns colcontent is-mobile">
-      <div class="column colcontent is-3 edge">
+      </BreadcrumbList>
+    </Breadcrumb>
+    <div class="flex h-full">
+      <div class="w-1/4 h-full border-r border-dev-lines p-0 m-0">
         <!-- two from end -->
         <DatabaseList
           :data="panel_path(2)"
@@ -99,7 +111,7 @@ function panel_jump(index) {
           @selected="panel1_select"
         ></DatabaseList>
       </div>
-      <div class="column colcontent is-3 edge isdark">
+      <div class="w-1/4 h-full border-r border-dev-lines p-0 m-0 bg-gray-50">
         <!-- one from end -->
         <DatabaseList
           :data="panel_path(1)"
@@ -107,7 +119,7 @@ function panel_jump(index) {
           @selected="panel2_select"
         ></DatabaseList>
       </div>
-      <div class="column colcontent is-6 edge isdark">
+      <div class="w-1/2 h-full p-0 m-0 bg-gray-50">
         <!-- zero from end -->
         <DatabaseList :data="panel_path(0)" @selected="panel3_select"></DatabaseList>
       </div>
@@ -116,36 +128,5 @@ function panel_jump(index) {
 </template>
 
 <style scoped>
-.breadcrumb {
-  padding: 5px;
-  padding-top: 5px;
-  padding-bottom: 4px;
-  padding-left: 10px;
-  margin: 0px;
-  height: 30px;
-  background-color: #eeeeee;
-  border-bottom: 1px solid #ccc;
-  border-top: 1px solid #ccc;
-  font-size: 0.8em;
-  color: #434343;
-}
-.breadcrumb li + li::before {
-  color: var(--darker-grey);
-}
-.contentpanel {
-  padding-left: 0px;
-  margin: 0px;
-  height: 100%;
-}
-.colcontent {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-.edge {
-  border-right: 1px solid #e3e3e3;
-  margin: 0px;
-  padding: 0px;
-}
+/* Removed all Bulma-specific styles as they're now handled by Tailwind classes */
 </style>

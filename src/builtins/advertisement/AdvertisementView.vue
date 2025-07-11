@@ -6,6 +6,10 @@ import { onMounted, ref, onBeforeUnmount } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
+// import UIkit components
+import { Button } from '@/uikit/components/ui/button'
+import { ConstrainedTaskWindow } from '@/uikit/layouts'
+
 // animation library
 import { animate } from 'motion'
 
@@ -16,8 +20,8 @@ const button = ref(null) // reference to button
 // this function wiggles the button a little if it hasn't been clicked
 // just some fun
 function wiggle() {
-  if (!clicked) {
-    animate(button.value, { rotate: [0, 10, -10, 10, -10, 0] }, { duration: 0.75 }).finished.then(() => {
+  if (!clicked && button.value) {
+    animate(button.value.$el, { rotate: [0, 60, -60, 60, -60, 0] }, { duration: 0.75 }).finished.then(() => {
       timer = setTimeout(wiggle, 15000) // Reinitialize the timer after animation
     })
   }
@@ -40,15 +44,19 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="page prevent-select">
-    <br /><br /><br />
-    <img ref="logo" src="@/user/assets/brain.svg" width="220" />
-    <h1 ref="title" class="title is-3">Please help us understand the mind!</h1>
+  <ConstrainedTaskWindow
+    variant="ghost"
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+  >
+    <img ref="logo" src="@/user/assets/brain.svg" width="220" class="dark-aware-img" />
+    <h1 ref="title" class="text-3xl font-bold mb-4">Please help us understand the mind!</h1>
     <p>Take part in a short experiment where you play some games.</p>
     <br />
-    <button ref="button" class="button is-warning" id="begintask" @click="finish()">
-      I'm ready! &nbsp;
-      <FAIcon icon="fa-solid fa-arrow-right" />
-    </button>
-  </div>
+    <Button ref="button" id="begintask" @click="finish()" size="lg">
+      I'm ready!
+      <i-lucide-arrow-right />
+    </Button>
+  </ConstrainedTaskWindow>
 </template>

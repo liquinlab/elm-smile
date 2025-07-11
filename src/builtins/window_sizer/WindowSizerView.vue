@@ -1,104 +1,83 @@
 <script setup>
-import { reactive } from 'vue'
-// import and initalize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
+import { Button } from '@/uikit/components/ui/button'
+import { CenteredContent } from '@/uikit/layouts'
 const api = useViewAPI()
 const props = defineProps(['triggered'])
 
-const sizer = reactive({
-  w: api.config.windowsizerRequest.width + 'px',
-  h: api.config.windowsizerRequest.height + 'px',
-})
-
 function finish() {
-  // smilestore.setConsented()
-  // smilestore.saveData()
   api.verifyVisibility(true)
   api.goNextView()
 }
 </script>
 
 <template>
-  <div class="page prevent-select">
-    <div class="sizer border-animation">
-      <div class="info" v-if="!props.triggered">
-        <span class="is-size-2">
-          <FAIcon icon="fa-solid fa-arrows-up-down-left-right "></FAIcon>
+  <CenteredContent class="m-2 mt-5">
+    <div
+      class="bg-window-sizer-bg border-animation flex items-center justify-center"
+      :style="{
+        width: api.config.windowsizerRequest.width + 'px',
+        height: api.config.windowsizerRequest.height + 'px',
+        minWidth: api.config.windowsizerRequest.width + 'px',
+        minHeight: api.config.windowsizerRequest.height + 'px',
+      }"
+    >
+      <div class="w-2/3 pt-8 mx-auto text-center" v-if="!props.triggered">
+        <span class="text-4xl text-window-sizer-text mb-4 block">
+          <i-fa6-solid-arrows-up-down-left-right class="inline" />
         </span>
-        <h1 class="is-size-4">
+        <h1 class="text-xl font-semibold text-window-sizer-text mb-4">
           Please adjust the size of your browser window until <b>ALL</b> four edges of this box are visible.
         </h1>
-        <hr />
-        <div class="is-8 is-size-7 has-text-left note">
+        <hr class="border-window-sizer-border my-4" />
+        <div class="text-sm text-left mb-4 text-window-sizer-text">
           <b>Warning</b>: If you can't resize your window and see the entire box please click the red "withdraw" button
           at the top of the page and return the task. You need to be able view the entire page at once.
         </div>
-        <hr />
-        <br /><br />
-        <button class="button is-info" id="finish" @click="finish()">
-          It is visible now, I'm ready &nbsp;
-          <FAIcon icon="fa-solid fa-arrow-right" />
-        </button>
+        <hr class="border-window-sizer-border my-4" />
+        <div class="mt-8">
+          <Button
+            size="lg"
+            class="bg-window-sizer-text text-window-sizer-bg hover:bg-window-sizer-bg hover:bg-window-sizer-border"
+            @click="finish()"
+          >
+            It is visible now, I'm ready
+            <i-fa6-solid-arrow-right />
+          </Button>
+        </div>
       </div>
-      <div class="info" v-else>
-        <span class="is-size-2">
-          <FAIcon icon="fa-solid fa-arrows-up-down-left-right "></FAIcon>
+      <div class="w-2/3 pt-8 mx-auto text-center" v-else>
+        <span class="text-4xl text-window-sizer-text mb-4 block">
+          <i-fa6-solid-arrows-up-down-left-right></i-fa6-solid-arrows-up-down-left-right>
         </span>
-        <h1 class="is-size-4">
+        <h1 class="text-xl font-semibold text-window-sizer-text mb-4">
           <b>We don't want you to miss anything!</b><br />Please re-adjust the size of your browser window until
           <b>ALL</b> four edges of this box are visible.
         </h1>
-        <hr />
-        <div class="is-8 is-size-7 has-text-left note">
+        <hr class="border-window-sizer-border my-4" />
+        <div class="text-sm text-left text-window-sizer-text">
           <b>Warning</b>: If you can't resize your window and see the entire box please click the red "withdraw" button
           at the top of the page and return the task. You need to be able view the entire page at once.
         </div>
       </div>
     </div>
-  </div>
+  </CenteredContent>
 </template>
 
 <style scoped>
-.info {
-  width: 65%;
-  padding-top: 30px;
-  margin: auto;
-  color: rgb(18, 53, 90);
-}
-
-.note {
-  color: rgb(64, 91, 121);
-}
-
-hr {
-  background-color: rgb(18, 53, 90);
-}
-
-.sizer {
-  background-color: rgb(208, 242, 251);
-  /*border: 2px dashed red;*/
-  width: v-bind(sizer.w);
-  height: v-bind(sizer.h);
-  margin-left: auto;
-  margin-right: auto;
-  vertical-align: center;
-  padding-top: auto;
-  padding: 20px;
-  align: center;
-}
-
 .border-animation {
   background-image:
-    linear-gradient(90deg, rgb(18, 53, 90) 50%, transparent 50%),
-    linear-gradient(90deg, rgb(18, 53, 90) 50%, transparent 50%),
-    linear-gradient(0deg, rgb(18, 53, 90) 50%, transparent 50%),
-    linear-gradient(0deg, rgb(18, 53, 90) 50%, transparent 50%);
+    linear-gradient(90deg, var(--window-sizer-border) 50%, transparent 50%),
+    linear-gradient(90deg, var(--window-sizer-border) 50%, transparent 50%),
+    linear-gradient(0deg, var(--window-sizer-border) 50%, transparent 50%),
+    linear-gradient(0deg, var(--window-sizer-border) 50%, transparent 50%);
   background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
   background-size:
     15px 2px,
     15px 2px,
     2px 15px,
     2px 15px;
+  border-radius: 20px;
   background-position:
     left top,
     right bottom,

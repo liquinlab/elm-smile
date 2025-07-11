@@ -6,7 +6,13 @@ const api = SmileAPI()
 import useLog from '@/core/stores/log'
 const log = useLog()
 
-const height_pct = computed(() => `${api.store.dev.consoleBarHeight - 67}px`)
+// Import shadcn/ui components
+import { Input } from '@/uikit/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
+import { Switch } from '@/uikit/components/ui/switch'
+import { Label } from '@/uikit/components/ui/label'
+
+const height_pct = computed(() => `${api.store.dev.consoleBarHeight - 55}px`)
 
 function filter_log(msg) {
   const search_match = msg.message.toLowerCase().includes(api.store.dev.searchParams.toLowerCase())
@@ -33,193 +39,182 @@ function filter_log(msg) {
 function getBgClass(msg) {
   switch (msg.type) {
     case 'log':
-      return 'bg-white'
+      return 'bg-background'
     case 'warn':
-      return 'bg-yellow'
+      return 'bg-yellow-100'
     case 'error':
-      return 'bg-red'
+      return 'bg-red-100'
     case 'debug':
-      return 'bg-grey'
+      return 'bg-muted text-muted-foreground'
     case 'success':
-      return 'bg-green'
+      return 'bg-green-100'
     default:
-      return ''
+      return 'bg-background'
   }
 }
 </script>
 <template>
   <!-- content of panel here -->
-  <div class="contentpanel">
-    <div class="togglebar">
-      <ul>
-        <li>
-          <label class="checkbox">
-            <b>Since last page change:</b>&nbsp;
-            <input type="checkbox" v-model="api.store.dev.lastViewLimit" />
-          </label>
-        </li>
-        <li>
-          <b>Search:</b>&nbsp;
-          <input
-            class="input is-small search"
-            placeholder="Search..."
-            type="text"
-            v-model="api.store.dev.searchParams"
-          />
-        </li>
-        <li>
-          <b>Filter:</b>&nbsp;
-          <div class="select is-small">
-            <select v-model="api.store.dev.logFilter">
-              <option>All</option>
-              <option>Current page only</option>
-              <option>Debug only</option>
-              <option>Warnings and Errors only</option>
-              <option>Warnings only</option>
-              <option>Errors only</option>
-            </select>
-          </div>
-        </li>
-        <li>
-          <b>Notifications:</b>&nbsp;
-          <div class="select is-small">
-            <select v-model="api.store.dev.notificationFilter">
-              <option>All</option>
-              <option>None</option>
-              <option>Warnings and Errors</option>
-              <option>Warnings only</option>
-              <option>Errors only</option>
-              <option>Success only</option>
-            </select>
-          </div>
-        </li>
-      </ul>
+  <div class="h-full p-0 m-0 overflow-hidden">
+    <div class="bg-muted border-b border-t border-dev-lines px-3 py-2 font-mono">
+      <div class="flex items-center justify-end gap-4 text-xs">
+        <div class="flex items-center gap-2">
+          <Label class="text-xs font-semibold">Since last view:</Label>
+          <Switch v-model="api.store.dev.lastViewLimit" size="sm" />
+        </div>
+
+        <div class="flex items-center gap-2">
+          <Label class="text-xs font-semibold">Search:</Label>
+          <Input v-model="api.store.dev.searchParams" placeholder="Search..." class="h-6 w-24 text-xs" />
+        </div>
+
+        <div class="flex items-center gap-2">
+          <Label class="text-xs font-semibold">Filter:</Label>
+          <Select v-model="api.store.dev.logFilter">
+            <SelectTrigger class="h-6 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All</SelectItem>
+              <SelectItem value="Current page only">Current page only</SelectItem>
+              <SelectItem value="Debug only">Debug only</SelectItem>
+              <SelectItem value="Warnings and Errors only">Warnings and Errors only</SelectItem>
+              <SelectItem value="Warnings only">Warnings only</SelectItem>
+              <SelectItem value="Errors only">Errors only</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <Label class="text-xs font-semibold">Notifications:</Label>
+          <Select v-model="api.store.dev.notificationFilter">
+            <SelectTrigger class="h-6 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All</SelectItem>
+              <SelectItem value="None">None</SelectItem>
+              <SelectItem value="Warnings and Errors">Warnings and Errors</SelectItem>
+              <SelectItem value="Warnings only">Warnings only</SelectItem>
+              <SelectItem value="Errors only">Errors only</SelectItem>
+              <SelectItem value="Success only">Success only</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
     </div>
 
-    <div class="scrollablelog">
-      <aside class="menu">
-        <ul class="menu-list" v-if="api.store.dev.lastViewLimit">
+    <div
+      class="w-full overflow-hidden overflow-y-scroll flex flex-col-reverse box-border"
+      :style="{ height: height_pct }"
+    >
+      <div class="w-full min-w-0">
+        <ul v-if="api.store.dev.lastViewLimit" class="w-full min-w-0">
           <template v-for="msg in log.page_history">
-            <li :class="getBgClass(msg)" v-if="filter_log(msg)">
-              <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
-              <FAIcon icon="fa-solid fa-database" v-else-if="msg.message.includes('SMILESTORE')" />
-              <FAIcon icon="fa-solid fa-gear" v-else-if="msg.message.includes('DEV MODE')" />
-              <FAIcon icon="fa-solid fa-clock" v-else-if="msg.message.includes('TIMELINE STEPPER')" />
-              <FAIcon icon="fa-regular fa-clock" v-else-if="msg.message.includes('TRIAL STEPPER')" />
-              <img src="/src/assets/dev/firebase-bw.svg" width="15" v-else-if="msg.message.includes('FIRESTORE')" />
-              <FAIcon icon="fa-solid fa-angle-right" v-else />
-              &nbsp;{{ msg.time }} <b>{{ msg.message }}</b> <br />&nbsp;&nbsp;{{ msg.trace }}
+            <li
+              v-if="filter_log(msg)"
+              :class="[
+                getBgClass(msg),
+                'text-xs font-mono p-2 pr-0 border-b border-border whitespace-pre-wrap break-words break-all min-w-0 w-full',
+              ]"
+            >
+              <div class="flex items-start gap-1 min-w-0">
+                <div class="flex-shrink-0 mt-0.5">
+                  <i-fa6-solid-code-branch v-if="msg.message.includes('ROUTER GUARD')" />
+                  <i-fa6-solid-database v-else-if="msg.message.includes('SMILESTORE')" />
+                  <i-fa6-solid-gear v-else-if="msg.message.includes('DEV MODE')" />
+                  <i-fa6-solid-clock v-else-if="msg.message.includes('TIMELINE STEPPER')" />
+                  <i-fa6-regular-clock v-else-if="msg.message.includes('TRIAL STEPPER')" />
+                  <img src="/src/assets/dev/firebase-bw.svg" width="15" v-else-if="msg.message.includes('FIRESTORE')" />
+                  <i-fa6-solid-angle-right v-else />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="font-semibold break-words break-all">{{ msg.time }} {{ msg.message }}</div>
+                  <div class="break-words break-all text-xs opacity-75">{{ msg.trace }}</div>
+                </div>
+              </div>
             </li>
           </template>
         </ul>
-        <ul class="menu-list" v-else>
+        <ul v-else class="w-full min-w-0">
           <template v-for="msg in log.history">
-            <li :class="getBgClass(msg)" v-if="filter_log(msg)">
-              <FAIcon icon="fa-solid fa-code-branch" v-if="msg.message.includes('ROUTER GUARD')" />
-              <FAIcon icon="fa-solid fa-database" v-else-if="msg.message.includes('SMILESTORE')" />
-              <FAIcon icon="fa-solid fa-gear" v-else-if="msg.message.includes('DEV MODE')" />
-              <FAIcon icon="fa-solid fa-clock" v-else-if="msg.message.includes('TIMELINE STEPPER')" />
-              <FAIcon icon="fa-regular fa-clock" v-else-if="msg.message.includes('TRIAL STEPPER')" />
-              <img src="/src/assets/dev/firebase-bw.svg" width="15" v-else-if="msg.message.includes('FIRESTORE')" />
-              <FAIcon icon="fa-solid fa-angle-right" v-else />
-              &nbsp;{{ msg.time }} <b>{{ msg.message }}</b> <br />&nbsp;&nbsp;{{ msg.trace }}
+            <li
+              v-if="filter_log(msg)"
+              :class="[
+                getBgClass(msg),
+                'text-xs font-mono p-2 pr-0 border-b border-border whitespace-pre-wrap break-words break-all min-w-0 w-full',
+              ]"
+            >
+              <div class="flex items-start gap-1 min-w-0">
+                <div class="flex-shrink-0 mt-0.5">
+                  <i-fa6-solid-code-branch v-if="msg.message.includes('ROUTER GUARD')" />
+                  <i-fa6-solid-database v-else-if="msg.message.includes('SMILESTORE')" />
+                  <i-fa6-solid-gear v-else-if="msg.message.includes('DEV MODE')" />
+                  <i-fa6-solid-clock v-else-if="msg.message.includes('TIMELINE STEPPER')" />
+                  <i-fa6-regular-clock v-else-if="msg.message.includes('TRIAL STEPPER')" />
+                  <img src="/src/assets/dev/firebase-bw.svg" width="15" v-else-if="msg.message.includes('FIRESTORE')" />
+                  <i-fa6-solid-angle-right v-else />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="font-semibold break-words break-all">{{ msg.time }} {{ msg.message }}</div>
+                  <div class="break-words break-all text-xs opacity-75">{{ msg.trace }}</div>
+                </div>
+              </div>
             </li>
           </template>
         </ul>
-      </aside>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.search {
-  max-width: 100px;
+/* Custom scrollbar styling for better UX */
+.overflow-y-scroll::-webkit-scrollbar {
+  width: 6px;
 }
-.togglebar {
-  min-height: 35px;
-  background-color: #eeeeee;
-  border-bottom: 0.05em solid #cbcbcb;
-  padding-bottom: 3px;
-  padding-top: 3px;
-  width: 100%;
-  text-align: right;
-}
-.togglebar ul {
-  list-style-type: none;
-  padding: 0px;
-  padding-left: 10px;
-}
-.togglebar li {
-  display: inline;
-  padding: 5px;
-  font-size: 0.7em;
-}
-/*
-.togglebar select {
-}
-*/
 
-.columnheader {
-  background: #f4f4f4;
-  color: #858484;
-  padding: 5px;
-  font-size: 0.8em;
-  margin-bottom: 10px;
-  margin-top: 0px;
+.overflow-y-scroll::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 3px;
 }
-.contentpanel {
-  padding-left: 0px;
-  margin: 0px;
-  margin-right: 0px;
-  margin-bottom: 0px;
-  height: 100%;
+
+.overflow-y-scroll::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
 }
-.scrollablelog {
-  height: v-bind(height_pct);
-  max-height: 100%;
-  width: 100%;
-  max-width: 100%;
-  margin: 0px;
-  margin-top: 0px;
-  overflow: hidden;
-  overflow-y: scroll;
-  display: flex;
-  flex-direction: column-reverse;
-  box-sizing: border-box;
+
+.overflow-y-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
 }
-.menu-list {
-  width: 100%;
-  max-width: 100%;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
+
+/* Theme-aware background colors for log messages */
+.bg-background {
+  background-color: var(--background);
 }
-.menu-list li {
-  font-size: 0.7em;
-  font-family: monospace;
-  padding: 7px;
-  padding-right: 0px;
-  border-bottom: 1px solid #f2f2f2;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  word-break: break-word;
-  max-width: 100%;
-  overflow-wrap: break-word;
+
+.bg-muted {
+  background-color: var(--muted);
 }
-.bg-white {
-  background-color: #ffffff;
+
+.text-muted-foreground {
+  color: var(--muted-foreground);
 }
-.bg-yellow {
-  background-color: #e0deaa;
+
+.border-border {
+  border-color: var(--border);
 }
-.bg-red {
-  background-color: #e0aaaa;
+
+/* Keep semantic colors for log types but make them theme-aware */
+.bg-yellow-100 {
+  background-color: var(--log-yellow);
 }
-.bg-grey {
-  background-color: #d0dadd;
-  color: #505050;
+
+.bg-red-100 {
+  background-color: var(--log-red);
 }
-.bg-green {
-  background-color: rgb(189, 241, 189);
+
+.bg-green-100 {
+  background-color: var(--log-green);
 }
 </style>

@@ -1,51 +1,42 @@
-<script setup></script>
+<script setup>
+import { QrCode, Download } from 'lucide-vue-next'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/uikit/components/ui/dropdown-menu'
+import { Button } from '@/uikit/components/ui/button'
+</script>
+
 <template>
-  <div class="dropdown is-hoverable is-right">
-    <div class="dropdown-trigger">
-      <button class="button devbar-button">
-        <FAIcon icon=" fa-solid fa-qrcode" />
-      </button>
-    </div>
-    <div class="dropdown-menu pt-0 mt-0" id="dropdown-menu" role="menu">
-      <div class="dropdown-content">
-        <div class="qrcontent is-right">
-          <h1 class="title is-6">QR Code</h1>
-          <p>
+  <DropdownMenu>
+    <DropdownMenuTrigger as-child>
+      <Button size="menu" variant="outline">
+        <QrCode />
+      </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent class="w-80 p-4" align="end">
+      <div class="space-y-3">
+        <div>
+          <h3 class="text-sm font-semibold">QR Code</h3>
+          <p class="text-xs text-muted-foreground mt-1">
             Use the QR code to quickly access the current page from a mobile device. Can be downloaded as a .svg to add
             to posters and talks.
           </p>
-          <img src="/qr.svg" />
-          <br />
-          <div class="has-text-right">
-            <a href="qr.svg" download="qr.svg" class="button is-small">
-              <FAIcon icon="fa-solid fa-download" />&nbsp;
+        </div>
+        <div class="flex justify-center">
+          <img src="/qr.svg" alt="QR Code" class="w-48 h-48" />
+        </div>
+        <div class="flex justify-end">
+          <Button variant="outline" size="sm" as-child>
+            <a href="qr.svg" download="qr.svg" class="flex items-center gap-2">
+              <Download class="size-3" />
               <span>Download QR</span>
             </a>
-          </div>
+          </Button>
         </div>
       </div>
-    </div>
-  </div>
+    </DropdownMenuContent>
+  </DropdownMenu>
 </template>
-
-<style scoped>
-.dropdown-content {
-  padding: 20;
-  padding-top: 8px;
-  margin: 10;
-  width: 300px;
-  text-align: left;
-  padding-bottom: 20px;
-}
-
-.qr {
-  width: 300px;
-  height: auto;
-}
-
-.qrcontent {
-  width: 100%;
-  padding: 15px;
-  text-align: left;
-}
-</style>

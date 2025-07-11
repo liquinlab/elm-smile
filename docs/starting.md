@@ -242,12 +242,12 @@ lab. A robot :robot: there will let you know that your project was deployed and
 provide you with a web link to live site.
 
 If that didn't happen/work then continue reading to learn more about
-[deployments](/deploying) including
-[debugging tips](/deploying#debugging-deployment-issues).
+[deployments](/recruit/deploying) including
+[debugging tips](/recruit/deploying#debugging-deployment-issues).
 
 From here on out any time you make a change to any file (except in the `docs/`
 folder or a
-[few specifically named branches](/deploying#what-commits-trigger-a-deployment)),
+[few specifically named branches](/recruit/deploying#what-commits-trigger-a-deployment)),
 commit it, and push that change to your project repository the Slack bot will
 confirm your code has been uploaded to the live webserver and is theoretically
 ready for participants.
@@ -263,4 +263,4 @@ npm run dev
 ```
 
 to run the development server and see the current, default setup of the site.
-More information about developing is available [here](/developing).
+More information about developing is available [here](/coding/developing).

@@ -26,7 +26,7 @@ const emit = defineEmits(['nextPageCaptcha'])
     <hr />
     <button class="button is-warning" id="finish" @click="$emit('nextPageCaptcha')">
       Warm me up &nbsp;
-      <FAIcon icon="fa-solid fa-arrow-right" />
+      <i-fa6-solid-arrow-right />
     </button>
   </div>
 </template>

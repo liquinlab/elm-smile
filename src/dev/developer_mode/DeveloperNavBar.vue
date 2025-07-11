@@ -1,12 +1,13 @@
 <script setup>
-import DocsDropDown from '@/dev/developer_mode/DocsDropDown.vue'
 import Stepper from '@/dev/developer_mode/Stepper.vue'
 import RouteInfoButton from '@/dev/developer_mode/RouteInfoButton.vue'
 import ResetButton from '@/dev/developer_mode/ResetButton.vue'
 import ReloadButton from '@/dev/developer_mode/ReloadButton.vue'
+import ColorModeButton from '@/dev/developer_mode/ColorModeButton.vue'
 import DataBarButton from '@/dev/developer_mode/DataBarButton.vue'
+import FullScreenButton from '@/dev/developer_mode/FullScreenButton.vue'
 import ViewButton from '@/dev/developer_mode/ViewButton.vue'
-
+import { BugPlay } from 'lucide-vue-next'
 import useAPI from '@/core/composables/useAPI'
 import KeyCommandNotification from '@/dev/developer_mode/KeyCommandNotification.vue'
 
@@ -26,9 +27,12 @@ const api = useAPI()
  *
  * Panel Controls:
  * - Ctrl+1: Toggle sidebar/console panels
- * - Ctrl+2: Cycle through console tabs (Browse -> Log -> Config)
- * - Ctrl+3: Reset local state
- * - Ctrl+4: Connect to database
+ * - Ctrl+2: Cycle through sidebar tabs (Steps -> Random -> DB Info)
+ * - Ctrl+3: Cycle through console tabs (Browse -> Log -> Config)
+ * - Ctrl+R: Reset local state
+ * - Ctrl+D: Connect to database
+ * - Ctrl+A: Autofill current view (if available)
+ * - Ctrl+P: Pin/unpin current route
  */
 onKeyDown((e) => {
   if (e.key === 'ArrowUp') {
@@ -77,32 +81,56 @@ onKeyDown((e) => {
   if (e.ctrlKey && e.key === '2') {
     e.preventDefault()
 
+    if (!api.store.dev.showSideBar) {
+      showTemporaryNotification('Ctrl + 2', 'Sidebar is hidden', 'error')
+      return
+    }
+
+    const currentTab = api.store.dev.sideBarTab
+
+    if (currentTab === 'steps') {
+      api.store.dev.sideBarTab = 'randomization'
+      showTemporaryNotification('Ctrl + 2', 'Switched to Random Tab')
+    } else if (currentTab === 'randomization') {
+      api.store.dev.sideBarTab = 'db'
+      showTemporaryNotification('Ctrl + 2', 'Switched to DB Info Tab')
+    } else {
+      api.store.dev.sideBarTab = 'steps'
+      showTemporaryNotification('Ctrl + 2', 'Switched to Steps Tab')
+    }
+  }
+})
+
+// Modify Ctrl+3 handler
+onKeyDown((e) => {
+  if (e.ctrlKey && e.key === '3') {
+    e.preventDefault()
+
+    if (!api.store.dev.showConsoleBar) {
+      showTemporaryNotification('Ctrl + 3', 'Console is hidden', 'error')
+      return
+    }
+
     const currentTab = api.store.dev.consoleBarTab
 
     if (currentTab === 'browse') {
       api.store.dev.consoleBarTab = 'log'
-      if (api.store.dev.showConsoleBar) {
-        showTemporaryNotification('Ctrl + 2', 'Switched to Log Tab')
-      }
+      showTemporaryNotification('Ctrl + 3', 'Switched to Log Tab')
     } else if (currentTab === 'log') {
       api.store.dev.consoleBarTab = 'config'
-      if (api.store.dev.showConsoleBar) {
-        showTemporaryNotification('Ctrl + 2', 'Switched to Config Tab')
-      }
+      showTemporaryNotification('Ctrl + 3', 'Switched to Config Tab')
     } else {
       api.store.dev.consoleBarTab = 'browse'
-      if (api.store.dev.showConsoleBar) {
-        showTemporaryNotification('Ctrl + 2', 'Switched to Browse Tab')
-      }
+      showTemporaryNotification('Ctrl + 3', 'Switched to Browse Tab')
     }
   }
 })
 
 // Add shortcut for resetting local state
 onKeyDown((e) => {
-  if (e.ctrlKey && e.key === '3') {
+  if (e.ctrlKey && e.key === 'r') {
     e.preventDefault()
-    showTemporaryNotification('Ctrl + 3', 'Resetting Local State')
+    showTemporaryNotification('Ctrl + R', 'Resetting Local State')
     setTimeout(() => {
       api.resetLocalState()
     }, 200)
@@ -111,12 +139,42 @@ onKeyDown((e) => {
 
 // Add shortcut for connecting to database
 onKeyDown((e) => {
-  if (e.ctrlKey && e.key === '4') {
+  if (e.ctrlKey && e.key === 'd') {
     e.preventDefault()
     if (!api.store.browserPersisted.knownUser) {
       api.setKnown()
       api.setConsented()
-      showTemporaryNotification('Ctrl + 4', 'Connected to Database')
+      showTemporaryNotification('Ctrl + D', 'Connected to Database')
+    }
+  }
+})
+
+// Add shortcut for autofill
+onKeyDown((e) => {
+  if (e.ctrlKey && e.key === 'a') {
+    e.preventDefault()
+    if (api.hasAutofill()) {
+      api.autofill()
+      showTemporaryNotification('Ctrl + A', 'Autofilled Current View')
+    } else {
+      showTemporaryNotification('Ctrl + A', 'No Autofill Available', 'error')
+    }
+  }
+})
+
+// Add shortcut for pinning current route
+onKeyDown((e) => {
+  if (e.ctrlKey && e.key === 'p') {
+    e.preventDefault()
+    const currentRoute = api.currentRouteName()
+    const isCurrentlyPinned = api.store.dev.pinnedRoute === currentRoute
+
+    if (isCurrentlyPinned) {
+      api.store.dev.pinnedRoute = null
+      showTemporaryNotification('Ctrl + P', 'Unpinned Route')
+    } else {
+      api.store.dev.pinnedRoute = currentRoute
+      showTemporaryNotification('Ctrl + P', 'Pinned Current Route')
     }
   }
 })
@@ -126,17 +184,20 @@ onKeyDown((e) => {
  *
  * @param {string} command - The command text to display in the notification
  * @param {string} action - The action text to display in the notification
+ * @param {string} type - The type of notification ('default' or 'error')
  *
  * Sets the notification content and shows it by updating reactive refs:
  * - notificationCommand
  * - notificationAction
+ * - notificationType
  * - showNotification
  *
  * Uses setTimeout to automatically hide the notification after 1.5 seconds
  */
-const showTemporaryNotification = (command, action) => {
+const showTemporaryNotification = (command, action, type = 'default') => {
   notificationCommand.value = command
   notificationAction.value = action
+  notificationType.value = type
   showNotification.value = true
   setTimeout(() => {
     showNotification.value = false
@@ -147,222 +208,88 @@ const showTemporaryNotification = (command, action) => {
 const showNotification = ref(false)
 const notificationCommand = ref('')
 const notificationAction = ref('')
+const notificationType = ref('default')
 </script>
 
 <template>
-  <nav class="devbar">
-    <div class="devbar-brand">
-      <div class="devbar-title">
-        <div class="devbar-fulltitle">👩‍💻&nbsp;<b>DEVELOPER MODE</b></div>
-        <div class="devbar-subtitle">👩‍💻&nbsp;<b>DEV MODE</b></div>
+  <nav class="flex items-center justify-between w-full border-b min-h-[36px] max-h-[36px] text-sm px-2">
+    <!-- Left section - anchored to the left -->
+    <div class="flex items-center flex-shrink-0 px-2 py-1 rounded">
+      <div class="flex items-center">
+        <div class="hidden sm:block">
+          <div class="flex items-center text-xs font-normal"><BugPlay class="size-4 mr-1" /><b>DEVELOPER MODE</b></div>
+        </div>
+        <div class="block sm:hidden">
+          <div class="flex items-center text-xs font-normal"><BugPlay class="size-4 mr-1" /><b>DEV</b></div>
+        </div>
       </div>
     </div>
 
-    <div class="devbar-menu">
-      <div class="devbar-start">
-        <div class="devmode">
-          <DocsDropDown></DocsDropDown>
+    <!-- Middle section - centered -->
+    <div class="flex items-center justify-center flex-1 min-w-0 px-2 py-1 rounded">
+      <div class="flex items-center space-x-2">
+        <!-- Add any middle content here -->
+        <div class="text-xs text-gray-600">
+          <!-- Middle content placeholder -->
         </div>
       </div>
+    </div>
 
-      <div class="devbar-end">
-        <div class="devbar-item devbar-buttonpanel">
-          <div class="buttons">
-            <!-- reload button -->
-            <div class="devbar-resetbutton">
-              <ReloadButton></ReloadButton>
-            </div>
+    <!-- Right section - anchored to the right -->
+    <div class="flex items-center flex-shrink-0 px-1 py-1 rounded">
+      <div class="flex items-center space-x-2.5 border-gray-300 pl-4 rounded-l">
+        <!-- reload button -->
+        <div class="flex items-center">
+          <ReloadButton></ReloadButton>
+        </div>
 
-            <!-- reset button -->
-            <div class="devbar-resetbutton">
-              <ResetButton></ResetButton>
-            </div>
+        <!-- reset button -->
+        <div class="flex items-center">
+          <ResetButton></ResetButton>
+        </div>
 
-            <!-- database info button -->
-            <DataBarButton></DataBarButton>
-            <!-- responsive hides this if the page is too small-->
-            <div class="devbar-stepper">
-              <Stepper></Stepper>
-            </div>
-            <!-- route info buttons -->
-            <div class="devbar-routeinfodropdown">
-              <RouteInfoButton></RouteInfoButton>
-            </div>
+        <!-- color mode button -->
+        <div class="flex items-center" v-if="api.store.dev.isFullscreen">
+          <ColorModeButton></ColorModeButton>
+        </div>
 
-            <!-- view button -->
-            <ViewButton></ViewButton>
-          </div>
+        <!--fullscreen button -->
+        <div class="flex items-center" v-if="api.currentRouteName() !== 'recruit'">
+          <FullScreenButton></FullScreenButton>
+        </div>
+
+        <!-- database info button -->
+        <DataBarButton></DataBarButton>
+
+        <!-- responsive hides this if the page is too small-->
+        <div class="items-center">
+          <Stepper></Stepper>
+        </div>
+
+        <!-- route info buttons -->
+        <div class="hidden md:flex items-center">
+          <RouteInfoButton></RouteInfoButton>
+        </div>
+
+        <!-- view button -->
+        <div class="flex items-center">
+          <ViewButton></ViewButton>
         </div>
       </div>
     </div>
   </nav>
-  <KeyCommandNotification :show="showNotification" :command="notificationCommand" :action="notificationAction" />
+  <KeyCommandNotification
+    :show="showNotification"
+    :command="notificationCommand"
+    :action="notificationAction"
+    :type="notificationType"
+  />
 </template>
-
-<style>
-.devbar {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: stretch;
-  position: relative;
-  z-index: 1000;
-}
-.devbar-fulltitle {
-  padding-top: 0px;
-  font-size: 0.92em;
-}
-
-.devbar-subtitle {
-  padding-top: 0px;
-  padding-right: 20px;
-  display: none;
-  white-space: nowrap;
-  font-size: 0.92em;
-}
-
-.devbar-menu {
-  flex-grow: 1;
-  flex-shrink: 0;
-  align-items: stretch;
-  display: flex;
-  z-index: 999;
-}
-
-.devbar {
-  font-size: 13px;
-  background: var(--dev-bar-light-grey); /*rgb(63, 160, 149);*/
-  color: var(--dev-bar-text);
-  border-bottom: var(--dev-bar-lines);
-  min-height: 32px;
-  max-height: 32px;
-}
-
-.devbar-start {
-  justify-content: flex-start;
-  margin-inline-end: auto;
-  display: flex;
-  align-items: stretch;
-  flex-shrink: 3;
-}
-
-@media screen and (max-width: 830px) {
-  .devbar-start {
-    display: none;
-  }
-}
-
-.devbar-title {
-  padding-top: 8px;
-  font-weight: 500;
-  padding-left: 10px;
-}
-
-.devbar-end {
-  justify-content: flex-end;
-  margin-inline-start: auto;
-  display: flex;
-  align-items: stretch;
-}
-
-.devbar-item {
-  align-items: center;
-  display: flex;
-}
-
-.devbar-buttonpanel {
-  padding-top: 0px;
-  padding-left: 10px;
-  padding-right: 10px;
-  border-left: var(--dev-bar-lines);
-  background-color: var(--dev-bar-mild-grey); /*rgb(63, 160, 149);*/
-}
-
-.devbar-button {
-  font-size: 0.65rem;
-  height: 2em;
-}
-
-@media screen and (max-width: 725px) {
-  .devbar-fulltitle {
-    display: none;
-  }
-  .devbar-buttonpanel {
-    border-left: none;
-    background-color: #eeeeee; /*rgb(63, 160, 149);*/
-  }
-  .devbar {
-    border-left: 0.01em solid #b5b5b5;
-    background-color: #eeeeee; /*rgb(63, 160, 149);*/
-  }
-  .devbar-subtitle {
-    display: inline;
-  }
-  .devbar-stepper {
-    display: none;
-  }
-}
-
-@media screen and (max-width: 520px) {
-  .devbar-randomizationdropdown {
-    display: none;
-  }
-}
-
-@media screen and (max-width: 474px) {
-  .devbar-routeinfodropdown {
-    display: none;
-  }
-}
-</style>
 
 <style scoped>
 a:hover {
   color: #10dffa;
 }
 
-.jumper {
-  padding-top: 4px;
-  background-color: #dddddd;
-}
-
-.navbar {
-  font-size: 13px;
-  background: #f7f7f7; /*rgb(63, 160, 149);*/
-  color: #000;
-  border-bottom: 0.01em solid #b5b5b5;
-  height: 0px;
-  padding: 0px;
-  padding-left: 10px;
-  margin: 0px;
-  min-height: 32px;
-  text-align: center;
-}
-
-.field {
-  margin: 0px;
-  margin-top: 3px;
-}
-.is-jump-bar {
-  font-size: 0.65rem;
-  height: 2em;
-  margin: 0px;
-}
-
-.devmode-title {
-  padding-top: 8px;
-  font-weight: 500;
-  padding-left: 10px;
-}
-
-.devmode {
-  padding-top: 8px;
-  font-weight: 400;
-  padding-left: 10px;
-}
-
-.mainstate {
-  padding-top: 8px;
-  border-left: 0.01em solid #b5b5b5;
-  background-color: #eeeeee; /*rgb(63, 160, 149);*/
-}
+/* Keep any custom styles that might be needed for child components */
 </style>

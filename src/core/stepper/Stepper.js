@@ -172,11 +172,10 @@ export class Stepper extends StepState {
   /**
    * Appends one or more objects as new states to the current node
    * @param {Object|Array<Object>} items - Single object or array of objects to append as new states
-   * @param {Function} [idGenerator] - Optional function to generate custom IDs for each item
    * @returns {Stepper} Returns this instance for method chaining
    * @throws {Error} If items is not an object or array, or if adding items would exceed maxStepperRows
    */
-  append(items, idGenerator = null) {
+  append(items) {
     this._log.debug('\tappend', items)
     // Convert single item to array if needed
     const itemsToAdd = Array.isArray(items) ? items : [items]
@@ -193,11 +192,6 @@ export class Stepper extends StepState {
 
     // Try to add each item individually
     itemsToAdd.forEach((item) => {
-      // If an idGenerator function is provided, use it to generate the ID
-      if (typeof idGenerator === 'function') {
-        item.id = idGenerator(item)
-      }
-
       // Check if this specific item would create a duplicate path
       if (this._hasDuplicatePaths(item)) {
         this._log.warn(`Warning: Skipping item that would create duplicate path`)

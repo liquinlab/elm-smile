@@ -4,6 +4,10 @@ import TreeNode from './TreeNode.vue'
 import DataPathViewer from '@/dev/developer_mode/DataPathViewer.vue'
 import { useRoute } from 'vue-router'
 import useViewAPI from '@/core/composables/useViewAPI'
+import { ButtonGroup, ButtonGroupItem } from '@/uikit/components/ui/button-group'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
+import { Button } from '@/uikit/components/ui/button'
+
 const api = useViewAPI()
 
 const stateMachine = computed(() => api.steps.visualize())
@@ -158,39 +162,65 @@ watch(
 
 <template>
   <div class="tree-viewer-container" v-if="api.steps">
-    <div class="path-display-container">
-      <div class="path-info">
-        <div class="path-display">{{ api.pathString }}</div>
-      </div>
+    <div :class="{ disabled: api.nSteps === 0 }">
+      <div class="path-display-container">
+        <div class="path-info">
+          <div class="path-display">{{ api.pathString }}</div>
+        </div>
 
-      <div class="field has-addons">
-        <p class="control">
-          <button @click="api.goPrevStep()" class="button is-small nav-button" :disabled="!api.hasSteps()">
-            <span><FAIcon icon="fa-solid fa-angle-left" /></span>
-          </button>
-        </p>
-        <p class="control">
-          <button @click="api.goNextStep()" class="button is-small nav-button" :disabled="!api.hasSteps()">
-            <span><FAIcon icon="fa-solid fa-angle-right" /></span>
-          </button>
-        </p>
-        <p class="control">
-          <button @click="api.goFirstStep()" class="button is-small nav-button" :disabled="!api.hasSteps()">
-            <span><FAIcon icon="fa-solid fa-house-flag" /></span>
-          </button>
-        </p>
-        <p class="control">
-          <button @click="api.clear()" class="button is-small nav-button" :disabled="!api.hasSteps()">
-            <span><FAIcon icon="fa-solid fa-trash" /></span>
-          </button>
-        </p>
+        <TooltipProvider>
+          <ButtonGroup variant="outline" size="menu">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ButtonGroupItem @click="api.goPrevStep()" :disabled="!api.hasSteps()">
+                  <i-lucide-chevron-left />
+                </ButtonGroupItem>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Previous Step</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ButtonGroupItem @click="api.goNextStep()" :disabled="!api.hasSteps()">
+                  <i-lucide-chevron-right />
+                </ButtonGroupItem>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Next Step</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ButtonGroupItem @click="api.goFirstStep()" :disabled="!api.hasSteps()">
+                  <i-famicons-home />
+                </ButtonGroupItem>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">First Step</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ButtonGroupItem @click="api.clear()" :disabled="!api.hasSteps()">
+                  <i-mdi-trash />
+                </ButtonGroupItem>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Clear Steps</TooltipContent>
+            </Tooltip>
+          </ButtonGroup>
+        </TooltipProvider>
       </div>
     </div>
 
     <div class="tree-container" ref="treeContainer">
       <div v-if="api.nSteps > 0">
         <div class="index-display">
-          {{ api.stepIndex }}/{{ api.nSteps }} ({{ api.blockIndex }}/{{ api.blockLength }})
+          <Tooltip>
+            <TooltipTrigger>{{ api.stepIndex }}/{{ api.nSteps }}</TooltipTrigger>
+            <TooltipContent side="bottom">Step index</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger class="ml-1 text-teal-500">({{ api.blockIndex }}/{{ api.blockLength }})</TooltipTrigger>
+            <TooltipContent side="bottom">Index within block</TooltipContent>
+          </Tooltip>
         </div>
 
         <ul class="tree-root">
@@ -213,36 +243,43 @@ watch(
           </li>
         </ul>
       </div>
-      <div class="tree-viewer-container-empty" v-else>No steps defined</div>
+      <div class="tree-viewer-container-empty disabled" v-else>No steps defined</div>
     </div>
-    <div class="data-container-global">
-      <div class="global-data-display">
-        Persisted Vars
-        <span class="data-label">(.persist)</span>
 
-        <button
+    <div class="data-container-global" :class="{ disabled: Object.keys(api.persist).length === 0 }">
+      <div class="section-title">
+        <span>Persisted Vars <span class="data-label">(.persist)</span></span>
+        <Button
           @click="api.clearPersist()"
-          class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
+          variant="outline"
+          size="menu"
+          class="has-tooltip-arrow has-tooltip-bottom"
           data-tooltip="Delete Global Variables"
         >
-          <span><FAIcon icon="fa-solid fa-trash" /></span>
-        </button>
-        <DataPathViewer :data="api.persist" />
+          <i-fa6-solid-trash />
+        </Button>
+      </div>
+      <div class="global-data-display">
+        <DataPathViewer :data="api.persist" v-if="Object.keys(api.persist).length !== 0" />
+        <div class="italic text-xs" v-else>No variables persisted</div>
       </div>
     </div>
-    <div class="data-container">
+    <div class="data-container" :class="{ disabled: api.nSteps === 0 }">
+      <div class="section-title">
+        <span>Step Data <span class="data-label">(.stepData)</span></span>
+      </div>
       <div class="data-display">
-        Step Data <span class="data-label">(.stepData)</span>
         <!--
         <button
           @click="api.clearCurrentStepData()"
           class="button is-small nav-button-small has-tooltip-arrow has-tooltip-bottom"
           data-tooltip="Delete Nodes"
         >
-          <span><FAIcon icon="fa-solid fa-trash" /></span>
+          <span><i-fa6-solid-trash" /></span>
         </button>
         -->
-        <DataPathViewer :data="api.stepData" />
+        <DataPathViewer :data="api.stepData" v-if="api.nSteps !== 0" />
+        <div class="italic text-xs" v-else>Data defined on this step</div>
       </div>
     </div>
   </div>
@@ -255,8 +292,8 @@ watch(
   height: 100%;
   min-height: 0; /* Important for nested flex containers */
   overflow: hidden;
-  background-color: #f1f3f3;
-  border-top: 1px solid #cacaca;
+  background-color: var(--background);
+  border-top: 1px solid var(--border);
 }
 
 .tree-viewer-container-empty {
@@ -267,14 +304,14 @@ watch(
   padding-right: 10px;
   font-size: 0.75rem;
   font-family: monospace;
-  font-weight: 800;
-  color: #9fa0a0;
-  border-top: 1px solid #cacaca;
+  font-weight: 200;
+  color: var(--muted-foreground);
   text-align: left;
+  font-style: italic;
 }
 
 .path-display-container {
-  background-color: #f1f3f3;
+  background-color: var(--background);
   padding: 0px 5px;
   display: flex;
   justify-content: space-between;
@@ -297,7 +334,7 @@ watch(
   margin-left: 5px;
   font-size: clamp(0.5rem, 0.8rem, 0.8rem); /* Shrink font size if needed but not larger than 0.9rem */
   font-family: monospace;
-  font-weight: 800;
+  font-weight: 500;
   color: #246761;
   line-height: 1;
   white-space: nowrap; /* Prevent wrapping */
@@ -337,13 +374,14 @@ watch(
   padding-right: 4px;
   padding-top: 3px;
   font-family: monospace;
-  font-weight: 800;
+  font-weight: 500;
   color: #e49310;
   line-height: 1; /* Add line-height to match */
   text-align: right;
   position: absolute;
   right: 0;
   top: 4px;
+  z-index: 50;
 }
 .content-display {
   font-size: 0.7rem;
@@ -363,12 +401,12 @@ watch(
   flex: 0 1 auto; /* don't grow, can shrink, auto basis */
   overflow: auto;
   font-family: monospace;
-  border-top: 1px solid #cacaca;
+  border-top: 1px solid var(--border);
   position: relative;
   scroll-behavior: smooth;
   max-height: 300px;
   min-height: 50px;
-  background-color: #fff;
+  background-color: var(--background);
 }
 
 .data-container-global {
@@ -376,9 +414,9 @@ watch(
   overflow: visible;
   display: flex;
   flex-direction: column;
-  max-height: 120px;
-  background-color: #f1f3f3;
-  border-top: 1px solid #cacaca;
+  min-height: 120px;
+  background-color: var(--background);
+  border-top: 1px solid var(--border);
   text-align: left;
 }
 
@@ -387,9 +425,25 @@ watch(
   overflow: visible;
   display: flex;
   flex-direction: column;
-  background-color: #f1f3f3;
-  border-top: 1px solid #cacaca;
+  background-color: var(--background);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   text-align: left;
+}
+
+.data-container.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.data-container-global.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .tree-root {
@@ -414,11 +468,10 @@ watch(
   flex: 1;
   overflow: auto;
   padding: 10px;
-  max-height: 120px;
-  min-height: 120px;
   font-size: 0.8rem;
-  font-weight: 800;
+  font-weight: 200;
   font-family: monospace;
+  color: var(--muted-foreground);
 }
 
 .data-display {
@@ -427,15 +480,31 @@ watch(
   padding: 10px;
   min-height: 180px;
   font-size: 0.8rem;
-  font-weight: 800;
+  font-weight: 500;
   font-family: monospace;
+  color: var(--muted-foreground);
 }
 
 .data-label {
   font-size: 0.7rem;
-  font-weight: 800;
+  font-weight: 500;
   font-family: monospace;
   color: #10a8a2;
   padding-right: 6px;
+}
+
+.section-title {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  font-family: monospace;
+  text-align: left;
+  background-color: var(--muted);
+  padding: 0.375rem 0.5rem;
+  margin: 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

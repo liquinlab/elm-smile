@@ -52,6 +52,7 @@ export default function stripDevToolPlugin() {
             clean_src = removetag(clean_src, 'Notivue')
             clean_src = removeline(clean_src, 'Notivue')
             clean_src = removeline(clean_src, 'notivue')
+            clean_src = removeline(clean_src, 'DevAppSidebar')
           }
         }
 

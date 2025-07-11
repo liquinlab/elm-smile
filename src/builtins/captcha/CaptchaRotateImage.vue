@@ -63,7 +63,7 @@ var myInterval = setInterval(() => {
           <tr>
             <td>
               <button class="button" @click="rotateImageDelta(-10)">
-                Rotate Left&nbsp;&nbsp;<FAIcon icon="fa-solid fa-rotate-left" />
+                Rotate Left&nbsp;&nbsp;<i-fa6-solid-rotate-left />
               </button>
             </td>
             <td>
@@ -71,7 +71,7 @@ var myInterval = setInterval(() => {
             </td>
             <td>
               <button class="button" @click="rotateImageDelta(10)">
-                Rotate Right&nbsp;&nbsp;<FAIcon icon="fa-solid fa-rotate-right" />
+                Rotate Right&nbsp;&nbsp;<i-fa6-solid-rotate-right />
               </button>
             </td>
           </tr>

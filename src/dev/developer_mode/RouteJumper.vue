@@ -9,6 +9,8 @@ const props = defineProps(['routeName'])
 import useLog from '@/core/stores/log'
 const log = useLog()
 import { useRoute, useRouter } from 'vue-router'
+import { DropdownMenuContent, DropdownMenuItem } from '@/uikit/components/ui/dropdown-menu'
+
 const hoverRoute = ref('')
 const router = useRouter() // this is needed in composition API because this.$router not availabel
 const route = useRoute()
@@ -43,88 +45,27 @@ function navigate(route) {
 }
 </script>
 <template>
-  <div class="dropdown-content has-text-left">
-    <template v-for="r in allRoutes">
-      <div
-        class="routelabel"
-        @mouseover="hoverRoute = r.name"
-        @mouseout="hoverRoute = ''"
-        :class="{ route_selected: routeName === r.name, hover: hoverRoute === r.name }"
-        @click="navigate(r.name)"
-      >
-        <span class="is-size-7">
-          <div class="routename">
-            <span v-if="r.meta.level > 0" v-for="i in r.meta.level" style="margin-left: 5px">&nbsp;</span>
-            <FAIcon v-if="r.meta.sequential" icon="fa-solid fa-arrow-down" />
-            <FAIcon v-else icon="fa-solid fa-diamond" />
-            /{{ r.name }}
-          </div>
-        </span>
-      </div>
-    </template>
-  </div>
+  <DropdownMenuContent align="end">
+    <DropdownMenuItem
+      v-for="r in allRoutes"
+      :key="r.name"
+      @mouseover="hoverRoute = r.name"
+      @mouseout="hoverRoute = ''"
+      :class="{
+        'bg-accent text-accent-foreground': route.name === r.name,
+        'bg-muted': hoverRoute === r.name,
+      }"
+      @click="navigate(r.name)"
+      class="cursor-pointer"
+    >
+      <span class="text-[0.65rem] font-mono">
+        <div class="routename font-medium">
+          <span v-if="r.meta.level > 0" v-for="i in r.meta.level" style="margin-left: 5px">&nbsp;</span>
+          <i-fa6-solid-arrow-down v-if="r.meta.sequential" class="inline mr-1" />
+          <i-fa6-solid-diamond v-else class="inline mr-1" />
+          /{{ r.name }}
+        </div>
+      </span>
+    </DropdownMenuItem>
+  </DropdownMenuContent>
 </template>
-
-<style scoped>
-.dropdown-content {
-  padding-left: 10px;
-  padding-right: 5px;
-  z-index: 9999;
-}
-.dropdown-content hr {
-  margin: 0;
-  border-top: 0.05em solid #cbcbcb;
-}
-
-.forcemode {
-  color: #595959;
-}
-.note {
-  font-size: 0.8em;
-  color: #6b6b6b;
-  padding-top: 3px;
-}
-
-.dropdown-content b {
-  color: #000;
-  font-size: 13px;
-}
-.hover {
-  background-color: #f0f0f0;
-}
-.routelink {
-  font-family: monospace;
-}
-
-.routename {
-  font-weight: 800;
-}
-
-.forcebutton {
-  font-size: 0.8rem;
-  position: absolute;
-
-  position: absolute;
-  right: 2px;
-  top: 3px;
-  padding: 3px;
-  margin-right: 4px;
-  margin-left: auto;
-}
-.route_selected {
-  background-color: #bbbbbb;
-  color: #fff;
-  font-weight: 500;
-}
-
-.routelabel {
-  font-weight: 800;
-  font-family: 'Courier New', Courier, monospace;
-  display: inline-block;
-  position: relative;
-  width: 100%;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  padding-left: 5px;
-}
-</style>

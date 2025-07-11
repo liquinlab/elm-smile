@@ -1,6 +1,11 @@
 <script setup>
 import { reactive, computed, ref, onMounted, nextTick } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
+import { Button } from '@/uikit/components/ui/button'
+import { Checkbox } from '@/uikit/components/ui/checkbox'
+import { MultiSelect } from '@/uikit/components/ui/multiselect'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
+import { TitleTwoCol, ConstrainedPage, ConstrainedTaskWindow } from '@/uikit/layouts'
 const api = useViewAPI()
 
 // read in props
@@ -97,7 +102,7 @@ const currentPageComplete = computed(() => {
   return api.stepData.questions.every((question) => {
     if ('answer' in question) {
       // For multiselect, ensure at least one option is selected
-      if (question.multiselect) {
+      if (question.multiSelect) {
         return Array.isArray(question.answer) && question.answer.length > 0
       }
       return true
@@ -134,94 +139,126 @@ init()
 </script>
 
 <template>
-  <div class="page prevent-select">
-    <div class="formcontent">
-      <!-- Replace the two quiz page sections with this single dynamic one -->
-      <div class="formstep" v-if="api.stepIndex < qs.length && /^pages\/pg\d+$/.test(api.pathString)">
-        <div class="formheader">
-          <h3 class="is-size-3 has-text-weight-bold">
-            <FAIcon icon="fa-solid fa-square-check" />&nbsp;Did we explain things clearly?
-          </h3>
-          <p class="is-size-6">
-            Using the information provided in the previous pages, please select the correct answer for each question. Do
-            your best! If anything is unclear you can review the instructions again after you submit your response.
-          </p>
+  <!-- Quiz pages -->
+  <ConstrainedPage
+    v-if="api.stepIndex < qs.length && /^pages\/pg\d+$/.test(api.pathString)"
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+  >
+    <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
+      <template #title>
+        <h3 class="text-3xl font-bold mb-4">
+          <i-fa6-solid-square-check class="inline mr-2" />&nbsp;Did we explain things clearly?
+        </h3>
+        <p class="text-lg mb-8">
+          Using the information provided in the previous pages, please select the correct answer for each question. Do
+          your best! If anything is unclear you can review the instructions again after you submit your response.
+        </p>
+      </template>
+      <template #left>
+        <div class="text-left text-muted-foreground">
+          <h3 class="text-lg font-bold mb-2">Test your understanding</h3>
+          <p class="text-md font-light text-muted-foreground">You must answer all the questions to move on.</p>
         </div>
-        <div class="columns">
-          <div class="column is-one-third">
-            <div class="formsectionexplainer">
-              <h3 class="is-size-6 has-text-weight-bold">Test your understanding</h3>
-              <p class="is-size-6">You must answer all the questions in order to move on.</p>
-            </div>
-          </div>
-          <div class="column">
-            <div class="box is-shadowless formbox">
-              <div v-for="(question, index) in api.stepData.questions" :key="question.id" class="mb-5">
-                <FormKit
-                  :type="question.multiSelect ? 'checkbox' : 'select'"
-                  :label="question.question"
-                  :name="question.id"
-                  :placeholder="question.multiSelect ? 'Select options' : 'Select option'"
-                  v-model="api.stepData.questions[index].answer"
-                  :options="question.answers"
-                  validation="required"
-                  :multiple="question.multiSelect"
-                />
-              </div>
-              <hr />
-              <div class="columns">
-                <div class="column">
-                  <div class="has-text-left">
-                    <button v-if="api.stepIndex >= 1" class="button is-warning" @click="api.goPrevStep()">
-                      <FAIcon icon="fa-solid fa-arrow-left" />&nbsp; Previous page
-                    </button>
-                  </div>
-                </div>
-                <div class="column">
-                  <div class="has-text-right">
-                    <button
-                      v-if="currentPageComplete"
-                      :class="['button', api.isLastBlockStep() ? 'is-success' : 'is-warning']"
-                      @click="api.isLastBlockStep() ? submitQuiz() : api.goNextStep()"
-                    >
-                      {{ api.isLastBlockStep() ? 'Submit' : 'Next page' }}
-                      <template v-if="!api.isLastBlockStep()">
-                        &nbsp;<FAIcon icon="fa-solid fa-arrow-right" />
-                      </template>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      </template>
+      <template #right>
+        <div class="border border-border text-left bg-muted p-6 rounded-lg">
+          <div
+            v-for="(question, index) in api.stepData.questions"
+            :key="question.id"
+            :class="{ 'mt-0': index === 0, 'mt-9': index > 0 }"
+            class="mb-6"
+          >
+            <label class="block text-md font-semibold text-foreground mb-2">
+              {{ question.question }}
+            </label>
 
-      <div class="formstep" v-else-if="api.pathString === 'feedback/success'">
-        <div class="formheader">
-          <h3 class="is-size-3 has-text-weight-bold has-text-centered">
-            <FAIcon icon="fa-solid fa-square-check" />&nbsp;Congrats! You passed.
-          </h3>
-          <p class="is-size-5 has-text-centered">Click here to begin the next phase of the experiment.</p>
-        </div>
-        <div class="has-text-centered">
-          <button class="button is-warning" @click="finish">Let's begin.</button>
-        </div>
-      </div>
+            <!-- Multi-select checkbox -->
+            <div v-if="question.multiSelect" class="mb-9">
+              <MultiSelect
+                :options="question.answers"
+                v-model="api.stepData.questions[index].answer"
+                variant="success"
+                help="Select all that apply"
+                size="lg"
+              />
+            </div>
 
-      <div class="formstep" v-else-if="api.pathString === 'feedback/retry'">
-        <div class="formheader">
-          <h3 class="is-size-3 has-text-weight-bold has-text-centered">
-            <FAIcon icon="fa-solid fa-square-check" />&nbsp;Sorry! You did not get all the answers correct.
-          </h3>
-          <p class="is-size-5 has-text-centered">Please re-read the instructions and try again.</p>
+            <!-- Single select dropdown -->
+            <Select v-else v-model="api.stepData.questions[index].answer">
+              <SelectTrigger class="w-full bg-background dark:bg-background text-base">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="answer in question.answers" :key="answer" :value="answer">
+                  {{ answer }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <hr class="border-border my-6" />
+
+          <div class="flex justify-between">
+            <Button variant="outline" v-if="api.stepIndex >= 1" @click="api.goPrevStep()">
+              <i-fa6-solid-arrow-left />
+              Previous page
+            </Button>
+            <div v-else></div>
+            <Button
+              :variant="api.isLastBlockStep() ? 'default' : 'outline'"
+              :disabled="!currentPageComplete"
+              @click="api.isLastBlockStep() ? submitQuiz() : api.goNextStep()"
+            >
+              {{ api.isLastBlockStep() ? 'Submit' : 'Next page' }}
+              <i-fa6-solid-arrow-right v-if="!api.isLastBlockStep()" />
+            </Button>
+          </div>
         </div>
-        <div class="has-text-centered">
-          <button class="button is-warning" @click="returnInstructions">Back to Instructions</button>
+      </template>
+    </TitleTwoCol>
+  </ConstrainedPage>
+
+  <!-- Success page -->
+  <ConstrainedTaskWindow
+    v-else-if="api.pathString === 'feedback/success'"
+    variant="ghost"
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+  >
+    <div class="text-center items-center justify-center">
+      <h3 class="text-3xl font-bold mb-4">
+        <div class="flex justify-center mb-2">
+          <i-fa6-solid-square-check class="text-[4rem]" />
         </div>
-      </div>
+        Congrats! You passed.
+      </h3>
+      <p class="text-lg mb-6">Click here to begin the next phase of the experiment.</p>
+      <Button variant="default" @click="finish">Let's begin.</Button>
     </div>
-  </div>
+  </ConstrainedTaskWindow>
+
+  <!-- Retry page -->
+  <ConstrainedTaskWindow
+    v-else-if="api.pathString === 'feedback/retry'"
+    variant="ghost"
+    :responsiveUI="api.config.responsiveUI"
+    :width="api.config.windowsizerRequest.width"
+    :height="api.config.windowsizerRequest.height"
+  >
+    <div class="text-center items-center justify-center">
+      <h3 class="text-3xl font-bold mb-4">
+        <div class="flex justify-center mb-2">
+          <i-bx-error class="text-[4rem]" />
+        </div>
+        Sorry! You did not get all the answers correct.
+      </h3>
+      <p class="text-lg mb-6">Please re-read the instructions and try again.</p>
+      <Button variant="warning-light" @click="returnInstructions">Back to Instructions</Button>
+    </div>
+  </ConstrainedTaskWindow>
 </template>
 
 <style scoped>

@@ -115,18 +115,21 @@ const initDev = {
   showConsoleBar: false, // show/hide the data base bottom (transient)
   showSideBar: false,
   pinnedRoute: null,
+  mainView: 'devmode',
   consoleBarHeight: 300, // height of the data bar (transient)
   consoleBarTab: 'browse', // which tab to show in the data bar (transient)
+  sideBarTab: 'steps', // which tab is visible in the dev sidebar (transient)
   searchParams: '', // search parameters (transient)
   logFilter: 'All', // what level of log messages to show (transient)
   notificationFilter: 'Errors only', // what level of notifications to show (transient)
   lastViewLimit: false, // limits logs to the last page (transient)
   dataPath: null, // path to the data (transient)
   configPath: null, // path to the config (transient)
+  selectedDevice: 'desktop2', // selected device for responsive design mode
+  isRotated: false, // device rotation state for responsive design mode
+  isFullscreen: false, // fullscreen state for responsive design mode
   // panel locations (transient)
-  configPanel: { type: 'local', visible: false, x: -280, y: 0 },
-  randomizationPanel: { visible: false, x: -130, y: 0 },
-  routePanel: { visible: false, x: -0, y: -3 },
+  routePanelVisible: false,
 }
 
 const initBrowserPersisted = {
@@ -139,6 +142,7 @@ const initBrowserPersisted = {
   currentViewDone: false,
   consented: false,
   withdrawn: false,
+  verifiedVisibility: false,
   done: false,
   reset: false,
   totalWrites: 0,
@@ -158,6 +162,7 @@ const initBrowserPersisted = {
 const initBrowserEphemeral = {
   // ephemeral state, resets on browser refresh
   forceNavigate: false,
+  tooSmall: false,
   steppers: {}, // Store for HStepper instances
   dbConnected: false,
   dbChanges: true,
@@ -326,6 +331,11 @@ export default defineStore('smilestore', {
       this.data.withdrawn = true
       this.private.withdrawData = forminfo
       this.data.endtime = fsnow()
+    },
+
+    verifyVisibility(value) {
+      this.browserPersisted.verifiedVisibility = value
+      this.data.verifiedVisibility = value
     },
 
     /**

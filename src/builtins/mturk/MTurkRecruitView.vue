@@ -4,6 +4,7 @@ import StudyPreviewText from '@/builtins/advertisement/StudyPreviewText.vue'
 
 // import and initalize smile API
 import useAPI from '@/core/composables/useAPI'
+import { Button } from '@/uikit/components/ui/button'
 const api = useAPI()
 
 const props = defineProps({
@@ -63,16 +64,16 @@ function submit() {
 </script>
 
 <template>
-  <div class="page">
+  <div class="mt-20 w-4/5 mx-auto">
     <StudyPreviewText :estimated_time="props.estimated_time" :payrate="payrate" v-if="mturkPreview"></StudyPreviewText>
     <div v-else>
-      <h1 class="title is-3">Thanks for accepting our HIT</h1>
-      <div class="submitform" v-if="launched">
-        <p class="has-text-left">
+      <h1 class="text-2xl font-bold mb-4">Thanks for accepting our HIT</h1>
+      <div class="w-1/2 mx-auto" v-if="launched">
+        <p class="text-left mb-4">
           Please complete the task in the window that was launched. When you are finished you will be provided with a
           completion code which you should copy and enter here.
         </p>
-        <hr />
+        <hr class="border-gray-300 my-4" />
         <FormKit type="form" submit-label="Submit to Mechanical Turk" :action="turkSubmitTo" method="post">
           <FormKit
             type="text"
@@ -85,15 +86,8 @@ function submit() {
         </FormKit>
       </div>
       <div v-else>
-        <a class="button is-info" id="launch_window" @click="clicked()" target="_new">Begin Task in New Window</a>
+        <Button variant="default" @click="clicked()" target="_new"> Begin Task in New Window </Button>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.submitform {
-  width: 50%;
-  margin: auto;
-}
-</style>
