@@ -28,6 +28,7 @@
     "dev:test": "vite --mode testing",
     "build": "vite build",
     "build:present": "vite build --mode presentation",
+    "build:dev": "vite build --mode development",
     "emulators": "firebase emulators:start --only database,firestore",
     "preview": "vite preview",
     "getdata": "node scripts/download_data.mjs",
