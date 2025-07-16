@@ -121,6 +121,43 @@ the text content:
 
 :::
 
+### Making Buttons Clickable
+
+There are two main ways to make buttons interactive:
+
+#### 1. Using onClick Handler
+
+For simple click actions, you can add an `@click` handler directly to the
+button:
+
+```vue
+<Button @click="handleClick" variant="primary">
+  Click Me
+</Button>
+```
+
+#### 2. Using asChild with Anchor Tags
+
+For navigation or external links, you can use the `asChild` prop with an anchor
+tag in the slot:
+
+```vue
+<Button asChild variant="primary">
+  <a href="/some-page">Navigate to Page</a>
+</Button>
+```
+
+This approach is useful for:
+
+- Internal navigation
+- External links
+- Download links
+- Any scenario where you need the button to behave like a link
+
+The `asChild` prop tells the Button component to render its children as the root
+element instead of a `<button>` tag, allowing you to use anchor tags while
+maintaining the button's styling.
+
 ### Props
 
 `variant` (string): The visual style variant can be `default`, `destructive`,
