@@ -464,7 +464,8 @@ export class SmileAPI {
    */
   setAutofill(autofill) {
     this.logStore.debug('SMILEAPI: registering autofill function')
-    if (this.store.config.mode === 'development') this.store.setAutofill(autofill)
+    if (this.store.config.mode === 'development' || this.store.config.mode === 'presentation')
+      this.store.setAutofill(autofill)
   }
 
   /**
@@ -473,7 +474,8 @@ export class SmileAPI {
    */
   removeAutofill() {
     this.logStore.debug('SMILEAPI: removing autofill')
-    if (this.store.config.mode === 'development') this.store.removeAutofill()
+    if (this.store.config.mode === 'development' || this.store.config.mode === 'presentation')
+      this.store.removeAutofill()
   }
 
   // Completion and recruitment
@@ -518,6 +520,15 @@ export class SmileAPI {
    */
   currentRouteName() {
     return this.route.name
+  }
+
+  // routes
+  /**
+   * Gets the info of the current route
+   * @returns {Object} The current route info
+   */
+  currentRouteInfo() {
+    return this.route
   }
 
   /**

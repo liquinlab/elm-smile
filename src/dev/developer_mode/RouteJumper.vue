@@ -61,8 +61,9 @@ function navigate(route) {
       <span class="text-[0.65rem] font-mono">
         <div class="routename font-medium">
           <span v-if="r.meta.level > 0" v-for="i in r.meta.level" style="margin-left: 5px">&nbsp;</span>
-          <i-fa6-solid-arrow-down v-if="r.meta.sequential" class="inline mr-1" />
-          <i-fa6-solid-diamond v-else class="inline mr-1" />
+          <i-lucide-arrow-down v-if="r.meta.sequential" class="inline mr-1" />
+          <i-lucide-presentation v-else-if="r.name === 'presentation_home'" class="inline mr-1" />
+          <i-lucide-diamond v-else class="inline mr-1" />
           /{{ r.name }}
         </div>
       </span>

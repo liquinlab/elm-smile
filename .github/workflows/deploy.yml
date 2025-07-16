@@ -172,7 +172,7 @@ jobs:
       # Build the web app
       - name: Build web app
         run: |
-          if ${{ github.ref == 'refs/heads/presentation'}}; then 
+          if ${{ github.ref == 'refs/heads/presentation' || secrets.EXP_DEPLOY_MODE == 'presentation' }}; then 
             npm run build:present 
           else
             npm run build

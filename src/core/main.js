@@ -4,15 +4,17 @@
 
 /**
  * Core imports for the SMILE application including:
- * - Vue and Vue plugins (FormKit, Router, Pinia, Google Analytics)
- * - UI components and styling (FontAwesome, FormKit theme)
+ * - Vue and Vue plugins (Router, Pinia, Google Analytics)
  * - Application configuration (timeline, icons)
  */
 import { useRouter, addGuards } from '@/core/router'
 import { pinia } from '@/core/stores/createPinia'
 
 import timeline from '@/user/design'
-import App from '@/core/SmileApp.vue'
+
+// this is automatically replaced with SmileApp.vue in the vite strip-devtool.js plugin for developer mode
+// or PresentationModeApp.vue in the presentation mode
+import App from '@/core/MainApp.vue'
 import { createApp } from 'vue'
 import VueGtag from 'vue-gtag'
 import '@/core/main.css'

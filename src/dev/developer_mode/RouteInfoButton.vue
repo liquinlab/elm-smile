@@ -101,7 +101,15 @@ const togglePin = () => {
       <DropdownMenu :open="api.store.dev.routePanelVisible" @update:open="handleDropdownOpenChange">
         <DropdownMenuTrigger as-child>
           <ButtonGroupItem :class="buttonstyle">
-            <div class="font-mono text-[0.65rem] font-medium min-w-[100px]">/{{ api.currentRouteName() }}</div>
+            <div class="font-mono text-[0.65rem] font-medium min-w-[100px]">
+              <i-lucide-arrow-down v-if="api.currentRouteInfo().meta.sequential" class="inline size-3 mr-1" />
+              <i-lucide-presentation
+                v-else-if="api.currentRouteName() === 'presentation_home'"
+                class="inline size-3 mr-1"
+              />
+              <i-lucide-diamond v-else class="inline size-3 mr-1" />
+              /{{ api.currentRouteName() }}
+            </div>
           </ButtonGroupItem>
         </DropdownMenuTrigger>
         <RouteJumper />

@@ -399,6 +399,7 @@ EXP_DEPLOY_HOST        = "exps.mydomain.org"
 EXP_DEPLOY_PATH        = "/home/user/exps.mydomain.org"
 EXP_DEPLOY_PORT        = 22
 EXP_DEPLOY_USER        = user
+EXP_DEPLOY_MODE        = production
 SLACK_WEBHOOK_URL      = https://hooks.slack.com/workflows/something
 SLACK_WEBHOOK_ERROR_URL= https://hooks.slack.com/workflows/somethingelse
 EXP_DEPLOY_KEY         = "-----BEGIN RSA PRIVATE KEY-----\n-----END RSA PRIVATE KEY-----"
@@ -409,6 +410,8 @@ EXP_DEPLOY_KEY         = "-----BEGIN RSA PRIVATE KEY-----\n-----END RSA PRIVATE 
 - `EXP_DEPLOY_PATH` is the directory you upload your experiment to
 - `EXP_DEPLOY_PORT` is the ssh port for your server (usually 22)
 - `EXP_DEPLOY_USER` is the username for your server
+- `EXP_DEPLOY_MODE` is the mode of the deployment (production, development, or
+  presentation)
 - `SLACK_WEBHOOK_URL` is the url for the Slack Webhook for posting deployment
   messages
 - `SLACK_WEBHOOK_ERROR_URL` is the url for the Slack Webhook for posting error

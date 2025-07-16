@@ -148,7 +148,7 @@ const shouldUseResponsiveContainer = computed(() => {
 <template>
   <!-- Fullscreen mode - just the slot content -->
   <div
-    v-if="api.store.dev.isFullscreen || !shouldUseResponsiveContainer"
+    v-if="api.store.dev.isFullscreen || !shouldUseResponsiveContainer || api.config.mode == 'presentation'"
     ref="fullScreenDiv"
     class="fullscreen-container bg-background text-foreground"
     :class="api.currentRouteName() !== 'recruit' ? (api.config.colorMode === 'dark' ? 'dark' : 'light') : ''"

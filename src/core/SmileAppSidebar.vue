@@ -7,17 +7,13 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
-  SidebarInput,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
-  useSidebar,
 } from '@/uikit/components/ui/sidebar'
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/uikit/components/ui/popover'
 import ConfigDevPanel from '@/dev/developer_mode/ConfigDevPanel.vue'
-import Toggle from '@/uikit/components/ui/toggle/Toggle.vue'
 import { Sun, Moon } from 'lucide-vue-next'
 import { useColorMode } from '@vueuse/core'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
@@ -99,20 +95,6 @@ const isDarkMode = computed({
             </SidebarMenuItem>
             -->
 
-            <!-- Present -->
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
-                :class="{
-                  'bg-chart-4 hover:!bg-chart-4/80': api.store.dev.mainView === 'presentation',
-                  'hover:!bg-sidebar-border': api.store.dev.mainView !== 'presentation',
-                }"
-                tooltip="Presentation Mode"
-                @click="api.store.dev.mainView = 'presentation'"
-              >
-                <i-uil-presentation-line class="!size-5" />
-              </SidebarMenuButton>
-            </SidebarMenuItem>
             <!-- Recruit 
             <SidebarMenuItem>
               <SidebarMenuButton
@@ -159,7 +141,7 @@ const isDarkMode = computed({
             </SidebarMenuButton>
           </TooltipTrigger>
           <TooltipContent side="right">
-            <p>{{ isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode' }}</p>
+            <p>{{ isDarkMode ? 'Switch to Light Mode in Dev Tools' : 'Switch to Dark Mode in Dev Tools' }}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

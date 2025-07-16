@@ -3,7 +3,8 @@ import { computed } from 'vue'
 import { Button } from '@/uikit/components/ui/button'
 import { Separator } from '@/uikit/components/ui/separator'
 import { ArrowRight, ExternalLink, Calendar, Users, Building } from 'lucide-vue-next'
-
+import useAPI from '@/core/composables/useAPI'
+const api = useAPI()
 // setup the info for the page here
 
 // main title
@@ -152,7 +153,7 @@ function getAffiliationIndex(affiliation) {
                     rel="noopener noreferrer"
                   >
                     {{ item.data }}
-                    <ExternalLink class="w-3 h-3" />
+                    <i-lucide-external-link class="w-3 h-3" />
                   </a>
                   <span v-else class="text-foreground">{{ item.data }}</span>
                 </div>
@@ -197,10 +198,10 @@ function getAffiliationIndex(affiliation) {
             Start the experiment from the very beginning as if you were a real participant. Your data will not be saved,
             though some local storage may be used while you are on the page.
           </p>
-          <Button as-child variant="default" size="sm">
-            <a href="#/welcome">
+          <Button size="sm" asChild>
+            <a :href="api.urls['web']">
               Start
-              <ArrowRight class="w-4 h-4 ml-2" />
+              <i-lucide-arrow-right class="w-4 h-4 ml-2 inline" />
             </a>
           </Button>
         </div>
@@ -214,11 +215,9 @@ function getAffiliationIndex(affiliation) {
             Go to the task instructions to learn about how to play the game. After several pages of instructions, you
             can try out the comprehension quiz that real participants must pass to continue.
           </p>
-          <Button as-child variant="secondary" size="sm">
-            <a href="#/instructions">
-              Instructions
-              <ArrowRight class="w-4 h-4 ml-2" />
-            </a>
+          <Button size="sm" @click="api.goToView('instructions')">
+            Instructions
+            <i-lucide-arrow-right class="w-4 h-4 ml-2 inline" />
           </Button>
         </div>
 
@@ -226,16 +225,11 @@ function getAffiliationIndex(affiliation) {
 
         <!-- Captcha game -->
         <div>
-          <h3 class="text-xl font-semibold text-foreground mb-3">Play captcha game</h3>
-          <p class="text-lg text-muted-foreground mb-4">
-            Try out the captcha game participants play to ensure that they are human (and that the required software
-            loads properly in their browser).
-          </p>
-          <Button as-child variant="outline" size="sm">
-            <a href="#/captcha">
-              Captcha
-              <ArrowRight class="w-4 h-4 ml-2" />
-            </a>
+          <h3 class="text-xl font-semibold text-foreground mb-3">Play Stoop</h3>
+          <p class="text-lg text-muted-foreground mb-4">Try out the stroop task.</p>
+          <Button size="sm" @click="api.goToView('stroop')">
+            Stroop
+            <ArrowRight class="w-4 h-4 ml-2 inline" />
           </Button>
         </div>
       </div>

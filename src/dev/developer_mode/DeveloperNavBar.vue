@@ -249,7 +249,7 @@ const notificationType = ref('default')
         </div>
 
         <!-- color mode button -->
-        <div class="flex items-center" v-if="api.store.dev.isFullscreen">
+        <div class="flex items-center" v-if="api.store.dev.isFullscreen && api.currentRouteName() !== 'recruit'">
           <ColorModeButton></ColorModeButton>
         </div>
 

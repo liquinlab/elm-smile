@@ -5,10 +5,15 @@
 
 import { ref, computed, onMounted } from 'vue'
 
+/**
+ * Import toast notification components and styles
+ * @requires Toaster Toast notification component from sonner UI library
+ * @requires vue-sonner/style.css Required styles for vue-sonner v2 toast notifications
+ */
 import { Toaster } from '@/uikit/components/ui/sonner'
 import 'vue-sonner/style.css' // vue-sonner v2 requires this import
 
-import DevAppSidebar from '@/dev/DevAppSidebar.vue'
+import SmileAppSidebar from '@/core/SmileAppSidebar.vue'
 import { SidebarInset, SidebarProvider } from '@/uikit/components/ui/sidebar'
 /**
  * Developer mode components for debugging and development tools
@@ -21,12 +26,6 @@ import DeveloperNavBar from '@/dev/developer_mode/DeveloperNavBar.vue'
 import DevConsoleBar from '@/dev/developer_mode/DevConsoleBar.vue'
 import DevSideBar from '@/dev/developer_mode/DevSideBar.vue'
 
-/**
- * Presentation mode components
- * @requires PresentationNavBar Navigation bar for presentation mode
- */
-import PresentationNavBar from '@/dev/presentation_mode/PresentationNavBar.vue'
-import PresentationModeView from '@/dev/presentation_mode/PresentationModeView.vue'
 /**
  * Built-in experiment components
  * @requires ResponsiveDeviceContainer Responsive device container component
@@ -134,6 +133,11 @@ function onIframeLoad() {
   }
 }
 
+/**
+ * Initialize dashboard URL when component is mounted
+ * Calls initializeDashboardUrl() to set up the initial dashboard URL
+ * from localStorage or default value
+ */
 onMounted(() => {
   initializeDashboardUrl()
 })
@@ -146,8 +150,10 @@ onMounted(() => {
       '--sidebar-width': '48px',
     }"
   >
-    <DevAppSidebar />
+    <!-- Sidebar for developer tools -->
+    <SmileAppSidebar />
     <SidebarInset>
+      <!-- Main app container for developer mode -->
       <div class="app-container">
         <!-- Analyze Mode - Clean full-screen dashboard -->
         <div v-if="api.store.dev.mainView === 'dashboard'" class="analyze-container">
@@ -181,19 +187,6 @@ onMounted(() => {
           ></iframe>
         </div>
 
-        <!-- Presentation Mode - Clean full-screen presentation -->
-        <template v-else-if="api.store.dev.mainView === 'presentation'">
-          <!-- Top toolbar -->
-          <div class="toolbar">
-            <PresentationNavBar />
-          </div>
-
-          <!-- Middle row - content and sidebar -->
-          <div class="presentation-content-wrapper">
-            <PresentationModeView />
-          </div>
-        </template>
-
         <!-- Developer Mode - Full interface with toolbar, sidebar, console -->
         <template v-else>
           <!-- Top toolbar -->
@@ -202,7 +195,6 @@ onMounted(() => {
           </div>
 
           <!-- Middle row - content and sidebar -->
-
           <div class="content-wrapper">
             <div class="content-and-console">
               <!-- Main content - scrollable -->
@@ -351,6 +343,13 @@ onMounted(() => {
 }
 
 .recruit-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  overflow: hidden;
+}
+
+.presentation-iframe {
   width: 100%;
   height: 100%;
   border: none;

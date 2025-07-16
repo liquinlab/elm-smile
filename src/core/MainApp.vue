@@ -135,7 +135,7 @@ const effectiveDeviceHeight = computed(() => {
  * - Returns true otherwise
  */
 const showStatusBar = computed(() => {
-  return api.currentRouteName() !== 'recruit' && api.config.mode != 'presentation'
+  return api.currentRouteName() !== 'recruit' && api.currentRouteName() !== 'presentation_home'
 })
 
 // Pure computed property without side effects
