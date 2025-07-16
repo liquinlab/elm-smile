@@ -58,7 +58,9 @@ jobs:
 
       # accesses some git variables and processes them to be lower case/short/escaped
       - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v3.x
+        uses: rlespinasse/github-slug-action@v5
+        with:
+          short-length: 7
 
       # Configure git-specific .env file
       - name: Expose git-specific information to the Vite environment
