@@ -22,7 +22,7 @@ jobs:
       - name: Setup node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.node-version'
+          node-version-file: '.node_version'
 
       # install node packages
       - name: Install node dependencies
