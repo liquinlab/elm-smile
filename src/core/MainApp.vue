@@ -9,7 +9,7 @@ const api = useAPI()
 import { useSmileColorMode } from '@/core/composables/useColorMode'
 
 // Use global scope for production and presentation modes (applies to html/body), experiment scope for development
-const colorModeScope = (api.config.mode === 'production' || api.config.mode === 'presentation') ? 'global' : 'experiment'
+const colorModeScope = api.config.mode === 'production' || api.config.mode === 'presentation' ? 'global' : 'experiment'
 const { state: systemColorMode, mode: colorModeControl } = useSmileColorMode(colorModeScope)
 
 // In presentation mode, prioritize the color mode control over API config
@@ -189,7 +189,12 @@ const deviceTooSmall = computed(() => {
 </script>
 
 <template>
-  <div id="main-app" class="@container bg-background text-foreground" :data-experiment-scope="api.config.mode !== 'presentation' ? '' : null" ref="containerDiv">
+  <div
+    id="main-app"
+    class="@container bg-background text-foreground"
+    :data-experiment-scope="api.config.mode !== 'presentation' ? '' : null"
+    ref="containerDiv"
+  >
     <StatusBar v-if="showStatusBar" />
     <WindowSizerView triggered="true" v-if="deviceTooSmall"></WindowSizerView>
     <router-view v-else />

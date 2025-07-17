@@ -21,7 +21,7 @@ const portalSelectors = [
   '[data-slot="tooltip-content"]',
   '[data-slot="dropdown-menu-content"]',
   '[data-slot="context-menu-content"]',
-  '[data-slot="menubar-content"]'
+  '[data-slot="menubar-content"]',
 ]
 
 // Global set to track experiment portal triggers
@@ -32,13 +32,13 @@ const isInExperimentContext = (element) => {
   // Check if the element or its ancestors have experiment-related selectors
   const experimentSelectors = [
     '#main-app',
-    '.device-container', 
+    '.device-container',
     '.fullscreen-container',
     '.dev-color-mode .device-wrapper',
-    '[data-experiment-scope]' // We can add this attribute to experiment containers
+    '[data-experiment-scope]', // We can add this attribute to experiment containers
   ]
-  
-  return experimentSelectors.some(selector => {
+
+  return experimentSelectors.some((selector) => {
     const container = document.querySelector(selector)
     return container && container.contains(element)
   })
@@ -46,8 +46,8 @@ const isInExperimentContext = (element) => {
 
 // Function to apply color mode to experiment-scoped portaled elements only
 const applyColorModeToExperimentPortals = (mode) => {
-  portalSelectors.forEach(selector => {
-    document.querySelectorAll(selector).forEach(el => {
+  portalSelectors.forEach((selector) => {
+    document.querySelectorAll(selector).forEach((el) => {
       // Only apply to portaled elements that have a data attribute marking them as experiment-scoped
       if (el.hasAttribute('data-experiment-portal')) {
         el.classList.remove('light', 'dark')
@@ -62,15 +62,15 @@ const applyColorModeToExperimentPortals = (mode) => {
 // Set up MutationObserver for dynamically created portaled elements
 const setupPortalObserver = () => {
   if (portalObserver || typeof window === 'undefined') return
-  
+
   portalObserver = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
         if (node.nodeType === Node.ELEMENT_NODE) {
           // Check if the added node or any of its descendants match our portal selectors
-          portalSelectors.forEach(selector => {
+          portalSelectors.forEach((selector) => {
             const matchingElements = []
-            
+
             if (node.matches && node.matches(selector)) {
               matchingElements.push(node)
             }
@@ -78,18 +78,21 @@ const setupPortalObserver = () => {
             if (node.querySelectorAll) {
               matchingElements.push(...node.querySelectorAll(selector))
             }
-            
-            matchingElements.forEach(el => {
+
+            matchingElements.forEach((el) => {
               // Check if this portal element should be treated as experiment-scoped
               // We'll look for triggers within experiment containers
               if (shouldBeExperimentPortal(el)) {
                 el.setAttribute('data-experiment-portal', 'true')
-                
+
                 // Apply current experiment color mode
-                const currentMode = experimentColorMode.value === 'auto' 
-                  ? (usePreferredDark().value ? 'dark' : 'light')
-                  : experimentColorMode.value
-                  
+                const currentMode =
+                  experimentColorMode.value === 'auto'
+                    ? usePreferredDark().value
+                      ? 'dark'
+                      : 'light'
+                    : experimentColorMode.value
+
                 el.classList.remove('light', 'dark')
                 if (currentMode === 'dark' || currentMode === 'light') {
                   el.classList.add(currentMode)
@@ -101,10 +104,10 @@ const setupPortalObserver = () => {
       })
     })
   })
-  
+
   portalObserver.observe(document.body, {
     childList: true,
-    subtree: true
+    subtree: true,
   })
 }
 
@@ -113,7 +116,7 @@ const shouldBeExperimentPortal = (portalElement) => {
   // Simple approach: check if any experiment containers exist and have focus/active elements
   const experimentContainer = document.querySelector('[data-experiment-scope]')
   if (!experimentContainer) return false
-  
+
   // Check if there are any open popover/select triggers within the experiment container
   const openTriggers = experimentContainer.querySelectorAll('[data-state="open"], [aria-expanded="true"]')
   return openTriggers.length > 0
@@ -122,21 +125,25 @@ const shouldBeExperimentPortal = (portalElement) => {
 // Setup click tracking to identify experiment-originating portals
 const setupExperimentPortalTracking = () => {
   if (typeof window === 'undefined') return
-  
-  document.addEventListener('click', (event) => {
-    const target = event.target
-    const experimentScope = target.closest('[data-experiment-scope]')
-    
-    if (experimentScope) {
-      // Mark this as a potential experiment portal trigger
-      experimentPortalTriggers.add(target)
-      
-      // Clean up old triggers after a delay
-      setTimeout(() => {
-        experimentPortalTriggers.delete(target)
-      }, 1000)
-    }
-  }, true) // Use capture phase to catch before portal creation
+
+  document.addEventListener(
+    'click',
+    (event) => {
+      const target = event.target
+      const experimentScope = target.closest('[data-experiment-scope]')
+
+      if (experimentScope) {
+        // Mark this as a potential experiment portal trigger
+        experimentPortalTriggers.add(target)
+
+        // Clean up old triggers after a delay
+        setTimeout(() => {
+          experimentPortalTriggers.delete(target)
+        }, 1000)
+      }
+    },
+    true
+  ) // Use capture phase to catch before portal creation
 }
 
 /**
@@ -147,69 +154,77 @@ const setupExperimentPortalTracking = () => {
  */
 export function useSmileColorMode(scope = 'experiment', options = {}) {
   const preferredDark = usePreferredDark()
-  
+
   // Determine which mode ref to use based on scope
   const modeRef = scope === 'global' ? globalColorMode : experimentColorMode
-  
+
   // System computed value
-  const system = computed(() => preferredDark.value ? 'dark' : 'light')
-  
+  const system = computed(() => (preferredDark.value ? 'dark' : 'light'))
+
   // Actual resolved state (auto -> system preference)
-  const state = computed(() => 
-    modeRef.value === 'auto' ? system.value : modeRef.value
-  )
-  
+  const state = computed(() => (modeRef.value === 'auto' ? system.value : modeRef.value))
+
   // Function to apply color mode to specific selector
   const applyColorMode = (selector, mode) => {
     const el = document.querySelector(selector)
     if (!el) return
-    
+
     // Remove existing mode classes
     el.classList.remove('light', 'dark')
-    
+
     // Add the new mode class
     if (mode === 'dark' || mode === 'light') {
       el.classList.add(mode)
     }
   }
-  
+
   // Watch for changes and apply to appropriate selectors
-  watch(state, (newMode) => {
-    nextTick(() => {
-      if (scope === 'global') {
-        // Apply to html element for global theming
-        applyColorMode('html', newMode)
-      } else if (scope === 'experiment') {
-        // Apply to experiment containers only
-        applyColorMode('#main-app', newMode)
-        applyColorMode('.device-container', newMode)
-        applyColorMode('.fullscreen-container', newMode)
-        applyColorMode('.dev-color-mode', newMode)
-        applyColorMode('.device-wrapper', newMode)
-        
-        // Apply to experiment-scoped portaled UI components and set up observer for new ones
-        applyColorModeToExperimentPortals(newMode)
-        setupPortalObserver()
-        setupExperimentPortalTracking()
-      }
-    })
-  }, { immediate: true })
-  
+  watch(
+    state,
+    (newMode) => {
+      nextTick(() => {
+        if (scope === 'global') {
+          // Apply to html element for global theming
+          applyColorMode('html', newMode)
+        } else if (scope === 'experiment') {
+          // Apply to experiment containers only
+          applyColorMode('#main-app', newMode)
+          applyColorMode('.device-container', newMode)
+          applyColorMode('.fullscreen-container', newMode)
+          applyColorMode('.dev-color-mode', newMode)
+          applyColorMode('.device-wrapper', newMode)
+
+          // Apply to experiment-scoped portaled UI components and set up observer for new ones
+          applyColorModeToExperimentPortals(newMode)
+          setupPortalObserver()
+          setupExperimentPortalTracking()
+        }
+      })
+    },
+    { immediate: true }
+  )
+
   return {
     // Reactive color mode value (can be 'auto', 'light', or 'dark')
     mode: modeRef,
-    
+
     // System preference
     system,
-    
+
     // Resolved state (never 'auto', always 'light' or 'dark')
     state,
-    
+
     // Convenience setter functions
-    setLight: () => { modeRef.value = 'light' },
-    setDark: () => { modeRef.value = 'dark' },
-    setAuto: () => { modeRef.value = 'auto' },
-    
+    setLight: () => {
+      modeRef.value = 'light'
+    },
+    setDark: () => {
+      modeRef.value = 'dark'
+    },
+    setAuto: () => {
+      modeRef.value = 'auto'
+    },
+
     // Toggle function
     toggle: () => {
       if (modeRef.value === 'auto') {
@@ -219,7 +234,7 @@ export function useSmileColorMode(scope = 'experiment', options = {}) {
       } else {
         modeRef.value = 'auto'
       }
-    }
+    },
   }
 }
 

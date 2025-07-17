@@ -16,7 +16,7 @@ const colorModeSelect = computed({
     experimentColorMode.value = value
     // Also update the API config to keep it in sync
     api.config.colorMode = value
-  }
+  },
 })
 
 // Create a computed property for the display text in the SelectTrigger

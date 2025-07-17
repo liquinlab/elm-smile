@@ -14,7 +14,12 @@ import { useElementSize } from '@vueuse/core'
 const fullScreenDiv = ref(null)
 const { width: fullScreenWidth, height: fullScreenHeight } = useElementSize(fullScreenDiv)
 
-const { state: experimentColorMode, mode: experimentColorModeRaw, toggle: toggleColorMode, system } = useSmileColorMode('experiment')
+const {
+  state: experimentColorMode,
+  mode: experimentColorModeRaw,
+  toggle: toggleColorMode,
+  system,
+} = useSmileColorMode('experiment')
 
 // Initialize device dimensions based on the selected device from store
 const devicePresets = {

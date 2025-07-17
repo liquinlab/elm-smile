@@ -6,7 +6,12 @@ import { useSmileColorMode } from '@/core/composables/useColorMode'
 import { computed } from 'vue'
 
 // Use global scope for presentation mode (applies to html element, like production mode)
-const { state: globalColorMode, mode: globalColorModeRaw, toggle: toggleColorMode, system } = useSmileColorMode('global')
+const {
+  state: globalColorMode,
+  mode: globalColorModeRaw,
+  toggle: toggleColorMode,
+  system,
+} = useSmileColorMode('global')
 </script>
 
 <template>
