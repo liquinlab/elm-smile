@@ -305,11 +305,9 @@ references) must be converted to Firestore-safe formats before saving.
 These methods provide functionality for querying data across multiple steps in
 the experiment.
 
-#### `queryStepData(pathFilter = null)`
-
-Gets data for all leaf nodes in the stepper, optionally filtered by path
-pattern. Returns only the data directly associated with each leaf node, without
-merging parent block data.
+- `queryStepData(pathFilter = null)`: Gets data for all leaf nodes in the
+  stepper, optionally filtered by path pattern. Returns only the data directly
+  associated with each leaf node, without merging parent block data.
 
 ```javascript
 // Get data for all leaf nodes
@@ -319,12 +317,10 @@ const allLeafData = api.queryStepData()
 const trialData = api.queryStepData('trial/block*')
 ```
 
-#### `queryStepDataLeaf(pathFilter = null)`
-
-Gets data for all leaf nodes in the stepper, optionally filtered by path
-pattern. Returns only the data directly associated with each leaf node, without
-merging parent block data. This is an alias for `queryStepData` for consistency
-with the `stepDataLeaf` getter.
+- `queryStepDataLeaf(pathFilter = null)`: Gets data for all leaf nodes in the
+  stepper, optionally filtered by path pattern. Returns only the data directly
+  associated with each leaf node, without merging parent block data. This is an
+  alias for `queryStepData` for consistency with the `stepDataLeaf` getter.
 
 ```javascript
 // Get data for all leaf nodes
@@ -343,18 +339,18 @@ The difference between these methods:
 
 Example:
 
-```javascript
-// Given a structure:
-// block (blockType: 'practice')
-//   trial1 (response: 'A')
-//   trial2 (response: 'B')
+Given a structure:
 
-// queryStepData() returns (merged data):
-;[
-  { blockType: 'practice', response: 'A' },
-  { blockType: 'practice', response: 'B' },
-][
-  // queryStepDataLeaf() returns (leaf data only):
-  ({ response: 'A' }, { response: 'B' })
-]
+- block (blockType: 'practice')
+  - trial1 (response: 'A')
+  - trial2 (response: 'B')
+
+`queryStepData()` returns (merged data):
+`[ { blockType: 'practice', response: 'A' }, { blockType: 'practice', response: 'B' }, ]`
+
+`queryStepDataLeaf()` returns (leaf data only):
+`[({ response: 'A' }, { response: 'B' })]`
+
+```
+
 ```
