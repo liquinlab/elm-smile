@@ -36,23 +36,24 @@ const isLoading = computed(() => {
 })
 </script>
 <template>
-  <!-- Main app container for developer mode -->
+  <!-- Main app container for presentation mode -->
   <div class="app-container">
-    <!-- Developer Mode - Full interface with toolbar, sidebar, console -->
-    <!-- Top toolbar -->
+    <!-- Top toolbar with navigation -->
     <div class="toolbar">
       <PresentationNavBar />
     </div>
 
-    <!-- Middle row - content and sidebar -->
+    <!-- Middle row - content area -->
     <div class="content-wrapper">
       <div class="content-and-console">
         <!-- Main content - scrollable -->
         <div class="main-content bg-background text-foreground">
+          <!-- Loading state -->
           <div v-if="isLoading" class="loading-container">
             <div class="loading-spinner"></div>
             <p>Loading...</p>
           </div>
+          <!-- Main app content -->
           <template v-else>
             <MainApp />
           </template>
@@ -63,6 +64,7 @@ const isLoading = computed(() => {
 </template>
 
 <style scoped>
+/* Main app container layout */
 .app-container {
   display: flex;
   flex-direction: column;
@@ -70,24 +72,7 @@ const isLoading = computed(() => {
   width: 100%;
 }
 
-.analyze-container {
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-}
-
-.recruit-container {
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-}
-
-.docs-container {
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-}
-
+/* Top toolbar styling */
 .toolbar {
   margin-top: auto;
   margin-bottom: auto;
@@ -96,6 +81,7 @@ const isLoading = computed(() => {
   background-color: var(--dev-bar-bg);
 }
 
+/* Content wrapper layout */
 .content-wrapper {
   display: flex;
   flex: 1;
@@ -103,14 +89,7 @@ const isLoading = computed(() => {
   width: 100%;
 }
 
-.presentation-content-wrapper {
-  display: flex;
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  width: 100%;
-}
-
+/* Content and console container */
 .content-and-console {
   display: flex;
   flex-direction: column;
@@ -120,6 +99,7 @@ const isLoading = computed(() => {
   overflow: hidden;
 }
 
+/* Main content area */
 .main-content {
   flex: 1;
   display: flex;
@@ -128,77 +108,6 @@ const isLoading = computed(() => {
   overflow-x: auto;
   min-height: 0;
   min-width: 0;
-}
-
-.sidebar {
-  flex: 0 0 300px;
-  height: 100%;
-  overflow-y: auto;
-  border-left: 1px solid var(--border);
-  background-color: var(--dev-bg);
-}
-
-.console {
-  height: v-bind(height_pct);
-  width: 100%;
-  background-color: #adadad;
-  overflow: hidden;
-  overflow-x: hidden;
-  min-width: 0;
-  max-width: 100%;
-}
-
-.analyze-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  width: 100%;
-}
-
-.dashboard-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  overflow: hidden;
-}
-
-.recruit-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  overflow: hidden;
-}
-
-.docs-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  overflow: hidden;
-}
-
-/* Transition effects */
-
-.sidebar-slide-enter-active,
-.sidebar-slide-leave-active {
-  transition: all 0.3s ease-in-out;
-}
-
-.sidebar-slide-enter-from,
-.sidebar-slide-leave-to {
-  flex: 0 0 0px;
-  width: 0px;
-  overflow: hidden;
-}
-
-.console-slide-enter-active,
-.console-slide-leave-active {
-  transition: height 0.3s ease-in-out;
-}
-
-.console-slide-enter-from,
-.console-slide-leave-to {
-  height: 0;
 }
 
 /* Loading styles */
