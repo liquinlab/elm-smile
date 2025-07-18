@@ -171,7 +171,7 @@ export default defineConfig({
         items: [
           { text: 'Getting started contributing', link: '/gettingstarted' },
           { text: 'Contributing to the docs', link: '/contributing' },
-          { text: 'DesignPhilosophy', link: '/philosophy' },
+          { text: 'Design Philosophy', link: '/philosophy' },
         ],
       },
       {
