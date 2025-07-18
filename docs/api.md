@@ -362,7 +362,3 @@ Given a structure:
 
 `queryStepDataLeaf()` returns (leaf data only):
 `[({ response: 'A' }, { response: 'B' })]`
-
-```
-
-```

@@ -163,10 +163,7 @@ export default defineConfig({
       },
       {
         text: 'APIs and Advanced Documentation',
-        items: [
-          { text: 'API', link: '/api' },
-          { text: 'Example patterns', link: '/examplepatterns' },
-        ],
+        items: [{ text: 'API', link: '/api' }],
       },
 
       {
