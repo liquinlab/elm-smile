@@ -22,7 +22,7 @@ import CenteredContentCustomExample from '../examples/CenteredContentCustomExamp
 import CenteredContentCustomExampleRaw from '../examples/CenteredContentCustomExample.vue?raw'
 </script>
 
-# UIKit Layouts
+# Layouts
 
 The UIKit provides several layout components to help structure your experiment
 views consistently.

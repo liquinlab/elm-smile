@@ -20,7 +20,7 @@ import BadgeExampleRaw from '../examples/BadgeExample.vue?raw'
 
 </script>
 
-# UIKit Components
+# Components
 
 Smile provides a library of built-in lower level components which are styled and
 themed to match the overall project. These components build on
