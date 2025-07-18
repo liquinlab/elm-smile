@@ -1,13 +1,12 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import useSmileStore from '@/core/stores/smilestore'
 import appconfig from '@/core/config'
 import useAPI from '@/core/composables/useAPI'
-// load sub-components used in this compomnents
+// load sub-components used in this component
 import WithdrawModal from '@/builtins/withdraw/WithdrawModal.vue'
 import InformedConsentModal from '@/builtins/simple_consent/InformedConsentModal.vue'
-import ReportIssueModal from '@/builtins/report_issue/ReportIssueModal.vue'
 import { Button } from '@/uikit/components/ui/button'
 
 const router = useRouter()
@@ -15,7 +14,10 @@ const smilestore = useSmileStore() // get the global store
 const api = useAPI() // get the api
 const email = ref('')
 
-// IF OTHER SERVICES PROVIDE EASY EMAIL ADDRESSES, ADD THEM HERE
+/**
+ * Prefills email address based on recruitment service
+ * @returns {string} Email address for the current recruitment service
+ */
 function prefill_email() {
   let emailval = ''
   if (smilestore.data.recruitmentService === 'prolific') {
@@ -27,21 +29,33 @@ email.value = prefill_email()
 
 /* these just toggle interface elements so are state local to the component */
 const showconsentmodal = ref(false) // reactive
+/**
+ * Toggles the consent modal visibility
+ */
 function toggleConsent() {
   showconsentmodal.value = !showconsentmodal.value // have to use .value in <script> when using ref()
 }
 
 const showwithdrawmodal = ref(false) // reactive
+/**
+ * Toggles the withdraw modal visibility and updates email prefill
+ */
 function toggleWithdraw() {
   showwithdrawmodal.value = !showwithdrawmodal.value // have to use .value in <script> when using ref()
   email.value = prefill_email() // update the value
 }
 
 const showreportissuemodal = ref(false) // reactive
+/**
+ * Toggles the report issue modal visibility
+ */
 function toggleReport() {
   showreportissuemodal.value = !showreportissuemodal.value // have to use .value in <script> when using ref()
 }
 
+/**
+ * Submits the withdraw form and navigates to withdraw page
+ */
 function submitWithdraw() {
   // submit the withdraw form and jump to the thanks
   toggleWithdraw()
@@ -50,7 +64,9 @@ function submitWithdraw() {
 </script>
 
 <template>
+  <!-- Main navigation bar with study info and action buttons -->
   <div class="flex flex-row items-stretch relative px-5" role="navigation" aria-label="main navigation">
+    <!-- Left section: Brand logo and study information -->
     <div class="flex items-stretch flex-shrink-0 min-h-[3.25rem]">
       <a class="flex items-center pt-3" :href="appconfig.labURL" target="_new" v-if="!appconfig.anonymousMode">
         <img :src="api.getStaticUrl(appconfig.brandLogoFn)" width="90" class="dark-aware-img" />
@@ -67,6 +83,8 @@ function submitWithdraw() {
         </p>
       </div>
     </div>
+
+    <!-- Right section: Action buttons -->
     <div id="infobar" class="flex-grow flex-shrink-0 flex items-stretch z-10">
       <div class="flex justify-end ml-auto items-stretch">
         <div class="flex items-center pt-1" v-if="!appconfig.anonymousMode">
@@ -98,32 +116,15 @@ function submitWithdraw() {
     </div>
   </div>
 
-  <!-- modal for viewing consent form -->
+  <!-- Modal components -->
+  <!-- Modal for viewing consent form -->
   <InformedConsentModal :show="showconsentmodal" @toggle-consent="toggleConsent()" />
 
-  <!-- modal for withdrawing from study -->
+  <!-- Modal for withdrawing from study -->
   <WithdrawModal
     :show="showwithdrawmodal"
     :prefill-email="email"
     @toggle-withdraw="toggleWithdraw()"
     @submit-withdraw="submitWithdraw()"
   />
-
-  <!-- modal for reporting issues 
-  <div class="absolute inset-0 z-50 flex items-center justify-center p-8" :class="{ hidden: !showreportissuemodal }">
-    <div class="absolute inset-0 bg-black bg-opacity-50" @click="toggleReport()"></div>
-    <div class="relative bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-      <div class="p-8">
-        <ReportIssueModal @toggle-report="toggleReport()" />
-      </div>
-    </div>
-    <button
-      class="absolute top-8 right-8 text-gray-400 hover:text-gray-600 text-2xl z-10"
-      aria-label="close"
-      @click="toggleReport()"
-    >
-      ×
-    </button>
-  </div>
-  -->
 </template>

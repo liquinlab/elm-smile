@@ -9,26 +9,39 @@ import { Switch } from '@/uikit/components/ui/switch'
 import { Label } from '@/uikit/components/ui/label'
 import { TwoCol, ConstrainedPage } from '@/uikit/layouts'
 
-//import InformedConsentText from '@/user/components/InformedConsentText.vue'
+// Import and initialize Smile API
+import useViewAPI from '@/core/composables/useViewAPI'
+
+/**
+ * Props for the InformedConsentView component
+ * @typedef {Object} Props
+ * @property {Object} informedConsentText - The consent text component to display
+ */
 const props = defineProps({
   informedConsentText: {
     type: Object,
     required: true,
   },
 })
-// import and initalize smile API
-import useViewAPI from '@/core/composables/useViewAPI'
+
 const api = useViewAPI()
 
+/**
+ * Advances to the next view in the experiment flow
+ */
 function finish() {
   api.goNextView()
 }
 
+// Skip consent form if in anonymous mode
 if (appconfig.anonymousMode) {
-  // Skip the consent form if in anonymous mode
   finish()
 }
 
+/**
+ * Animates the button with a wiggle effect when consent is given
+ * Sets up a timer to repeat the animation every 2 seconds
+ */
 function wiggle() {
   if (api.persist.agree) {
     animate(button.value, { rotate: [0, 5, -5, 5, -5, 0] }, { duration: 1.25 }).finished.then(() => {
@@ -37,50 +50,62 @@ function wiggle() {
   }
 }
 
+// Reactive references
 const name = ref('enter your name')
 const button = ref(null)
 let timer
 
+// Initialize consent agreement state if not already set
 if (!('agree' in api.persist)) {
   api.persist.agree = ref(false)
 }
 
+// Watch for changes in consent agreement and trigger wiggle animation
 if (api.persist.agree) {
   watch(api.persist.agree, (newVal) => {
     if (newVal) {
       console.log('agree changed')
-      //button.value.focus()
       timer = setTimeout(wiggle, 3000)
     }
   })
 }
 
+// Clean up timer on component unmount
 onBeforeUnmount(() => {
   clearTimeout(timer)
 })
 </script>
 
 <template>
+  <!-- Main consent form layout with responsive design -->
   <ConstrainedPage
     :responsiveUI="api.config.responsiveUI"
     :width="api.config.windowsizerRequest.width"
     :height="api.config.windowsizerRequest.height"
   >
+    <!-- Two-column layout: consent text on left, form on right -->
     <TwoCol rightFirst leftWidth="w-3/5" class="px-6">
+      <!-- Left column: Consent text content -->
       <template #left>
         <div class="text-foreground">
           <component :is="informedConsentText" />
         </div>
       </template>
+
+      <!-- Right column: Consent form and controls -->
       <template #right>
         <Card class="bg-muted">
           <CardContent class="bg-muted">
+            <!-- Instructions text -->
             <p class="text-left font-semibold text-foreground mb-4">
               We first must verify that you are participating willingly and know your rights. Please take the time to
               read the consent form (you can scroll the page).
             </p>
+
+            <!-- Visual separator -->
             <div class="border-t border-gray-200 my-4"></div>
 
+            <!-- Consent toggle switch -->
             <div class="flex items-center space-x-2 mb-4">
               <Switch
                 variant="success"
@@ -94,6 +119,7 @@ onBeforeUnmount(() => {
               </Label>
             </div>
 
+            <!-- Hidden name input (currently disabled) -->
             <div class="hidden">
               <Label for="your_name" class="text-sm font-medium text-gray-700 mb-2 block">
                 Required! Please enter your name:
@@ -101,6 +127,7 @@ onBeforeUnmount(() => {
               <Input id="your_name" name="your_name" v-model="name" placeholder="Enter your name" class="w-full" />
             </div>
 
+            <!-- Continue button (only shown when consent is given) -->
             <div class="mt-6">
               <Button
                 ref="button"

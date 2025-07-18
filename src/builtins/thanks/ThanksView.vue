@@ -1,27 +1,43 @@
 <script setup>
-//import { ref, onMounted } from 'vue';
+/**
+ * ThanksView Component
+ *
+ * Displays completion/thanks page with different layouts based on recruitment service.
+ * Handles completion code generation and clipboard functionality for various platforms.
+ */
 
+// External library imports
 import Clipboard from 'clipboard'
 import sha256 from 'crypto-js/sha256'
 import Base64url from 'crypto-js/enc-base64'
 import stringify from 'json-stable-stringify'
 
+// Vue imports
+import { onMounted } from 'vue'
+
+// Internal imports
 import useAPI from '@/core/composables/useAPI'
 import appconfig from '@/core/config'
 import { Button } from '@/uikit/components/ui/button'
 import { Input } from '@/uikit/components/ui/input'
 import { TitleTwoCol } from '@/uikit/layouts'
 
+/**
+ * Initialize API and force data save
+ */
 const api = useAPI()
-
 api.saveData(true) // force a data save
 
-/// / https://app.prolific.co/submissions/complete?cc=16K4HJM1
-// prolific offers another code for non-completion
-
-// compute completion code
+/**
+ * Computes a unique completion code based on study data
+ *
+ * Creates a hash of the study data and appends status indicators.
+ * Used for participant verification across different recruitment platforms.
+ *
+ * @returns {string} A unique completion code with status suffix
+ */
 function computeCompletionCode() {
-  // stringify the data
+  // stringify the data for consistent hashing
   const data = stringify(api.data)
   const hashDigest = Base64url.stringify(sha256(data))
 
@@ -38,29 +54,29 @@ function computeCompletionCode() {
   return hashDigest.slice(0, 20) + end_code // only use first 20 characters, may need to update to shortest possible code
 }
 
+/**
+ * Generate completion code and set it in the API
+ */
 const completionCode = computeCompletionCode()
 api.setCompletionCode(completionCode)
 
-// create clipboard system
-import { onMounted } from 'vue'
-
+/**
+ * Initialize clipboard functionality for copying completion codes
+ * Sets up clipboard.js to handle copy-to-clipboard actions
+ */
 onMounted(() => {
   const clipboard = new Clipboard('[data-clipboard-target]')
   clipboard.on('success', (e) => {
     api.log.debug(`code copied to clipboard ${e.trigger.id}`)
   })
 })
-
-// api.debug(computeCompletionCode())
-// function finish(goto) {
-//     smilestore.saveData()
-//     router.push(goto)
-// }
 </script>
 
 <template>
+  <!-- Main container with responsive padding and centering -->
   <div class="w-full mx-auto py-10">
     <div class="w-4/5 mx-auto text-left">
+      <!-- Prolific recruitment service completion -->
       <div v-if="api.getRecruitmentService() == 'prolific'">
         <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
           <template #title>
@@ -96,6 +112,7 @@ onMounted(() => {
         </TitleTwoCol>
       </div>
 
+      <!-- CloudResearch recruitment service completion -->
       <div v-if="api.getRecruitmentService() == 'cloudresearch'">
         <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
           <template #title>
@@ -131,6 +148,7 @@ onMounted(() => {
         </TitleTwoCol>
       </div>
 
+      <!-- MTurk recruitment service completion -->
       <div v-if="api.getRecruitmentService() == 'mturk'">
         <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
           <template #title>
@@ -167,6 +185,7 @@ onMounted(() => {
         </TitleTwoCol>
       </div>
 
+      <!-- Citizen Science recruitment service completion -->
       <div v-if="api.getRecruitmentService() == 'citizensci'">
         <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
           <template #title>
@@ -196,6 +215,7 @@ onMounted(() => {
         </TitleTwoCol>
       </div>
 
+      <!-- Web recruitment service completion -->
       <div v-if="api.getRecruitmentService() == 'web'">
         <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
           <template #title>

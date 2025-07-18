@@ -5,11 +5,17 @@ import { ConstrainedTaskWindow } from '@/uikit/layouts'
 import { Card, CardHeader, CardContent } from '@/uikit/components/ui/card'
 import { computed } from 'vue'
 
+// Initialize the API
 const api = useAPI()
 
-api.saveData(true) // force a data save
+// Force a data save when component mounts
+api.saveData(true)
 
-// Define card content for each recruitment service
+/**
+ * Card content configuration for different recruitment services
+ * Provides appropriate messaging based on the recruitment platform used
+ * @type {Object.<string, {title: string, message: string}>}
+ */
 const cardContent = {
   prolific: {
     title: 'Notice about withdraw from our Prolific study',
@@ -36,7 +42,17 @@ const cardContent = {
   },
 }
 
+/**
+ * Computed property to get the current recruitment service
+ * @type {import('vue').ComputedRef<string>}
+ */
 const currentService = computed(() => api.getRecruitmentService())
+
+/**
+ * Computed property to get the appropriate content based on recruitment service
+ * Falls back to default content if service is not recognized
+ * @type {import('vue').ComputedRef<{title: string, message: string}>}
+ */
 const content = computed(() => {
   return (
     cardContent[currentService.value] || {
@@ -48,13 +64,16 @@ const content = computed(() => {
 </script>
 
 <template>
+  <!-- Main container with responsive task window -->
   <ConstrainedTaskWindow
     variant="ghost"
     :responsiveUI="api.config.responsiveUI"
     :width="api.config.windowsizerRequest.width"
     :height="api.config.windowsizerRequest.height"
   >
+    <!-- Content wrapper with sizing constraints -->
     <div class="w-[60%] h-[80%]">
+      <!-- Withdrawal confirmation card - shown when user has withdrawn -->
       <Card
         v-if="api.store.browserPersisted.withdrawn && content"
         class="border-withdraw-border bg-withdraw-bg text-withdraw-text"
@@ -70,6 +89,7 @@ const content = computed(() => {
         </CardContent>
       </Card>
 
+      <!-- Error card - shown when user accesses page without withdrawing -->
       <Card v-else class="border-warning-border bg-warning-bg text-warning-text">
         <CardHeader>
           <p class="text-xl font-semibold text-center">

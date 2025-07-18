@@ -1,9 +1,9 @@
 <script setup>
-import { reactive, computed, ref } from 'vue'
+import { reactive, computed, ref, watch } from 'vue'
 import { DateFormatter, getLocalTimeZone, CalendarDate } from '@internationalized/date'
 import { CalendarIcon } from 'lucide-vue-next'
 
-// import and initalize smile API
+// Import and initialize Smile API
 import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
 import { Calendar } from '@/uikit/components/ui/calendar'
@@ -12,18 +12,37 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn } from '@/uikit/lib/utils'
 import { TitleTwoCol, ConstrainedPage } from '@/uikit/layouts'
 
+/**
+ * Initialize the Smile API for view management
+ */
 const api = useViewAPI()
 
+/**
+ * Configure the survey steps for the demographic survey
+ */
 api.steps.append([{ id: 'survey_page1' }, { id: 'survey_page2' }, { id: 'survey_page3' }])
 
+/**
+ * Date formatter for displaying dates in long format
+ */
 const df = new DateFormatter('en-US', {
   dateStyle: 'long',
 })
 
+/**
+ * Reactive reference for the selected date value
+ */
 const dateValue = ref()
+
+/**
+ * Reactive reference for controlling the date picker popover state
+ */
 const isPopoverOpen = ref(false)
 
-// persists the form info in local storage, otherwise initialize
+/**
+ * Initialize form data in local storage if not already defined
+ * Persists demographic survey responses across page navigation
+ */
 if (!api.persist.isDefined('forminfo')) {
   api.persist.forminfo = reactive({
     dob: '',
@@ -43,8 +62,10 @@ if (!api.persist.isDefined('forminfo')) {
   })
 }
 
-// Watch for date changes and update the form data
-import { watch } from 'vue'
+/**
+ * Watch for date changes and update the form data
+ * Converts CalendarDate to ISO string format and closes popover
+ */
 watch(dateValue, (newValue) => {
   if (newValue) {
     const date = newValue.toDate(getLocalTimeZone())
@@ -53,7 +74,10 @@ watch(dateValue, (newValue) => {
   }
 })
 
-// Watch for form data changes and update the date picker
+/**
+ * Watch for form data changes and update the date picker
+ * Synchronizes the date picker with the stored form data
+ */
 watch(
   () => api.persist.forminfo.dob,
   (newValue) => {
@@ -68,6 +92,10 @@ watch(
   { immediate: true }
 )
 
+/**
+ * Computed property to check if page one is complete
+ * Validates that all required fields on the first page are filled
+ */
 const page_one_complete = computed(
   () =>
     api.persist.forminfo.dob !== '' &&
@@ -77,6 +105,10 @@ const page_one_complete = computed(
     api.persist.forminfo.fluent_english !== ''
 )
 
+/**
+ * Computed property to check if page two is complete
+ * Validates that all required fields on the second page are filled
+ */
 const page_two_complete = computed(
   () =>
     api.persist.forminfo.color_blind !== '' &&
@@ -85,6 +117,10 @@ const page_two_complete = computed(
     api.persist.forminfo.psychiatric_disorder !== ''
 )
 
+/**
+ * Computed property to check if page three is complete
+ * Validates that all required fields on the third page are filled
+ */
 const page_three_complete = computed(
   () =>
     api.persist.forminfo.country !== '' &&
@@ -92,6 +128,10 @@ const page_three_complete = computed(
     api.persist.forminfo.household_income !== ''
 )
 
+/**
+ * Autofill function for development and testing purposes
+ * Pre-populates the form with sample data
+ */
 function autofill() {
   // Set the date value first so the watcher can handle it
   dateValue.value = new CalendarDate(1978, 9, 12)
@@ -110,8 +150,15 @@ function autofill() {
   api.persist.forminfo.household_income = '$100,000–$199,999'
 }
 
+/**
+ * Register the autofill function with the API for development mode
+ */
 api.setAutofill(autofill)
 
+/**
+ * Finish function to record form data and proceed to next view
+ * Saves the demographic survey responses and navigates to the next step
+ */
 function finish() {
   api.recordForm('demographicForm', api.persist.forminfo)
   api.goNextView()
@@ -119,12 +166,15 @@ function finish() {
 </script>
 
 <template>
+  <!-- Main container with responsive layout -->
   <ConstrainedPage
     :responsiveUI="api.config.responsiveUI"
     :width="api.config.windowsizerRequest.width"
     :height="api.config.windowsizerRequest.height"
   >
+    <!-- Two-column layout with title and form content -->
     <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
+      <!-- Page title and description section -->
       <template #title>
         <h3 class="text-3xl font-bold mb-4"><i-fa6-solid-person class="inline mr-2" />Demographic Information</h3>
         <p class="text-lg mb-8">
@@ -133,6 +183,8 @@ function finish() {
           email).
         </p>
       </template>
+
+      <!-- Left sidebar with page-specific instructions -->
       <template #left>
         <div v-if="api.pathString === 'survey_page1'" class="text-left text-muted-foreground">
           <h3 class="text-lg font-bold mb-2">Basic Info</h3>
@@ -141,20 +193,24 @@ function finish() {
           </p>
         </div>
         <div v-else-if="api.pathString === 'survey_page2'" class="text-left text-muted-foreground">
-          <h3 class="text-lg font-bold mb-2">Basic Info</h3>
+          <h3 class="text-lg font-bold mb-2">Health & Vision</h3>
           <p class="text-md font-light text-muted-foreground">
-            First, we need some basic, generic information about you.
+            Next, we need information about your vision and health conditions.
           </p>
         </div>
         <div v-else-if="api.pathString === 'survey_page3'" class="text-left text-muted-foreground">
-          <h3 class="text-lg font-bold mb-2">Basic Info</h3>
+          <h3 class="text-lg font-bold mb-2">Location & Background</h3>
           <p class="text-md font-light text-muted-foreground">
-            First, we need some basic, generic information about you.
+            Finally, we need information about your location and background.
           </p>
         </div>
       </template>
+
+      <!-- Right content area with form sections -->
       <template #right>
+        <!-- Page 1: Basic demographic information -->
         <div v-if="api.pathString === 'survey_page1'" class="border border-border text-left bg-muted p-6 rounded-lg">
+          <!-- Date of Birth field -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2"> Date of Birth </label>
             <Popover v-model:open="isPopoverOpen">
@@ -179,6 +235,7 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">Enter your birthday (required)</p>
           </div>
 
+          <!-- Gender field -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2"> Gender </label>
             <Select v-model="api.persist.forminfo.gender">
@@ -195,6 +252,7 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">Enter your self-identified gender (required)</p>
           </div>
 
+          <!-- Race field -->
           <div class="mb-3">
             <label class="block text-md font-medium text-foreground mb-2"> Race </label>
             <Select v-model="api.persist.forminfo.race">
@@ -215,6 +273,7 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">Enter the race that best describes you (required)</p>
           </div>
 
+          <!-- Hispanic ethnicity field -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2"> Are you hispanic? </label>
             <Select v-model="api.persist.forminfo.hispanic">
@@ -230,6 +289,7 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">Do you consider yourself hispanic? (required)</p>
           </div>
 
+          <!-- English fluency field -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2"> Are you fluent in English? </label>
             <Select v-model="api.persist.forminfo.fluent_english">
@@ -247,8 +307,8 @@ function finish() {
             </p>
           </div>
 
+          <!-- Navigation section -->
           <hr class="border-border my-6" />
-
           <div class="flex justify-end">
             <Button variant="outline" :disabled="!page_one_complete" @click="api.goNextStep()">
               Continue
@@ -257,10 +317,12 @@ function finish() {
           </div>
         </div>
 
+        <!-- Page 2: Health and vision information -->
         <div
           v-else-if="api.pathString === 'survey_page2'"
           class="border border-border text-left bg-muted p-6 rounded-lg"
         >
+          <!-- Vision field -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2">
               Do you have normal vision (or corrected to be normal)?
@@ -279,6 +341,7 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">Do you have normal vision? (required)</p>
           </div>
 
+          <!-- Color blindness field -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2"> Are you color blind? </label>
             <Select v-model="api.persist.forminfo.color_blind">
@@ -295,6 +358,7 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">Do you have any color blindness? (required)</p>
           </div>
 
+          <!-- Learning disability field -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2">
               Have you been diagnosed with a learning disability (e.g., dyslexia, dysclaculia)?
@@ -313,6 +377,7 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">Do you have a diagnosed learning disability? (required)</p>
           </div>
 
+          <!-- Neurodevelopmental disorder field -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2">
               Have you been diagnosed with a neurodevelopmental disorder (e.g., autism, tic disorder)?
@@ -333,6 +398,7 @@ function finish() {
             </p>
           </div>
 
+          <!-- Psychiatric disorder field -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2">
               Have you been diagnosed with a psychiatric disorder (e.g., anxiety, depression, OCD)?
@@ -353,8 +419,8 @@ function finish() {
             </p>
           </div>
 
+          <!-- Navigation section -->
           <hr class="border-border my-6" />
-
           <div class="flex justify-between">
             <Button variant="outline" @click="api.goPrevStep()">
               <i-fa6-solid-arrow-left />
@@ -367,10 +433,12 @@ function finish() {
           </div>
         </div>
 
+        <!-- Page 3: Location and background information -->
         <div
           v-else-if="api.pathString === 'survey_page3'"
           class="border border-border text-left bg-muted p-6 rounded-lg"
         >
+          <!-- Country field -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2"> Country </label>
             <Select v-model="api.persist.forminfo.country">
@@ -579,6 +647,7 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">Select the country in which you reside. (required)</p>
           </div>
 
+          <!-- Zipcode field -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2"> Zipcode/Postal Code </label>
             <input
@@ -592,6 +661,7 @@ function finish() {
             </p>
           </div>
 
+          <!-- Education level field -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2"> Highest level of education </label>
             <Select v-model="api.persist.forminfo.education_level">
@@ -615,6 +685,7 @@ function finish() {
             </p>
           </div>
 
+          <!-- Household income field -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2">
               Enter your approximate household income.
@@ -641,8 +712,8 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">What is your approximate household income? (required)</p>
           </div>
 
+          <!-- Navigation section -->
           <hr class="border-border my-6" />
-
           <div class="flex justify-between">
             <Button variant="outline" @click="api.goPrevStep()">
               <i-fa6-solid-arrow-left />

@@ -1,29 +1,44 @@
 <script setup>
 import { reactive, computed } from 'vue'
 
-// import and initalize smile API
+// Import and initialize Smile API for navigation and state management
 import useViewAPI from '@/core/composables/useViewAPI'
+// Import UI components for form elements and layout
 import { Button } from '@/uikit/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
 import { TitleTwoCol, ConstrainedPage } from '@/uikit/layouts'
 
+/**
+ * Initialize the Smile API for navigation and state management
+ */
 const api = useViewAPI()
 
+/**
+ * Append device survey steps to the navigation flow
+ * Creates two pages: device_page1 and device_page2
+ */
 api.steps.append([{ id: 'device_page1' }, { id: 'device_page2' }])
 
-// persists the form info in local storage, otherwise initialize
+/**
+ * Initialize form data in persistent storage if not already defined
+ * Stores device information across page navigation
+ */
 if (!api.persist.isDefined('forminfo')) {
   api.persist.forminfo = reactive({
-    device_type: '', // type of device (e.g., desktop, laptop, tablet, phone)
-    connection: '', // type of internet connection (e.g., wifi, ethernet, cellular)
-    connection_quality: '', // self-reported connection quality
-    browser: '', // self-reported browser
-    pointer: '', // self-reported pointing device (mouse, trackpad, touchscreen)
-    assistive_technology: '', // self-reported assistive technology
-    tools: '', // self-report of tools
+    device_type: '', // Type of device (e.g., desktop, laptop, tablet, phone)
+    connection: '', // Type of internet connection (e.g., wifi, ethernet, cellular)
+    connection_quality: '', // Self-reported connection quality
+    browser: '', // Self-reported browser
+    pointer: '', // Self-reported pointing device (mouse, trackpad, touchscreen)
+    assistive_technology: '', // Self-reported assistive technology
+    tools: '', // Self-report of tools
   })
 }
 
+/**
+ * Computed property to check if all required fields on page 1 are completed
+ * @returns {boolean} True if all page 1 fields are filled
+ */
 const page_one_complete = computed(
   () =>
     api.persist.forminfo.device_type !== '' &&
@@ -32,6 +47,10 @@ const page_one_complete = computed(
     api.persist.forminfo.browser !== ''
 )
 
+/**
+ * Computed property to check if all required fields on page 2 are completed
+ * @returns {boolean} True if all page 2 fields are filled
+ */
 const page_two_complete = computed(
   () =>
     api.persist.forminfo.pointer !== '' &&
@@ -39,6 +58,10 @@ const page_two_complete = computed(
     api.persist.forminfo.tools !== ''
 )
 
+/**
+ * Autofill function for development/testing purposes
+ * Pre-populates all form fields with sample data
+ */
 function autofill() {
   api.persist.forminfo.device_type = 'Desktop Computer'
   api.persist.forminfo.connection = 'Wifi'
@@ -49,8 +72,15 @@ function autofill() {
   api.persist.forminfo.tools = 'No'
 }
 
+/**
+ * Register the autofill function with the API for development mode
+ */
 api.setAutofill(autofill)
 
+/**
+ * Complete the device survey and proceed to the next view
+ * Records form data and navigates to the next view in the experiment flow
+ */
 function finish() {
   api.recordForm('deviceForm', api.persist.forminfo)
   api.goNextView()
@@ -58,12 +88,15 @@ function finish() {
 </script>
 
 <template>
+  <!-- Main container with responsive layout constraints -->
   <ConstrainedPage
     :responsiveUI="api.config.responsiveUI"
     :width="api.config.windowsizerRequest.width"
     :height="api.config.windowsizerRequest.height"
   >
+    <!-- Two-column layout with title and form sections -->
     <TitleTwoCol leftFirst leftWidth="w-1/3" :responsiveUI="api.config.responsiveUI">
+      <!-- Title and description section -->
       <template #title>
         <h3 class="text-3xl font-bold mb-4">
           <i-fa6-solid-desktop class="inline mr-2" />&nbsp;Computer/Device Information
@@ -73,6 +106,8 @@ function finish() {
           to improve the quality of our experiments in the future.
         </p>
       </template>
+
+      <!-- Left sidebar with important note -->
       <template #left>
         <div class="text-left text-muted-foreground">
           <h3 class="text-lg font-bold mb-2">Important Note</h3>
@@ -82,8 +117,12 @@ function finish() {
           </p>
         </div>
       </template>
+
+      <!-- Right content area with form pages -->
       <template #right>
+        <!-- Page 1: Device and connection information -->
         <div v-if="api.pathString === 'device_page1'" class="border border-border text-left bg-muted p-6 rounded-lg">
+          <!-- Device type selection -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2">
               What best describes the computer you are using right now?
@@ -106,6 +145,7 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">Enter your computer type (choose the best match)</p>
           </div>
 
+          <!-- Internet connection type selection -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2">
               What type of Internet connection are you using right now?
@@ -130,6 +170,7 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">Enter your internet connection type</p>
           </div>
 
+          <!-- Connection quality rating -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2">
               How would you rate you Internet connection quality today?
@@ -150,6 +191,7 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">How would you rate your Internet connection</p>
           </div>
 
+          <!-- Browser selection -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2"> What web browser are you using? </label>
             <Select v-model="api.persist.forminfo.browser">
@@ -175,8 +217,10 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">Enter your internet browser type</p>
           </div>
 
+          <!-- Navigation separator -->
           <hr class="border-border my-6" />
 
+          <!-- Continue button for page 1 -->
           <div class="flex justify-end">
             <Button variant="outline" :disabled="!page_one_complete" @click="api.goNextStep()">
               Continue
@@ -185,10 +229,12 @@ function finish() {
           </div>
         </div>
 
+        <!-- Page 2: Input devices and assistive technology -->
         <div
           v-else-if="api.pathString === 'device_page2'"
           class="border border-border text-left bg-muted p-6 rounded-lg"
         >
+          <!-- Input device selection -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2">
               What best descries how you moved the cursor, clicked, or scrolled things during this experiment?
@@ -214,6 +260,7 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">Enter your input type</p>
           </div>
 
+          <!-- Assistive technology usage -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2">
               Are you using any assistive technologies?
@@ -234,6 +281,7 @@ function finish() {
             </p>
           </div>
 
+          <!-- AI/tools usage -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2">
               Did you use any AI or other tools to help you complete this experiment?
@@ -255,8 +303,10 @@ function finish() {
             </p>
           </div>
 
+          <!-- Navigation separator -->
           <hr class="border-border my-6" />
 
+          <!-- Navigation buttons for page 2 -->
           <div class="flex justify-between">
             <Button variant="outline" @click="api.goPrevStep()">
               <i-fa6-solid-arrow-left />

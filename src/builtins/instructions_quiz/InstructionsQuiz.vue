@@ -1,11 +1,20 @@
 <script setup>
-import { reactive, computed, ref, onMounted, nextTick } from 'vue'
+import { computed } from 'vue'
 import useViewAPI from '@/core/composables/useViewAPI'
 import { Button } from '@/uikit/components/ui/button'
 import { Checkbox } from '@/uikit/components/ui/checkbox'
 import { MultiSelect } from '@/uikit/components/ui/multiselect'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
 import { TitleTwoCol, ConstrainedPage, ConstrainedTaskWindow } from '@/uikit/layouts'
+
+/**
+ * Instructions Quiz Component
+ *
+ * A quiz component that tests user understanding of instructions before proceeding
+ * to the main experiment. Supports both single-select and multi-select questions
+ * with randomization capabilities.
+ */
+
 const api = useViewAPI()
 
 // read in props
@@ -27,6 +36,10 @@ const props = defineProps({
 })
 let qs = props.questions
 
+/**
+ * Initialize the quiz by setting up the stepper structure
+ * and randomizing questions if enabled
+ */
 function init() {
   // randomize questions and add to stepper
   qs = props.randomizeQandA ? getRandomizedQuestions() : props.questions
@@ -42,6 +55,10 @@ function init() {
   }
 }
 
+/**
+ * Randomize questions and their answer options
+ * @returns {Array} Randomized questions array
+ */
 function getRandomizedQuestions() {
   api.randomSeed() // randomize seed
   return props.questions.map((page) => ({
@@ -55,6 +72,9 @@ function getRandomizedQuestions() {
   }))
 }
 
+/**
+ * Autofill function for development/testing - automatically fills correct answers
+ */
 function autofill() {
   // Helper function to recursively find and update questions in states
   function updateQuestionsInState(state) {
@@ -77,6 +97,10 @@ function autofill() {
 
 api.setAutofill(autofill)
 
+/**
+ * Computed property that checks if all quiz questions are answered correctly
+ * @returns {boolean} True if all questions are correct
+ */
 const quizCorrect = computed(() => {
   // Get all questions from all pages using queryStepData with a path filter
   const allQuestions = api.queryStepData('pages*').flatMap((page) => page.questions || [])
@@ -95,6 +119,10 @@ const quizCorrect = computed(() => {
   })
 })
 
+/**
+ * Computed property that checks if the current page has all questions answered
+ * @returns {boolean} True if current page is complete
+ */
 const currentPageComplete = computed(() => {
   if (!api.stepData?.questions || !Array.isArray(api.stepData.questions)) {
     return false
@@ -111,6 +139,9 @@ const currentPageComplete = computed(() => {
   })
 })
 
+/**
+ * Submit the quiz and navigate to success or retry page based on results
+ */
 function submitQuiz() {
   api.recordData({
     phase: 'INSTRUCTIONS_QUIZ',
@@ -124,6 +155,9 @@ function submitQuiz() {
   }
 }
 
+/**
+ * Return to instructions page and increment attempt counter
+ */
 function returnInstructions() {
   api.goFirstStep() // reset the quiz
   api.clear() // don't remember across reloads
@@ -131,6 +165,9 @@ function returnInstructions() {
   api.goToView(props.returnTo) // go back to instructions
 }
 
+/**
+ * Proceed to the next view in the experiment
+ */
 function finish() {
   api.goNextView()
 }
@@ -139,7 +176,7 @@ init()
 </script>
 
 <template>
-  <!-- Quiz pages -->
+  <!-- Quiz pages - Main quiz interface with questions -->
   <ConstrainedPage
     v-if="api.stepIndex < qs.length && /^pages\/pg\d+$/.test(api.pathString)"
     :responsiveUI="api.config.responsiveUI"
@@ -163,6 +200,7 @@ init()
         </div>
       </template>
       <template #right>
+        <!-- Quiz questions container -->
         <div class="border border-border text-left bg-muted p-6 rounded-lg">
           <div
             v-for="(question, index) in api.stepData.questions"
@@ -200,6 +238,7 @@ init()
 
           <hr class="border-border my-6" />
 
+          <!-- Navigation buttons -->
           <div class="flex justify-between">
             <Button variant="outline" v-if="api.stepIndex >= 1" @click="api.goPrevStep()">
               <i-fa6-solid-arrow-left />
@@ -220,7 +259,7 @@ init()
     </TitleTwoCol>
   </ConstrainedPage>
 
-  <!-- Success page -->
+  <!-- Success page - Shown when all questions are answered correctly -->
   <ConstrainedTaskWindow
     v-else-if="api.pathString === 'feedback/success'"
     variant="ghost"
@@ -240,7 +279,7 @@ init()
     </div>
   </ConstrainedTaskWindow>
 
-  <!-- Retry page -->
+  <!-- Retry page - Shown when some questions are answered incorrectly -->
   <ConstrainedTaskWindow
     v-else-if="api.pathString === 'feedback/retry'"
     variant="ghost"
@@ -260,49 +299,3 @@ init()
     </div>
   </ConstrainedTaskWindow>
 </template>
-
-<style scoped>
-.header-box {
-  border: 1px solid #dfdfdf;
-  background-color: rgb(248, 248, 248);
-  padding: 20px;
-  border-radius: 8px;
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.formstep {
-  margin-top: 0px;
-}
-
-.formheader {
-  margin-bottom: 40px;
-}
-
-.formbox {
-  border: 1px solid #dfdfdf;
-  text-align: left;
-  padding: 20px;
-  background-color: rgb(248, 248, 248);
-}
-
-.formcontent {
-  width: 95%; /* Default for mobile */
-  margin: auto;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  text-align: left;
-}
-
-@media screen and (min-width: 569px) {
-  .formcontent {
-    width: 85%; /* Tablet */
-  }
-}
-
-@media screen and (min-width: 1024px) {
-  .formcontent {
-    width: 98%; /* Desktop */
-  }
-}
-</style>

@@ -2,7 +2,7 @@
 // import Vue functions
 import { onMounted, ref, onBeforeUnmount } from 'vue'
 
-// import and initalize smile API
+// import and initialize smile API
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 
@@ -17,8 +17,10 @@ let timer // waits before doing animation
 let clicked = false // has the button been clicked?
 const button = ref(null) // reference to button
 
-// this function wiggles the button a little if it hasn't been clicked
-// just some fun
+/**
+ * Wiggles the button with a rotation animation if it hasn't been clicked yet
+ * This provides a fun interactive element to draw attention to the button
+ */
 function wiggle() {
   if (!clicked && button.value) {
     animate(button.value.$el, { rotate: [0, 60, -60, 60, -60, 0] }, { duration: 0.75 }).finished.then(() => {
@@ -27,10 +29,17 @@ function wiggle() {
   }
 }
 
+/**
+ * Lifecycle hook: Sets up the initial wiggle timer when component mounts
+ */
 onMounted(() => {
   timer = setTimeout(wiggle, 3000)
 })
 
+/**
+ * Handles the completion of the advertisement view
+ * Preloads all media assets and navigates to the next view
+ */
 function finish() {
   clicked = true
   api.preloadAllImages()
@@ -38,22 +47,33 @@ function finish() {
   api.goNextView()
 }
 
+/**
+ * Lifecycle hook: Cleans up the timer when component unmounts
+ */
 onBeforeUnmount(() => {
   clearTimeout(timer)
 })
 </script>
 
 <template>
+  <!-- Main advertisement container with responsive task window -->
   <ConstrainedTaskWindow
     variant="ghost"
     :responsiveUI="api.config.responsiveUI"
     :width="api.config.windowsizerRequest.width"
     :height="api.config.windowsizerRequest.height"
   >
+    <!-- Study logo/branding image -->
     <img ref="logo" src="@/user/assets/brain.svg" width="220" class="dark-aware-img" />
+
+    <!-- Main heading -->
     <h1 ref="title" class="text-3xl font-bold mb-4">Please help us understand the mind!</h1>
+
+    <!-- Study description -->
     <p>Take part in a short experiment where you play some games.</p>
     <br />
+
+    <!-- Call-to-action button -->
     <Button ref="button" id="begintask" @click="finish()" size="lg">
       I'm ready!
       <i-lucide-arrow-right />

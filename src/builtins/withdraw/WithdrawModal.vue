@@ -9,6 +9,12 @@ import { Label } from '@/uikit/components/ui/label'
 import { Textarea } from '@/uikit/components/ui/textarea'
 import { TitleTwoCol } from '@/uikit/layouts'
 
+/**
+ * Component props for WithdrawModal
+ * @typedef {Object} WithdrawModalProps
+ * @property {boolean} show - Controls modal visibility
+ * @property {string} prefillEmail - Pre-filled email address for the form
+ */
 const props = defineProps({
   show: {
     type: Boolean,
@@ -20,17 +26,31 @@ const props = defineProps({
   },
 })
 
+/**
+ * Component emits for WithdrawModal
+ * @typedef {Object} WithdrawModalEmits
+ * @property {Function} toggleWithdraw - Emitted when modal should be toggled
+ * @property {Function} submitWithdraw - Emitted when withdraw form is submitted
+ */
 const emit = defineEmits(['toggleWithdraw', 'submitWithdraw'])
 
 // Initialize the API
 const api = useAPI()
 
+/**
+ * Reactive form data for withdraw information
+ * @type {import('vue').Reactive<Object>}
+ */
 const forminfo = reactive({
   reason_select: [],
   reason_comments: '',
   email: props.prefillEmail || '',
 })
 
+/**
+ * Available withdraw reason options for participants to select from
+ * @type {string[]}
+ */
 const withdrawOptions = [
   "I couldn't adjust the size of my browser to make everything visible",
   'This task is too hard.',
@@ -42,6 +62,10 @@ const withdrawOptions = [
   'I am having technical issues.',
 ]
 
+/**
+ * Handles the withdraw submission process
+ * Sets withdraw data and saves to API, then emits submit event
+ */
 function withdraw() {
   api.setWithdrawn(forminfo) // set withdraw data fields
   api.saveData(true) // force a data save
@@ -74,8 +98,12 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <!-- Modal overlay and container -->
   <div class="absolute inset-0 z-50 flex items-center justify-center p-8" :class="{ hidden: !show }">
+    <!-- Backdrop overlay -->
     <div class="absolute inset-0 bg-black bg-opacity-50" @click="$emit('toggleWithdraw')"></div>
+
+    <!-- Close button -->
     <Button
       class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
       aria-label="close"
@@ -83,14 +111,20 @@ onUnmounted(() => {
     >
       <i-fa6-solid-xmark class="text-xl" />
     </Button>
+
+    <!-- Modal content container -->
     <div class="w-[90%] h-[90%] relative bg-background border border-border flex flex-col overflow-hidden">
+      <!-- Scrollable content area -->
       <div class="flex-1 overflow-y-auto">
         <TitleTwoCol :responsiveUI="api.config.responsiveUI">
+          <!-- Modal header with title -->
           <template #title>
             <h3 class="text-3xl font-semibold">
               <i-ph-hand-withdraw-thin class="text-red-500 inline-block mr-2" />Withdraw from study?
             </h3>
           </template>
+
+          <!-- Left column: Withdrawal information -->
           <template #left>
             <div class="text-left text-muted-foreground">
               <p class="text-sm text-muted-foreground">
@@ -103,8 +137,11 @@ onUnmounted(() => {
               </p>
             </div>
           </template>
+
+          <!-- Right column: Withdrawal form -->
           <template #right>
             <div class="space-y-6">
+              <!-- Withdrawal reasons section -->
               <div class="space-y-4">
                 <Label class="text-lg font-semibold"> Why are you withdrawing from the study? (Optional) </Label>
                 <div class="space-y-3">
@@ -136,6 +173,7 @@ onUnmounted(() => {
                 <p class="text-xs text-gray-500">Select all that apply.</p>
               </div>
 
+              <!-- Additional comments section -->
               <div class="space-y-3">
                 <Label for="comments" class="text-lg font-semibold"> Additional comments. (Optional) </Label>
                 <Textarea
@@ -150,6 +188,7 @@ onUnmounted(() => {
                 </p>
               </div>
 
+              <!-- Contact email section -->
               <div class="space-y-3">
                 <Label for="email" class="text-base font-medium"> Contact email. (Optional) </Label>
                 <Input
@@ -171,6 +210,8 @@ onUnmounted(() => {
           </template>
         </TitleTwoCol>
       </div>
+
+      <!-- Modal footer with action buttons -->
       <div class="border-t bg-muted px-5 py-4 flex justify-end space-x-4 flex-shrink-0">
         <Button variant="outline" @click="$emit('toggleWithdraw')"> Nevermind, take me back to the study! </Button>
         <Button variant="destructive" @click="withdraw"> Withdraw </Button>
