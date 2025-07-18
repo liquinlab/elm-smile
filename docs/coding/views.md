@@ -204,21 +204,20 @@ and more information can be found
 
 ## Overview of Built-in Views
 
-| Name                                                | Props | Description                                                                                                                               |
-| --------------------------------------------------- | :---- | :---------------------------------------------------------------------------------------------------------------------------------------- |
-| [Recruitment Ad](#recruitment-advertisement)        | No    | Landing page for participants                                                                                                             |
-| [MTurk Ad](#mturk-recruitment)                      | Yes   | Interacts with the MTurk system                                                                                                           |
-| [Simple Informed Consent](#simple-informed-consent) | Yes   | Collects informed consent using a simple checkbox                                                                                         |
-| [Window Sizer](#window-sizer)                       | Yes   | Verifies a given area of the screen is visible (with a more aggressive option that hides page content if the window is resized too small) |
-| [Simple Instructions](#simple-instructions)         | No    | A simple sequence of pages for instructions                                                                                               |
-| [Instructions Quiz](#instructions-quiz)             | No    | A basic instructions quiz                                                                                                                 |
-| [Demographic Survey](#demographic-survey)           | Yes   | A survey which collects some demographic info                                                                                             |
-| [Device Survey](#device-survey)                     | No    | A survey which collects some self-report about computer/device                                                                            |
-| [Withdraw](#withdraw)                               | Yes   | A survey which processes a participant's request to withdraw from study                                                                   |
-| [Debrief](#debrief)                                 | No    | A simple text View which describes the purpose of study                                                                                   |
-| [Feedback](#feedback)                               | No    | A survey for soliciting structured and unstructured feedback on the study                                                                 |
-| [Thanks Page](#thanks)                              | Yes   | A thank you page                                                                                                                          |
-| [Report Issue](#report-issue)                       | Yes   | A form to report a bug/issue with the experiment                                                                                          |
+| Name                                         | Props | Description                                                                                                                               |
+| -------------------------------------------- | :---- | :---------------------------------------------------------------------------------------------------------------------------------------- |
+| [Recruitment Ad](#recruitment-advertisement) | No    | Landing page for participants                                                                                                             |
+| [MTurk Ad](#mturk-recruitment)               | Yes   | Interacts with the MTurk system                                                                                                           |
+| [Informed Consent](#simple-informed-consent) | Yes   | Collects informed consent using a simple checkbox                                                                                         |
+| [Window Sizer](#window-sizer)                | Yes   | Verifies a given area of the screen is visible (with a more aggressive option that hides page content if the window is resized too small) |
+| [Simple Instructions](#simple-instructions)  | No    | A simple sequence of pages for instructions                                                                                               |
+| [Instructions Quiz](#instructions-quiz)      | Yes   | A basic instructions quiz                                                                                                                 |
+| [Demographic Survey](#demographic-survey)    | No    | A survey which collects some demographic info                                                                                             |
+| [Device Survey](#device-survey)              | No    | A survey which collects some self-report about computer/device                                                                            |
+| [Withdraw](#withdraw)                        | No    | A survey which processes a participant's request to withdraw from study                                                                   |
+| [Debrief](#debrief)                          | Yes   | A simple text View which describes the purpose of study                                                                                   |
+| [Feedback](#feedback)                        | No    | A survey for soliciting structured and unstructured feedback on the study                                                                 |
+| [Thanks Page](#thanks)                       | No    | A thank you page                                                                                                                          |
 
 These components are located in the `src/builtins` directory. In <SmileText/> a
 short-hand for the src folder is '@' so for instance '@/builtins' refers to the
@@ -240,7 +239,6 @@ Advertisement View is a simple page that contains a title and an invitation to
 participate. There is a animated button which will take the participant to the
 next View in the timeline.
 
-- There are no side effects, and nothing is recorded.
 - The template can be edited to change the text.
 - The logo image imports from `@/user/assets/brain.svg`.
 
@@ -337,13 +335,12 @@ this.registerView({
 })
 ```
 
-### Simple Informed Consent
+### Informed Consent
 
 **Base Component**: `@/builtins/informedConsent/InformedConsentView.vue`  
 **Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/informedConsent/InformedConsentView.vue)  
-**Side
-effects**: Sets the `consent` key in the `localStorage` to `true.`  
-**Typical accessibility**: `{requiresConsent: false, requiresDone: false}`
+**Typical
+accessibility**: `{requiresConsent: false, requiresDone: false}`
 
 Most studies require some type of informed consent from participants. This is
 usually a short piece of text describing the study and the participant's rights
@@ -381,9 +378,8 @@ timeline.pushSeqView({
 
 **Base Component**: `@/builtins/windowSizer/WindowSizerView.vue`  
 **Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/windowSizer/WindowSizerView.vue)  
-**Side
-effects**: Yes, sets the is verifiedVisibility key in the [API](/api) to true.  
-**Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
+**Typical
+accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The window sizer is a small component
 `src/builtins/windowSizer/WindowSizerView.vue` that will display a box with a
@@ -429,9 +425,8 @@ if they do not pass the instructions quiz.
 
 **Base Component**: `@/builtins/instructions/InstructionsView.vue`  
 **Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/instructions/InstructionsView.vue)  
-**Side
-effects**: None **Typical accessibility**:
-`{requiresConsent: true, requiresDone: false}`
+**Typical
+accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 [TO DO: Add info about instructions]
 
@@ -459,9 +454,10 @@ timeline.pushSeqView({
 
 ### Instructions Quiz
 
-**Component**: `@/builtins/instructionsQuiz/InstructionsQuiz.vue`  
-**Side effects**: Saves the data from the quiz  
-**Typical accessibility**: Always
+**Base Component**: `@/builtins/instructionsQuiz/InstructionsQuiz.vue`  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/instructionsQuiz/InstructionsQuiz.vue)  
+**Typical
+accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The instructions quiz is a simple quiz that makes sure the participant has read
 and understood the experiment instructions. The user has to answer all the
@@ -529,15 +525,15 @@ questions will be randomized in the same way each time the quiz is taken.
 
 ```js
 // import the quiz questions
-import { QUIZ_QUESTIONS } from '/coding/components/quizQuestions'
+import { QUIZ_QUESTIONS } from './components/quizQuestions'
 // instructions quiz
 timeline.pushSeqView({
   name: 'quiz',
   component: InstructionsQuiz,
   props: {
-    quizQuestions: QUIZ_QUESTIONS,
+    questions: QUIZ_QUESTIONS,
     returnTo: 'instructions',
-    randomizeQuestionsAndAnswers: true,
+    randomizeQandA: true,
   },
 })
 ```
@@ -546,16 +542,15 @@ timeline.pushSeqView({
 
 **Base Component**: `@/builtins/demographicSurvey/DemographicSurveyView.vue`  
 **Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/demographicSurvey/DemographicSurveyView.vue)  
-**Side
-effects**: Yes, saves the data from the form.  
-**Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
+**Typical
+accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The demographic survey is a simple survey that asks participants to provide some
 information about themselves. This is important for many reasons. For example,
 it is often important to report information about the demographics of the
 participants in a study (age, gender, country, primary language, etc...). In
 addition, it is useful to know if a subject is color blind in case the studies
-relies on color information. The demongr
+relies on color information.
 
 ```js
 // put this at the top of the file
@@ -572,9 +567,8 @@ timeline.pushSeqView({
 
 **Base Component**: `@/builtins/deviceSurvey/DeviceSurveyView.vue`  
 **Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/deviceSurvey/DeviceSurveyView.vue)  
-**Side
-effects**: Yes, saves the data from the form.  
-**Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
+**Typical
+accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The device survey askes participants to provide some information about their
 computer/tablet/etc... This is important because sometimes the information
@@ -613,11 +607,10 @@ timeline.pushSeqView({
 
 ### Withdraw
 
-**Component**: `@/builtins/withdraw/WithdrawView.vue`  
+**Base Component**: `@/builtins/withdraw/WithdrawView.vue`  
 **Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/withdraw/WithdrawView.vue)  
-**Side
-effects**: Sets the `consent` key in the `localStorage` to `true.`  
-**Typical accessibility**: `{ requiresWithdraw: true }`
+**Typical
+accessibility**: `{ requiresWithdraw: true }`
 
 As part of most IRB protocols, participants should be able to withdraw from a
 study at any time for any reason. Online, this is as simple as closing the
@@ -654,10 +647,10 @@ timeline.registerView({
 
 ### Debrief
 
-**Component**: `@/builtins/debrief/DebriefView.vue`  
+**Base Component**: `@/builtins/debrief/DebriefView.vue`  
 **Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/debrief/DebriefView.vue)  
-**Side
-effects**: None **Typical accessibility**: Always
+**Typical
+accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The debrief page displays the text that explains the purpose of the experiment
 and provides the participant with any additional postfacto information about the
@@ -682,11 +675,10 @@ timeline.pushSeqView({
 
 ### Thanks
 
-**Component**: `@/builtins/thanks/ThanksView.vue`  
+**Base Component**: `@/builtins/thanks/ThanksView.vue`  
 **Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/thanks/ThanksView.vue)  
-**Side
-effects**: Yes, saves the data from the form.  
-**Typical accessibility**: `{requiresDone: true}`
+**Typical
+accessibility**: `{requiresDone: true}`
 
 ```js
 // put this at the top of the file
@@ -705,11 +697,10 @@ timeline.pushSeqView({
 
 ### Feedback Survey
 
-**Component**: `src/builtins/taskFeedbackSurvey/TaskFeedbackSurveyView.vue`  
+**Base Component**: `@/builtins/taskFeedbackSurvey/TaskFeedbackSurveyView.vue`  
 **Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/taskFeedbackSurvey/TaskFeedbackSurveyView.vue)  
-**Side
-effects**: Yes, saves the data from the form.  
-**Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
+**Typical
+accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 The task survey asks some simple questions about the participant's experience in
 the task. The questions gauge how enjoyable and challenging the task was and
@@ -730,10 +721,6 @@ timeline.pushSeqView({
   meta: { setDone: true }, // optional if this is the last form
 })
 ```
-
-### Report Issue
-
-Coming soon
 
 ## Navbars and Modals
 
@@ -756,9 +743,24 @@ them as needed for your study.
 **Base Component**: `@/builtins/statusBar/StatusBar.vue`  
 **Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/statusBar/StatusBar.vue)
 
+The Status Bar is a persistent navigation component that appears at the top of
+every view throughout the experiment. It provides essential study information
+and participant controls that are always accessible such as the lab logo
+(`src/user/assets/universitylogo.png`), the study code name, version information
+(i.e., the git commit hash for debugging purposes, along with the current mode
+(development, testing, presentation)), a shortened user ID. It also provides two
+buttons (After the user consents) which allow users to review the informed
+consent information, or to withdraw from the study. The Status Bar automatically
+adapts to different screen sizes, showing abbreviated labels on smaller screens
+and hiding certain information on very narrow displays.
+
 ### Withdraw Modal
 
-**Base Component**: `@/builtins/withdraw/WithdrawFormModal.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/withdraw/WithdrawFormModal)  
-**Side
-effects**: Yes
+**Base Component**: `@/builtins/withdraw/WithdrawModal.vue`  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/withdraw/WithdrawModal.vue)
+
+The Withdraw Modal is a form that appears when participants click the "Withdraw"
+button in the Status Bar. It provides a structured way for participants to
+withdraw from the study while collecting valuable feedback about their
+experience. It is optional for users to complete but otherwise is automatically
+saved in the data store.
