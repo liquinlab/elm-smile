@@ -17,7 +17,7 @@ Online docs: [https://smile.gureckislab.org](https://smile.gureckislab.org)
   experiments.
 - Built-in support for
   common experiment elements like consent forms,
-  captchas, instructions, and surveys. Just add your custom experiment logic and
+  instructions, and surveys. Just add your custom experiment logic and
   start collecting data.
 - Basic component library which helps you quickly design and
   layout elements.

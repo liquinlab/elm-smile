@@ -23,8 +23,8 @@ AI-assisted programmers) accomplish more in less time.
   working on without restarting the entire experiment, and more!
 - Built-in support for
   [common experiment elements](/coding/views#built-in-views) like consent forms,
-  captchas, instructions, and surveys. Just add your custom experiment logic and
-  start collecting data.
+  instructions, and surveys. Just add your custom experiment logic and start
+  collecting data.
 - Code writing can be greatly accelerated using AI tools because LLMs are
   trained on extensive codebases covering Vue, Tailwind, and other popular web
   standards used by the project.

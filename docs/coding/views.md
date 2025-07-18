@@ -182,9 +182,9 @@ developing tasks and help improve the consistency of the design.
 When you [setup](/starting) the default <SmileText /> project you automatically
 get a number of built-in Views that are useful for most experiments. These
 include things like obtaining [informed consent](#informed-consent), presenting
-[instructions](#simple-instructions), [CAPTCHAs](#the-smile-captcha), etc...
-This section describes these default built-in Views and provides an overview of
-how to customize them for your experiment.
+[instructions](#simple-instructions), etc... This section describes these
+default built-in Views and provides an overview of how to customize them for
+your experiment.
 
 ### Props
 
@@ -209,7 +209,6 @@ and more information can be found
 | [Recruitment Ad](#recruitment-advertisement)        | No    | Landing page for participants                                                                                                             |
 | [MTurk Ad](#mturk-recruitment)                      | Yes   | Interacts with the MTurk system                                                                                                           |
 | [Simple Informed Consent](#simple-informed-consent) | Yes   | Collects informed consent using a simple checkbox                                                                                         |
-| [CAPTCHA](#the-smile-captcha)                       | No    | Fun tasks to verify human-ness and attention                                                                                              |
 | [Window Sizer](#window-sizer)                       | Yes   | Verifies a given area of the screen is visible (with a more aggressive option that hides page content if the window is resized too small) |
 | [Simple Instructions](#simple-instructions)         | No    | A simple sequence of pages for instructions                                                                                               |
 | [Instructions Quiz](#instructions-quiz)             | No    | A basic instructions quiz                                                                                                                 |
@@ -375,40 +374,6 @@ timeline.pushSeqView({
     requiresConsent: false,
     setConsented: true, // set the status to consented ater this route
   },
-})
-```
-
-### The Smile CAPTCHA
-
-**Base Component**: `@/builtins/captcha/CaptchaView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/captcha/CaptchaView.vue)  
-**Side
-effects**: Yes, saves the data from the tasks.  
-**Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
-
-CAPTHCAs (Completely Automated Public Turing test to tell Computers and Humans
-Apart) are simple tasks used to verify that the user is a human and not a
-computer. We developed a unique CAPTCHA system for <SmileText/> that is fun and
-engaging for participants. The Smile CAPTCHA is a series of tasks that are easy
-for humans but difficult for computers. The tasks happen quickly in sequence
-with a timer requiring fast responses (limiting the ability to send the
-questions to an AI). In addition, the set of tasks is diverse and requires
-language understanding, intuitive physical reasoning, fine motor control and
-perception, and object recognition. A few of the tasks measure known cognitive
-phenomena specific to humans, such as patterns in reaction time.
-
-<SmileText/> we use a simple CAPTCHA that asks the participant to click on a
-specific location on the screen. This is a simple task that is easy for humans
-but difficult for computers.
-
-(THIS IS IN DEVELOPMENT)
-
-```js
-// captcha
-timeline.pushSeqView({
-  path: '/captcha',
-  name: 'captcha',
-  component: Captcha,
 })
 ```
 

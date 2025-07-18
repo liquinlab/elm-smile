@@ -223,7 +223,7 @@ function getAffiliationIndex(affiliation) {
 
         <Separator />
 
-        <!-- Captcha game -->
+        <!-- stoop example game -->
         <div>
           <h3 class="text-xl font-semibold text-foreground mb-3">Play Stoop</h3>
           <p class="text-lg text-muted-foreground mb-4">Try out the stroop task.</p>

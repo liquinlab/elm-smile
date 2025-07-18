@@ -55,9 +55,9 @@ views [here](/coding/views).
 
 Smile comes with several [built-in views](/coding/views#built-in-views) for
 common phases of an experiment. This includes things like obtaining informed
-consent, presenting instructions, CAPTCHAs, and presenting a thank you page. We
-describe these default built-in views and provide an overview of how to
-customize them for your own experiment.
+consent, presenting instructions, and presenting a thank you page. We describe
+these default built-in views and provide an overview of how to customize them
+for your own experiment.
 
 ## Timeline and Design
 
