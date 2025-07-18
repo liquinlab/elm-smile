@@ -5,12 +5,27 @@
  * - 'experiment': Applies to experiment containers only (dev tools buttons)
  */
 
-import { ref, computed, watch, nextTick } from 'vue'
+import { computed, watch, nextTick } from 'vue'
 import { usePreferredDark } from '@vueuse/core'
+import useAPI from '@/core/composables/useAPI'
 
-// Global state for color modes
-const globalColorMode = ref('auto') // For html element (SmileAppSidebar)
-const experimentColorMode = ref('auto') // For experiment containers (dev tools)
+// Get API instance for accessing persisted store
+const api = useAPI()
+
+// Global state for color modes - now connected to persisted store
+const globalColorMode = computed({
+  get: () => api.store.dev.globalColorMode,
+  set: (value) => {
+    api.store.dev.globalColorMode = value
+  },
+})
+
+const experimentColorMode = computed({
+  get: () => api.store.dev.experimentColorMode,
+  set: (value) => {
+    api.store.dev.experimentColorMode = value
+  },
+})
 
 // Global MutationObserver for portaled elements
 let portalObserver = null
@@ -188,7 +203,9 @@ export function useSmileColorMode(scope = 'experiment', options = {}) {
           applyColorMode('html', newMode)
         } else if (scope === 'experiment') {
           // Apply to experiment containers only
-          applyColorMode('#main-app', newMode)
+          if (api.currentRouteName() !== 'recruit') {
+            applyColorMode('#main-app', newMode)
+          }
           applyColorMode('.device-container', newMode)
           applyColorMode('.fullscreen-container', newMode)
           applyColorMode('.dev-color-mode', newMode)

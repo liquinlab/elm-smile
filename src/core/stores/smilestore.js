@@ -132,6 +132,9 @@ const initDev = {
   isFullscreen: false, // fullscreen state for responsive design mode
   // panel locations (transient)
   routePanelVisible: false,
+  // color mode settings (persisted)
+  globalColorMode: 'auto', // global color mode for the dev tools
+  experimentColorMode: 'auto', // experiment color mode for the main app
 }
 
 const initBrowserPersisted = {

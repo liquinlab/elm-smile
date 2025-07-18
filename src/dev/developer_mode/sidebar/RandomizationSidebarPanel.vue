@@ -198,5 +198,3 @@ const getBranchType = (index, total) => {
     </div>
   </TooltipProvider>
 </template>
-
-w

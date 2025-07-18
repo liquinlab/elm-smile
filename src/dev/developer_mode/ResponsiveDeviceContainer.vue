@@ -40,6 +40,11 @@ const {
   system,
 } = useSmileColorMode('experiment')
 
+/**
+ * Global color mode for recruit route
+ */
+const { state: globalColorMode } = useSmileColorMode('global')
+
 // Initialize store values if they don't exist
 if (!api.store.dev.deviceWidth || !api.store.dev.deviceHeight) {
   const initialPreset = devicePresets[api.store.dev.selectedDevice] || devicePresets.desktop1
@@ -185,7 +190,7 @@ const colorMode = computed(() => {
     v-if="api.store.dev.isFullscreen || !shouldUseResponsiveContainer || api.config.mode == 'presentation'"
     ref="fullScreenDiv"
     class="fullscreen-container bg-background text-foreground dev-color-mode"
-    :class="api.currentRouteName() !== 'recruit' ? colorMode : ''"
+    :class="api.currentRouteName() !== 'recruit' ? colorMode : globalColorMode"
   >
     <MainApp :deviceWidth="fullScreenWidth" :deviceHeight="fullScreenHeight" />
   </div>
@@ -254,7 +259,7 @@ const colorMode = computed(() => {
       </div>
 
       <!-- Device container with resize handles -->
-      <div class="device-wrapper dev-color-mode" :class="api.currentRouteName() !== 'recruit' ? colorMode : ''">
+      <div class="device-wrapper dev-color-mode" :class="api.currentRouteName() !== 'recruit' ? colorMode : globalColorMode">
         <!-- Main device container -->
         <div class="device-container bg-background text-foreground" ref="containerDiv">
           <MainApp :deviceWidth="api.store.dev.deviceWidth" :deviceHeight="api.store.dev.deviceHeight" />
