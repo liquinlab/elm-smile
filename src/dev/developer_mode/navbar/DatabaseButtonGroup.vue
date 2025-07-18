@@ -1,16 +1,30 @@
 <script setup>
+// Vue composables
 import { computed } from 'vue'
+
+// UI components
 import { Button } from '@/uikit/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
-import { Database, RefreshCw } from 'lucide-vue-next'
-import useAPI from '@/core/composables/useAPI'
-const api = useAPI()
 
+// Icons
+import { Database, RefreshCw } from 'lucide-vue-next'
+
+// API composable
+import useAPI from '@/core/composables/useAPI'
+
+// Local components
 import CircleProgress from '@/dev/developer_mode/navbar/CircleProgress.vue'
 
-// if in dev mode (which should always be true on this page), set known
-// if not a known user
+/**
+ * API instance for accessing application state and methods
+ */
+const api = useAPI()
 
+/**
+ * Computed tooltip text showing database connection status and data usage
+ *
+ * @returns {string} Formatted tooltip message with connection status, sync status, and data usage
+ */
 const database_tooltip = computed(() => {
   var msg = ''
   if (api.store.browserEphemeral.dbConnected == true) {
@@ -32,16 +46,19 @@ const database_tooltip = computed(() => {
 </script>
 
 <template>
+  <!-- Database connection status button with tooltip -->
   <TooltipProvider>
     <Tooltip>
       <TooltipTrigger asChild>
         <Button size="menu" variant="outline">
+          <!-- Database icon with connection status styling -->
           <i-ix-database-filled
             style="font-size: 2em"
             class="disconnected"
             :class="{ connected: api.store.browserEphemeral.dbConnected == true }"
           />
 
+          <!-- Refresh icon with sync status styling -->
           <template v-if="!api.store.browserEphemeral.dbConnected">
             <RefreshCw class="has-text-grey" />
           </template>
@@ -51,6 +68,8 @@ const database_tooltip = computed(() => {
           <template v-else>
             <RefreshCw class="insync" />
           </template>
+
+          <!-- Progress circle for data usage -->
           <template v-if="!api.store.browserEphemeral.dbConnected">
             <div class="mt-1">
               <CircleProgress
@@ -94,8 +113,5 @@ const database_tooltip = computed(() => {
 }
 .insync {
   color: var(--status-green);
-}
-.notconnected {
-  color: var(--darker-grey);
 }
 </style>

@@ -1,11 +1,19 @@
 <script setup>
+// UI components
 import { Button } from '@/uikit/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
+
+// API composable
 import useAPI from '@/core/composables/useAPI'
+
+/**
+ * API instance for accessing application state and methods
+ */
 const api = useAPI()
 </script>
 
 <template>
+  <!-- Fullscreen toggle button with tooltip -->
   <TooltipProvider>
     <Tooltip>
       <TooltipTrigger asChild>

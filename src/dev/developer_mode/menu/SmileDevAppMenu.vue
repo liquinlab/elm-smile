@@ -5,8 +5,6 @@
 
 /**
  * Import Vue composition API functions
- * @requires h Vue render function for creating elements
- * @requires ref Vue ref for reactive references
  * @requires computed Vue computed for derived state
  */
 import { computed } from 'vue'
@@ -45,7 +43,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/uikit/components/ui/p
 
 /**
  * Import configuration panel component
- * @requires ConfigDevPanel Developer configuration panel component
+ * @requires DevConfigPanel Developer configuration panel component
  */
 import DevConfigPanel from '@/dev/developer_mode/menu/DevConfigPanel.vue'
 
@@ -65,6 +63,12 @@ import { useSmileColorMode } from '@/core/composables/useColorMode'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
 
 /**
+ * Import and initialize SMILE API
+ * @requires useAPI SMILE API composable
+ */
+import useAPI from '@/core/composables/useAPI'
+
+/**
  * Component props for sidebar configuration
  * @typedef {Object} Props
  * @property {string} [side] - Side of the sidebar ('left' or 'right')
@@ -78,12 +82,6 @@ const props = defineProps({
   collapsible: { type: String, required: false, default: 'icon' },
   class: { type: null, required: false },
 })
-
-/**
- * Import and initialize SMILE API
- * @requires useAPI SMILE API composable
- */
-import useAPI from '@/core/composables/useAPI'
 
 /**
  * Initialize SMILE API instance
@@ -123,10 +121,9 @@ const isDarkMode = computed({
 </script>
 
 <template>
-  <!-- This is the first sidebar -->
-  <!-- We disable collapsible and adjust width to icon. -->
-  <!-- This will make the sidebar appear as icons. -->
+  <!-- Main sidebar container with icon-only layout -->
   <Sidebar class="w-[calc(var(--sidebar-width-icon)+1px)]! border-r" v-bind="props">
+    <!-- Sidebar header with main logo button -->
     <SidebarHeader>
       <SidebarMenu>
         <SidebarMenuItem>
@@ -140,11 +137,13 @@ const isDarkMode = computed({
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarHeader>
+
+    <!-- Sidebar content with navigation menu -->
     <SidebarContent>
       <SidebarGroup>
         <SidebarGroupContent class="px-1.5 md:px-0">
           <SidebarMenu>
-            <!-- Developer Mode -->
+            <!-- Developer Mode navigation item -->
             <SidebarMenuItem>
               <SidebarMenuButton
                 class="px-[0.05rem] group-data-[collapsible=icon]:!p-1.5 my-1"
@@ -206,8 +205,10 @@ const isDarkMode = computed({
         </SidebarGroupContent>
       </SidebarGroup>
     </SidebarContent>
+
+    <!-- Sidebar footer with utility buttons -->
     <SidebarFooter>
-      <!-- color mode toggle -->
+      <!-- Color mode toggle button -->
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -226,7 +227,7 @@ const isDarkMode = computed({
         </Tooltip>
       </TooltipProvider>
 
-      <!-- Developer Mode Configuration -->
+      <!-- Developer configuration popover -->
       <Popover>
         <PopoverTrigger>
           <SidebarMenuButton
@@ -246,9 +247,12 @@ const isDarkMode = computed({
 </template>
 
 <style scoped>
+/* Main button styling with light theme */
 .mainbutton {
   background-color: rgb(175, 218, 236);
 }
+
+/* Main button styling with dark theme */
 .dark .mainbutton {
   background-color: rgb(192, 240, 163);
   color: rgb(0, 0, 0);

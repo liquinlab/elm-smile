@@ -1,4 +1,15 @@
 <script setup>
+/**
+ * RecruitmentChooserView.vue
+ *
+ * A developer mode view that provides access to different recruitment platforms
+ * for testing and participant recruitment. This component displays cards for
+ * various platforms like Prolific, CloudResearch, Mechanical Turk, etc.
+ *
+ * @component RecruitmentChooserView
+ * @description Developer interface for choosing recruitment platforms
+ */
+
 import { Button } from '@/uikit/components/ui/button'
 import { ArrowRight } from 'lucide-vue-next'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/uikit/components/ui/card'
@@ -8,13 +19,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
  * @requires useViewAPI SMILE ViewAPI composable that provides view-specific functionality
  * @constant {ViewAPI} api Global ViewAPI instance for this view
  */
-
 import useViewAPI from '@/core/composables/useViewAPI'
 const api = useViewAPI()
 </script>
 
 <template>
+  <!-- Main container with responsive padding -->
   <div class="px-4 md:px-8 lg:px-12 pt-10 pb-10">
+    <!-- Header section with title and description -->
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-4">Welcome to Smile Developer 👩‍💻 Mode</h1>
       <p class="text-lg mb-6">
@@ -22,8 +34,13 @@ const api = useViewAPI()
         multiple platforms.
       </p>
     </div>
+
+    <!-- Divider line -->
     <hr class="my-4" />
+
+    <!-- Grid of recruitment platform cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- Prolific Platform Card -->
       <Card class="flex flex-col">
         <CardHeader>
           <CardTitle>Prolific</CardTitle>
@@ -41,6 +58,7 @@ const api = useViewAPI()
         </CardContent>
       </Card>
 
+      <!-- CloudResearch Platform Card -->
       <Card class="flex flex-col">
         <CardHeader>
           <CardTitle>CloudResearch</CardTitle>
@@ -59,6 +77,7 @@ const api = useViewAPI()
         </CardContent>
       </Card>
 
+      <!-- Mechanical Turk Platform Card -->
       <Card class="flex flex-col">
         <CardHeader>
           <CardTitle>Mechanical Turk</CardTitle>
@@ -84,6 +103,7 @@ const api = useViewAPI()
         </CardContent>
       </Card>
 
+      <!-- Citizen Science Platform Card -->
       <Card class="flex flex-col">
         <CardHeader>
           <CardTitle>Citizen Science</CardTitle>
@@ -101,6 +121,7 @@ const api = useViewAPI()
         </CardContent>
       </Card>
 
+      <!-- Anonymous Web User Card -->
       <Card class="flex flex-col">
         <CardHeader>
           <CardTitle>Anonymous Web User</CardTitle>
@@ -120,12 +141,7 @@ const api = useViewAPI()
 </template>
 
 <style scoped>
-.hero {
-  background-color: #79f2cc;
-  margin-bottom: 40px;
-  padding: 0px;
-}
-
+/* Platform-specific button color variants */
 .is-blue {
   background-color: rgb(102, 209, 255);
   color: #393939;
@@ -140,6 +156,7 @@ const api = useViewAPI()
   background-color: rgb(245, 213, 138);
   color: #393939;
 }
+
 .is-yellow {
   background-color: rgb(255, 183, 15);
   color: #393939;
@@ -158,14 +175,10 @@ const api = useViewAPI()
 .is-purple {
   background-color: #ebaeff;
   color: #393939;
-  /*color: #fff;*/
   border: none;
 }
 
-#bigsmile {
-  font-size: 100px;
-}
-
+/* Responsive text sizing for mobile devices */
 @media screen and (max-width: 599px) {
   .text-4xl {
     font-size: 1.5em;

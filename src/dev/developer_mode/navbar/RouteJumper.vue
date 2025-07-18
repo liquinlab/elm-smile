@@ -1,50 +1,75 @@
 <script setup>
+// Vue composables
 import { watch, ref } from 'vue'
 
+// API composable
 import useAPI from '@/core/composables/useAPI'
+
+/**
+ * API instance for accessing application state and methods
+ */
 const api = useAPI()
 
+// Props
 const props = defineProps(['routeName'])
 
+// Logging store
 import useLog from '@/core/stores/log'
 const log = useLog()
+
+// Vue Router composables
 import { useRoute, useRouter } from 'vue-router'
+
+// UI components
 import { DropdownMenuContent, DropdownMenuItem } from '@/uikit/components/ui/dropdown-menu'
 
+/**
+ * Hovered route name for UI highlighting
+ */
 const hoverRoute = ref('')
-const router = useRouter() // this is needed in composition API because this.$router not availabel
+const router = useRouter()
 const route = useRoute()
 
-// construct routes in order we want to display them
+// Construct routes in order to display
 const routerRoutes = router.getRoutes()
-// get seqtimeline and routes from local storage
 const seqtimeline = api.store.browserPersisted.seqtimeline
 const routes = api.store.browserPersisted.routes
 
-// filter routes - only those that aren't in seqtimeline
+// Filter routes - only those not in seqtimeline
 const filteredRoutes = routes.filter((r) => {
   return !seqtimeline.find((s) => s.name === r.name)
 })
 
-// now append seqtimeline and filteredRoutes
+// Concatenate seqtimeline and filteredRoutes
 const allRoutes = seqtimeline.concat(filteredRoutes)
 
-// watch route -- if route changes, update value of current query. This will get carried forward when you jump routes
+/**
+ * Watches the route and updates the current query
+ */
 const currentQuery = ref(route.query)
 watch(route, async (newRoute, oldRoute) => {
   currentQuery.value = newRoute.query
 })
 
+/**
+ * Set the currently hovered route
+ * @param {string} route - Route name
+ */
 function setHover(route) {
   hoverRoute.value = route
 }
 
+/**
+ * Navigate to a given route
+ * @param {string} route - Route name
+ */
 function navigate(route) {
   log.warn(`DEV MODE: user requested to FORCE navigate to ${route}`)
   api.goToView(route, true)
 }
 </script>
 <template>
+  <!-- Dropdown menu listing all routes for navigation -->
   <DropdownMenuContent align="end">
     <DropdownMenuItem
       v-for="r in allRoutes"

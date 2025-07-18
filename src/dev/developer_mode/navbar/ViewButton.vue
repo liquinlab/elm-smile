@@ -1,12 +1,21 @@
 <script setup>
+// UI components
 import { Button } from '@/uikit/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
 
+// API composable
 import useAPI from '@/core/composables/useAPI'
 import { computed } from 'vue'
 
+/**
+ * API instance for accessing application state and methods
+ */
 const api = useAPI()
 
+/**
+ * Computes the current panel state: 'both', 'none', 'sidebar', or 'console'
+ * @returns {string}
+ */
 const currentState = computed(() => {
   const sideBar = api.store.dev.showSideBar
   const consoleBar = api.store.dev.showConsoleBar
@@ -17,6 +26,10 @@ const currentState = computed(() => {
   return 'console'
 })
 
+/**
+ * Tooltip text for the current panel state
+ * @returns {string}
+ */
 const tooltipText = computed(() => {
   switch (currentState.value) {
     case 'both':
@@ -32,6 +45,9 @@ const tooltipText = computed(() => {
   }
 })
 
+/**
+ * Cycles the panel state between sidebar, console, both, and none
+ */
 const cycleState = () => {
   switch (currentState.value) {
     case 'both':
@@ -55,6 +71,7 @@ const cycleState = () => {
 </script>
 
 <template>
+  <!-- Panel toggle button with tooltip -->
   <TooltipProvider>
     <Tooltip>
       <TooltipTrigger asChild>

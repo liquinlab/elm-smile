@@ -7,36 +7,38 @@ import { Separator } from '@/uikit/components/ui/separator'
 import { Button } from '@/uikit/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
 import { useSmileColorMode } from '@/core/composables/useColorMode'
+import { useElementSize } from '@vueuse/core'
 
+/**
+ * Import shared device presets
+ * @requires devicePresets Shared device presets for responsive testing
+ */
+import { devicePresets } from '@/dev/developer_mode/devicePresets.js'
+
+/**
+ * API instance for accessing store and configuration
+ */
 const api = useAPI()
 
-import { useElementSize } from '@vueuse/core'
+/**
+ * Reference to the fullscreen container element
+ */
 const fullScreenDiv = ref(null)
+
+/**
+ * Reactive element size tracking for fullscreen mode
+ */
 const { width: fullScreenWidth, height: fullScreenHeight } = useElementSize(fullScreenDiv)
 
+/**
+ * Color mode composable for experiment theme management
+ */
 const {
   state: experimentColorMode,
   mode: experimentColorModeRaw,
   toggle: toggleColorMode,
   system,
 } = useSmileColorMode('experiment')
-
-// Initialize device dimensions based on the selected device from store
-const devicePresets = {
-  iphone: { width: 393, height: 852, name: 'iPhone' },
-  'iphone-plus': { width: 430, height: 932, name: 'iPhone Plus' },
-  'iphone-pro': { width: 402, height: 874, name: 'iPhone Pro' },
-  'iphone-pro-max': { width: 440, height: 956, name: 'iPhone Pro Max' },
-  'iphone-se': { width: 375, height: 667, name: 'iPhone SE' },
-  'ipad-11': { width: 1180, height: 820, name: 'iPad 11-inch' },
-  'ipad-13': { width: 1366, height: 1024, name: 'iPad 13-inch' },
-  desktop1: { width: 800, height: 600, name: '800x600' },
-  desktop2: { width: 1024, height: 768, name: '1024x768' },
-  desktop3: { width: 1280, height: 1024, name: '1280x1024' },
-  desktop4: { width: 1440, height: 900, name: '1440x900' },
-  desktop5: { width: 1600, height: 1200, name: '1600x1200' },
-  desktop16: { width: 1920, height: 1080, name: '1920x1080' },
-}
 
 // Initialize store values if they don't exist
 if (!api.store.dev.deviceWidth || !api.store.dev.deviceHeight) {
@@ -45,12 +47,17 @@ if (!api.store.dev.deviceWidth || !api.store.dev.deviceHeight) {
   api.store.dev.deviceHeight = initialPreset.height
 }
 
+/**
+ * Computed style object for device container dimensions
+ */
 const containerStyle = computed(() => ({
   '--device-width': `${api.store.dev.deviceWidth}px`,
   '--device-height': `${api.store.dev.deviceHeight}px`,
 }))
 
-// Check if current dimensions match any preset
+/**
+ * Checks if current dimensions match any preset and updates selectedDevice accordingly
+ */
 const checkForMatchingPreset = () => {
   for (const [key, preset] of Object.entries(devicePresets)) {
     // Check both normal orientation and rotated orientation
@@ -66,7 +73,7 @@ const checkForMatchingPreset = () => {
   api.store.dev.selectedDevice = 'custom'
 }
 
-// Resize functionality
+// Resize functionality state
 const isResizing = ref(false)
 const resizeDirection = ref('')
 const startX = ref(0)
@@ -74,6 +81,11 @@ const startY = ref(0)
 const startWidth = ref(0)
 const startHeight = ref(0)
 
+/**
+ * Initiates resize operation
+ * @param {string} direction - The resize direction ('left', 'right', 'bottom')
+ * @param {MouseEvent} event - The mouse event that triggered the resize
+ */
 const startResize = (direction, event) => {
   isResizing.value = true
   resizeDirection.value = direction
@@ -90,6 +102,10 @@ const startResize = (direction, event) => {
   event.preventDefault()
 }
 
+/**
+ * Handles mouse movement during resize operation
+ * @param {MouseEvent} event - The mouse move event
+ */
 const handleResize = (event) => {
   if (!isResizing.value) return
 
@@ -110,6 +126,9 @@ const handleResize = (event) => {
   }
 }
 
+/**
+ * Stops the resize operation and checks for matching presets
+ */
 const stopResize = () => {
   isResizing.value = false
   resizeDirection.value = ''
@@ -120,7 +139,9 @@ const stopResize = () => {
   checkForMatchingPreset()
 }
 
-// Toggle rotation (swap width and height)
+/**
+ * Toggles device rotation by swapping width and height
+ */
 const toggleRotation = () => {
   const tempWidth = api.store.dev.deviceWidth
   api.store.dev.deviceWidth = api.store.dev.deviceHeight
@@ -131,32 +152,35 @@ const toggleRotation = () => {
   checkForMatchingPreset()
 }
 
-// Toggle fullscreen mode
+/**
+ * Toggles fullscreen mode
+ */
 const toggleFullscreen = () => {
   api.store.dev.isFullscreen = !api.store.dev.isFullscreen
 }
-
-// toggleColorMode is now imported from useSmileColorMode above
 
 /**
  * Computed property that determines whether to wrap content in ResponsiveDeviceContainer
  *
  * @returns {boolean} True if ResponsiveDeviceContainer should be used, false otherwise
  * - Returns false if current route is '/' (root route)
- * - Returns true
+ * - Returns true for development mode
  */
 const shouldUseResponsiveContainer = computed(() => {
   const routeName = api.currentRouteName()
   return routeName !== undefined && routeName !== 'recruit' && api.config.mode == 'development'
 })
 
+/**
+ * Computed color mode for the experiment
+ */
 const colorMode = computed(() => {
   return experimentColorMode.value
 })
 </script>
 
 <template>
-  <!-- Fullscreen mode - just the slot content -->
+  <!-- Fullscreen mode - displays just the slot content without device container -->
   <div
     v-if="api.store.dev.isFullscreen || !shouldUseResponsiveContainer || api.config.mode == 'presentation'"
     ref="fullScreenDiv"
@@ -166,12 +190,16 @@ const colorMode = computed(() => {
     <MainApp :deviceWidth="fullScreenWidth" :deviceHeight="fullScreenHeight" />
   </div>
 
-  <!-- Normal device container mode -->
+  <!-- Normal device container mode with responsive controls -->
   <div v-else class="device-container-wrapper" :style="containerStyle">
     <div class="device-content-wrapper">
+      <!-- Device information and control panel -->
       <div class="device-info">
         <div class="device-controls">
+          <!-- Device selection dropdown -->
           <ResponsiveDeviceSelect />
+
+          <!-- Rotation toggle button -->
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -184,9 +212,14 @@ const colorMode = computed(() => {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+
+          <!-- Separator between controls -->
           <Separator orientation="vertical" />
+
+          <!-- Current device dimensions display -->
           <div class="device-dimensions">{{ api.store.dev.deviceWidth }} x {{ api.store.dev.deviceHeight }}</div>
 
+          <!-- Color mode toggle button -->
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -204,6 +237,7 @@ const colorMode = computed(() => {
             </Tooltip>
           </TooltipProvider>
 
+          <!-- Fullscreen toggle button -->
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -218,12 +252,15 @@ const colorMode = computed(() => {
           </TooltipProvider>
         </div>
       </div>
+
+      <!-- Device container with resize handles -->
       <div class="device-wrapper dev-color-mode" :class="api.currentRouteName() !== 'recruit' ? colorMode : ''">
+        <!-- Main device container -->
         <div class="device-container bg-background text-foreground" ref="containerDiv">
           <MainApp :deviceWidth="api.store.dev.deviceWidth" :deviceHeight="api.store.dev.deviceHeight" />
         </div>
 
-        <!-- Resize handles -->
+        <!-- Resize handles for interactive resizing -->
         <div class="resize-handle resize-handle-left" @mousedown="startResize('left', $event)"></div>
         <div class="resize-handle resize-handle-right" @mousedown="startResize('right', $event)"></div>
         <div class="resize-handle resize-handle-bottom" @mousedown="startResize('bottom', $event)"></div>
@@ -237,19 +274,6 @@ const colorMode = computed(() => {
   width: 100%;
   height: 100%;
   position: relative;
-}
-
-.fullscreen-controls {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  background-color: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .device-container-wrapper {
@@ -438,14 +462,5 @@ const colorMode = computed(() => {
 
 .resize-handle-bottom:active {
   transform: translateX(-50%) scale(1.05);
-}
-
-.resize-handle-corner {
-  bottom: -15px;
-  right: -15px;
-  width: 12px;
-  height: 12px;
-  cursor: nw-resize;
-  border-radius: 50%;
 }
 </style>

@@ -1,10 +1,12 @@
 <script setup>
-import { computed } from 'vue'
-import SmileAPI from '@/core/composables/useAPI'
-const api = SmileAPI()
+/**
+ * @fileoverview Console log panel component
+ * Displays application logs with filtering and search capabilities
+ */
 
+import { computed } from 'vue'
+import useAPI from '@/core/composables/useAPI'
 import useLog from '@/core/stores/log'
-const log = useLog()
 
 // Import shadcn/ui components
 import { Input } from '@/uikit/components/ui/input'
@@ -12,8 +14,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/uikit/components/ui/switch'
 import { Label } from '@/uikit/components/ui/label'
 
+/**
+ * Initialize the API instance for accessing store and configuration
+ */
+const api = useAPI()
+
+/**
+ * Initialize the log store for accessing log history
+ */
+const log = useLog()
+
+/**
+ * Compute the height percentage for the log display area
+ * @returns {string} Height in pixels
+ */
 const height_pct = computed(() => `${api.store.dev.consoleBarHeight - 55}px`)
 
+/**
+ * Filter log messages based on search text and log type
+ * @param {Object} msg - Log message object
+ * @param {string} msg.message - Log message text
+ * @param {string} msg.type - Log type (debug, warn, error, etc.)
+ * @returns {boolean} Whether the message should be displayed
+ */
 function filter_log(msg) {
   const search_match = msg.message.toLowerCase().includes(api.store.dev.searchParams.toLowerCase())
   let type_match = true
@@ -36,6 +59,12 @@ function filter_log(msg) {
   return search_match && type_match
 }
 
+/**
+ * Get the background CSS class for a log message based on its type
+ * @param {Object} msg - Log message object
+ * @param {string} msg.type - Log type
+ * @returns {string} CSS class name for background styling
+ */
 function getBgClass(msg) {
   switch (msg.type) {
     case 'log':
@@ -53,21 +82,26 @@ function getBgClass(msg) {
   }
 }
 </script>
+
 <template>
-  <!-- content of panel here -->
+  <!-- Console log panel with controls and log display -->
   <div class="h-full p-0 m-0 overflow-hidden">
+    <!-- Control bar with filters and search -->
     <div class="bg-muted border-b border-t border-dev-lines px-3 py-2 font-mono">
       <div class="flex items-center justify-end gap-4 text-xs">
+        <!-- Since last view toggle -->
         <div class="flex items-center gap-2">
           <Label class="text-xs font-semibold">Since last view:</Label>
           <Switch v-model="api.store.dev.lastViewLimit" size="sm" />
         </div>
 
+        <!-- Search input -->
         <div class="flex items-center gap-2">
           <Label class="text-xs font-semibold">Search:</Label>
           <Input v-model="api.store.dev.searchParams" placeholder="Search..." class="h-6 w-24 text-xs" />
         </div>
 
+        <!-- Log type filter -->
         <div class="flex items-center gap-2">
           <Label class="text-xs font-semibold">Filter:</Label>
           <Select v-model="api.store.dev.logFilter">
@@ -85,6 +119,7 @@ function getBgClass(msg) {
           </Select>
         </div>
 
+        <!-- Notification filter -->
         <div class="flex items-center gap-2">
           <Label class="text-xs font-semibold">Notifications:</Label>
           <Select v-model="api.store.dev.notificationFilter">
@@ -104,11 +139,13 @@ function getBgClass(msg) {
       </div>
     </div>
 
+    <!-- Log display area with scrollable content -->
     <div
       class="w-full overflow-hidden overflow-y-scroll flex flex-col-reverse box-border"
       :style="{ height: height_pct }"
     >
       <div class="w-full min-w-0">
+        <!-- Log messages list - filtered by last view setting -->
         <ul v-if="api.store.dev.lastViewLimit" class="w-full min-w-0">
           <template v-for="msg in log.page_history">
             <li
@@ -119,6 +156,7 @@ function getBgClass(msg) {
               ]"
             >
               <div class="flex items-start gap-1 min-w-0">
+                <!-- Icon indicator based on message content -->
                 <div class="flex-shrink-0 mt-0.5">
                   <i-fa6-solid-code-branch v-if="msg.message.includes('ROUTER GUARD')" />
                   <i-fa6-solid-database v-else-if="msg.message.includes('SMILESTORE')" />
@@ -128,6 +166,7 @@ function getBgClass(msg) {
                   <img src="/src/assets/dev/firebase-bw.svg" width="15" v-else-if="msg.message.includes('FIRESTORE')" />
                   <i-fa6-solid-angle-right v-else />
                 </div>
+                <!-- Message content -->
                 <div class="min-w-0 flex-1">
                   <div class="font-semibold break-words break-all">{{ msg.time }} {{ msg.message }}</div>
                   <div class="break-words break-all text-xs opacity-75">{{ msg.trace }}</div>
@@ -136,6 +175,7 @@ function getBgClass(msg) {
             </li>
           </template>
         </ul>
+        <!-- Log messages list - full history -->
         <ul v-else class="w-full min-w-0">
           <template v-for="msg in log.history">
             <li
@@ -146,6 +186,7 @@ function getBgClass(msg) {
               ]"
             >
               <div class="flex items-start gap-1 min-w-0">
+                <!-- Icon indicator based on message content -->
                 <div class="flex-shrink-0 mt-0.5">
                   <i-fa6-solid-code-branch v-if="msg.message.includes('ROUTER GUARD')" />
                   <i-fa6-solid-database v-else-if="msg.message.includes('SMILESTORE')" />
@@ -155,6 +196,7 @@ function getBgClass(msg) {
                   <img src="/src/assets/dev/firebase-bw.svg" width="15" v-else-if="msg.message.includes('FIRESTORE')" />
                   <i-fa6-solid-angle-right v-else />
                 </div>
+                <!-- Message content -->
                 <div class="min-w-0 flex-1">
                   <div class="font-semibold break-words break-all">{{ msg.time }} {{ msg.message }}</div>
                   <div class="break-words break-all text-xs opacity-75">{{ msg.trace }}</div>

@@ -1,6 +1,14 @@
 <script setup>
+// Vue composables
 import { ref, onMounted } from 'vue'
 
+/**
+ * Props for the key command notification
+ * @property {string} command - The command key (e.g., 'Ctrl + R')
+ * @property {string} action - The action description
+ * @property {boolean} show - Whether to show the notification
+ * @property {string} type - Notification type ('default' or 'error')
+ */
 const props = defineProps({
   command: {
     type: String,
@@ -23,6 +31,7 @@ const props = defineProps({
 </script>
 
 <template>
+  <!-- Slide-up transition for notification -->
   <Transition name="slide-up">
     <div v-if="show" class="notification" :class="{ 'error-notification': type === 'error' }">
       <div class="notification-content" :class="{ 'error-content': type === 'error' }">

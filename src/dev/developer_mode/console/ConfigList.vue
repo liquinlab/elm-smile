@@ -1,13 +1,41 @@
 <script setup>
+/**
+ * @fileoverview Configuration list component
+ * Displays hierarchical configuration structures with navigation capabilities
+ */
+
 import { computed } from 'vue'
 
+/**
+ * Component props for configuration data and selection state
+ * @typedef {Object} Props
+ * @property {string|null} data - The configuration path to display
+ * @property {string|null} selected - Currently selected item
+ */
 const props = defineProps(['data', 'selected'])
+
 import useAPI from '@/core/composables/useAPI'
+
+/**
+ * Initialize the API instance for accessing configuration and store
+ */
 const api = useAPI()
+
+/**
+ * Define component emits for selection events
+ */
 const emit = defineEmits(['selected'])
 
+/**
+ * Compute the height percentage for the list display area
+ * @returns {string} Height in pixels
+ */
 const height_pct = computed(() => `${api.store.dev.consoleBarHeight - 90}px`)
 
+/**
+ * Compute the header text from the configuration path
+ * @returns {string|null} Header text or null if no data
+ */
 const header = computed(() => {
   if (props.data === undefined || props.data === null) {
     return null
@@ -17,6 +45,10 @@ const header = computed(() => {
   }
 })
 
+/**
+ * Compute the configuration field to display based on the current path
+ * @returns {Object|null} Configuration object or null if invalid path
+ */
 const data_field = computed(() => {
   if (props.data !== undefined && props.data !== null) {
     var pieces = props.data.split('.')
@@ -32,20 +64,31 @@ const data_field = computed(() => {
   }
 })
 
+/**
+ * Truncate text to a maximum length with ellipsis
+ * @param {string} text - Text to truncate
+ * @param {number} maxLength - Maximum length before truncation
+ * @returns {string} Truncated text
+ */
 function truncateText(text, maxLength = 30) {
   if (!text) return text
   if (text.length <= maxLength) return text
   return text.substring(0, maxLength) + '...'
 }
 
+/**
+ * Handle option selection and emit the selected event
+ * @param {string} option - Selected option key
+ */
 function option_selected(option) {
   emit('selected', option)
 }
 </script>
 
 <template>
+  <!-- Configuration list container with header and scrollable content -->
   <aside class="w-full h-full flex flex-col config-list-container bg-background">
-    <!-- Header -->
+    <!-- Header section with navigation title -->
     <div v-if="header" class="bg-muted text-dev-text px-3 py-2 text-xs font-medium border-b border-dev-lines">
       <template v-if="header == '/'">
         <i-fa6-solid-house class="mr-1" />
@@ -55,10 +98,10 @@ function option_selected(option) {
       >
     </div>
 
-    <!-- Menu List -->
+    <!-- Scrollable list content -->
     <div class="flex-1 overflow-y-auto overflow-x-hidden" :style="{ height: height_pct }">
       <ul class="space-y-0.5 p-1">
-        <!-- Empty state -->
+        <!-- Empty state message -->
         <li
           v-if="
             (data_field === null || data_field === undefined || Object.keys(data_field).length == 0) && header !== null
@@ -67,7 +110,7 @@ function option_selected(option) {
           <div class="px-2 py-1.5 text-foreground text-xs font-mono">Empty currently</div>
         </li>
 
-        <!-- Data items -->
+        <!-- Configuration items list -->
         <li v-for="(option, key) in data_field" :key="key">
           <!-- Non-object values (display only) -->
           <div
@@ -80,7 +123,7 @@ function option_selected(option) {
             >
           </div>
 
-          <!-- Object values (clickable) -->
+          <!-- Object values (clickable navigation) -->
           <button
             v-else
             @click="option_selected(key)"

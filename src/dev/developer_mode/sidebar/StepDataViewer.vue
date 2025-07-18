@@ -1,6 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 
+/**
+ * Props for the StepDataViewer component
+ * @typedef {Object} Props
+ * @property {Object|Array|String|Number|Boolean|null} data - The data to be displayed in the viewer
+ */
 const props = defineProps({
   data: {
     type: [Object, Array, String, Number, Boolean, null],
@@ -8,8 +13,16 @@ const props = defineProps({
   },
 })
 
+/**
+ * Set of expanded node paths for tracking which nodes are expanded
+ * @type {import('vue').Ref<Set>}
+ */
 const expandedNodes = ref(new Set())
 
+/**
+ * Toggles the expansion state of a node
+ * @param {string} path - The path/key of the node to toggle
+ */
 const toggleNode = (path) => {
   if (expandedNodes.value.has(path)) {
     expandedNodes.value.delete(path)
@@ -18,6 +31,11 @@ const toggleNode = (path) => {
   }
 }
 
+/**
+ * Formats a value for display in the viewer
+ * @param {*} value - The value to format
+ * @returns {string} The formatted value string
+ */
 const formatValue = (value) => {
   if (value === null) return 'null'
   if (value === undefined) return 'undefined'
@@ -25,29 +43,39 @@ const formatValue = (value) => {
   return String(value)
 }
 
+/**
+ * Checks if a value is expandable (object or array)
+ * @param {*} value - The value to check
+ * @returns {boolean} True if the value is expandable
+ */
 const isExpandable = (value) => {
   return value !== null && (typeof value === 'object' || Array.isArray(value))
 }
 
+/**
+ * Checks if a value is a single primitive type
+ * @param {*} value - The value to check
+ * @returns {boolean} True if the value is a string, number, or boolean
+ */
 const isSinglePrimitive = (value) => {
   return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
-}
-
-const getSingleValue = (value) => {
-  return value
 }
 </script>
 
 <template>
+  <!-- Main data viewer container -->
   <div class="data-path-viewer">
+    <!-- Render expandable objects/arrays -->
     <template v-if="isExpandable(data)">
       <div v-for="(value, key) in data" :key="key" class="data-node">
+        <!-- Render primitive values directly -->
         <template v-if="isSinglePrimitive(value)">
           <div class="node-content">
             <span class="key">{{ key }}:</span>
             <span class="primitive-value">{{ formatValue(value) }}</span>
           </div>
         </template>
+        <!-- Render expandable objects/arrays with toggle functionality -->
         <template v-else>
           <div class="node-content" @click="toggleNode(key)">
             <span class="expand-icon">{{ expandedNodes.has(key) ? '▼' : '▶' }}</span>
@@ -56,12 +84,14 @@ const getSingleValue = (value) => {
               {{ Array.isArray(value) ? `[${value.length} items]` : '{...}' }}
             </span>
           </div>
+          <!-- Nested content when expanded -->
           <div v-if="expandedNodes.has(key)" class="nested-content">
             <StepDataViewer :data="value" />
           </div>
         </template>
       </div>
     </template>
+    <!-- Render primitive values directly -->
     <template v-else>
       <span class="primitive-value">{{ formatValue(data) }}</span>
     </template>

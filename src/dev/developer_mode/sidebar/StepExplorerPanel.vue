@@ -1,30 +1,51 @@
 <script setup>
-import { ref, computed, watch, onMounted, defineComponent, h } from 'vue'
+import { ref, computed, watch } from 'vue'
 import StepNode from './StepNode.vue'
 import StepDataViewer from '@/dev/developer_mode/sidebar/StepDataViewer.vue'
-import { useRoute } from 'vue-router'
 import useViewAPI from '@/core/composables/useViewAPI'
 import { ButtonGroup, ButtonGroupItem } from '@/uikit/components/ui/button-group'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
 import { Button } from '@/uikit/components/ui/button'
 
+/**
+ * API instance for step navigation and data access
+ * @type {import('@/core/composables/useViewAPI')}
+ */
 const api = useViewAPI()
 
+/**
+ * Computed state machine visualization data
+ * @type {import('vue').ComputedRef<Object>}
+ */
 const stateMachine = computed(() => api.steps.visualize())
 
-// Convert array path to string format (e.g., [1, 1] -> "1-1")
+/**
+ * Converts array path to string format (e.g., [1, 1] -> "1/1")
+ * @param {Array} pathArray - The path array to convert
+ * @returns {string} The path as a string
+ */
 const pathToString = (pathArray) => {
   return Array.isArray(pathArray) ? pathArray.join('/') : ''
 }
 
-// Add computed property to check if a node is selected
+/**
+ * Checks if a node is currently selected
+ * @param {string} nodePath - The path of the node to check
+ * @returns {boolean} True if the node is selected
+ */
 const isNodeSelected = (nodePath) => {
   if (!api.path) return false
   const currentPathStr = api.pathString
   return nodePath === currentPathStr
 }
 
-// Function to format object with indentation
+/**
+ * Formats an object with proper indentation for display
+ * @param {*} obj - The object to format
+ * @param {number} indent - The indentation level
+ * @param {WeakSet} seen - Set to track circular references
+ * @returns {string} The formatted object string
+ */
 const formatObjectWithIndent = (obj, indent = 0, seen = new WeakSet()) => {
   if (obj === null || obj === undefined) return 'null'
 
@@ -60,12 +81,19 @@ const formatObjectWithIndent = (obj, indent = 0, seen = new WeakSet()) => {
   return String(obj)
 }
 
-// You can now use this instead of the current rootNode display
+/**
+ * Computed formatted root node for display
+ * @type {import('vue').ComputedRef<string>}
+ */
 const formattedRootNode = computed(() => {
   return formatObjectWithIndent(stateMachine.value)
 })
 
-// Function to format data for display
+/**
+ * Formats data for display in the tree
+ * @param {*} data - The data to format
+ * @returns {string} The formatted data string
+ */
 const formatData = (data) => {
   if (data === null || data === undefined) return ''
 
@@ -100,6 +128,10 @@ const formatData = (data) => {
   }
 }
 
+/**
+ * Handles node click events for navigation
+ * @param {string} path - The path of the clicked node
+ */
 const handleNodeClick = (path) => {
   console.log('Node clicked with path:', path)
   if (api.steps) {
@@ -110,14 +142,22 @@ const handleNodeClick = (path) => {
   }
 }
 
-// Add this function to handle reload
+/**
+ * Handles page reload
+ */
 const handleReload = () => {
   window.location.reload()
 }
 
-// Add refs for container and selected node tracking
+/**
+ * Reference to the tree container for scrolling
+ * @type {import('vue').Ref<HTMLElement|null>}
+ */
 const treeContainer = ref(null)
 
+/**
+ * Scrolls to the currently selected node
+ */
 const scrollToSelectedNode = () => {
   if (!api.path) return
 
@@ -149,7 +189,9 @@ const scrollToSelectedNode = () => {
   }, 100)
 }
 
-// Add watcher for path changes to trigger scroll
+/**
+ * Watcher for path changes to trigger scroll to selected node
+ */
 watch(
   () => api.path,
   (newPath) => {
@@ -161,13 +203,17 @@ watch(
 </script>
 
 <template>
+  <!-- Main step explorer container -->
   <div class="tree-viewer-container" v-if="api.steps">
+    <!-- Navigation controls section -->
     <div :class="{ disabled: api.nSteps === 0 }">
       <div class="path-display-container">
+        <!-- Current path display -->
         <div class="path-info">
           <div class="path-display">{{ api.pathString }}</div>
         </div>
 
+        <!-- Navigation buttons -->
         <TooltipProvider>
           <ButtonGroup variant="outline" size="menu">
             <Tooltip>
@@ -210,8 +256,10 @@ watch(
       </div>
     </div>
 
+    <!-- Tree structure display -->
     <div class="tree-container" ref="treeContainer">
       <div v-if="api.nSteps > 0">
+        <!-- Step index display -->
         <div class="index-display">
           <Tooltip>
             <TooltipTrigger>{{ api.stepIndex }}/{{ api.nSteps }}</TooltipTrigger>
@@ -223,6 +271,7 @@ watch(
           </Tooltip>
         </div>
 
+        <!-- Tree structure -->
         <ul class="tree-root">
           <li v-if="stateMachine" class="tree-node root-node">
             <ul v-if="stateMachine.rows && stateMachine.rows.length > 0" class="children">
@@ -243,9 +292,11 @@ watch(
           </li>
         </ul>
       </div>
+      <!-- Empty state when no steps defined -->
       <div class="tree-viewer-container-empty disabled" v-else>No steps defined</div>
     </div>
 
+    <!-- Global persisted variables section -->
     <div class="data-container-global" :class="{ disabled: Object.keys(api.persist).length === 0 }">
       <div class="section-title">
         <span>Persisted Vars <span class="data-label">(.persist)</span></span>
@@ -264,6 +315,8 @@ watch(
         <div class="italic text-xs" v-else>No variables persisted</div>
       </div>
     </div>
+
+    <!-- Step data section -->
     <div class="data-container" :class="{ disabled: api.nSteps === 0 }">
       <div class="section-title">
         <span>Step Data <span class="data-label">(.stepData)</span></span>
@@ -464,6 +517,7 @@ watch(
 .tree-root > li.tree-node {
   padding-left: 0;
 }
+
 .global-data-display {
   flex: 1;
   overflow: auto;

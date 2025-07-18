@@ -1,4 +1,5 @@
 <script setup>
+// Component imports
 import StepInfoButtonGroup from '@/dev/developer_mode/navbar/StepInfoButtonGroup.vue'
 import ViewInfoButtonGroup from '@/dev/developer_mode/navbar/ViewInfoButtonGroup.vue'
 import ResetButton from '@/dev/developer_mode/navbar/ResetButton.vue'
@@ -7,15 +8,47 @@ import ColorModeButton from '@/dev/developer_mode/navbar/ColorModeButton.vue'
 import DatabaseButtonGroup from '@/dev/developer_mode/navbar/DatabaseButtonGroup.vue'
 import FullScreenButton from '@/dev/developer_mode/navbar/FullScreenButton.vue'
 import ViewButton from '@/dev/developer_mode/navbar/ViewButton.vue'
-import { BugPlay } from 'lucide-vue-next'
-import useAPI from '@/core/composables/useAPI'
 import KeyCommandNotification from '@/dev/developer_mode/navbar/KeyCommandNotification.vue'
 
-import { ref } from 'vue'
+// Icon imports
+import { BugPlay } from 'lucide-vue-next'
 
+// Vue composables
+import { ref } from 'vue'
 import { onKeyDown } from '@vueuse/core'
 
+// API composable
+import useAPI from '@/core/composables/useAPI'
+
+/**
+ * API instance for accessing application state and methods
+ */
 const api = useAPI()
+
+/**
+ * Reactive refs for notification system
+ */
+const showNotification = ref(false)
+const notificationCommand = ref('')
+const notificationAction = ref('')
+const notificationType = ref('default')
+
+/**
+ * Shows a temporary notification with a command and action that automatically hides after 1.5 seconds
+ *
+ * @param {string} command - The command text to display in the notification
+ * @param {string} action - The action text to display in the notification
+ * @param {string} type - The type of notification ('default' or 'error')
+ */
+const showTemporaryNotification = (command, action, type = 'default') => {
+  notificationCommand.value = command
+  notificationAction.value = action
+  notificationType.value = type
+  showNotification.value = true
+  setTimeout(() => {
+    showNotification.value = false
+  }, 1500) // Hide after 1.5 seconds
+}
 
 /**
  * Developer mode keyboard shortcuts
@@ -34,6 +67,10 @@ const api = useAPI()
  * - Ctrl+A: Autofill current view (if available)
  * - Ctrl+P: Pin/unpin current route
  */
+
+/**
+ * Navigate to previous view on ArrowUp key press
+ */
 onKeyDown((e) => {
   if (e.key === 'ArrowUp') {
     e.preventDefault()
@@ -41,6 +78,9 @@ onKeyDown((e) => {
   }
 })
 
+/**
+ * Navigate to next view on ArrowDown key press
+ */
 onKeyDown((e) => {
   if (e.key === 'ArrowDown') {
     e.preventDefault()
@@ -48,7 +88,9 @@ onKeyDown((e) => {
   }
 })
 
-// Modify Ctrl+1 handler
+/**
+ * Toggle sidebar/console panels on Ctrl+1 key press
+ */
 onKeyDown((e) => {
   if (e.ctrlKey && e.key === '1') {
     e.preventDefault()
@@ -76,7 +118,9 @@ onKeyDown((e) => {
   }
 })
 
-// Modify Ctrl+2 handler
+/**
+ * Cycle through sidebar tabs on Ctrl+2 key press
+ */
 onKeyDown((e) => {
   if (e.ctrlKey && e.key === '2') {
     e.preventDefault()
@@ -101,7 +145,9 @@ onKeyDown((e) => {
   }
 })
 
-// Modify Ctrl+3 handler
+/**
+ * Cycle through console tabs on Ctrl+3 key press
+ */
 onKeyDown((e) => {
   if (e.ctrlKey && e.key === '3') {
     e.preventDefault()
@@ -126,7 +172,9 @@ onKeyDown((e) => {
   }
 })
 
-// Add shortcut for resetting local state
+/**
+ * Reset local state on Ctrl+R key press
+ */
 onKeyDown((e) => {
   if (e.ctrlKey && e.key === 'r') {
     e.preventDefault()
@@ -137,7 +185,9 @@ onKeyDown((e) => {
   }
 })
 
-// Add shortcut for connecting to database
+/**
+ * Connect to database on Ctrl+D key press
+ */
 onKeyDown((e) => {
   if (e.ctrlKey && e.key === 'd') {
     e.preventDefault()
@@ -149,7 +199,9 @@ onKeyDown((e) => {
   }
 })
 
-// Add shortcut for autofill
+/**
+ * Autofill current view on Ctrl+A key press
+ */
 onKeyDown((e) => {
   if (e.ctrlKey && e.key === 'a') {
     e.preventDefault()
@@ -162,7 +214,9 @@ onKeyDown((e) => {
   }
 })
 
-// Add shortcut for pinning current route
+/**
+ * Pin/unpin current route on Ctrl+P key press
+ */
 onKeyDown((e) => {
   if (e.ctrlKey && e.key === 'p') {
     e.preventDefault()
@@ -178,107 +232,85 @@ onKeyDown((e) => {
     }
   }
 })
-
-/**
- * Shows a temporary notification with a command and action that automatically hides after 1.5 seconds
- *
- * @param {string} command - The command text to display in the notification
- * @param {string} action - The action text to display in the notification
- * @param {string} type - The type of notification ('default' or 'error')
- *
- * Sets the notification content and shows it by updating reactive refs:
- * - notificationCommand
- * - notificationAction
- * - notificationType
- * - showNotification
- *
- * Uses setTimeout to automatically hide the notification after 1.5 seconds
- */
-const showTemporaryNotification = (command, action, type = 'default') => {
-  notificationCommand.value = command
-  notificationAction.value = action
-  notificationType.value = type
-  showNotification.value = true
-  setTimeout(() => {
-    showNotification.value = false
-  }, 1500) // Hide after 1.5 seconds
-}
-
-// Add notification state
-const showNotification = ref(false)
-const notificationCommand = ref('')
-const notificationAction = ref('')
-const notificationType = ref('default')
 </script>
 
 <template>
+  <!-- Main navigation bar container -->
   <nav class="flex items-center justify-between w-full border-b min-h-[36px] max-h-[36px] text-sm px-2">
-    <!-- Left section - anchored to the left -->
+    <!-- Left section - Developer mode indicator -->
     <div class="flex items-center flex-shrink-0 px-2 py-1 rounded">
       <div class="flex items-center">
+        <!-- Desktop version -->
         <div class="hidden sm:block">
-          <div class="flex items-center text-xs font-normal"><BugPlay class="size-4 mr-1" /><b>DEVELOPER MODE</b></div>
+          <div class="flex items-center text-xs font-normal">
+            <BugPlay class="size-4 mr-1" />
+            <b>DEVELOPER MODE</b>
+          </div>
         </div>
+        <!-- Mobile version -->
         <div class="block sm:hidden">
-          <div class="flex items-center text-xs font-normal"><BugPlay class="size-4 mr-1" /><b>DEV</b></div>
+          <div class="flex items-center text-xs font-normal">
+            <BugPlay class="size-4 mr-1" />
+            <b>DEV</b>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Middle section - centered -->
+    <!-- Middle section - Centered content area -->
     <div class="flex items-center justify-center flex-1 min-w-0 px-2 py-1 rounded">
       <div class="flex items-center space-x-2">
-        <!-- Add any middle content here -->
         <div class="text-xs text-gray-600">
           <!-- Middle content placeholder -->
         </div>
       </div>
     </div>
 
-    <!-- Right section - anchored to the right -->
+    <!-- Right section - Control buttons -->
     <div class="flex items-center flex-shrink-0 px-1 py-1 rounded">
       <div class="flex items-center space-x-2.5 border-gray-300 pl-4 rounded-l">
-        <!-- reload button -->
+        <!-- Reload button -->
         <div class="flex items-center">
-          <ReloadButton></ReloadButton>
+          <ReloadButton />
         </div>
 
-        <!-- reset button -->
+        <!-- Reset button -->
         <div class="flex items-center">
-          <ResetButton></ResetButton>
+          <ResetButton />
         </div>
 
-        <!-- color mode button -->
+        <!-- Color mode button (only in fullscreen mode and not on recruit page) -->
         <div class="flex items-center" v-if="api.store.dev.isFullscreen && api.currentRouteName() !== 'recruit'">
-          <ColorModeButton></ColorModeButton>
+          <ColorModeButton />
         </div>
 
-        <!--fullscreen button -->
+        <!-- Fullscreen button (not on recruit page) -->
         <div class="flex items-center" v-if="api.currentRouteName() !== 'recruit'">
-          <FullScreenButton></FullScreenButton>
+          <FullScreenButton />
         </div>
 
-        <!-- database info button -->
-        <DatabaseButtonGroup></DatabaseButtonGroup>
+        <!-- Database info button group -->
+        <DatabaseButtonGroup />
 
-        <!-- responsive hides this if the page is too small-->
-        <!-- step info buttons -->
+        <!-- Step info buttons (responsive - hidden on small screens) -->
         <div class="items-center">
-          <StepInfoButtonGroup></StepInfoButtonGroup>
+          <StepInfoButtonGroup />
         </div>
 
-        <!-- view info buttons -->
+        <!-- View info buttons (hidden on medium screens and below) -->
         <div class="hidden md:flex items-center">
-          <ViewInfoButtonGroup></ViewInfoButtonGroup>
+          <ViewInfoButtonGroup />
         </div>
 
-        <!-- view button -->
+        <!-- View button -->
         <div class="flex items-center">
-          <ViewButton></ViewButton>
+          <ViewButton />
         </div>
       </div>
     </div>
   </nav>
+
+  <!-- Keyboard command notification overlay -->
   <KeyCommandNotification
     :show="showNotification"
     :command="notificationCommand"
@@ -288,9 +320,5 @@ const notificationType = ref('default')
 </template>
 
 <style scoped>
-a:hover {
-  color: #10dffa;
-}
-
-/* Keep any custom styles that might be needed for child components */
+/* No custom styles needed - all styling handled by Tailwind classes */
 </style>

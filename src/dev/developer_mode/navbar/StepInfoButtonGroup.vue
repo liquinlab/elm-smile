@@ -1,14 +1,25 @@
 <script setup>
+// API composable for stepper navigation
 import useViewAPI from '@/core/composables/useViewAPI'
+
+// UI components
 import { ButtonGroup, ButtonGroupItem } from '@/uikit/components/ui/button-group'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
+
+// Icons
 import { ChevronLeft, ChevronRight, CircleMinus } from 'lucide-vue-next'
+
+/**
+ * API instance for accessing stepper state and methods
+ */
 const api = useViewAPI()
 </script>
 
 <template>
+  <!-- Step navigation button group with tooltips -->
   <TooltipProvider>
     <ButtonGroup variant="outline" size="menu">
+      <!-- Step back button -->
       <Tooltip>
         <TooltipTrigger asChild>
           <ButtonGroupItem
@@ -21,6 +32,7 @@ const api = useViewAPI()
         <TooltipContent side="bottom"> Step back (Left Arrow) </TooltipContent>
       </Tooltip>
 
+      <!-- Current path display -->
       <Tooltip>
         <TooltipTrigger asChild>
           <ButtonGroupItem :disabled="!api.store.dev.viewProvidesStepper || !api.hasSteps()">
@@ -31,6 +43,7 @@ const api = useViewAPI()
         <TooltipContent side="bottom"> Current path </TooltipContent>
       </Tooltip>
 
+      <!-- Step forward button -->
       <Tooltip>
         <TooltipTrigger asChild>
           <ButtonGroupItem

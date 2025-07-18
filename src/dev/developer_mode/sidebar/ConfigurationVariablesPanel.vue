@@ -4,12 +4,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/uikit/components/ui/input'
 import useAPI from '@/core/composables/useAPI'
 import { Checkbox } from '@/uikit/components/ui/checkbox'
-const api = useAPI()
-import { useSmileColorMode } from '@/core/composables/useColorMode'
 import { computed } from 'vue'
+import { useSmileColorMode } from '@/core/composables/useColorMode'
+
+/**
+ * API instance for accessing Smile app state and actions
+ * @type {import('@/core/composables/useAPI')}
+ */
+const api = useAPI()
+
+/**
+ * Color mode composable for experiment color mode
+ * @type {ReturnType<typeof useSmileColorMode>}
+ */
 const { system, mode: experimentColorMode } = useSmileColorMode('experiment')
 
-// Create a computed property that syncs the dropdown with the actual color mode
+/**
+ * Computed property that syncs the dropdown with the actual color mode
+ * @type {import('vue').ComputedRef<string>}
+ */
 const colorModeSelect = computed({
   get: () => experimentColorMode.value,
   set: (value) => {
@@ -19,7 +32,10 @@ const colorModeSelect = computed({
   },
 })
 
-// Create a computed property for the display text in the SelectTrigger
+/**
+ * Computed property for the display text in the SelectTrigger
+ * @type {import('vue').ComputedRef<string>}
+ */
 const colorModeDisplayText = computed(() => {
   switch (colorModeSelect.value) {
     case 'light':
@@ -35,10 +51,11 @@ const colorModeDisplayText = computed(() => {
 </script>
 
 <template>
-  <!-- content of panel here -->
+  <!-- Configuration variables panel -->
   <div class="bg-muted">
     <table class="w-full">
       <tbody>
+        <!-- Consent, Known, Done, Withdrew, Viz toggles -->
         <tr class="table-row-base">
           <td class="table-cell-base table-cell-left table-cell-small font-mono" colspan="4">
             <div class="flex flex-wrap gap-4">
@@ -75,6 +92,7 @@ const colorModeDisplayText = computed(() => {
             </div>
           </td>
         </tr>
+        <!-- Window size and aggressive mode -->
         <tr class="table-row-base table-row-base-bottom">
           <td
             class="table-cell-base table-cell-left table-cell-small font-mono"
@@ -111,7 +129,7 @@ const colorModeDisplayText = computed(() => {
             </div>
           </td>
         </tr>
-
+        <!-- Responsive UI and color mode -->
         <tr class="table-row-base table-row-base-bottom">
           <td class="table-cell-base table-cell-left table-cell-small font-mono" colspan="4">
             <div class="flex flex-wrap gap-4 items-center">
@@ -121,7 +139,6 @@ const colorModeDisplayText = computed(() => {
                   <Checkbox v-model="api.config.responsiveUI" class="mt-1" />
                 </div>
               </div>
-
               <div class="flex flex-col items-left">
                 <span>Color Mode</span>
                 <Select v-model="colorModeSelect" class="mt-1 h-8">
@@ -138,13 +155,12 @@ const colorModeDisplayText = computed(() => {
             </div>
           </td>
         </tr>
-
+        <!-- Recruitment service select -->
         <tr class="table-row-base table-row-base-bottom">
           <td class="table-cell-base table-cell-left table-cell-small font-mono" colspan="4">
             <div class="flex flex-wrap gap-4 items-center">
               <div class="flex flex-col items-left">
                 Service<br />
-
                 <Select v-model="api.store.data.recruitmentService" class="mt-1 h-8">
                   <SelectTrigger size="sm" class="h-8 text-[1.2em] font-mono">
                     <SelectValue />

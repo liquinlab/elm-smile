@@ -28,3 +28,41 @@ developer mode and dev/presentation_mode/PresentationModeApp.vue in presentation
 (so it can be a little confusing to navigate since it not part of the runcode). The
 reason for this is that we want to completely strip out the devtools in developer mode
 and presentation mode so that it is never delivered to the end user/participant.
+
+The developer mode interface (`SmileDevApp.vue`) is organized into a structured layout with four main areas:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  ┌─────┐ ┌─────────────────────────────────────────────────────────────┐    │
+│  │     │ │                    NAVBAR (TOP)                             │    │
+│  │     │ │  Status indicators, mode controls, database buttons         │    │
+│  │     │ └─────────────────────────────────────────────────────────────┘    │
+│  │     │                                                                    │
+│  │     │ ┌─────────────────────────────────────┐ ┌─────────────────────┐    │
+│  │     │ │                                     │ │                     │    │
+│  │     │ │                                     │ │                     │    │
+│  │ MENU│ │            MAIN CONTENT             │ │                     │    │
+│  │     │ │                                     │ │                     │    │
+│  │     │ │      (Responsive Device Container)  │ │      SIDEBAR        │    │
+│  │     │ │                                     │ │                     │    │
+│  │     │ │                                     │ │     (RIGHT)         │    │
+│  │     │ │                                     │ │                     │    │
+│  │     │ └─────────────────────────────────────┘ │                     │    │
+│  │     │                                         │  Steps,             │    │
+│  │     │ ┌─────────────────────────────────────┐ │  randomization      │    │
+│  │     │ │         CONSOLE (BOTTOM)            │ │  controls, study    │    │
+│  │     │ │  Logs, database browser,            │ │  information        │    │
+│  │     │ │  configuration panel                │ │                     │    │
+│  └─────┘ └─────────────────────────────────────┘ └─────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Layout Components:**
+
+- **Menu (Left)**: `dev/developer_mode/menu/SmileDevAppMenu.vue` - Collapsible sidebar with navigation options
+- **Navbar (Top)**: `dev/developer_mode/navbar/SmileDevNavBar.vue` - Status bar with controls and indicators
+- **Main Content (Center)**: `dev/developer_mode/ResponsiveDeviceContainer.vue` - The experiment interface
+- **Sidebar (Right)**: `dev/developer_mode/sidebar/DevSideBar.vue` - Steps, randomization, study/db iunfo
+- **Console (Bottom)**: `dev/developer_mode/console/SmileDevConsole.vue` - Logs, database browser, and configuration
+
+within each subfolder are the components that help with that section, with descriptive names when possible (e.g., \*Button.vue, \*ButtonGroup.vue, \*Panel.vue, etc...)

@@ -1,6 +1,23 @@
 <script setup>
-import { ref, computed } from 'vue'
+/**
+ * @fileoverview Responsive device selection component for developer mode
+ */
+
+/**
+ * Import Vue composition API functions
+ * Note: No Vue composition API functions are currently used in this component
+ */
+
+/**
+ * Import SMILE API composable for accessing application state and methods
+ * @requires useAPI SMILE API composable
+ */
 import useAPI from '@/core/composables/useAPI'
+
+/**
+ * Import UI components from shadcn-vue
+ * @requires Select Select components for dropdown menus
+ */
 import {
   Select,
   SelectContent,
@@ -11,26 +28,28 @@ import {
   SelectValue,
 } from '@/uikit/components/ui/select'
 
+/**
+ * Import shared device presets
+ * @requires devicePresets Shared device presets for responsive testing
+ */
+import { devicePresets } from '@/dev/developer_mode/devicePresets.js'
+
+/**
+ * Initialize SMILE API instance
+ * @constant {Object} api Global API instance
+ */
 const api = useAPI()
 
-// Device presets
-const devicePresets = {
-  iphone: { width: 393, height: 852, name: 'iPhone' },
-  'iphone-plus': { width: 430, height: 932, name: 'iPhone Plus' },
-  'iphone-pro': { width: 402, height: 874, name: 'iPhone Pro' },
-  'iphone-pro-max': { width: 440, height: 956, name: 'iPhone Pro Max' },
-  'iphone-se': { width: 375, height: 667, name: 'iPhone SE' },
-  'ipad-11': { width: 1180, height: 820, name: 'iPad 11-inch' },
-  'ipad-13': { width: 1366, height: 1024, name: 'iPad 13-inch' },
-  desktop1: { width: 800, height: 600, name: '800x600' },
-  desktop2: { width: 1024, height: 768, name: '1024x768' },
-  desktop3: { width: 1280, height: 1024, name: '1280x1024' },
-  desktop4: { width: 1440, height: 900, name: '1440x900' },
-  desktop5: { width: 1600, height: 1200, name: '1600x1200' },
-  desktop16: { width: 1920, height: 1080, name: '1920x1080' },
-}
-
-// Handle device selection from dropdown
+/**
+ * Handle device selection from dropdown
+ *
+ * Updates the device dimensions in the store when a preset is selected.
+ * If 'custom' is selected, only updates the selected device without changing dimensions.
+ *
+ * @function handleDeviceChange
+ * @param {string} value - The selected device preset key
+ * @returns {void}
+ */
 const handleDeviceChange = (value) => {
   console.log('handleDeviceChange called with:', value)
 
@@ -55,11 +74,13 @@ const handleDeviceChange = (value) => {
 </script>
 
 <template>
+  <!-- Device selection dropdown -->
   <Select v-model="api.store.dev.selectedDevice" @update:modelValue="handleDeviceChange">
     <SelectTrigger class="select-small">
       <SelectValue placeholder="Custom size" />
     </SelectTrigger>
     <SelectContent>
+      <!-- Mobile devices group -->
       <SelectGroup>
         <SelectLabel class="mt-2">Mobile</SelectLabel>
         <SelectItem value="iphone"> iPhone </SelectItem>
@@ -68,11 +89,15 @@ const handleDeviceChange = (value) => {
         <SelectItem value="iphone-pro-max"> iPhone Pro Max </SelectItem>
         <SelectItem value="iphone-se"> iPhone SE </SelectItem>
       </SelectGroup>
+
+      <!-- Tablet devices group -->
       <SelectGroup>
         <SelectLabel class="mt-2">Tablet</SelectLabel>
         <SelectItem value="ipad-11"> iPad 11-inch </SelectItem>
         <SelectItem value="ipad-13"> iPad 13-inch</SelectItem>
       </SelectGroup>
+
+      <!-- Desktop resolutions group -->
       <SelectGroup>
         <SelectLabel class="mt-2">Desktop</SelectLabel>
         <SelectItem value="desktop1"> 800x600</SelectItem>
@@ -82,6 +107,8 @@ const handleDeviceChange = (value) => {
         <SelectItem value="desktop5"> 1600x1200</SelectItem>
         <SelectItem value="desktop16"> 1920x1080</SelectItem>
       </SelectGroup>
+
+      <!-- Other options group -->
       <SelectGroup>
         <SelectLabel class="mt-2">Other</SelectLabel>
         <SelectItem value="custom"> Custom size </SelectItem>
@@ -91,7 +118,7 @@ const handleDeviceChange = (value) => {
 </template>
 
 <style scoped>
-/* Make select smaller */
+/* Make select smaller for compact layout */
 :deep(.select-small) {
   height: 28px !important;
   padding: 4px 8px !important;

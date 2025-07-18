@@ -1,16 +1,26 @@
 <script setup>
+/**
+ * @fileoverview Main console component for developer mode
+ * Provides a tabbed interface for database browsing, log viewing, and configuration
+ */
+
 import { Button } from '@/uikit/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
 import ConsoleDatabaseBrowsePanel from '@/dev/developer_mode/console/ConsoleDatabaseBrowsePanel.vue'
 import ConsoleLogPanel from '@/dev/developer_mode/console/ConsoleLogPanel.vue'
 import ConsoleConfigPanel from '@/dev/developer_mode/console/ConsoleConfigPanel.vue'
 import useAPI from '@/core/composables/useAPI'
+
+/**
+ * Initialize the API instance for accessing store and navigation
+ */
 const api = useAPI()
 </script>
 
 <template>
+  <!-- Main console container with left sidebar and right content area -->
   <div class="w-full h-full flex border-t border-border overflow-hidden">
-    <!-- Left sidebar - 36px wide -->
+    <!-- Left sidebar - 36px wide with tab navigation -->
     <div
       class="w-9 h-full bg-muted border-dev-lines border-r flex flex-col items-center justify-between pt-1 pb-1 flex-shrink-0"
     >
@@ -106,9 +116,9 @@ const api = useAPI()
       </TooltipProvider>
     </div>
 
-    <!-- Right column - remaining width -->
+    <!-- Right column - remaining width with panel content -->
     <div class="flex-1 h-full flex flex-col min-w-0 overflow-hidden">
-      <!-- Panel content -->
+      <!-- Panel content area -->
       <div class="flex-1 overflow-hidden">
         <ConsoleDatabaseBrowsePanel v-if="api.store.dev.consoleBarTab === 'browse'" />
         <ConsoleLogPanel v-if="api.store.dev.consoleBarTab === 'log'" />

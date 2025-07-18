@@ -1,12 +1,20 @@
 <script setup>
+// UI components
 import { Button } from '@/uikit/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
+
+// Color mode composable
 import { useSmileColorMode } from '@/core/composables/useColorMode'
 
+/**
+ * Provides color mode state and toggle function for the experiment
+ * @type {{ mode: string, toggle: Function, system: string }}
+ */
 const { mode: experimentColorMode, toggle: toggleColorMode, system } = useSmileColorMode('experiment')
 </script>
 
 <template>
+  <!-- Color mode toggle button with tooltip -->
   <TooltipProvider>
     <Tooltip>
       <TooltipTrigger asChild>

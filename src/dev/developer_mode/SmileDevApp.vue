@@ -73,6 +73,8 @@ const isLoading = computed(() => {
 
 /**
  * Initialize dashboard URL from localStorage or default
+ * Retrieves the saved dashboard URL from localStorage or falls back to the default
+ * public URL for the dashboard.html file
  */
 function initializeDashboardUrl() {
   const savedUrl = localStorage.getItem('smile-dashboard-url')
@@ -85,6 +87,9 @@ function initializeDashboardUrl() {
 
 /**
  * Save dashboard URL to localStorage
+ * Persists the provided URL to localStorage and updates the reactive dashboardUrl ref
+ *
+ * @param {string} url The URL to save and set as the current dashboard URL
  */
 function saveDashboardUrl(url) {
   localStorage.setItem('smile-dashboard-url', url)
@@ -93,6 +98,8 @@ function saveDashboardUrl(url) {
 
 /**
  * Monitor iframe URL changes and persist them
+ * Checks if the iframe content is accessible and monitors for URL changes,
+ * saving any changes to localStorage. Handles cross-origin restrictions gracefully.
  */
 function monitorIframeUrl() {
   if (!dashboardIframe.value) return
@@ -114,6 +121,8 @@ function monitorIframeUrl() {
 
 /**
  * Set up iframe monitoring when iframe loads
+ * Establishes periodic monitoring of iframe URL changes and sets up focus event listeners
+ * to track navigation within the dashboard iframe
  */
 function onIframeLoad() {
   if (!dashboardIframe.value) return
@@ -142,16 +151,22 @@ onMounted(() => {
   initializeDashboardUrl()
 })
 </script>
+
 <template>
+  <!-- Toast notification system -->
   <Toaster closeButton position="top-left" :rich-colors="true" class="custom-toaster" />
+
+  <!-- Main sidebar provider for developer tools -->
   <SidebarProvider
     :default-open="false"
     :style="{
       '--sidebar-width': '48px',
     }"
   >
-    <!-- Sidebar for developer tools -->
+    <!-- Developer app menu sidebar -->
     <SmileDevAppMenu />
+
+    <!-- Main content area -->
     <SidebarInset>
       <!-- Main app container for developer mode -->
       <div class="app-container">
@@ -189,20 +204,23 @@ onMounted(() => {
 
         <!-- Developer Mode - Full interface with toolbar, sidebar, console -->
         <template v-else>
-          <!-- Top toolbar -->
+          <!-- Top toolbar with navigation controls -->
           <div class="toolbar">
             <DevNavBar />
           </div>
 
           <!-- Middle row - content and sidebar -->
           <div class="content-wrapper">
+            <!-- Main content area with console -->
             <div class="content-and-console">
-              <!-- Main content - scrollable -->
+              <!-- Main content - scrollable experiment container -->
               <div class="main-content bg-background text-foreground">
+                <!-- Loading state -->
                 <div v-if="isLoading" class="loading-container">
                   <div class="loading-spinner"></div>
                   <p>Loading...</p>
                 </div>
+                <!-- Experiment content -->
                 <template v-else>
                   <ResponsiveDeviceContainer />
                 </template>
@@ -230,6 +248,7 @@ onMounted(() => {
 </template>
 
 <style>
+/* Toast notification positioning */
 .custom-toaster {
   --toast-offset-x: 60px;
   --toast-offset-y: 50px;
@@ -242,6 +261,7 @@ onMounted(() => {
 </style>
 
 <style scoped>
+/* Main app container */
 .app-container {
   display: flex;
   flex-direction: column;
@@ -249,6 +269,7 @@ onMounted(() => {
   width: 100%;
 }
 
+/* Analyze mode containers */
 .analyze-container {
   height: 100vh;
   width: 100%;
@@ -267,6 +288,29 @@ onMounted(() => {
   overflow: hidden;
 }
 
+/* Iframe styling */
+.dashboard-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  overflow: hidden;
+}
+
+.recruit-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  overflow: hidden;
+}
+
+.docs-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  overflow: hidden;
+}
+
+/* Developer mode layout */
 .toolbar {
   margin-top: auto;
   margin-bottom: auto;
@@ -319,29 +363,7 @@ onMounted(() => {
   max-width: 100%;
 }
 
-.dashboard-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  overflow: hidden;
-}
-
-.recruit-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  overflow: hidden;
-}
-
-.docs-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  overflow: hidden;
-}
-
 /* Transition effects */
-
 .sidebar-slide-enter-active,
 .sidebar-slide-leave-active {
   transition: all 0.3s ease-in-out;

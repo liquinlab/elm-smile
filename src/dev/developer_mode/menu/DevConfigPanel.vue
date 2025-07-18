@@ -1,5 +1,29 @@
 <script setup>
+/**
+ * @fileoverview Developer configuration panel component for adjusting developer mode settings
+ */
+
+/**
+ * Import Vue composition API functions
+ * Note: No Vue composition API functions are currently used in this component
+ */
+
+/**
+ * Import SMILE API composable for accessing application state and methods
+ * @requires useAPI SMILE API composable
+ */
 import useAPI from '@/core/composables/useAPI'
+
+/**
+ * Import UI components from shadcn-vue
+ * @requires ResponsiveDeviceSelect Component for device selection
+ * @requires Label Label component for form inputs
+ * @requires Switch Switch component for toggles
+ * @requires Button Button component for actions
+ * @requires Separator Separator component for visual dividers
+ * @requires Select Select components for dropdown menus
+ * @requires Tooltip Tooltip components for enhanced UX
+ */
 import ResponsiveDeviceSelect from '@/dev/developer_mode/menu/ResponsiveDeviceSelect.vue'
 import { Label } from '@/uikit/components/ui/label'
 import { Switch } from '@/uikit/components/ui/switch'
@@ -8,28 +32,27 @@ import { Separator } from '@/uikit/components/ui/separator'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/uikit/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
 
-import { computed } from 'vue'
+/**
+ * Import shared device presets
+ * @requires devicePresets Shared device presets for responsive testing
+ */
+import { devicePresets } from '@/dev/developer_mode/devicePresets.js'
 
+/**
+ * Initialize SMILE API instance
+ * @constant {Object} api Global API instance
+ */
 const api = useAPI()
 
-// Device presets for rotation logic
-const devicePresets = {
-  iphone: { width: 393, height: 852, name: 'iPhone' },
-  'iphone-plus': { width: 430, height: 932, name: 'iPhone Plus' },
-  'iphone-pro': { width: 402, height: 874, name: 'iPhone Pro' },
-  'iphone-pro-max': { width: 440, height: 956, name: 'iPhone Pro Max' },
-  'iphone-se': { width: 375, height: 667, name: 'iPhone SE' },
-  'ipad-11': { width: 1180, height: 820, name: 'iPad 11-inch' },
-  'ipad-13': { width: 1366, height: 1024, name: 'iPad 13-inch' },
-  desktop1: { width: 800, height: 600, name: '800x600' },
-  desktop2: { width: 1024, height: 768, name: '1024x768' },
-  desktop3: { width: 1280, height: 1024, name: '1280x1024' },
-  desktop4: { width: 1440, height: 900, name: '1440x900' },
-  desktop5: { width: 1600, height: 1200, name: '1600x1200' },
-  desktop16: { width: 1920, height: 1080, name: '1920x1080' },
-}
-
-// Check if current dimensions match any preset
+/**
+ * Check if current dimensions match any preset and update selected device
+ *
+ * Compares current device dimensions against all presets, checking both
+ * normal and rotated orientations. Updates the selected device in the store.
+ *
+ * @function checkForMatchingPreset
+ * @returns {void}
+ */
 const checkForMatchingPreset = () => {
   for (const [key, preset] of Object.entries(devicePresets)) {
     // Check both normal orientation and rotated orientation
@@ -45,7 +68,15 @@ const checkForMatchingPreset = () => {
   api.store.dev.selectedDevice = 'custom'
 }
 
-// Toggle rotation (swap width and height) - same logic as ResponsiveDeviceContainer
+/**
+ * Toggle rotation by swapping width and height dimensions
+ *
+ * Swaps the device width and height values and updates the rotation state.
+ * Also checks if the new dimensions match any preset.
+ *
+ * @function toggleRotation
+ * @returns {void}
+ */
 const toggleRotation = () => {
   const tempWidth = api.store.dev.deviceWidth
   api.store.dev.deviceWidth = api.store.dev.deviceHeight
@@ -56,18 +87,31 @@ const toggleRotation = () => {
   checkForMatchingPreset()
 }
 
-// Reset developer mode settings to default
+/**
+ * Reset developer mode settings to default values
+ *
+ * Removes developer mode settings from localStorage and reloads the page
+ * to restore default configuration.
+ *
+ * @function resetDevState
+ * @returns {void}
+ */
 function resetDevState() {
   localStorage.removeItem(api.config.devLocalStorageKey) // delete the local store
   location.reload()
 }
 </script>
+
 <template>
+  <!-- Main configuration container -->
   <div class="grid gap-4">
+    <!-- Header section with title and description -->
     <div class="space-y-2">
       <h4 class="font-medium leading-none">Developer Configurations</h4>
       <p class="text-sm text-muted-foreground">Adjust or reset developer mode settings.</p>
     </div>
+
+    <!-- Visual separator with "Panels" label -->
     <div class="relative">
       <div class="absolute inset-0 flex items-center">
         <Separator />
@@ -76,11 +120,16 @@ function resetDevState() {
         <span class="bg-background px-2 text-muted-foreground">Panels</span>
       </div>
     </div>
+
+    <!-- Configuration options grid -->
     <div class="grid gap-2">
+      <!-- Sidebar visibility toggle -->
       <div class="grid grid-cols-3 items-center gap-4">
         <Label for="sidebar">Show Sidebar</Label>
         <Switch id="sidebar" v-model="api.store.dev.showSideBar" class="col-span-2" />
       </div>
+
+      <!-- Sidebar tab selection -->
       <div class="grid grid-cols-3 items-center gap-4">
         <Label for="sidebarTab">Sidebar Tab</Label>
         <div class="col-span-2">
@@ -96,10 +145,14 @@ function resetDevState() {
           </Select>
         </div>
       </div>
+
+      <!-- Console visibility toggle -->
       <div class="grid grid-cols-3 items-center gap-4">
         <Label for="console">Show Console</Label>
         <Switch id="console" v-model="api.store.dev.showConsoleBar" class="col-span-2" />
       </div>
+
+      <!-- Console tab selection -->
       <div class="grid grid-cols-3 items-center gap-4">
         <Label for="consoleBarTab">Console Tab</Label>
         <div class="col-span-2">
@@ -115,6 +168,8 @@ function resetDevState() {
           </Select>
         </div>
       </div>
+
+      <!-- Visual separator with "Responsive Mode" label -->
       <div class="relative mt-5">
         <div class="absolute inset-0 flex items-center">
           <Separator />
@@ -123,10 +178,14 @@ function resetDevState() {
           <span class="bg-background px-2 text-muted-foreground">Responsive Mode</span>
         </div>
       </div>
+
+      <!-- Fullscreen toggle -->
       <div class="grid grid-cols-3 items-center gap-4">
         <Label for="width">Full screen</Label>
         <Switch id="width" v-model="api.store.dev.isFullscreen" class="col-span-2" />
       </div>
+
+      <!-- Device selection with rotation button -->
       <div class="grid grid-cols-3 items-center gap-4">
         <Label for="device">Target Device</Label>
         <div class="col-span-2 flex items-center gap-2">
@@ -146,6 +205,8 @@ function resetDevState() {
         </div>
       </div>
     </div>
+
+    <!-- Reset button section -->
     <div class="flex justify-end mt-5">
       <Button variant="outline" size="sm" @click="resetDevState"> Reset to Default </Button>
     </div>

@@ -1,4 +1,16 @@
 <script setup>
+/**
+ * Props for StepNode component
+ * @typedef {Object} StepNodeProps
+ * @property {Object} state - The state object for this node
+ * @property {number} index - The index of this node among siblings
+ * @property {number} total - The total number of siblings
+ * @property {Function} isNodeSelected - Function to check if node is selected
+ * @property {Function} formatData - Function to format node data
+ * @property {number} depth - The current depth in the tree
+ * @property {number} maxDepth - The maximum depth to render
+ * @property {Array} verticalLines - Array indicating where to draw vertical lines
+ */
 const props = defineProps({
   state: Object,
   index: Number,
@@ -21,40 +33,56 @@ const props = defineProps({
 
 const emit = defineEmits(['node-click'])
 
+/**
+ * Emits node-click event with the node's path
+ */
 const handleClick = () => {
   emit('node-click', props.state.path)
 }
 
+/**
+ * Returns the branch type character for tree display
+ * @param {number} index - Index of the node
+ * @param {number} total - Total siblings
+ * @param {number} depth - Current depth
+ * @returns {string} Branch type character
+ */
 const getBranchType = (index, total, depth) => {
-  // Only show ┌── for the first item at depth 1
   if (index === 0 && depth === 1) {
-    return '┌─ '
+    return '\u250c\u2500 '
   } else if (index === total - 1) {
-    return '└─ '
+    return '\u2514\u2500 '
   } else {
-    return '├─ '
+    return '\u251c\u2500 '
   }
 }
 
-// Create the vertical lines prefix
+/**
+ * Returns the vertical lines prefix for tree display
+ * @param {Array} verticalLines - Array of booleans for vertical lines
+ * @returns {string} Vertical line prefix
+ */
 const getVerticalPrefix = (verticalLines) => {
   if (!verticalLines || !verticalLines.length) return ''
-
-  return verticalLines.map((hasLine) => (hasLine ? '│ ' : '  ')).join('')
+  return verticalLines.map((hasLine) => (hasLine ? '\u2502 ' : '  ')).join('')
 }
 
-// Create new vertical lines for children based on current node
+/**
+ * Returns the vertical lines array for children
+ * @param {Array} verticalLines - Current vertical lines
+ * @param {number} index - Index of this node
+ * @param {number} total - Total siblings
+ * @returns {Array} New vertical lines array for children
+ */
 const getChildVerticalLines = (verticalLines, index, total) => {
   const newLines = [...verticalLines]
-
-  // Add a line if this is not the last item
   newLines.push(index < total - 1)
-
   return newLines
 }
 </script>
 
 <template>
+  <!-- Tree node item -->
   <li class="tree-node">
     <div
       class="tree-line"
