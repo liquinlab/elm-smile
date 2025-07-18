@@ -1,10 +1,10 @@
 <script setup>
-import Stepper from '@/dev/developer_mode/navbar/Stepper.vue'
-import RouteInfoButton from '@/dev/developer_mode/navbar/RouteInfoButton.vue'
+import StepInfoButtonGroup from '@/dev/developer_mode/navbar/StepInfoButtonGroup.vue'
+import ViewInfoButtonGroup from '@/dev/developer_mode/navbar/ViewInfoButtonGroup.vue'
 import ResetButton from '@/dev/developer_mode/navbar/ResetButton.vue'
 import ReloadButton from '@/dev/developer_mode/navbar/ReloadButton.vue'
 import ColorModeButton from '@/dev/developer_mode/navbar/ColorModeButton.vue'
-import DataBarButton from '@/dev/developer_mode/navbar/DataBarButton.vue'
+import DatabaseButtonGroup from '@/dev/developer_mode/navbar/DatabaseButtonGroup.vue'
 import FullScreenButton from '@/dev/developer_mode/navbar/FullScreenButton.vue'
 import ViewButton from '@/dev/developer_mode/navbar/ViewButton.vue'
 import { BugPlay } from 'lucide-vue-next'
@@ -259,16 +259,17 @@ const notificationType = ref('default')
         </div>
 
         <!-- database info button -->
-        <DataBarButton></DataBarButton>
+        <DatabaseButtonGroup></DatabaseButtonGroup>
 
         <!-- responsive hides this if the page is too small-->
+        <!-- step info buttons -->
         <div class="items-center">
-          <Stepper></Stepper>
+          <StepInfoButtonGroup></StepInfoButtonGroup>
         </div>
 
-        <!-- route info buttons -->
+        <!-- view info buttons -->
         <div class="hidden md:flex items-center">
-          <RouteInfoButton></RouteInfoButton>
+          <ViewInfoButtonGroup></ViewInfoButtonGroup>
         </div>
 
         <!-- view button -->

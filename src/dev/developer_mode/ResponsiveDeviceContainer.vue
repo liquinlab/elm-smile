@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 import MainApp from '@/core/MainApp.vue'
-import ResponsiveDeviceSelect from './ResponsiveDeviceSelect.vue'
+import ResponsiveDeviceSelect from '@/dev/developer_mode/menu/ResponsiveDeviceSelect.vue'
 import { Separator } from '@/uikit/components/ui/separator'
 import { Button } from '@/uikit/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'

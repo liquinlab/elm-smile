@@ -1,10 +1,10 @@
 <script setup>
-import StateTreeViewer from '@/dev/developer_mode/sidebar/StateTreeViewer.vue'
-import ToggleStatus from '@/dev/developer_mode/sidebar/ToggleStatus.vue'
-import DatabaseStatusInfo from '@/dev/developer_mode/sidebar/DatabaseStatusInfo.vue'
+import StepExplorerPanel from '@/dev/developer_mode/sidebar/StepExplorerPanel.vue'
+import ConfigurationVariablesPanel from '@/dev/developer_mode/sidebar/ConfigurationVariablesPanel.vue'
+import DatabaseStatusInfoPanel from '@/dev/developer_mode/sidebar/DatabaseStatusInfoPanel.vue'
 import RandomizationSidebarPanel from '@/dev/developer_mode/sidebar/RandomizationSidebarPanel.vue'
-import StudyInfo from '@/dev/developer_mode/sidebar/StudyInfo.vue'
-import ProgressSteps from '@/dev/developer_mode/sidebar/ProgressSteps.vue'
+import StudyInfoPanel from '@/dev/developer_mode/sidebar/StudyInfoPanel.vue'
+import AppProgressPanel from '@/dev/developer_mode/sidebar/AppProgressPanel.vue'
 
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
@@ -21,21 +21,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/uikit/components/ui/
           <TabsTrigger value="db" class="text-[0.75rem] font-mono"> Info </TabsTrigger>
         </TabsList>
         <TabsContent value="steps">
-          <StateTreeViewer />
+          <StepExplorerPanel />
         </TabsContent>
         <TabsContent value="randomization">
           <RandomizationSidebarPanel />
         </TabsContent>
         <TabsContent value="db">
-          <DatabaseStatusInfo />
+          <DatabaseStatusInfoPanel />
         </TabsContent>
       </Tabs>
     </div>
 
     <div class="sidebar-footer">
-      <ToggleStatus />
-      <ProgressSteps />
-      <StudyInfo />
+      <ConfigurationVariablesPanel />
+      <AppProgressPanel />
+      <StudyInfoPanel />
     </div>
   </div>
 </template>

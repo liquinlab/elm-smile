@@ -47,7 +47,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/uikit/components/ui/p
  * Import configuration panel component
  * @requires ConfigDevPanel Developer configuration panel component
  */
-import ConfigDevPanel from '@/dev/developer_mode/ConfigDevPanel.vue'
+import DevConfigPanel from '@/dev/developer_mode/menu/DevConfigPanel.vue'
 
 /**
  * Import color mode composable
@@ -238,7 +238,7 @@ const isDarkMode = computed({
           </SidebarMenuButton>
         </PopoverTrigger>
         <PopoverContent side="right" align="end">
-          <ConfigDevPanel />
+          <DevConfigPanel />
         </PopoverContent>
       </Popover>
     </SidebarFooter>

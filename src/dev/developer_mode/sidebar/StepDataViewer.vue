@@ -57,7 +57,7 @@ const getSingleValue = (value) => {
             </span>
           </div>
           <div v-if="expandedNodes.has(key)" class="nested-content">
-            <DataPathViewer :data="value" />
+            <StepDataViewer :data="value" />
           </div>
         </template>
       </div>

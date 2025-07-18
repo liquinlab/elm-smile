@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, defineComponent, h } from 'vue'
-import TreeNode from './TreeNode.vue'
-import DataPathViewer from '@/dev/developer_mode/sidebar/DataPathViewer.vue'
+import StepNode from './StepNode.vue'
+import StepDataViewer from '@/dev/developer_mode/sidebar/StepDataViewer.vue'
 import { useRoute } from 'vue-router'
 import useViewAPI from '@/core/composables/useViewAPI'
 import { ButtonGroup, ButtonGroupItem } from '@/uikit/components/ui/button-group'
@@ -226,7 +226,7 @@ watch(
         <ul class="tree-root">
           <li v-if="stateMachine" class="tree-node root-node">
             <ul v-if="stateMachine.rows && stateMachine.rows.length > 0" class="children">
-              <TreeNode
+              <StepNode
                 v-for="(state, index) in stateMachine.rows"
                 :key="index"
                 :state="state"
@@ -260,7 +260,7 @@ watch(
         </Button>
       </div>
       <div class="global-data-display">
-        <DataPathViewer :data="api.persist" v-if="Object.keys(api.persist).length !== 0" />
+        <StepDataViewer :data="api.persist" v-if="Object.keys(api.persist).length !== 0" />
         <div class="italic text-xs" v-else>No variables persisted</div>
       </div>
     </div>
@@ -278,7 +278,7 @@ watch(
           <span><i-fa6-solid-trash" /></span>
         </button>
         -->
-        <DataPathViewer :data="api.stepData" v-if="api.nSteps !== 0" />
+        <StepDataViewer :data="api.stepData" v-if="api.nSteps !== 0" />
         <div class="italic text-xs" v-else>Data defined on this step</div>
       </div>
     </div>

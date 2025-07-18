@@ -12,7 +12,6 @@ import SmileAPI from '@/core/composables/useAPI'
 import useSmileStore from '@/core/stores/smilestore'
 
 const api = SmileAPI()
-const smilestore = useSmileStore()
 </script>
 
 <template>

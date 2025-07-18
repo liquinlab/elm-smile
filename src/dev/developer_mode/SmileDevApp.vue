@@ -13,18 +13,18 @@ import { ref, computed, onMounted } from 'vue'
 import { Toaster } from '@/uikit/components/ui/sonner'
 import 'vue-sonner/style.css' // vue-sonner v2 requires this import
 
-import SmileAppSidebar from '@/dev/developer_mode/SmileAppSidebar.vue'
+import SmileDevAppMenu from '@/dev/developer_mode/menu/SmileDevAppMenu.vue'
 import { SidebarInset, SidebarProvider } from '@/uikit/components/ui/sidebar'
+
 /**
  * Developer mode components for debugging and development tools
- * @requires DeveloperNavBar Navigation bar for developer mode
- * @requires DevConsoleBar Console bar for developer tools
- * @requires DevConsoleBarTailwind Console bar for developer tools
- * @requires DevSideBar Side bar for developer tools
+ * @requires SmileDevNavBar Navigation bar component with developer controls and status
+ * @requires SmileDevConsole Console component for logs, database browsing and configuration
+ * @requires SmileDevSideBar Sidebar component with state tree, randomization and study info
  */
-import DeveloperNavBar from '@/dev/developer_mode/navbar/DeveloperNavBar.vue'
-import DevConsoleBar from '@/dev/developer_mode/console/DevConsoleBar.vue'
-import DevSideBar from '@/dev/developer_mode/sidebar/DevSideBar.vue'
+import DevNavBar from '@/dev/developer_mode/navbar/SmileDevNavBar.vue'
+import DevConsole from '@/dev/developer_mode/console/SmileDevConsole.vue'
+import DevSideBar from '@/dev/developer_mode/sidebar/SmileDevSideBar.vue'
 
 /**
  * Built-in experiment components
@@ -151,7 +151,7 @@ onMounted(() => {
     }"
   >
     <!-- Sidebar for developer tools -->
-    <SmileAppSidebar />
+    <SmileDevAppMenu />
     <SidebarInset>
       <!-- Main app container for developer mode -->
       <div class="app-container">
@@ -191,7 +191,7 @@ onMounted(() => {
         <template v-else>
           <!-- Top toolbar -->
           <div class="toolbar">
-            <DeveloperNavBar />
+            <DevNavBar />
           </div>
 
           <!-- Middle row - content and sidebar -->
@@ -211,7 +211,7 @@ onMounted(() => {
               <!-- Bottom console - can be toggled -->
               <Transition name="console-slide">
                 <div v-if="api.config.mode == 'development' && api.store.dev.showConsoleBar" class="console">
-                  <DevConsoleBar />
+                  <DevConsole />
                 </div>
               </Transition>
             </div>

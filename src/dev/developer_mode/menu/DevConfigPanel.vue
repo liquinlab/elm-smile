@@ -1,6 +1,6 @@
 <script setup>
 import useAPI from '@/core/composables/useAPI'
-import ResponsiveDeviceSelect from './ResponsiveDeviceSelect.vue'
+import ResponsiveDeviceSelect from '@/dev/developer_mode/menu/ResponsiveDeviceSelect.vue'
 import { Label } from '@/uikit/components/ui/label'
 import { Switch } from '@/uikit/components/ui/switch'
 import { Button } from '@/uikit/components/ui/button'
