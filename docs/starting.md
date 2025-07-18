@@ -60,9 +60,10 @@ const config = reactive({
 
 # Starting a new project
 
-When you start a new project, there are a few one-time steps you must take.
-These include copying the current version of the <SmileText/> project, adjusting
-the configuration settings for your project, and running a setup script.
+After [setting up your lab](/labconfig), when you want to start a new project,
+there are a few steps you must take. These include copying the current version
+of the <SmileText/> project, adjusting the configuration settings for your
+project, and running a setup script.
 
 **Don't worry it is easy and most of it you only do once!**
 

@@ -115,10 +115,12 @@ changes from the child and parent repositories when you want. This new forked
 repo will be your lab's "base" repo. All your individual projects will then fork
 from your lab's "base" repo. This allows you to share the
 lab/organization-specific configuration files with all the repos that fork from
-your base repo. It is recommended you fork from your lab's base repo because you
-can then make common changes that should apply to all your experiments (e.g.,
-logos, branding, consent forms). Of course you can also fork from the main Smile
-repo as well.
+your base repo. For example, you might have a custom university logo or informed
+consent form and if you make a base repo for your lab every sub-project can
+automatically grab these changes from the base Smile repo. It is recommended you
+fork from your lab's base repo because you can then make common changes that
+should apply to all your experiments (e.g., logos, branding, consent forms). Of
+course you can also fork from the main Smile repo as well.
 
 ![Inheriting between Github repos](/images/labconfig-github-inherit.png)
 
@@ -204,7 +206,7 @@ Firebase rules in the
 [Firebase rules documentation](https://firebase.google.com/docs/rules).
 
 Here is an example of the rules file that works well with Smile experiments (in
-`/firebase.rules` of the main Smile repo):
+`firebase/firebase.rules` of the main Smile repo):
 
 <<< @/../firebase/firebase.rules{js}
 
@@ -397,6 +399,18 @@ npm run upload_config
 ```
 
 Then be sure to redistribute the changed files to members of your lab.
+
+## Other things to configure in your base repo
+
+A few files you might want to modify in your base repo are:
+
+- `user/assets/universitylogo.png` (currently this is a NYU logo but you can
+  change it to your favored version)
+- `user/components/InformedConsentText.vue` (the basic informed consent form for
+  your experiment, currently it is boilerplate but if you share the same form
+  for all your downstream lab projects it might make sense to modify this in
+  your base repo, users can of course edit/overide it on a project-by-project
+  basis)
 
 ## All done!
 

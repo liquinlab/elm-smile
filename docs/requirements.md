@@ -2,7 +2,6 @@
 import { useData } from 'vitepress'
 
 const { theme } = useData()
-
 </script>
 
 # Required software you will need to install

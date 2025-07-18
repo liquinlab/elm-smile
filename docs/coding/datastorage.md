@@ -280,6 +280,10 @@ but there are many helpful videos and documentation websites:
   [Google Cloud Firestore](https://www.youtube.com/watch?v=QcsAb2RR52c&list=PLl-K7zZEsYLmOF_07IayrTntevxtbUxDL)
 - The [Cloud Firestore Console](https://console.firebase.google.com/u/0/)
 
+If you haven't set up your lab yet, please refer to the documentation which can
+walk you through creating a Google Firestore database. In particular, read and
+follow [this section](/labconfig#setup-firebase).
+
 ## Limitations
 
 One thing to be aware of is that Firebase has some limits on writing to
@@ -316,72 +320,232 @@ user, across page reloads or restarts of the browser we sync a few key values
 with the browser's local storage. The data which is synced to local storage is
 in `smilestore.browserPersisted` (see `smilestore.js`).
 
-## Setting up Google Firestore
-
-[TO BE WRITTEN -- HOW TO CREATE A NEW FIREBASE INSTANCE]
-
-- Create a new project
-- Create a web app
-- Enable anonymous login
-- Change the privacy settings
-
 ## SmileStore API
 
-`stores/smilestore.js`
+The backbone of the state management for this application is defined in
+`src/core/stores/smilestore.js`. In general user code doesn't need to access
+this API directly but it can be helpful for development. Instead developers are
+expected to use the main [API](/api).
 
-```vue
-<script setup>
-import { useSmileStore } from '@/core/stores/smilestore'
-const smileStore = useSmileStore()
-<script>
-```
+### Store Structure
 
-<img src="/images/pinialogo.svg" width="70px">
+The SmileStore is organized into several namespaces that handle different types
+of data:
 
-### createStore
+#### State Namespaces
 
-This describes this method
+- **`browserPersisted`**: Data that persists across browser sessions using
+  localStorage
+- **`browserEphemeral`**: Temporary data that resets on page refresh
+- **`dev`**: Development-only state and configuration (only active in
+  development mode)
+- **`private`**: Sensitive user data not synced to the database
+- **`data`**: Public experiment data synced to Firestore database
+- **`config`**: Application configuration settings
 
-- **Arguments**
+### State Types and Persistence
 
-- **Details**
+#### Browser Persisted State (`browserPersisted`)
 
-Somethign about it
+Data that automatically syncs with localStorage and persists across browser
+sessions:
 
-### saveData
+- `knownUser`: Whether the user has been identified
+- `lastRoute`: Last visited route for navigation state
+- `docRef`: Firebase document reference for the current session
+- `privateDocRef`: Private Firebase document reference
+- `completionCode`: Completion code for the experiment
+- `currentViewDone`: Whether current view is completed
+- `consented`: Whether user has provided consent
+- `withdrawn`: Whether user has withdrawn from study
+- `verifiedVisibility`: Whether browser visibility has been verified
+- `done`: Whether experiment is completed
+- `reset`: Whether app has been reset
+- `totalWrites`: Total number of database writes
+- `lastWrite`: Timestamp of last database write
+- `approxDataSize`: Approximate size of data in bytes
+- `useSeed`: Whether to use random seed based on participant ID
+- `seedID`: Random seed identifier
+- `seedSet`: Whether seed has been set
+- `viewSteppers`: Stepper state for different views
+- `possibleConditions`: Available conditions for randomization
+- `seqtimeline`: Sequential timeline data
+- `routes`: Route information
+- `conditions`: Condition assignments
+- `randomizedRoutes`: Randomized route assignments
 
-This describes this method
+#### Browser Ephemeral State (`browserEphemeral`)
 
-- **Arguments**
+Temporary data that resets on page refresh:
 
-- **Details**
+- `forceNavigate`: Force navigation flag
+- `tooSmall`: Browser window size check
+- `steppers`: HStepper instances
+- `dbConnected`: Database connection status
+- `dbChanges`: Whether data has changed
+- `urls`: URL configurations for different recruitment services
 
-Firebase has several limits on document writing. Documents can't be larger than
-1MB. In addition, you can't write to the same document faster than once per
-second. Since billing is based on writes it also is a bad idea to allow
-unlimited writes since code can live running in a user's browser for a long time
-if they do not close the window. As a result, this function has an upper limit
-on the number of writes allowed. This is
-[configured](configuration.html#experiment-options-env) using `VITE_MAX_WRITES`.
-By default, it is 1000 but can be adjusted if you need more writes for your
-experiment. In addition, the code doesn't allow this method to be called faster
-than once every two seconds. This is
-[configured](configuration.html#experiment-options-env) using
-`VITE_MIN_WRITE_INTERVAL`.
+#### Development State (`dev`)
 
-```
-service cloud.firestore {
-    match /databases/{database}/documents {
-        match /real/{expId} {
-            match data/{dataId} {
+Development-only state that syncs with localStorage in development mode:
 
-            }
-        }
-        match /testing/{expId} {
-            match data/{dataId} {
+- `viewProvidesAutofill`: Current page autofill function
+- `viewProvidesStepper`: Whether current page provides stepper
+- `showConsoleBar`: Show/hide database console bar
+- `showSideBar`: Show/hide development sidebar
+- `pinnedRoute`: Pinned route for development
+- `mainView`: Main view type
+- `consoleBarHeight`: Console bar height
+- `consoleBarTab`: Active console bar tab
+- `sideBarTab`: Active sidebar tab
+- `searchParams`: URL search parameters
+- `logFilter`: Log message filter level
+- `notificationFilter`: Notification filter level
+- `lastViewLimit`: Limit logs to last page
+- `dataPath`: Path to data
+- `configPath`: Path to configuration
+- `selectedDevice`: Selected device for responsive design
+- `deviceWidth`: Device width
+- `deviceHeight`: Device height
+- `isRotated`: Device rotation state
+- `isFullscreen`: Fullscreen state
+- `routePanelVisible`: Route panel visibility
+- `globalColorMode`: Global color mode
+- `experimentColorMode`: Experiment color mode
 
-            }
-        }
-    }
-}
-```
+#### Private Data (`private`)
+
+Sensitive user data not synced to database:
+
+- `recruitmentInfo`: Recruitment service information
+- `withdrawData`: Withdrawal form data
+- `browserFingerprint`: Browser fingerprinting data
+
+#### Public Data (`data`)
+
+Experiment data synced to Firestore database:
+
+- `appStartTime`: Application start timestamp
+- `seedID`: Random seed identifier
+- `firebaseAnonAuthID`: Firebase anonymous auth ID
+- `firebaseDocID`: Firebase document ID
+- `trialNum`: Current trial number
+- `consented`: Consent status
+- `verifiedVisibility`: Visibility verification status
+- `done`: Experiment completion status
+- `starttime`: Experiment start time
+- `endtime`: Experiment end time
+- `recruitmentService`: Recruitment service used
+- `browserData`: Browser event data
+- `withdrawn`: Withdrawal status
+- `routeOrder`: Route navigation history
+- `conditions`: Condition assignments
+- `randomizedRoutes`: Randomized route assignments
+- `smileConfig`: Application configuration
+- `studyData`: Study-specific data array
+
+### Getters
+
+The store provides several computed getters for accessing state:
+
+- `isDataBarVisible`: Whether data console bar is visible
+- `isKnownUser`: Whether user is known
+- `isConsented`: Whether user has consented
+- `isWithdrawn`: Whether user has withdrawn
+- `isDone`: Whether experiment is done
+- `lastRoute`: Last visited route
+- `isDBConnected`: Whether connected to database
+- `hasAutofill`: Whether current view provides autofill
+- `searchParams`: Current search parameters
+- `recruitmentService`: Current recruitment service
+- `isSeedSet`: Whether random seed is set
+- `getSeedID`: Current seed ID
+- `getLocal`: Local persisted state
+- `getConditions`: Current conditions
+- `getRandomizedRoutes`: Current randomized routes
+- `verifiedVisibility`: Visibility verification status
+- `getShortId`: Short document ID for display
+
+### Actions
+
+#### Database Management
+
+- `manualSyncLocalToData()`: Manually synchronizes local state to remote data
+  store
+- `setDBConnected()`: Sets database connection status and syncs local data
+- `setKnown()`: Marks user as known and creates database documents
+- `loadData()`: Loads data from database
+- `saveData(force = false)`: Saves data to database with optional force flag
+
+#### User State Management
+
+- `setConsented()`: Sets consent status and records start time
+- `setUnconsented()`: Sets consent status to false
+- `setWithdrawn(forminfo)`: Sets withdrawal status and records withdrawal time
+- `setDone()`: Sets completion status and records end time
+- `setCompletionCode(code)`: Sets completion code
+- `verifyVisibility(value)`: Sets visibility verification status
+- `resetApp()`: Resets application state
+- `setSeedID(seed)`: Sets random seed ID
+
+#### Stepper Management
+
+- `registerStepper(view, stepper)`: Registers a stepper for a view
+- `getStepper(view)`: Gets stepper for a view
+- `resetStepper(view)`: Resets stepper for a view
+
+#### Data Recording
+
+- `recordWindowEvent(type, event_data)`: Records window events
+- `recordData(data)`: Records experiment data
+- `recordProperty(name, data)`: Records a named property
+- `recordRoute(route)`: Records route navigation with timing
+
+#### Browser Fingerprinting
+
+- `getBrowserFingerprint()`: Retrieves browser fingerprint information
+- `setFingerPrint(ip, userAgent, language, webdriver)`: Sets browser fingerprint
+  data
+
+#### Development Tools
+
+- `setAutofill(fn)`: Sets autofill function for development
+- `removeAutofill()`: Removes autofill function
+- `setSearchParams(searchParams)`: Sets search parameters
+- `autofill()`: Executes autofill function
+
+#### Recruitment and Configuration
+
+- `setRecruitmentService(service, info)`: Sets recruitment service and info
+- `setCondition(name, cond)`: Sets a condition
+- `setRandomizedRoute(name, route)`: Sets a randomized route
+- `getConditionByName(name)`: Gets condition by name
+- `getRandomizedRouteByName(name)`: Gets randomized route by name
+
+#### Navigation
+
+- `setLastRoute(route)`: Sets last visited route
+
+#### State Reset
+
+- `resetLocal()`: Resets local state to initial values
+
+### Important Notes
+
+1. **Firestore Limitations**: The store respects Firestore limitations including
+   1MB document size, write rate limits, and data type restrictions.
+
+2. **Rate Limiting**: The store implements rate limiting to prevent excessive
+   database writes. Use `saveData(true)` to force writes when necessary.
+
+3. **Data Persistence**: Browser persisted state automatically syncs with
+   localStorage, while public data syncs with Firestore.
+
+4. **Development Mode**: Development state is only active in development mode
+   and provides additional debugging capabilities.
+
+5. **Security**: Private data is never synced to the database and remains local
+   to the browser session.
+
+6. **Reactivity**: The store is fully reactive, so changes to state will
+   automatically update components that depend on it.

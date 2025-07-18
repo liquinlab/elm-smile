@@ -520,50 +520,6 @@ components should be named using Pascal Case names (e.g., `StatusBar.vue` or
 official recommendation of the
 [Vue documentation](https://vuejs.org/guide/components/registration.html#component-name-casing).
 
-Second, components should be organized into folders based on the type of role
-the component plays. For this, <SmileText /> borrows sensibly from the
-organization of a typical experiment in psychology. In <SmileText />, the
-components are organized in the `src/builtins` directly which has the following
-layout:
-
-```
-src/builtins
-├── advertisement
-│   ├── AdvertisementView.preload.js
-│   ├── AdvertisementView.vue
-│   └── StudyPreviewText.vue
-├── debrief
-│   └── DebriefView.vue
-├── demographicSurvey
-│   └── DemographicSurveyView.vue
-├── deviceSurvey
-│   └── DeviceSurveyView.vue
-├── instructions
-│   └── InstructionsView.vue
-├── mturk
-│   └── MTurkRecruitView.vue
-├── navbars
-│   └── StatusBar.vue
-├── informedConsent
-│   ├── InformedConsentModal.vue
-│   └── InformedConsentView.vue
-├── taskSurvey
-│   └── TaskFeedbackSurveyView.vue
-├── tasks
-│   ├── ExpView.vue
-│   ├── Task1View.vue
-│   └── Task2View.vue
-├── thanks
-│   └── ThanksView.vue
-├── windowSizer
-│   └── WindowSizerView.vue
-└── withdraw
-    ├── WithdrawFormModal.vue
-    └── WithdrawView.vue
-```
-
-The following sections describe which types of components go in each folder.
-Based on what type of component you are developing, place the corresponding
-component file in the correct folder. This will help you stay organized and help
-other users of your code know where to look to find an element they might like
-to reuse in their projects.
+Second, new components should be placed in your `src/user/components` folder.
+This will help you stay organized and help other users of your code know where
+to look to find an element they might like to reuse in their projects.
