@@ -1,10 +1,9 @@
 <script setup>
-import { Popover, PopoverContent, PopoverTrigger } from '@/uikit/components/ui/popover'
 import { Button } from '@/uikit/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
-import ConsoleDatabaseBrowsePanel from '@/dev/developer_mode/ConsoleDatabaseBrowsePanel.vue'
-import ConsoleLogPanel from '@/dev/developer_mode/ConsoleLogPanel.vue'
-import ConsoleConfigPanel from '@/dev/developer_mode/ConsoleConfigPanel.vue'
+import ConsoleDatabaseBrowsePanel from '@/dev/developer_mode/console/ConsoleDatabaseBrowsePanel.vue'
+import ConsoleLogPanel from '@/dev/developer_mode/console/ConsoleLogPanel.vue'
+import ConsoleConfigPanel from '@/dev/developer_mode/console/ConsoleConfigPanel.vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 </script>

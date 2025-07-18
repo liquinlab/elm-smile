@@ -1,15 +1,52 @@
 <script setup>
+/**
+ * @fileoverview Main application component that handles core functionality and layout
+ */
+
+/**
+ * Import Vue composition API functions and built-in components
+ * @requires ref Vue ref for reactive references
+ * @requires computed Vue computed for derived state
+ * @requires watch Vue watch for reactive effects
+ * @requires onMounted Vue lifecycle hook for mounted phase
+ * @requires onUnmounted Vue lifecycle hook for cleanup
+ */
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+
+/**
+ * Import built-in view components
+ * @requires WindowSizerView Component for handling window sizing
+ * @requires StatusBar Component for displaying status information
+ */
 import WindowSizerView from '@/builtins/window_sizer/WindowSizerView.vue'
 import StatusBar from '@/builtins/navbars/StatusBar.vue'
 
+/**
+ * Import and initialize SMILE API
+ * @requires useAPI SMILE API composable
+ */
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
+/**
+ * Import color mode composable
+ * @requires useSmileColorMode Composable for managing color theme
+ */
 import { useSmileColorMode } from '@/core/composables/useColorMode'
 
-// Use global scope for production and presentation modes (applies to html/body), experiment scope for development
+/**
+ * Configure color mode scope based on application mode
+ * Uses global scope for production/presentation, experiment scope for development
+ * @type {string}
+ */
 const colorModeScope = api.config.mode === 'production' || api.config.mode === 'presentation' ? 'global' : 'experiment'
+
+/**
+ * Initialize color mode state and control
+ * @type {Object}
+ * @property {import('vue').Ref<string>} systemColorMode Current system color mode
+ * @property {import('vue').Ref<string>} colorModeControl Color mode control value
+ */
 const { state: systemColorMode, mode: colorModeControl } = useSmileColorMode(colorModeScope)
 
 // In presentation mode, prioritize the color mode control over API config
@@ -31,22 +68,12 @@ if (api.config.mode !== 'presentation') {
   )
 }
 
-// The effective color mode logic depends on the mode
-const effectiveColorMode = computed(() => {
-  if (api.config.mode === 'presentation') {
-    // In presentation mode, use the color mode control state (set by DarkModeButton)
-    return systemColorMode.value
-  } else {
-    // In other modes, respect the API config setting
-    if (api.config.colorMode === 'system' || api.config.colorMode === 'auto') {
-      return systemColorMode.value
-    } else {
-      return api.config.colorMode
-    }
-  }
-})
-
-// Define props
+/**
+ * Component props for device dimensions
+ * @typedef {Object} Props
+ * @property {number} [deviceWidth] - Override for device width (optional)
+ * @property {number} [deviceHeight] - Override for device height (optional)
+ */
 const props = defineProps({
   deviceWidth: {
     type: Number,
@@ -100,11 +127,24 @@ smilestore.$subscribe((mutation, newstate) => {
   snapshot = { ...newstate.data }
 })
 
-// Reactive window dimensions
+/**
+ * Reactive reference to current window width
+ * @type {import('vue').Ref<number>}
+ */
 const windowWidth = ref(window.innerWidth)
+
+/**
+ * Reactive reference to current window height
+ * @type {import('vue').Ref<number>}
+ */
 const windowHeight = ref(window.innerHeight)
 
-// Update window dimensions on resize
+/**
+ * Updates the reactive window dimension references with current window size
+ *
+ * Sets windowWidth and windowHeight to the current window.innerWidth and window.innerHeight
+ * values respectively.
+ */
 const updateWindowDimensions = () => {
   windowWidth.value = window.innerWidth
   windowHeight.value = window.innerHeight
@@ -150,15 +190,35 @@ onMounted(() => {
   )
 })
 
+/**
+ * Cleanup function called when component is unmounted
+ *
+ * Removes the resize event listener to prevent memory leaks
+ */
 onUnmounted(() => {
   window.removeEventListener('resize', updateWindowDimensions)
 })
 
-// Computed properties that use props when provided, otherwise fall back to window dimensions
+/**
+ * Computed property that determines the effective device width
+ *
+ * Uses the deviceWidth prop if provided, otherwise falls back to the current window width.
+ * This allows for testing with specific device dimensions or using actual window size.
+ *
+ * @returns {number} The effective device width in pixels
+ */
 const effectiveDeviceWidth = computed(() => {
   return props.deviceWidth !== undefined ? props.deviceWidth : windowWidth.value
 })
 
+/**
+ * Computed property that determines the effective device height
+ *
+ * Uses the deviceHeight prop if provided, otherwise falls back to the current window height.
+ * This allows for testing with specific device dimensions or using actual window size.
+ *
+ * @returns {number} The effective device height in pixels
+ */
 const effectiveDeviceHeight = computed(() => {
   return props.deviceHeight !== undefined ? props.deviceHeight : windowHeight.value
 })
@@ -175,7 +235,16 @@ const showStatusBar = computed(() => {
   return api.currentRouteName() !== 'recruit' && api.currentRouteName() !== 'presentation_home'
 })
 
-// Pure computed property without side effects
+/**
+ * Computed property that checks if the device is too small for the application
+ *
+ * Calls api.isBrowserTooSmall() with the effective device dimensions and stores
+ * the result in the browser ephemeral state. Returns false if there's an error
+ * during the check.
+ *
+ * @returns {boolean} True if device is too small, false otherwise
+ * @throws {Error} May throw if api.isBrowserTooSmall() fails
+ */
 const deviceTooSmall = computed(() => {
   try {
     const val = api.isBrowserTooSmall(effectiveDeviceWidth.value, effectiveDeviceHeight.value)

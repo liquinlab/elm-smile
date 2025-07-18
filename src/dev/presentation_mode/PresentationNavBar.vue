@@ -2,7 +2,7 @@
 import { onMounted, watch, ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
-import RouteInfoButton from '@/dev/developer_mode/RouteInfoButton.vue'
+import RouteInfoButton from '@/dev/developer_mode/navbar/RouteInfoButton.vue'
 import ResetButton from '@/dev/presentation_mode/PresentationModeResetButton.vue'
 import QRCodeButton from '@/dev/presentation_mode/QRCodeButton.vue'
 import DarkModeButton from '@/dev/presentation_mode/DarkModeButton.vue'

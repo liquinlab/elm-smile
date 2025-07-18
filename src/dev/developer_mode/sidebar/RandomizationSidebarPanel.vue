@@ -8,7 +8,7 @@ import useSmileStore from '@/core/stores/smilestore'
 const smilestore = useSmileStore() // load the global store
 const seed = ref(smilestore.getSeedID)
 import { v4 as uuidv4 } from 'uuid'
-import TextInputWithButton from '@/dev/developer_mode/TextInputWithButton.vue'
+import TextInputWithButton from '@/dev/developer_mode/sidebar/TextInputWithButton.vue'
 import { Button } from '@/uikit/components/ui/button'
 import { Input } from '@/uikit/components/ui/input'
 import { Switch } from '@/uikit/components/ui/switch'

@@ -1,10 +1,10 @@
 <script setup>
-import StateTreeViewer from '@/dev/developer_mode/StateTreeViewer.vue'
-import ToggleStatus from '@/dev/developer_mode/ToggleStatus.vue'
-import DatabaseStatusInfo from '@/dev/developer_mode/DatabaseStatusInfo.vue'
-import RandomizationSidebarPanel from '@/dev/developer_mode/RandomizationSidebarPanel.vue'
-import StudyInfo from '@/dev/developer_mode/StudyInfo.vue'
-import ProgressSteps from '@/dev/developer_mode/ProgressSteps.vue'
+import StateTreeViewer from '@/dev/developer_mode/sidebar/StateTreeViewer.vue'
+import ToggleStatus from '@/dev/developer_mode/sidebar/ToggleStatus.vue'
+import DatabaseStatusInfo from '@/dev/developer_mode/sidebar/DatabaseStatusInfo.vue'
+import RandomizationSidebarPanel from '@/dev/developer_mode/sidebar/RandomizationSidebarPanel.vue'
+import StudyInfo from '@/dev/developer_mode/sidebar/StudyInfo.vue'
+import ProgressSteps from '@/dev/developer_mode/sidebar/ProgressSteps.vue'
 
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
@@ -34,7 +34,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/uikit/components/ui/
 
     <div class="sidebar-footer">
       <ToggleStatus />
-
       <ProgressSteps />
       <StudyInfo />
     </div>

@@ -13,7 +13,7 @@ import { ref, computed, onMounted } from 'vue'
 import { Toaster } from '@/uikit/components/ui/sonner'
 import 'vue-sonner/style.css' // vue-sonner v2 requires this import
 
-import SmileAppSidebar from '@/core/SmileAppSidebar.vue'
+import SmileAppSidebar from '@/dev/developer_mode/SmileAppSidebar.vue'
 import { SidebarInset, SidebarProvider } from '@/uikit/components/ui/sidebar'
 /**
  * Developer mode components for debugging and development tools
@@ -22,9 +22,9 @@ import { SidebarInset, SidebarProvider } from '@/uikit/components/ui/sidebar'
  * @requires DevConsoleBarTailwind Console bar for developer tools
  * @requires DevSideBar Side bar for developer tools
  */
-import DeveloperNavBar from '@/dev/developer_mode/DeveloperNavBar.vue'
-import DevConsoleBar from '@/dev/developer_mode/DevConsoleBar.vue'
-import DevSideBar from '@/dev/developer_mode/DevSideBar.vue'
+import DeveloperNavBar from '@/dev/developer_mode/navbar/DeveloperNavBar.vue'
+import DevConsoleBar from '@/dev/developer_mode/console/DevConsoleBar.vue'
+import DevSideBar from '@/dev/developer_mode/sidebar/DevSideBar.vue'
 
 /**
  * Built-in experiment components
@@ -282,14 +282,6 @@ onMounted(() => {
   width: 100%;
 }
 
-.presentation-content-wrapper {
-  display: flex;
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  width: 100%;
-}
-
 .content-and-console {
   display: flex;
   flex-direction: column;
@@ -327,14 +319,6 @@ onMounted(() => {
   max-width: 100%;
 }
 
-.analyze-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  width: 100%;
-}
-
 .dashboard-iframe {
   width: 100%;
   height: 100%;
@@ -343,13 +327,6 @@ onMounted(() => {
 }
 
 .recruit-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  overflow: hidden;
-}
-
-.presentation-iframe {
   width: 100%;
   height: 100%;
   border: none;

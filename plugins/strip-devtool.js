@@ -16,10 +16,10 @@ export default function stripDevToolPlugin() {
         console.log('  ➜  processing main.js for mode:', config.mode)
 
         if (config.mode == 'development') {
-          // Replace MainApp import with SmileApp import for developer mode builds
+          // Replace MainApp import with SmileDevApp import for developer mode builds
           const updatedSrc = src.replace(
             /import App from '@\/core\/MainApp\.vue'/g,
-            "import App from '@/core/SmileApp.vue'"
+            "import App from '@/dev/developer_mode/SmileDevApp.vue'"
           )
           return { code: updatedSrc }
         } else if (config.mode == 'presentation') {

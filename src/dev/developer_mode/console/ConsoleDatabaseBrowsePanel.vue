@@ -1,6 +1,6 @@
 <script setup>
 import { reactive, computed, onMounted } from 'vue'
-import DatabaseList from '@/dev/developer_mode/DatabaseList.vue'
+import DatabaseList from '@/dev/developer_mode/console/DatabaseList.vue'
 import SmileAPI from '@/core/composables/useAPI'
 import {
   Breadcrumb,

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, defineComponent, h } from 'vue'
 import TreeNode from './TreeNode.vue'
-import DataPathViewer from '@/dev/developer_mode/DataPathViewer.vue'
+import DataPathViewer from '@/dev/developer_mode/sidebar/DataPathViewer.vue'
 import { useRoute } from 'vue-router'
 import useViewAPI from '@/core/composables/useViewAPI'
 import { ButtonGroup, ButtonGroupItem } from '@/uikit/components/ui/button-group'

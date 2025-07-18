@@ -6,7 +6,7 @@ import { Database, RefreshCw } from 'lucide-vue-next'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
-import CircleProgress from '@/dev/developer_mode/CircleProgress.vue'
+import CircleProgress from '@/dev/developer_mode/navbar/CircleProgress.vue'
 
 // if in dev mode (which should always be true on this page), set known
 // if not a known user

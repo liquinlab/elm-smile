@@ -9,17 +9,19 @@
  */
 import { useRouter, addGuards } from '@/core/router'
 import { pinia } from '@/core/stores/createPinia'
-
 import timeline from '@/user/design'
 
+/// IMPORTANT: This line is automatically replaced with SmileApp.vue in the vite strip-devtool.js plugin for developer mode
 // this is automatically replaced with SmileApp.vue in the vite strip-devtool.js plugin for developer mode
 // or PresentationModeApp.vue in the presentation mode
 import App from '@/core/MainApp.vue'
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 import { createApp } from 'vue'
 import VueGtag from 'vue-gtag'
 import '@/core/main.css'
 
-/**
+/*
  * Initialize the Vue application and router
  * @constant {Vue} app - The main Vue application instance
  * @constant {Router} router - The Vue router instance configured with timeline

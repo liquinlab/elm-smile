@@ -1,6 +1,6 @@
 <script setup>
 import { reactive, computed, onMounted } from 'vue'
-import ConfigList from '@/dev/developer_mode/ConfigList.vue'
+import ConfigList from '@/dev/developer_mode/console/ConfigList.vue'
 import SmileAPI from '@/core/composables/useAPI'
 const api = SmileAPI()
 

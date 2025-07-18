@@ -1,5 +1,28 @@
 <script setup>
-import { h, ref, computed } from 'vue'
+/**
+ * @fileoverview Sidebar component for the Smile application with navigation and configuration options
+ */
+
+/**
+ * Import Vue composition API functions
+ * @requires h Vue render function for creating elements
+ * @requires ref Vue ref for reactive references
+ * @requires computed Vue computed for derived state
+ */
+import { computed } from 'vue'
+
+/**
+ * Import sidebar UI components from shadcn-vue
+ * @requires Sidebar Main sidebar container component
+ * @requires SidebarContent Content area of the sidebar
+ * @requires SidebarFooter Footer area of the sidebar
+ * @requires SidebarGroup Group container for sidebar items
+ * @requires SidebarGroupContent Content within a sidebar group
+ * @requires SidebarHeader Header area of the sidebar
+ * @requires SidebarMenu Menu container for sidebar items
+ * @requires SidebarMenuButton Button component for sidebar menu items
+ * @requires SidebarMenuItem Individual menu item in the sidebar
+ */
 import {
   Sidebar,
   SidebarContent,
@@ -12,12 +35,43 @@ import {
   SidebarMenuItem,
 } from '@/uikit/components/ui/sidebar'
 
+/**
+ * Import popover components for configuration panel
+ * @requires Popover Popover container component
+ * @requires PopoverContent Content area of the popover
+ * @requires PopoverTrigger Trigger element for the popover
+ */
 import { Popover, PopoverContent, PopoverTrigger } from '@/uikit/components/ui/popover'
+
+/**
+ * Import configuration panel component
+ * @requires ConfigDevPanel Developer configuration panel component
+ */
 import ConfigDevPanel from '@/dev/developer_mode/ConfigDevPanel.vue'
-import { Sun, Moon } from 'lucide-vue-next'
+
+/**
+ * Import color mode composable
+ * @requires useSmileColorMode Composable for managing color theme
+ */
 import { useSmileColorMode } from '@/core/composables/useColorMode'
+
+/**
+ * Import tooltip components for enhanced UX
+ * @requires Tooltip Tooltip container component
+ * @requires TooltipContent Content area of the tooltip
+ * @requires TooltipProvider Provider for tooltip context
+ * @requires TooltipTrigger Trigger element for the tooltip
+ */
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
 
+/**
+ * Component props for sidebar configuration
+ * @typedef {Object} Props
+ * @property {string} [side] - Side of the sidebar ('left' or 'right')
+ * @property {string} [variant] - Variant of the sidebar styling
+ * @property {string} [collapsible] - Collapsible behavior ('icon' or 'none')
+ * @property {string} [class] - Additional CSS classes
+ */
 const props = defineProps({
   side: { type: String, required: false },
   variant: { type: String, required: false },
@@ -25,13 +79,37 @@ const props = defineProps({
   class: { type: null, required: false },
 })
 
+/**
+ * Import and initialize SMILE API
+ * @requires useAPI SMILE API composable
+ */
 import useAPI from '@/core/composables/useAPI'
+
+/**
+ * Initialize SMILE API instance
+ * @constant {Object} api Global API instance
+ */
 const api = useAPI()
 
-// Global color mode for the entire application (html element)
+/**
+ * Initialize global color mode for the entire application (html element)
+ * Uses global scope to apply color mode to the entire application
+ * @type {Object}
+ * @property {import('vue').Ref<string>} globalColorMode Current global color mode state
+ * @property {Function} setLight Function to set light mode
+ * @property {Function} setDark Function to set dark mode
+ */
 const { state: globalColorMode, setLight, setDark } = useSmileColorMode('global')
 
-// Computed property to bind to the switch
+/**
+ * Computed property that provides two-way binding for dark mode toggle
+ *
+ * Provides a boolean interface for the color mode toggle switch.
+ * When set to true, enables dark mode; when false, enables light mode.
+ *
+ * @type {import('vue').ComputedRef<boolean>}
+ * @returns {boolean} True if dark mode is active, false for light mode
+ */
 const isDarkMode = computed({
   get: () => globalColorMode.value === 'dark',
   set: (value) => {
@@ -138,8 +216,8 @@ const isDarkMode = computed({
               tooltip="Toggle Dark Mode"
               @click="isDarkMode = !isDarkMode"
             >
-              <Sun v-if="isDarkMode" class="!size-5" />
-              <Moon v-else class="!size-5" />
+              <i-lucide-moon v-if="isDarkMode" class="!size-5" />
+              <i-lucide-sun v-else class="!size-5" />
             </SidebarMenuButton>
           </TooltipTrigger>
           <TooltipContent side="right">

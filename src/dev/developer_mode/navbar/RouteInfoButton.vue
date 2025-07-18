@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import useAPI from '@/core/composables/useAPI'
 import { ButtonGroup, ButtonGroupItem } from '@/uikit/components/ui/button-group'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
-import RouteJumper from '@/dev/developer_mode/RouteJumper.vue'
+import RouteJumper from '@/dev/developer_mode/navbar/RouteJumper.vue'
 
 import {
   DropdownMenu,

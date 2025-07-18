@@ -1,9 +1,7 @@
 <script setup>
 import { Button } from '@/uikit/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/uikit/components/ui/tooltip'
-import { Moon, Sun } from 'lucide-vue-next'
 import { useSmileColorMode } from '@/core/composables/useColorMode'
-import { computed } from 'vue'
 
 // Use global scope for presentation mode (applies to html element, like production mode)
 const {
