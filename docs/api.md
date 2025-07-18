@@ -31,6 +31,17 @@ additional methods for:
 - Timing utilities
 - State visualization
 
+::: danger When to use `useViewAPI` versus `useAPI`?
+
+There are two ways to invoke the Smile API (`useViewAPI` or `useAPI`). You
+should only use `useViewAPI` with [Views](/coding/views) which are top level
+components you register in `design.js` timeline. This is because `useViewAPI` is
+specifically designed to provide View-level API features like the
+[steps](/coding/steps) functionality. In other components if you need access to
+API features like configuration settings, or the global store use `useAPI`.
+
+:::
+
 ## Stepper Functions
 
 The following functions are available when using `useViewAPI`:
@@ -238,6 +249,7 @@ api.goToStep('trial/block1/step2', false)
 - `getCoreStaticUrl(path)`: Returns the public URL for a static asset provided
   by the smile library in `src/assets`.
 - `scrollToTop()`: Scrolls the main content container to the top.
+- `currentRouteInfo()`: Returns the current route info object.
 
 ## Randomization Functions
 
