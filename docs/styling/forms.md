@@ -8,7 +8,7 @@ easy.
 
 The `TaskFeedbackSurveyView.vue` built-in component demonstrates how to build a
 comprehensive feedback form in Smile. Click
-[here](https://github.com/NYUCCL/smile/blob/main/src/builtins/instructions_quiz/InstructionsQuiz.vue)
+[here](https://github.com/NYUCCL/smile/blob/main/src/builtins/instructionsQuiz/InstructionsQuiz.vue)
 to see the entire code structure before continuing.
 
 This component collects both quantitative ratings and qualitative feedback about

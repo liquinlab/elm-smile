@@ -229,8 +229,8 @@ short-hand for the src folder is '@' so for instance '@/builtins' refers to the
 
 ### Recruitment Advertisement
 
-**Base Component**: `@/builtins/recruitment/AdvertisementView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/recruitment/AdvertisementView.vue)  
+**Base Component**: `@/builtins/advertisement/AdvertisementView.vue`  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/advertisement/AdvertisementView.vue)  
 **Typical
 accessibility**: `{allowAlways: true}`
 
@@ -340,8 +340,8 @@ this.registerView({
 
 ### Simple Informed Consent
 
-**Base Component**: `@/builtins/simple_consent/InformedConsentView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/simple_consent/InformedConsentView.vue)  
+**Base Component**: `@/builtins/informedConsent/InformedConsentView.vue`  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/informedConsent/InformedConsentView.vue)  
 **Side
 effects**: Sets the `consent` key in the `localStorage` to `true.`  
 **Typical accessibility**: `{requiresConsent: false, requiresDone: false}`
@@ -361,11 +361,11 @@ After a participant accepts the informed consent (usually the first few steps of
 study) they will see a button in the [status bar](#status-bar) that will always
 be available allowing them to review the consent form in case they have
 questions. Clicking this button pops up a modal with the text of the informed
-consent (also `@/builtins/simple_consent/InformedConsentText.vue`).
+consent (also `@/builtins/informedConsent/InformedConsentText.vue`).
 
 ```js
 // put this at the top of the file
-import Consent from '@/builtins/simple_consent/InformedConsentView.vue'
+import Consent from '@/builtins/informedConsent/InformedConsentView.vue'
 
 // consent
 timeline.pushSeqView({
@@ -414,16 +414,16 @@ timeline.pushSeqView({
 
 ### Window Sizer
 
-**Base Component**: `@/builtins/window_sizer/WindowSizerView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/window_sizer/WindowSizerView.vue)  
+**Base Component**: `@/builtins/windowSizer/WindowSizerView.vue`  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/windowSizer/WindowSizerView.vue)  
 **Side
 effects**: Yes, sets the is verifiedVisibility key in the [API](/api) to true.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
 
-The window sizer is a small component `src/components/pages/WindowSizerView.vue`
-that will display a box with a configured size on the screen and ask the
-participant to adjust their browser window to that size so everything is
-visible. It looks like this:
+The window sizer is a small component
+`src/builtins/windowSizer/WindowSizerView.vue` that will display a box with a
+configured size on the screen and ask the participant to adjust their browser
+window to that size so everything is visible. It looks like this:
 
 ![Window sizer](/images/windowsizer.png)
 
@@ -443,7 +443,7 @@ To add it to the timeline just add this in the appropriate place inside
 
 ```js
 // put this at the top of the file
-import WindowSizer from '@/builtins/window_sizer/WindowSizerView.vue'
+import WindowSizer from '@/builtins/windowSizer/WindowSizerView.vue'
 
 // windowsizer
 timeline.pushSeqView({
@@ -494,7 +494,7 @@ timeline.pushSeqView({
 
 ### Instructions Quiz
 
-**Component**: `@/builtins/instructions_quiz/InstructionsQuiz.vue`  
+**Component**: `@/builtins/instructionsQuiz/InstructionsQuiz.vue`  
 **Side effects**: Saves the data from the quiz  
 **Typical accessibility**: Always
 
@@ -579,8 +579,8 @@ timeline.pushSeqView({
 
 ### Demographic Survey
 
-**Base Component**: `@/builtins/demographic_survey/DemographicSurveyView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/demographic_survey/DemographicSurveyView.vue)  
+**Base Component**: `@/builtins/demographicSurvey/DemographicSurveyView.vue`  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/demographicSurvey/DemographicSurveyView.vue)  
 **Side
 effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
@@ -594,7 +594,7 @@ relies on color information. The demongr
 
 ```js
 // put this at the top of the file
-import DemographicSurvey from '@/builtins/demographic_survey/DemographicSurveyView.vue'
+import DemographicSurvey from '@/builtins/demographicSurvey/DemographicSurveyView.vue'
 
 timeline.pushSeqView({
   path: '/demograph',
@@ -605,8 +605,8 @@ timeline.pushSeqView({
 
 ### Device Survey
 
-**Base Component**: `@/builtins/device_survey/DeviceSurveyView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/device_survey/DeviceSurveyView.vue)  
+**Base Component**: `@/builtins/deviceSurvey/DeviceSurveyView.vue`  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/deviceSurvey/DeviceSurveyView.vue)  
 **Side
 effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
@@ -636,7 +636,7 @@ field.
 
 ```js
 // put this at the top of the file
-import DeviceSurvey from '@/builtins/device_survey/DeviceSurveyView.vue'
+import DeviceSurvey from '@/builtins/deviceSurvey/DeviceSurveyView.vue'
 
 timeline.pushSeqView({
   path: '/demograph',
@@ -740,8 +740,8 @@ timeline.pushSeqView({
 
 ### Feedback Survey
 
-**Component**: `src/builtins/task_survey/TaskFeedbackSurveyView.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/task_survey/TaskFeedbackSurveyView.vue)  
+**Component**: `src/builtins/taskFeedbackSurvey/TaskFeedbackSurveyView.vue`  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/taskFeedbackSurvey/TaskFeedbackSurveyView.vue)  
 **Side
 effects**: Yes, saves the data from the form.  
 **Typical accessibility**: `{requiresConsent: true, requiresDone: false}`
@@ -756,7 +756,7 @@ meta field.
 
 ```js
 // put this at the top of the file
-import TaskFeedbackSurvey from '@/builtins/device_survey/TaskFeedbackSurveyView.vue'
+import TaskFeedbackSurvey from '@/builtins/taskFeedbackSurvey/TaskFeedbackSurveyView.vue'
 
 // feedback
 timeline.pushSeqView({
@@ -788,8 +788,8 @@ them as needed for your study.
 
 ### Status Bar
 
-**Base Component**: `@/builtins/navbars/StatusBar.vue`  
-**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/navbars/StatusBar.vue)
+**Base Component**: `@/builtins/statusBar/StatusBar.vue`  
+**Code**: [source](https://github.com/NYUCCL/smile/blob/main/src/builtins/statusBar/StatusBar.vue)
 
 ### Withdraw Modal
 

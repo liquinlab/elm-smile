@@ -532,20 +532,11 @@ src/builtins
 │   ├── AdvertisementView.preload.js
 │   ├── AdvertisementView.vue
 │   └── StudyPreviewText.vue
-├── captcha
-│   ├── CaptchaInstructionsText_01.vue
-│   ├── CaptchaInstructionsText_02.vue
-│   ├── CaptchaRotateImage.vue
-│   ├── CaptchaTrialImageCategorization.vue
-│   ├── CaptchaTrialMotorControl.vue
-│   ├── CaptchaTrialStroop.vue
-│   ├── CaptchaTrialTextComprehension.vue
-│   └── CaptchaView.vue
 ├── debrief
 │   └── DebriefView.vue
-├── demographic_survey
+├── demographicSurvey
 │   └── DemographicSurveyView.vue
-├── device_survey
+├── deviceSurvey
 │   └── DeviceSurveyView.vue
 ├── instructions
 │   └── InstructionsView.vue
@@ -553,12 +544,10 @@ src/builtins
 │   └── MTurkRecruitView.vue
 ├── navbars
 │   └── StatusBar.vue
-├── report_issue
-│   └── ReportIssueModal.vue
-├── simple_consent
+├── informedConsent
 │   ├── InformedConsentModal.vue
 │   └── InformedConsentView.vue
-├── task_survey
+├── taskSurvey
 │   └── TaskFeedbackSurveyView.vue
 ├── tasks
 │   ├── ExpView.vue
@@ -566,7 +555,7 @@ src/builtins
 │   └── Task2View.vue
 ├── thanks
 │   └── ThanksView.vue
-├── window_sizer
+├── windowSizer
 │   └── WindowSizerView.vue
 └── withdraw
     ├── WithdrawFormModal.vue
@@ -578,6 +567,3 @@ Based on what type of component you are developing, place the corresponding
 component file in the correct folder. This will help you stay organized and help
 other users of your code know where to look to find an element they might like
 to reuse in their projects.
-
-[TO DO: Describe each folder? But also we actually want people to use User
-folder, right?]

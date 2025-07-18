@@ -18,8 +18,8 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
  * @requires WindowSizerView Component for handling window sizing
  * @requires StatusBar Component for displaying status information
  */
-import WindowSizerView from '@/builtins/window_sizer/WindowSizerView.vue'
-import StatusBar from '@/builtins/navbars/StatusBar.vue'
+import WindowSizerView from '@/builtins/windowSizer/WindowSizerView.vue'
+import StatusBar from '@/builtins/statusBar/StatusBar.vue'
 
 /**
  * Import and initialize SMILE API

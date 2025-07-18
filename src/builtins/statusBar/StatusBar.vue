@@ -6,7 +6,7 @@ import appconfig from '@/core/config'
 import useAPI from '@/core/composables/useAPI'
 // load sub-components used in this component
 import WithdrawModal from '@/builtins/withdraw/WithdrawModal.vue'
-import InformedConsentModal from '@/builtins/simple_consent/InformedConsentModal.vue'
+import InformedConsentModal from '@/builtins/informedConsent/InformedConsentModal.vue'
 import { Button } from '@/uikit/components/ui/button'
 
 const router = useRouter()

@@ -144,7 +144,7 @@ const currentPageComplete = computed(() => {
  */
 function submitQuiz() {
   api.recordData({
-    phase: 'INSTRUCTIONS_QUIZ',
+    phase: 'instructionsQuiz',
     questions: api.queryStepData('pages*'), // Update to use randomized questions
     persist: api.persist,
   })
