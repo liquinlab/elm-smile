@@ -182,7 +182,7 @@ works. Here is the button component in action:
 
 ::: raw
 
-<SimpleButton/>
+<SimpleButton />
 
 :::
 
@@ -195,7 +195,7 @@ import SimpleButton from '@/components/SimpleButton.vue'
 and then in the main text wrote
 
 ```
-<SimpleButton/>
+<SimpleButton />
 ```
 
 Vue replaced the custom `<SimpleButton/>` tag with the rendered HTML for the
@@ -210,15 +210,15 @@ instance of the component will have its own state and behavior.
 For example, writing
 
 ```
-<SimpleButton/>
-<SimpleButton/>
+<SimpleButton />
+<SimpleButton />
 ```
 
 will result in:
 
 ::: raw
 
-<SimpleButton/><br/><br> <SimpleButton/>
+<SimpleButton /><br /><br /> <SimpleButton />
 
 :::
 
@@ -330,7 +330,7 @@ const text = ref('')
 
 An example rendering of this component is here:
 
-<TextInput/>
+<TextInput />
 
 As you can see as you type the value of `text` is updated in real time (due to
 the onChange event) and since this variable is reactive it also renders into the

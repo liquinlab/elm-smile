@@ -47,8 +47,6 @@ make a new button appear in the developer bar called "Autofill Form" which will
 automatically fill in the form with some preset values making it easier to
 advance to the next stage of debugging.
 
-[TO DO: WALK THROUGH DEV BAR HERE]
-
 ## Testing the build process
 
 You can also test the build process locally. Simply type
