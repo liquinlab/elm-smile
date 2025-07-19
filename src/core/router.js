@@ -51,10 +51,10 @@ export function addGuards(r, providedApi = null) {
       }
 
       await api.connectDB()
-      api.log.error('ROUTER GUARD: Pinned route, redirecting to ' + api.store.dev.pinnedRoute)
       if (to.name === api.store.dev.pinnedRoute) {
         return true
       } else {
+        api.log.error('ROUTER GUARD: Pinned route, redirecting to ' + api.store.dev.pinnedRoute)
         return {
           name: api.store.dev.pinnedRoute,
           replace: true,
