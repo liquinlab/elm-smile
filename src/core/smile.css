@@ -28,14 +28,6 @@
   --page-text-color: '#000';
   --status-bar-bg-color: '#fff';
   --status-bar-text-color: '#000';
-
-  /* above from the out .scss file */
-  --bulma-input-arrow: var(--purple);
-  --bulma-primary: var(--purple);
-  --bulma-link: var(--darker-grey);
-  --bulma-link-text: var(--light-grey);
-  --bulma-link-text-hover: var(--pink);
-  --bulma-link-text-active: var(--darker-grey);
 }
 
 .table-cell-small {

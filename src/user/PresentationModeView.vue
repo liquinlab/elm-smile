@@ -262,7 +262,3 @@ function getAffiliationIndex(affiliation) {
     </footer>
   </div>
 </template>
-
-<style scoped>
-/* Remove all Bulma-specific styles and rely on Tailwind CSS */
-</style>

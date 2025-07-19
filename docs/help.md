@@ -67,8 +67,8 @@ Javascript applications. Here are some resources for learning more about Vite:
 
 ### CSS/Styling
 
-- [Bulma](https://bulma.io) - the CSS framework used in the project. The docs
-  are quite intuitive.
+- [Tailwind CSS](https://tailwindcss.com) - the CSS framework used in the
+  project. The docs are quite intuitive.
 
 ### Github
 

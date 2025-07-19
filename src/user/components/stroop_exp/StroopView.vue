@@ -143,8 +143,3 @@ function finish() {
     </div>
   </ConstrainedTaskWindow>
 </template>
-
-<style scoped>
-/* Remove Bulma-specific styles as we're now using Tailwind CSS */
-/* Remove Bulma-specific styles as we're now using Tailwind CSS */
-</style>

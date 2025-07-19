@@ -87,7 +87,7 @@ const database_tooltip = computed(() => {
                 :percentage="Math.round(api.store.browserPersisted.approxDataSize / 1048576) * 100"
                 :size="12"
                 :strokeWidth="40"
-                slicecolor="hsl(var(--bulma-button-h), var(--bulma-button-s), calc(var(--bulma-button-background-l) + var(--bulma-button-background-l-delta)))"
+                slicecolor="var(--primary-button)"
                 basecolor="var(--status-green)"
               />
             </div>
