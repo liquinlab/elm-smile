@@ -206,7 +206,6 @@ export function useSmileColorMode(scope = 'experiment', options = {}) {
         } else if (scope === 'experiment') {
           // Apply to experiment containers only
           applyColorMode('.device-container', newMode)
-          applyColorMode('.fullscreen-container', newMode)
           applyColorMode('.dev-color-mode', newMode)
           applyColorMode('.device-wrapper', newMode)
 

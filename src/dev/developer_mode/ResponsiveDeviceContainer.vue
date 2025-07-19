@@ -189,8 +189,8 @@ const colorMode = computed(() => {
   <div
     v-if="api.store.dev.isFullscreen || !shouldUseResponsiveContainer || api.config.mode == 'presentation'"
     ref="fullScreenDiv"
-    class="fullscreen-container bg-background text-foreground dev-color-mode"
-    :class="api.currentRouteName() !== 'recruit' ? colorMode : globalColorMode"
+    class="fullscreen-container bg-background text-foreground"
+    :class="api.currentViewName() !== 'recruit' ? colorMode : globalColorMode"
   >
     <MainApp :deviceWidth="fullScreenWidth" :deviceHeight="fullScreenHeight" />
   </div>
@@ -259,7 +259,10 @@ const colorMode = computed(() => {
       </div>
 
       <!-- Device container with resize handles -->
-      <div class="device-wrapper dev-color-mode" :class="api.currentRouteName() !== 'recruit' ? colorMode : globalColorMode">
+      <div
+        class="device-wrapper dev-color-mode"
+        :class="api.currentRouteName() !== 'recruit' ? colorMode : globalColorMode"
+      >
         <!-- Main device container -->
         <div class="device-container bg-background text-foreground" ref="containerDiv">
           <MainApp :deviceWidth="api.store.dev.deviceWidth" :deviceHeight="api.store.dev.deviceHeight" />
