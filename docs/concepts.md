@@ -11,7 +11,7 @@ an experiment. For example, the part of your experiment that collects informed
 consent might be one View. Another View might be the debriefing form. Below we
 will describe how you define the sequence of Views in your experiment.
 
-<img src="/images/viewstimeline.png" width="800" alt="timeline example" style="margin: auto;">
+<img src="/images/viewstimeline.png" width="600" alt="timeline example" style="margin: auto;">
 
 Each View is minimally a Vue component (a special type of web development file)
 which can be written in whatever way you please. However, Smile provides a

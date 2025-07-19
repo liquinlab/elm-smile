@@ -51,7 +51,7 @@ instructions, debriefing, etc...). We call the phases "Views" and each major
 phase of an experiment is associated with its own Vue component. Learn about
 views [here](/coding/views).
 
-<img src="/images/viewstimeline.png" width="800" alt="timeline example" style="margin: auto;">
+<img src="/images/viewstimeline.png" width="600" alt="timeline example" style="margin: auto;">
 
 Smile comes with several [built-in views](/coding/views#built-in-views) for
 common phases of an experiment. This includes things like obtaining informed

@@ -12,7 +12,7 @@ capital 'V' to distinguish them from ordinary uses of the word "view."). Other
 packages might refer to View elements as "pages", "routes", "sections", "parts",
 or "phases."
 
-<img src="/images/viewstimeline.png" width="800" alt="timeline example" style="margin: auto;">
+<img src="/images/viewstimeline.png" width="600" alt="timeline example" style="margin: auto;">
 
 To help make clear the distinction between a View and an ordinary component,
 consider the following examples:
@@ -248,12 +248,12 @@ Example `design.js` entry:
 
 ```js
 // put this at the top of the file
-import Advertisement from '@/builtins/advertisement/AdvertisementView.vue'
+import AdvertisementView from '@/builtins/advertisement/AdvertisementView.vue'
 
 timeline.pushSeqView({
   path: '/welcome',
   name: 'welcome_anonymous',
-  component: Advertisement,
+  component: AdvertisementView,
   meta: {
     prev: undefined,
     next: 'consent',
@@ -268,12 +268,12 @@ Prolific:
 
 ```js
 // put this at the top of the file
-import Advertisement from '@/builtins/advertisement/AdvertisementView.vue'
+import AdvertisementView from '@/builtins/advertisement/AdvertisementView.vue'
 
 timeline.pushSeqView({
   path: '/welcome/:service',
   name: 'welcome_referred',
-  component: Advertisement,
+  component: AdvertisementView,
   meta: {
     prev: undefined,
     next: 'consent',
@@ -318,12 +318,12 @@ experiment in a new browser window.
 
 ```js
 // put this at the top of the file
-import MTurk from '@/builtins/mturk/MTurkRecruitView.vue'
+import MTurkRecruitView from '@/builtins/mturk/MTurkRecruitView.vue'
 
 this.registerView({
   path: '/mturk',
   name: 'mturk',
-  component: MTurk,
+  component: MTurkRecruitView,
   props: {
     estimated_time: api.getConfig('estimated_time'),
     payrate: api.getConfig('payrate'),
@@ -361,12 +361,12 @@ consent (also `@/builtins/informedConsent/InformedConsentText.vue`).
 
 ```js
 // put this at the top of the file
-import Consent from '@/builtins/informedConsent/InformedConsentView.vue'
+import InformedConsentView from '@/builtins/informedConsent/InformedConsentView.vue'
 
 // consent
 timeline.pushSeqView({
   name: 'consent',
-  component: Consent,
+  component: InformedConsentView,
   meta: {
     requiresConsent: false,
     setConsented: true, // set the status to consented ater this route
@@ -404,13 +404,13 @@ To add it to the timeline just add this in the appropriate place inside
 
 ```js
 // put this at the top of the file
-import WindowSizer from '@/builtins/windowSizer/WindowSizerView.vue'
+import WindowSizerView from '@/builtins/windowSizer/WindowSizerView.vue'
 
 // windowsizer
 timeline.pushSeqView({
   path: '/windowsizer',
   name: 'windowsizer',
-  component: WindowSizer,
+  component: WindowSizerView,
 })
 ```
 
@@ -432,7 +432,7 @@ accessibility**: `{requiresConsent: true, requiresDone: false}`
 
 ```js
 // put this at the top of the file
-import Instructions from '@/builtins/instructions/InstructionsView.vue'
+import InstructionsView from '@/builtins/instructions/InstructionsView.vue'
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
@@ -445,7 +445,7 @@ api.randomAssignCondition({
 // instructions
 timeline.pushSeqView({
   name: 'instructions',
-  component: Instructions,
+  component: InstructionsView,
   meta: {
     allowAlways: true,
   },
@@ -554,12 +554,12 @@ relies on color information.
 
 ```js
 // put this at the top of the file
-import DemographicSurvey from '@/builtins/demographicSurvey/DemographicSurveyView.vue'
+import DemographicSurveyView from '@/builtins/demographicSurvey/DemographicSurveyView.vue'
 
 timeline.pushSeqView({
   path: '/demograph',
   name: 'demograph',
-  component: DemographicSurvey,
+  component: DemographicSurveyView,
 })
 ```
 
@@ -595,12 +595,12 @@ field.
 
 ```js
 // put this at the top of the file
-import DeviceSurvey from '@/builtins/deviceSurvey/DeviceSurveyView.vue'
+import DeviceSurveyView from '@/builtins/deviceSurvey/DeviceSurveyView.vue'
 
 timeline.pushSeqView({
   path: '/demograph',
   name: 'demograph',
-  component: DeviceSurvey,
+  component: DeviceSurveyView,
   meta: { setDone: true }, // optional if this is the last form
 })
 ```
@@ -632,7 +632,7 @@ compensation.
 
 ```js
 // put this at the top of the file
-import Withdraw from '@/builtins/withdraw/WithdrawView.vue'
+import WithdrawView from '@/builtins/withdraw/WithdrawView.vue'
 
 // withdraw
 timeline.registerView({
@@ -641,7 +641,7 @@ timeline.registerView({
     requiresWithdraw: true,
     resetApp: api.getConfig('allowRepeats'),
   },
-  component: Withdraw,
+  component: WithdrawView,
 })
 ```
 
@@ -660,13 +660,13 @@ their post-experiment surveys.
 
 ```js
 // put this at the top of the file
-import Debrief from '@/builtins/debrief/DebriefView.vue'
+import DebriefView from '@/builtins/debrief/DebriefView.vue'
 
 // debrief
 import DebriefText from '@/user/components/DebriefText.vue' // get access to the global store
 timeline.pushSeqView({
   name: 'debrief',
-  component: Debrief,
+  component: DebriefView,
   props: {
     debriefText: markRaw(DebriefText),
   },
@@ -682,12 +682,12 @@ accessibility**: `{requiresDone: true}`
 
 ```js
 // put this at the top of the file
-import Thanks from '@/builtins/thanks/ThanksView.vue'
+import ThanksView from '@/builtins/thanks/ThanksView.vue'
 
 // thanks
 timeline.pushSeqView({
   name: 'thanks',
-  component: Thanks,
+  component: ThanksView,
   meta: {
     requiresDone: true,
     resetApp: api.getConfig('allowRepeats'),
@@ -712,12 +712,12 @@ meta field.
 
 ```js
 // put this at the top of the file
-import TaskFeedbackSurvey from '@/builtins/taskFeedbackSurvey/TaskFeedbackSurveyView.vue'
+import TaskFeedbackSurveyView from '@/builtins/taskFeedbackSurvey/TaskFeedbackSurveyView.vue'
 
 // feedback
 timeline.pushSeqView({
   name: 'feedback',
-  component: TaskFeedbackSurvey,
+  component: TaskFeedbackSurveyView,
   meta: { setDone: true }, // optional if this is the last form
 })
 ```
