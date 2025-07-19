@@ -201,11 +201,10 @@ export function useSmileColorMode(scope = 'experiment', options = {}) {
         if (scope === 'global') {
           // Apply to html element for global theming
           applyColorMode('html', newMode)
+          // Also apply to elements with global-color-mode class
+          applyColorMode('.global-color-mode', newMode)
         } else if (scope === 'experiment') {
           // Apply to experiment containers only
-          if (api.currentRouteName() !== 'recruit') {
-            applyColorMode('#main-app', newMode)
-          }
           applyColorMode('.device-container', newMode)
           applyColorMode('.fullscreen-container', newMode)
           applyColorMode('.dev-color-mode', newMode)

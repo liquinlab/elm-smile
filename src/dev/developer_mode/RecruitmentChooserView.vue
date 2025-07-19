@@ -25,7 +25,7 @@ const api = useViewAPI()
 
 <template>
   <!-- Main container with responsive padding -->
-  <div class="px-4 md:px-8 lg:px-12 pt-10 pb-10">
+  <div class="px-4 md:px-8 lg:px-12 pt-10 pb-10 bg-background text-foreground global-color-mode">
     <!-- Header section with title and description -->
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-4">Welcome to Smile Developer 👩‍💻 Mode</h1>
