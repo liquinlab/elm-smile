@@ -101,7 +101,7 @@ const getChildVerticalLines = (verticalLines, index, total) => {
 
     <!-- Recursive tree nodes, but limit depth -->
     <ul v-if="state.rows && state.rows.length > 0 && depth < maxDepth" class="children">
-      <TreeNode
+      <StepNode
         v-for="(childState, childIndex) in state.rows"
         :key="childIndex"
         :state="childState"
