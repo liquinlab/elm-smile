@@ -15,7 +15,7 @@ import { setupBrowserEnvironment } from '../../setup/mocks'
 // Mock the config import
 vi.mock('@/core/config', () => ({
   default: {
-    maxStepperRows: 5000,
+    maxSteps: 5000,
   },
 }))
 

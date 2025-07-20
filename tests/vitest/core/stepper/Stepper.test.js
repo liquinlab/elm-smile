@@ -339,12 +339,12 @@ describe('Stepper test', () => {
 
     it('should throw error when outer would exceed safety limit', () => {
       const maxRows = Number(config.maxStepperRows)
-      // Create arrays that would generate more combinations than maxStepperRows
+      // Create arrays that would generate more combinations than maxSteps
       const trials = {
         x: Array(100).fill('x'),
         y: Array(100).fill('y'),
       }
-      // This would generate 100 * 100 = 10000 combinations, which exceeds maxStepperRows (5000)
+      // This would generate 100 * 100 = 10000 combinations, which exceeds maxSteps (5000)
       expect(() => {
         stepper.outer(trials)
       }).toThrow(/Cannot create \d+ combinations: would exceed maximum of \d+ rows/)

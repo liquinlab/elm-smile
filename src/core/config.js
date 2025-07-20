@@ -40,7 +40,7 @@ function parseWidthHeight(value) {
  * @property {boolean} autoSave - Whether to auto-save data
  * @property {number} maxWrites - Maximum number of writes allowed
  * @property {number} minWriteInterval - Minimum interval between writes
- * @property {number} maxStepperRows - Maximum rows in stepper tables
+ * @property {number}maxSteps - Maximum rows in stepper tables
  * @property {string} randomSeed - Seed for random number generation
  * @property {string} deployURL - URL where app is deployed
  * @property {string} labURL - URL of the lab website
@@ -80,7 +80,7 @@ export default {
   autoSave: import.meta.env.VITE_AUTO_SAVE_DATA,
   maxWrites: import.meta.env.VITE_MAX_WRITES,
   minWriteInterval: import.meta.env.VITE_MIN_WRITE_INTERVAL,
-  maxStepperRows: import.meta.env.VITE_MAX_STEPPER_ROWS,
+  maxSteps: import.meta.env.VITE_MAX_STEPS,
   randomSeed: import.meta.env.VITE_RANDOM_SEED,
   deployURL: import.meta.env.VITE_DEPLOY_URL, // auto compute this
   labURL: import.meta.env.VITE_LAB_URL,

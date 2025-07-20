@@ -173,14 +173,14 @@ export class Stepper extends StepState {
    * Appends one or more objects as new states to the current node
    * @param {Object|Array<Object>} items - Single object or array of objects to append as new states
    * @returns {Stepper} Returns this instance for method chaining
-   * @throws {Error} If items is not an object or array, or if adding items would exceed maxStepperRows
+   * @throws {Error} If items is not an object or array, or if adding items would exceed maxSteps
    */
   append(items) {
     this._log.debug('\tappend', items)
     // Convert single item to array if needed
     const itemsToAdd = Array.isArray(items) ? items : [items]
 
-    // Check if adding these items would exceed maxStepperRows
+    // Check if adding these items would exceed maxSteps
     if (this._states.length + itemsToAdd.length > config.maxStepperRows) {
       this._log.error(
         `Cannot append ${itemsToAdd.length} rows as it exceeds the safety limit of ${config.maxStepperRows}`
@@ -211,7 +211,7 @@ export class Stepper extends StepState {
    * @param {Object} trials - Object with arrays as values
    * @param {Function} [idGenerator] - Optional function to generate custom IDs for each combination
    * @returns {Stepper} Returns this instance for method chaining
-   * @throws {Error} If trials is not an object or if operation would exceed maxStepperRows
+   * @throws {Error} If trials is not an object or if operation would exceed maxSteps
    */
   outer(trials, idGenerator = null) {
     if (typeof trials !== 'object' || trials === null) {
@@ -232,7 +232,7 @@ export class Stepper extends StepState {
     // Calculate total number of combinations
     const totalCombinations = processedColumns.reduce((total, [_, arr]) => total * arr.length, 1)
 
-    // Check if adding these combinations would exceed maxStepperRows
+    // Check if adding these combinations would exceed maxSteps
     if (this._states.length + totalCombinations > config.maxStepperRows) {
       throw new Error(
         `Cannot create ${totalCombinations} combinations: would exceed maximum of ${config.maxStepperRows} rows`
@@ -286,7 +286,7 @@ export class Stepper extends StepState {
    * @param {string} [options.method] - Method to use: 'loop', 'pad', or 'last'
    * @param {*} [options.padValue] - Value to use for padding when method is 'pad'
    * @returns {Stepper} Returns this instance for method chaining
-   * @throws {Error} If trials is not an object or if operation would exceed maxStepperRows
+   * @throws {Error} If trials is not an object or if operation would exceed maxSteps
    */
   zip(trials, idGeneratorOrOptions = {}, options = {}) {
     if (typeof trials !== 'object' || trials === null) {
@@ -313,7 +313,7 @@ export class Stepper extends StepState {
     // Get the maximum length of any column
     const maxLength = Math.max(...processedColumns.map(([_, arr]) => arr.length))
 
-    // Check if adding these combinations would exceed maxStepperRows
+    // Check if adding these combinations would exceed maxSteps
     if (this._states.length + maxLength > config.maxStepperRows) {
       throw new Error(`Cannot create ${maxLength} combinations: would exceed maximum of ${config.maxStepperRows} rows`)
     }

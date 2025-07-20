@@ -219,7 +219,7 @@ VITE_MAX_WRITES                  = 1000
 VITE_MIN_WRITE_INTERVAL          = 2000
 
 # stepper configuration
-VITE_MAX_STEPPER_ROWS            = 5000
+VITE_MAX_STEPS                   = 5000
 
 ```
 
@@ -253,8 +253,7 @@ means they are made available to the web application/experiment.
 - `VITE_RANDOM_SEED` initializes the pseudo-random number generator in
   <SmileText />
 - `VITE_AUTO_SAVE_DATA` configures if smile attempts to automatically save data
-  when pages in the [TimelineStepper](timeline.html#timelinestepper) are
-  advanced.
+  when pages/view in the [timeline](timeline.html) are advanced.
 - `VITE_MAX_WRITES` configures the maximum total number of writes that each
   experiment can perform to the Firestore database. Each write to the database
   document costs money so this can prevent runaway costs. It can be adjusted if
@@ -262,9 +261,9 @@ means they are made available to the web application/experiment.
 - `VITE_MIN_WRITE_INTERVAL` configured the minimum time in milliseconds that
   should pass between writes to the Firestore. This respects Firestore's limit
   of 1 write per document per second. It defaults to 2000ms.
-- `VITE_MAX_STEPPER_ROWS` configures the maximum number of rows that can be
-  displayed in the TimelineStepper component. This helps manage performance and
-  UI complexity when dealing with large numbers of steps in your experiment.
+- `VITE_MAX_STEPS` configures the maximum number of rows/steps that can be
+  contained in a View component. This helps manage performance and UI complexity
+  when dealing with large numbers of steps in your experiment.
 
 #### Web Services Options (`.env.local`)
 
