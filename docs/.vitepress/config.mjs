@@ -122,8 +122,11 @@ export default defineConfig({
           { text: 'Timeline and Design File', link: '/coding/timeline' },
           { text: 'Stepping Views', link: '/coding/steps' },
           { text: 'Autofill', link: '/coding/autofill' },
+
           { text: 'Randomization', link: '/coding/randomization' },
+          { text: 'Persistence', link: '/coding/persistence' },
           { text: 'Data storage', link: '/coding/datastorage' },
+
           //{ text: '💰 Computing bonuses', link: '/bonuses' },
           //{ text: '🆘 Dealing with Errors', link: '/problems' },
           //{ text: 'Automated Testing', link: '/coding/testing' },

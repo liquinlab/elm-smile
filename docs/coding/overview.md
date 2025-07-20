@@ -41,8 +41,8 @@ we discuss specific features of Vue.js components (e.g.,
 and [reactivity](/coding/components#declarative-rendering-and-reactivity)) that
 help make web development code more compact and error-free.
 
-==A large part of designing your own experiment will be implementing a custom
-component for your task, or borrowing from an existing one.==
+A large part of designing your own experiment will be implementing a custom
+component for your task, or borrowing from an existing one.
 
 ## Views
 
@@ -74,7 +74,7 @@ they appear. In addition the design is used to specify randomization across
 conditions, preloading of content, and other important features of your
 experiment.
 
-==You almost certainly will need to edit this file for your experiment.==
+You almost certainly will need to edit this file for your experiment.
 
 ## Stepping Views
 
@@ -107,6 +107,13 @@ Almost all experiments require some form of randomization. This could be
 randomizing participants to a condition or randomizing the order of trials.
 Smile provides several mechanisms for [randomizing](/coding/randomization) the
 order of the flow of experiments.
+
+## Persistence
+
+An important aspect of Smile is that is can be fully _peristent_, meaning that
+if the participant reloads the browser page (or closes it and comes back), they
+will pick up where they left off. This property has several important
+implications for development and debugging.
 
 ## Saving and Recording Data
 

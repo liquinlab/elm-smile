@@ -2,8 +2,8 @@
 
 Smile introduces a new way to build behavioral experiments which promotes
 modularity and reusability. Smile leverages the capabilities of existing open
-source libraries including Vite and Vue, while providing an **entirely new
-interface** for specifying and debugging interactive experiments.
+source libraries including Vite and Vue, while providing an entirely new
+interface for specifying and debugging interactive experiments.
 
 The first concept to introduce is the notion of a [View](/coding/views.md). A
 View is a self-contained bit of code that represents a single "phase" or part of
@@ -15,27 +15,18 @@ will describe how you define the sequence of Views in your experiment.
 
 Each View is minimally a Vue component (a special type of web development file)
 which can be written in whatever way you please. However, Smile provides a
-custom API for building Views. The key idea behind this API is the concept of
-'steps'. A [step](/coding/steps.md) is a sequenced event that occurs _within_ a
-view. For example, a View might have a step that presents a question to the
-participant, a step that collects a response, and a step that displays the
-results.
+custom API for building Views.
+
+The key idea behind this API is the concept of 'steps'. A
+[step](/coding/steps.md) is a sequenced event that occurs _within_ a view. For
+example, a View might have a step that presents a question to the participant, a
+step that collects a response, and a step that displays the results.
 
 <img src="/images/steps.png" width="600" alt="steps example" style="margin: auto;">
 
 A useful way to think about it is the Views are like slides in a presentation
 software like Powerpoint/Keynote and steps are like "builds" or "animations
 steps" that occur within a slide.
-
-A final key concept of Smile is the idea of _persistence_. Persistence refers to
-the fact that information about the application is preserved across page
-reloads. When you record data from your experiment in a database that is one
-kind of persistence. Another is when information about the current application
-survives across page reloads. It is fairly common for participants to reload
-their browser window, or to close a window and reopen it at another time. In
-most experiment frameworks, the task begins anew when a participant does this
-which can be problematic for certain research questions. Instead, Smile makes it
-easy to persist variables in a way that they will survive page reloads.
 
 ## Creating a simple Experiment View
 
@@ -233,12 +224,13 @@ api.onKeyDown(' ', () => {
 
 First we start the timer if it is not already started. You might wonder why we
 need to check if it is already started since the `<script setup>` section only
-runs once. The reason is that Smile _persists_ information across page reloads.
-This way if your participant reloads the page in their browser, Smile will
-detect the timer was already started and continue measuring time with respect to
-the first time it was started. Of course, if you don't want that more fancy
-behavior you can just call `api.startTimer()` without checking if it was already
-started, which will restart it to measure "from the last page load."
+runs once. The reason is that Smile [_persists_](/coding/persistence)
+information across page reloads. This way if your participant reloads the page
+in their browser, Smile will detect the timer was already started and continue
+measuring time with respect to the first time it was started. Of course, if you
+don't want that more fancy behavior you can just call `api.startTimer()` without
+checking if it was already started, which will restart it to measure "from the
+last page load."
 
 This example shows another aspect of Smile's API. We use `api.elapsedTime()` to
 measure the time it took the user to press the spacebar. Then we _write_ the
@@ -409,7 +401,7 @@ You'll notice that there are many other Views in the default timeline including
 which are commonly used in experiments. You can of course remove any of these,
 or edit them to your liking. Some are quite sophisticated and can save you a lot
 of time such as the `InstructionsQuiz` View which can be used to quickly build
-comprehension check quizzes.
+[comprehension check quizzes](/styling/forms).
 
 With this change there is a new sequence to the experiment
 

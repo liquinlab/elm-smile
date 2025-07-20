@@ -261,12 +261,12 @@ a easy to parse JSON structure.
 
 ## Automatic saving/persistance
 
-You can configure automatic saving whenever a page change happens using the
-TimelineStepper using `env/.env` using option `VITE_AUTO_SAVE_DATA`.
+You can configure automatic saving whenever a view/page change happens using
+using `env/.env` using option `VITE_AUTO_SAVE_DATA`.
 
 :::warning
 
-This only works if you use the `TimelineStepper` to move between pages. If you
+This only works if you use the `useViewAPI` to move between pages. If you
 advance to new pages on your own you need to call `api.saveData()` manually.
 
 :::
