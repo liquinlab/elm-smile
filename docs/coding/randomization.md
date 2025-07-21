@@ -24,9 +24,9 @@ trials/stimuli/conditions over and over again.
 Finally, seeding helps prevent randomization errors that can happen when a
 participant accidentally refreshes the page or leaves the page and comes back
 later. **Without** seeded random number generation, a View that randomly
-presents will likely present a different image when the page is refreshed.
-**With** participant-specific seeded random number generation, the View will
-always present the same image when re-visited by the same participant.
+presents an image will likely present a different image when the page is
+refreshed. **With** participant-specific seeded random number generation, the
+View will always present the same image when re-visited by the same participant.
 
 In <SmileText />, seeding happens automatically when the website is first
 launched, then again upon entry into each **View** (see
@@ -88,9 +88,7 @@ and `BA`).
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
-api.randomAssignCondition({
-  taskOrder: ['AB', 'BA'],
-})
+api.randomAssignCondition({ taskOrder: ['AB', 'BA'] })
 ```
 
 This function can also include weights. Say you want twice as many participants
@@ -100,10 +98,7 @@ in variation condition C compared to variation condition D:
 import useAPI from '@/core/composables/useAPI'
 const api = useAPI()
 
-api.randomAssignCondition({
-  variation: ['C', 'D'],
-  weights: [2, 1],
-})
+api.randomAssignCondition({ variation: ['C', 'D'], weights: [2, 1] })
 ```
 
 Note that the weights are automatically normalized, so [2/3, 1/3] or [4, 2]
@@ -270,8 +265,8 @@ set all local seeds throughout the experiment. When in dev mode (see
 [Developing](/coding/developing)), you can also override the seed ID. By doing
 so, you can recreate exactly what a participant saw when they completed the
 experiment (or what you yourself saw in a previous run of the experiment). To do
-so, in the dev toolbar randomization dropdown, replace the contents of the
-textbox with the seed ID you'd like to use. Then click the arrow button to the
+so, go to the "Random" tab in the dev console, then replace the contents of the
+seed textbox with the seed ID you'd like to use. Click "Update seed" to the
 right of the textbox. You will now be viewing the experiment using randomization
 with that seed.
 
@@ -279,14 +274,16 @@ with that seed.
 
 You can also remove seeded random number generation within a component (e.g., if
 you'd like to re-randomize the condition assignment without starting over the
-entire experiment). To do so, in the same dropdown shown above, switch off
-"Fixed Seed." Now, every time you refresh the page, everything in the View will
-be newly randomized.
+entire experiment). To do so, in the same menu shown above, switch off "Fixed
+Seed." Now, every time you refresh the page, everything in the View will be
+newly randomized.
 
-In the same dropdown, you can also override the assigned conditions, by clicking
-on the dropdown for each condition:
+In the same "Random" menu, you can also override the assigned conditions, by
+clicking on the dropdown for each condition:
 
 ![Nav bar condition override](/images/conditionoverride.png)
 
 This could be useful e.g. if you want to preview what different in-View
 randomization outputs might look like without re-starting the whole experiment.
+For example, if you click on a different instructionsVersion condition in the
+example shown above, the page will immediately reload to show the new condition.
