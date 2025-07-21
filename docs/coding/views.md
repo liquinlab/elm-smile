@@ -82,9 +82,9 @@ persistent store (Firestore) whenever you navigated between Views.
 
 ## Persisting data for the view
 
-The ViewAPI object provides a `.persist` object that can be used to persist data
-for the view. This data is stored in the browser's local storage and is
-available even after the page is reloaded.
+The ViewAPI object provides a `.persist` object that can be used to
+[persist](/coding/persistence) data for the view. This data is stored in the
+browser's local storage and is available even after the page is reloaded.
 
 ```js
 api.persist.myVar = 'value'
@@ -128,23 +128,19 @@ across browser reloads and view navigation:
 
 ```js
 // Start a timer when the view loads
-api.startTimer('taskTimer')
+api.startTimer()
 
 // Later, check elapsed time
-const seconds = api.elapsedTimeInSeconds('taskTimer')
+const seconds = api.elapsedTimeInSeconds()
 console.log(`Task has been running for ${seconds} seconds`)
 
 // Check if timer exists before starting
 // This starts a timer if it doesn't already
 // exit meaning it records from the first page load rather than the most recent
 // page load
-if (!api.isTimerStarted('responseTimer')) {
-  api.startTimer('responseTimer')
+if (!api.isTimerStarted()) {
+  api.startTimer()
 }
-
-// Multiple timers can run simultaneously
-api.startTimer('overallTimer')
-api.startTimer('currentTrialTimer')
 ```
 
 ### Timer Names
@@ -172,10 +168,10 @@ long-running measurements.
 
 In addition to the ViewAPI, Smile provides a number of tools for designing and
 styling Views. These are described in the [styling](/styling/styleoverview)
-section. The most important of these is the [UIKit](/styling/uikit) and
-[layouts](/styling/layouts) which provide a library of components that can be
-used to design and style your Views. This can save you a lot of time when
-developing tasks and help improve the consistency of the design.
+section. The most important of these is the basic UI
+[components](/styling/uikit) and [layouts](/styling/layouts) which can be used
+to design and style your Views. This can save you a lot of time when developing
+tasks and help improve the consistency of the design.
 
 ## Built-in Views
 
@@ -191,7 +187,7 @@ your experiment.
 Each View can be configured with a set of
 [props](https://vuejs.org/guide/components/props) (basically input parameters)
 that control the behavior of the View. These props will be configured in the
-`@/user/design.js`. Examples on all of the props will be shown in the below
+`@/user/design.js`. Examples of all of the props will be shown in the below
 examples.
 
 ### Metadata options

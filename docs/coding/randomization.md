@@ -8,9 +8,9 @@ This page shows how to accomplish each of the above tasks.
 
 ## Seeded random number generation
 
-<SmileText /> uses <b>seeded</b> random number generation. Setting a seed makes
-random number generation reproducible. That is, two random number generators set
-with the same seed will produce the same sequence of random numbers.
+Smile uses <b>seeded</b> random number generation. Setting a seed makes random
+number generation reproducible. That is, two random number generators set with
+the same seed will produce the same sequence of random numbers.
 
 In the context of an experiment, if we know the seed used to assign a particular
 participant to conditions, stimuli, trial orders, etc., we can completely

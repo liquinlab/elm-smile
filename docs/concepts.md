@@ -254,7 +254,7 @@ database, persist data across page loads, and provides convenient ways to record
 data typically needed in behavioral experiments.**
 
 It gets much more fancy and powerful from there. For example
-[here](https://github.com/NYUCCL/smile/blob/main/src/user/components/stroop_exp/StroopView.vue)
+[here](https://github.com/NYUCCL/smile/blob/main/src/user/components/stroop_exp/StroopExpView.vue)
 is a more complex example of a Stroop experiment which uses hierarchically
 nested steps, randomization, and more. We provide complete documentation of
 [steps](/coding/steps) and the [API](/api).
