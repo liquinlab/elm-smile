@@ -15,6 +15,6 @@ during development and during "live" data collection.
 The first is that if you reload the webpage in live or developer mode it will
 tend to return to the same state as when it was left off.
 
-If you want to "reset" the state of the app complete (removing all persistence)
-then press the lightening bolt icon (<i-f7-bolt-fill class="inline vp-raw" />)
-in the developer tools.
+If you want to "reset" the state of the app completely (removing all
+persistence) then press the lightening bolt icon
+(<i-f7-bolt-fill class="inline vp-raw" />) in the developer tools.

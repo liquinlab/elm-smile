@@ -292,6 +292,6 @@ Now that you understand the basics of Tailwind CSS, you can explore the
 A very helpful resource is the
 [Tailwind CSS Cheat Sheet](https://nerdcave.com/tailwind-cheat-sheet).
 
-In addition it can be helpfuyl to install the
+In addition it can be helpful to install the
 [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)
 extension for VSCode. This will help you autocomplete Tailwind classes.

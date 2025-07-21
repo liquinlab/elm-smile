@@ -10,8 +10,8 @@ experiments.
 When learning about <SmileText/> and later developing/debugging your experiment,
 it is useful to interact with Smile using a web server running on your local
 computer (i.e., your laptop or desktop). <SmileText/> provides a special local
-developer mode that adds some interface elements to the page that help you debug
-and test your experiment. You can learn more about developer mode
+developer mode, which adds some interface elements to the page that help you
+debug and test your experiment. You can learn more about developer mode
 [here](/coding/developing). But the TL;DR is
 
 ```
@@ -24,8 +24,8 @@ in the project folder to get started.
 
 Every experiment is different and requires different configurations options for
 things like the database credentials, etc... In <SmileText/>, configs are set
-using `.env` files. Some of these are automatically generated, some are pass
-from the [base repo](/labconfig) to child repos, and some need to be customize
+using `.env` files. Some of these are automatically generated, some are passed
+from the [base repo](/labconfig) to child repos, and some need to be customized
 for each experiment. [This section](/coding/configuration) of the documentation
 explains all the configuration settings avaialble.
 
@@ -106,7 +106,7 @@ data analysis scripts.
 Almost all experiments require some form of randomization. This could be
 randomizing participants to a condition or randomizing the order of trials.
 Smile provides several mechanisms for [randomizing](/coding/randomization) the
-order of the flow of experiments.
+flow of experiments.
 
 ## Persistence
 
