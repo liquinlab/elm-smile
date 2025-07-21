@@ -1,6 +1,13 @@
-# Smile 🫠
+<p align="center">
+<a href="https://sli.dev" target="_blank">
+<img src="https://smile.gureckislab.org/images/smile.svg" alt="smile" height="150" />
+</a>
 
-_A head-meltingly happy approach to online behavioral research._
+<p align="center">
+<i>A  happy approach to online behavioral research.</i>
+</p>
+
+<br />
 
 The Smile project is new way to develop rich and interactive online experiments. Smile prioritizes modularity and reusability. Unlike tools that cater to non-programmers, Smile is designed to help reasonably competent programmers accomplish more in less time.
 
