@@ -89,7 +89,7 @@ const togglePin = () => {
               <i-meteor-icons-angles-left />
             </ButtonGroupItem>
           </TooltipTrigger>
-          <TooltipContent side="bottom"> Previous View (Down Arrow)</TooltipContent>
+          <TooltipContent side="bottom"> Previous View (Up Arrow)</TooltipContent>
         </Tooltip>
       </template>
       <template v-else>
@@ -106,7 +106,7 @@ const togglePin = () => {
               <i-meteor-icons-angles-right />
             </ButtonGroupItem>
           </TooltipTrigger>
-          <TooltipContent side="bottom"> Next View (Up Arrow)</TooltipContent>
+          <TooltipContent side="bottom"> Next View (Down Arrow)</TooltipContent>
         </Tooltip>
       </template>
       <template v-else>
