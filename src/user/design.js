@@ -31,8 +31,8 @@ import WindowSizerView from '@/builtins/windowSizer/WindowSizerView.vue'
 
 // 2. Import user View components
 import ExpView from '@/builtins/demoTasks/ExpView.vue'
-import Task1View from '@/builtins/demoTasks/Task1View.vue'
-import Task2View from '@/builtins/demoTasks/Task2View.vue'
+import FavoriteNumber from '@/builtins/demoTasks/FavoriteNumber.vue'
+import FavoriteColor from '@/builtins/demoTasks/FavoriteColor.vue'
 import StroopExpView from '@/user/components/stroop_exp/StroopExpView.vue'
 
 // #3. Import smile API and timeline
@@ -77,13 +77,10 @@ api.setAppComponent('informed_consent_text', InformedConsentText)
 // where the key is the condition name and the value is an array of possible condition values.
 // Each unique condition manipulation should be assigned via a separate call to setConditions.
 
-api.randomAssignCondition({
-  taskOrder: ['AB', 'BA'],
-})
-
-api.randomAssignCondition({
-  variation: ['alpha', 'beta'],
-})
+// EXAMPLE: set a between-subjects condition called taskOrder (AB or BA)
+// api.randomAssignCondition({
+//   taskOrder: ['AB', 'BA'],
+// })
 
 // you can also optionally set randomization weights for each condition. For
 // example, if you want twice as many participants to be assigned to instructions
@@ -213,18 +210,18 @@ timeline.pushSeqView({
 
 // routes must be initially registered, to tell the timeline they exist
 timeline.registerView({
-  name: 'task1',
-  component: Task1View,
+  name: 'number',
+  component: FavoriteNumber,
 })
 
 timeline.registerView({
-  name: 'task2',
-  component: Task2View,
+  name: 'color',
+  component: FavoriteColor,
 })
 
 timeline.pushRandomizedNode({
   name: 'RandomSplit',
-  options: [['task1'], ['task2']],
+  options: [['number'], ['color']],
 })
 
 // stroop exp

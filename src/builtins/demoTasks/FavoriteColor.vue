@@ -1,6 +1,6 @@
 <script setup>
 /**
- * @description Task 1 view component for collecting trial count input
+ * @description Task 1 view component for collecting favorite color
  * @author Smile UI
  */
 
@@ -16,10 +16,10 @@ import { ConstrainedTaskWindow } from '@/uikit/layouts'
 const api = useViewAPI()
 
 /**
- * @description Reactive reference for number of trials
+ * @description Reactive reference for favorite color
  * @type {import('vue').Ref<string>}
  */
-const ntrials = ref('1')
+const faveColor = ref('')
 
 /**
  * @description Advances to the next view in the experiment flow
@@ -27,6 +27,10 @@ const ntrials = ref('1')
  */
 function finish() {
   // do stuff if you want
+  // for example, save the data
+  api.recordProperty('favoriteColor', faveColor.value)
+
+  // then go to the next view
   api.goNextView()
 }
 </script>
@@ -43,9 +47,9 @@ function finish() {
       <div class="w-1/4 mx-auto mb-10 pb-52 text-left">
         <!-- Trial count input form -->
         <div class="space-y-2">
-          <label for="ntrials" class="text-sm font-medium">Number of trials</label>
-          <Input id="ntrials" v-model="ntrials" placeholder="Enter number of trials" type="number" />
-          <p class="text-sm text-muted-foreground">How many trials do you want to do?</p>
+          <label for="faveColor" class="text-sm font-medium">Favorite color</label>
+          <Input id="faveColor" v-model="faveColor" placeholder="Enter favorite color" type="string" />
+          <p class="text-sm text-muted-foreground">What is your favorite color?</p>
         </div>
 
         <!-- Navigation controls -->
