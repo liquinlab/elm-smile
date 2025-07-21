@@ -50,4 +50,8 @@ will be based on the Github contributions list (i.e., contributions to the docs
 or code that hits the main branch, or noteworthy helpful interactions on Github
 discussions). The author list is open to anyone who contributes substantially.
 
+_Initial project development was supported by National Science Foundation Grant
+[BCS-2121102](https://www.nsf.gov/awardsearch/showAward?AWD_ID=2121102&HistoricalAwards=false)
+to TM Gureckis._
+
 :::

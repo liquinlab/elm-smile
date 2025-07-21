@@ -46,3 +46,5 @@ Online docs: [https://smile.gureckislab.org](https://smile.gureckislab.org)
   GitHub Actions.
 - Data provenance features include an audit trail
   of which version of the code was used to create each data file.
+
+_Initial development was supported by National Science Foundation Grant [BCS-2121102](https://www.nsf.gov/awardsearch/showAward?AWD_ID=2121102&HistoricalAwards=false) to TM Gureckis._
