@@ -244,9 +244,31 @@ class Timeline {
 
     // Use this.api.store instead of smilestore
     let randomOption = this.api.store.getRandomizedRouteByName(newroute.name)
+    let currentRouteOptions = newroute.options
+    let needsNewOption = false
+
+    // is there already a selected option?
     if (randomOption != null) {
-      this.api.log.debug(`Randomized node ${newroute.name} already assigned option ${randomOption}`)
+      // is the currently selected option actually one of the available options, as currently defined in the design file?
+      const isContained = currentRouteOptions.some(
+        (option) => option.length === randomOption.length && option.every((val, i) => val === randomOption[i])
+      )
+      if (isContained) {
+        //if yes,
+        this.api.log.debug(`Randomized node ${newroute.name} already assigned option ${randomOption}`) //we can stick with the existing one
+      } else {
+        // otherwise, we need to select a new random option
+        needsNewOption = true
+        randomOption = this.api.sampleWithReplacement(options, 1, weights)[0]
+        this.api.log.debug(`Randomized node ${newroute.name} selected option ${randomOption}`)
+        this.api.store.setRandomizedRoute(newroute.name, randomOption)
+      }
     } else {
+      // also select new if there's no current option
+      needsNewOption = true
+    }
+
+    if (needsNewOption) {
       randomOption = this.api.sampleWithReplacement(options, 1, weights)[0]
       this.api.log.debug(`Randomized node ${newroute.name} selected option ${randomOption}`)
       this.api.store.setRandomizedRoute(newroute.name, randomOption)
