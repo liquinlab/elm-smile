@@ -41,14 +41,20 @@ function finish() {
     <!-- Task content area -->
     <div class="w-[80%] h-[80%]">
       <!-- Task title -->
-      <h1 class="text-2xl font-bold mb-4">Task 1</h1>
+      <h1 class="text-2xl font-bold mb-4">Task 2: What is your favorite number?</h1>
 
       <!-- Form input section -->
-      <div class="w-1/4 mx-auto mb-10 pb-52 text-left">
+      <div class="w-1/2 mx-auto mb-10 pb-52 text-left">
         <!-- Trial count input form -->
         <div class="space-y-2">
           <label for="faveNumber" class="text-sm font-medium">Favorite number</label>
-          <Input id="faveNumber" v-model="faveNumber" placeholder="Enter favorite number" type="number" />
+          <Input
+            id="faveNumber"
+            v-model="faveNumber"
+            placeholder="Enter favorite number"
+            type="number"
+            class="bg-background text-foreground"
+          />
           <p class="text-sm text-muted-foreground">What is your favorite number?</p>
         </div>
 
