@@ -181,13 +181,9 @@ export class Stepper extends StepState {
     const itemsToAdd = Array.isArray(items) ? items : [items]
 
     // Check if adding these items would exceed maxSteps
-    if (this._states.length + itemsToAdd.length > config.maxStepperRows) {
-      this._log.error(
-        `Cannot append ${itemsToAdd.length} rows as it exceeds the safety limit of ${config.maxStepperRows}`
-      )
-      throw new Error(
-        `Cannot append ${itemsToAdd.length} rows as it exceeds the safety limit of ${config.maxStepperRows}`
-      )
+    if (this._states.length + itemsToAdd.length > config.maxSteps) {
+      this._log.error(`Cannot append ${itemsToAdd.length} rows as it exceeds the safety limit of ${config.maxSteps}`)
+      throw new Error(`Cannot append ${itemsToAdd.length} rows as it exceeds the safety limit of ${config.maxSteps}`)
     }
 
     // Try to add each item individually
@@ -233,9 +229,9 @@ export class Stepper extends StepState {
     const totalCombinations = processedColumns.reduce((total, [_, arr]) => total * arr.length, 1)
 
     // Check if adding these combinations would exceed maxSteps
-    if (this._states.length + totalCombinations > config.maxStepperRows) {
+    if (this._states.length + totalCombinations > config.maxSteps) {
       throw new Error(
-        `Cannot create ${totalCombinations} combinations: would exceed maximum of ${config.maxStepperRows} rows`
+        `Cannot create ${totalCombinations} combinations: would exceed maximum of ${config.maxSteps} rows`
       )
     }
 
@@ -314,8 +310,8 @@ export class Stepper extends StepState {
     const maxLength = Math.max(...processedColumns.map(([_, arr]) => arr.length))
 
     // Check if adding these combinations would exceed maxSteps
-    if (this._states.length + maxLength > config.maxStepperRows) {
-      throw new Error(`Cannot create ${maxLength} combinations: would exceed maximum of ${config.maxStepperRows} rows`)
+    if (this._states.length + maxLength > config.maxSteps) {
+      throw new Error(`Cannot create ${maxLength} combinations: would exceed maximum of ${config.maxSteps} rows`)
     }
 
     // Check if any column has a different length
