@@ -7,6 +7,12 @@
 <i>A  happy approach to online behavioral research.</i>
 </p>
 
+<p align="center">
+<a href="https://github.com/nyuccl/smile/releases" alt="GitHub release"><img src="https://img.shields.io/github/v/release/nyuccl/smile"></a>
+<a href="https://github.com/nyuccl/smile/actions" alt="Build Status"><img src="https://github.com/nyuccl/smile/actions/workflows/deploy.yml/badge.svg"></a>
+<a href="https://github.com/nyuccl/smile/actions" alt="Doc Build Status"><img src="https://github.com/nyuccl/smile/actions/workflows/docs-deploy.yml/badge.svg"></a>
+</p>
+
 <br />
 
 The Smile project is new way to develop rich and interactive online experiments. Smile prioritizes modularity and reusability. Unlike tools that cater to non-programmers, Smile is designed to help reasonably competent programmers accomplish more in less time.

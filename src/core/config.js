@@ -40,7 +40,7 @@ function parseWidthHeight(value) {
  * @property {boolean} autoSave - Whether to auto-save data
  * @property {number} maxWrites - Maximum number of writes allowed
  * @property {number} minWriteInterval - Minimum interval between writes
- * @property {number}maxSteps - Maximum rows in stepper tables
+ * @property {number} maxSteps - Maximum rows in stepper tables
  * @property {string} randomSeed - Seed for random number generation
  * @property {string} deployURL - URL where app is deployed
  * @property {string} labURL - URL of the lab website

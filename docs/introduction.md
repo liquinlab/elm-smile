@@ -2,7 +2,7 @@
 outline: none
 ---
 
-# Welcome to Smile!
+<img src="/images/smile.svg" width="300">
 
 The Smile project is new way to develop rich and interactive online experiments.
 Smile prioritizes modularity and reusability. Unlike tools that cater to

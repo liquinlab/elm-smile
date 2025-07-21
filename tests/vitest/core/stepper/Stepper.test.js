@@ -286,7 +286,7 @@ describe('Stepper test', () => {
     })
 
     it('should throw error when appending would exceed safety limit', () => {
-      const maxRows = Number(config.maxStepperRows)
+      const maxRows = Number(config.maxSteps)
       const items = Array(maxRows + 1).fill({ color: 'red', shape: 'circle' })
       expect(() => {
         stepper.append(items)
@@ -338,7 +338,7 @@ describe('Stepper test', () => {
     })
 
     it('should throw error when outer would exceed safety limit', () => {
-      const maxRows = Number(config.maxStepperRows)
+      const maxRows = Number(config.maxSteps)
       // Create arrays that would generate more combinations than maxSteps
       const trials = {
         x: Array(100).fill('x'),
@@ -865,7 +865,7 @@ describe('Stepper test', () => {
     })
 
     it('should throw error when zip would exceed safety limit', () => {
-      const maxRows = Number(config.maxStepperRows)
+      const maxRows = Number(config.maxSteps)
 
       // Create arrays that would exceed the limit when zipped
       const trials = {
