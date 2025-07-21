@@ -45,7 +45,7 @@ Need help? Go [here](/help).
 
 ::: info Find this useful in your work? We have a plan to help you cite it!
 
-We will eventually issue a preferred citation for the project on Aug 1, 2026. It
+We will eventually issue a preferred citation for the project on May 1, 2026. It
 will be based on the Github contributions list (i.e., contributions to the docs
 or code that hits the main branch, or noteworthy helpful interactions on Github
 discussions). The author list is open to anyone who contributes substantially.
