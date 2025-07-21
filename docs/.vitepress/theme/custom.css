@@ -591,7 +591,7 @@ mark {
 }
 
 :root {
-  --vp-home-hero-image-background-image: url('/images/smiletown.svg');
+  --vp-home-hero-image-background-image: url('/images/smiletown.png');
   --vp-home-hero-image-filter: blur(0px);
 }
 
