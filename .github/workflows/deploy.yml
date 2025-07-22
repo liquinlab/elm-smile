@@ -194,8 +194,9 @@ jobs:
           host: ${{ secrets.EXP_DEPLOY_HOST }}
           username: ${{ secrets.EXP_DEPLOY_USER }}
           key: ${{ secrets.EXP_DEPLOY_KEY  }}
+          passphrase: ${{ secrets.EXP_DEPLOY_PASSPHRASE }}
           port: ${{ secrets.EXP_DEPLOY_PORT }}
-          script: mkdir -p ${{ secrets.EXP_DEPLOY_PATH }}/${{ steps.dotenv_github.outputs.VITE_DEPLOY_BASE_PATH }}; mkdir -p ${{ secrets.EXP_DEPLOY_PATH }}/e; mkdir -p ${{ secrets.EXP_DEPLOY_PATH }}/hashes
+          script: mkdir -p ${{ secrets.EXP_DEPLOY_PATH }}/${{ steps.dotenv_github.outputs.VITE_GIT_OWNER }}/${{ steps.dotenv_github.outputs.VITE_GIT_REPO_NAME }}/${{ steps.dotenv_github.outputs.VITE_GIT_BRANCH_NAME }} mkdir -p ${{ secrets.EXP_DEPLOY_PATH }}/e; mkdir -p ${{ secrets.EXP_DEPLOY_PATH }}/hashes;
 
       # link to code name path
       - name: link to the code name path
@@ -204,8 +205,9 @@ jobs:
           host: ${{ secrets.EXP_DEPLOY_HOST }}
           username: ${{ secrets.EXP_DEPLOY_USER }}
           key: ${{ secrets.EXP_DEPLOY_KEY  }}
+          passphrase: ${{ secrets.EXP_DEPLOY_PASSPHRASE }}
           port: ${{ secrets.EXP_DEPLOY_PORT }}
-          script: rm ${{ secrets.EXP_DEPLOY_PATH }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }}; ln -sf ${{ secrets.EXP_DEPLOY_PATH }}/${{ steps.dotenv_github.outputs.VITE_DEPLOY_BASE_PATH }} ${{ secrets.EXP_DEPLOY_PATH }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }}
+          script: rm ${{ secrets.EXP_DEPLOY_PATH }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }}; ln -sf ../${{ steps.dotenv_github.outputs.VITE_GIT_OWNER }}/${{ steps.dotenv_github.outputs.VITE_GIT_REPO_NAME }}/${{ steps.dotenv_github.outputs.VITE_GIT_BRANCH_NAME }} ${{ secrets.EXP_DEPLOY_PATH }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }}
 
       # Deploy files to web server
       - name: rsync to server
@@ -213,11 +215,12 @@ jobs:
         with:
           switches: -avrz --delete
           path: dist/
-          remote_path: ${{ secrets.EXP_DEPLOY_PATH }}/${{ steps.dotenv_github.outputs.VITE_DEPLOY_BASE_PATH }} # this should be configured with branch name and versioning
+          remote_path: ${{ secrets.EXP_DEPLOY_PATH }}/${{ steps.dotenv_github.outputs.VITE_GIT_OWNER }}/${{ steps.dotenv_github.outputs.VITE_GIT_REPO_NAME }}/${{ steps.dotenv_github.outputs.VITE_GIT_BRANCH_NAME }} # this should be configured with branch name and versioning
           remote_host: ${{ secrets.EXP_DEPLOY_HOST }}
           remote_port: ${{ secrets.EXP_DEPLOY_PORT }}
           remote_user: ${{ secrets.EXP_DEPLOY_USER }}
           remote_key: ${{ secrets.EXP_DEPLOY_KEY  }}
+          remote_key_pass: ${{ secrets.EXP_DEPLOY_PASSPHRASE }}
 
       # send a notification at the end
       - name: Send notification to lab slack
