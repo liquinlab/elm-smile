@@ -59,6 +59,7 @@ function parseWidthHeight(value) {
  */
 export default {
   mode: import.meta.env.MODE,
+  smileVersion: import.meta.env.VITE_SMILE_VERSION,
   projectName: import.meta.env.VITE_PROJECT_NAME, // autocompute this on intitialization
   projectRef: import.meta.env.VITE_DEPLOY_BASE_PATH.slice(1, -1).replace(/\//g, '-'),
   codeName: import.meta.env.VITE_CODE_NAME,

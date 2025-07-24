@@ -14,10 +14,15 @@ import Icons from 'unplugin-icons/vite'
 import Components from 'unplugin-vue-components/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import { fileURLToPath } from 'node:url'
+import { readFileSync } from 'fs'
 // Execute git environment generation script
 execSync('sh scripts/generate_git_env.sh', { stdio: 'inherit' })
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+// Read package.json to get version
+const packageJson = JSON.parse(readFileSync(path.resolve(__dirname, 'package.json'), 'utf8'))
+
 // https://vitejs.dev/config/
 export default ({ mode }) => {
   process.env = {
@@ -87,6 +92,7 @@ export default ({ mode }) => {
     },
     define: {
       __BUILD_TIME__: JSON.stringify(new Date().toLocaleDateString()),
+      'import.meta.env.VITE_SMILE_VERSION': JSON.stringify(packageJson.version),
     },
   })
 }
