@@ -1,21 +1,15 @@
 name: test
 
 on:
-  push:
-    branches-ignore:
-      - docs
-      - analysis
-      - models
-    paths-ignore: # ignore any changes to the docs for this workflow or unimportant files
-      - 'docs/**'
-      - '.github/workflows/docs-deploy.yml'
-      - 'LICENSE'
-      - '**/*.md'
-  pull_request: [main]
+  workflow_run:
+    workflows: ['autofix.ci']
+    types:
+      - completed
   workflow_dispatch:
 
 jobs:
   test:
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
 
     env:

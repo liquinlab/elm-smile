@@ -4,15 +4,10 @@ name: docs-deploy
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches:
-      - main
-    paths:
-      - 'docs/**'
-      - '.github/workflows/docs-deploy.yml'
-
-  # Allows you to run this workflow manually from the Actions tab
+  workflow_run:
+    workflows: ['test']
+    types:
+      - completed
   workflow_dispatch:
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
@@ -25,6 +20,7 @@ concurrency:
 jobs:
   # This workflow contains a single job called "deploy"
   docs-deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
