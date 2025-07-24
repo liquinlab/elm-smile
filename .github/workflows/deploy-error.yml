@@ -1,4 +1,4 @@
-name: DEPLOY_ERROR_NOTIFY
+name: deploy-error
 
 on:
   workflow_run:

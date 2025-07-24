@@ -1,6 +1,6 @@
 # This is a basic workflow to deploy your smile experiment
 
-name: Build Smile
+name: deploy
 
 on:
   workflow_dispatch:
@@ -25,7 +25,7 @@ on:
     paths-ignore: # ignore any changes to the docs for this workflow or unimportant files
       - 'docs/**'
       - '.github/workflows/docs-deploy.yml'
-      - 'README.md'
+      - '**/*.md'
       - 'LICENSE'
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
