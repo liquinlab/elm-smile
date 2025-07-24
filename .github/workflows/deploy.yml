@@ -15,9 +15,6 @@ on:
         type: string
   push:
     branches-ignore:
-      - analysis # want this to be all branches eventually
-      - models
-      - docs
       - 'feat-*'
       - 'fix-*'
       - 'refactor-*'
