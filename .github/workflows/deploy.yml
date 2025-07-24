@@ -15,6 +15,13 @@ on:
       - models
       - docs
       - 'feat-*'
+      - 'fix-*'
+      - 'refactor-*'
+      - 'test-*'
+      - 'chore-*'
+      - 'style-*'
+      - 'docs-*'
+      - 'ci-*'
     paths-ignore: # ignore any changes to the docs for this workflow or unimportant files
       - 'docs/**'
       - '.github/workflows/docs-deploy.yml'
