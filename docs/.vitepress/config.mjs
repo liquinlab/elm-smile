@@ -97,6 +97,10 @@ export default defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/NYUCCL/smile' },
       { icon: 'twitter', link: 'https://twitter.com/todd_gureckis' },
+      {
+        icon: 'youtube',
+        link: 'https://youtube.com/playlist?list=PLZmnZklqQaZxiGff7pq9dDU4ifoHcVL9w&si=EgbHNiw7K5gD2Ipx',
+      },
     ],
     sidebar: [
       {
