@@ -1,5 +1,5 @@
 <p align="center">
-<a href="https://sli.dev" target="_blank">
+<a href="https://smile.gureckislab.org/" target="_blank">
 <img src="https://smile.gureckislab.org/images/smile.svg" alt="smile" height="150" />
 </a>
 
