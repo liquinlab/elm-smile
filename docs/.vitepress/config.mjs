@@ -146,7 +146,7 @@ export default defineConfig({
           { text: 'Layouts', link: '/styling/layouts' },
           { text: 'UI Components', link: '/styling/uikit' },
           { text: 'Icons', link: '/styling/icons' },
-          { text: 'Forms and Quizes', link: '/styling/forms' },
+          { text: 'Forms and Quizzes', link: '/styling/forms' },
           { text: 'Images and Videos', link: '/styling/imagesvideo.md' },
           //{ text: 'Animations', link: '/styling/animations' },
         ],
