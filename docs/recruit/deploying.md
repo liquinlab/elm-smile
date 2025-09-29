@@ -191,13 +191,12 @@ First, check the `#smile-deploy` slack channel and see if there are any relevant
 messages.
 
 Second, make sure you have a set of `.env.*.local` files in the `env/` folder
-(created using `git secret reveal`) and have run the `npm run upload_config`
-command (refer back to the [initial setup instructions](/starting)). This latter
-command uploads some specific configuration options to GitHub which are needed
-for your deployment to run. You can verify these have been set by going to your
-repository on the GitHub website, clicking Settings, then "Secrets". There
-should be several repository secrets including `SECRET_APP_CONFIG` and
-`EXP_DEPLOY_PATH`, etc...
+and have run the `npm run upload_config` command (refer back to the
+[initial setup instructions](/starting)). This latter command uploads some
+specific configuration options to GitHub which are needed for your deployment to
+run. You can verify these have been set by going to your repository on the
+GitHub website, clicking Settings, then "Secrets". There should be several
+repository secrets including `SECRET_APP_CONFIG` and `EXP_DEPLOY_PATH`, etc...
 
 Third, run the `npm run build` and `npm run preview` commands and verify that
 these steps are completed without error on your local machine. If there are

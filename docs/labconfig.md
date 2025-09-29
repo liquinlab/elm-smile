@@ -376,7 +376,7 @@ you need to distribute those files out to people working in your lab. To do
 that, we recommend you store them in a safe place accessible only by members of
 your lab, such as a file server or Slack channel.
 
-## Configure your git secrets on GitHub
+## Configure your secrets on GitHub
 
 To configure the GitHub repo correctly:
 

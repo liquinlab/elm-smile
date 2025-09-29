@@ -184,8 +184,8 @@ npm run upload_config
 to configure your deployment process, remove some files you do not need, and
 create an initial deployment/commit. The `npm run upload_config` command only
 needs to be run once in your project the first time you create it. If you are
-collaborating with someone on an existing project, you only need to run
-`git secret reveal`.
+collaborating with someone on an existing project, you only need to do this
+once.
 
 ::: info Error handling
 

@@ -37,26 +37,9 @@ ANOTHER_OPTION    = 33
 MY_CONFIG         = '${MY_CONFIG_OPTION}1234'
 ```
 
-If you have set up a [base repo](/labconfig) it will contain encrypted versions
-of your lab's configuration files. As described in the
-[starting a new project](/starting) guide, you will want to simply decrypt the
-files provided in the repository.
-
-::: danger Warning!
-
-This will only work if you have signed and encrypted your lab's configurations.
-See instructions [here](/adduser).
-
-:::
-
-To do this simply type:
-
-```
-git secret reveal
-```
-
-this should create several `.env.*.local` files in your `env/` directory (the
-`*` means anything fills in there).
+As described in the [starting a new project](/starting) guide, you will want to
+add the env files to your project from your lab. You either will have created
+them yourself or you will have received them from your lab.
 
 After all the necessary files are in the `env` folder run:
 
