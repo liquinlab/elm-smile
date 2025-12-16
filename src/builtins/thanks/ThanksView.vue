@@ -4,77 +4,93 @@
  *
  * Displays completion/thanks page with different layouts based on recruitment service.
  * Handles completion code generation and clipboard functionality for various platforms.
+ * Shows an upload progress animation before displaying the final thanks message.
  */
 
 // External library imports
 import Clipboard from 'clipboard'
-import sha256 from 'crypto-js/sha256'
-import Base64url from 'crypto-js/enc-base64'
-import stringify from 'json-stable-stringify'
 
 // Vue imports
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 
 // Internal imports
 import useAPI from '@/core/composables/useAPI'
 import appconfig from '@/core/config'
 import { Button } from '@/uikit/components/ui/button'
 import { Input } from '@/uikit/components/ui/input'
+import { Progress } from '@/uikit/components/ui/progress'
 import { TitleTwoCol } from '@/uikit/layouts'
 
 /**
- * Initialize API and force data save
+ * Upload progress state
  */
-const api = useAPI()
-api.saveData(true) // force a data save
+const isUploading = ref(true)
+const uploadProgress = ref(0)
 
 /**
- * Computes a unique completion code based on study data
- *
- * Creates a hash of the study data and appends status indicators.
- * Used for participant verification across different recruitment platforms.
- *
- * @returns {string} A unique completion code with status suffix
+ * Initialize API
  */
-function computeCompletionCode() {
-  // stringify the data for consistent hashing
-  const data = stringify(api.data)
-  const hashDigest = Base64url.stringify(sha256(data))
-
-  const codes = {
-    withdrew: 'xx',
-    completed: 'oo',
-  }
-  let end_code = ''
-  if (api.store.browserPersisted.withdrawn) {
-    end_code = codes['withdrew']
-  } else if (api.store.browserPersisted.done) {
-    end_code = codes['completed']
-  }
-  return hashDigest.slice(0, 20) + end_code // only use first 20 characters, may need to update to shortest possible code
-}
+const api = useAPI()
 
 /**
  * Generate completion code and set it in the API
  */
-const completionCode = computeCompletionCode()
+const completionCode = api.computeCompletionCode()
 api.setCompletionCode(completionCode)
 
 /**
- * Initialize clipboard functionality for copying completion codes
+ * Initialize clipboard functionality and run upload animation
  * Sets up clipboard.js to handle copy-to-clipboard actions
+ * Animates the progress bar over 15 seconds before showing thanks content
  */
 onMounted(() => {
+  // Set up clipboard functionality
   const clipboard = new Clipboard('[data-clipboard-target]')
   clipboard.on('success', (e) => {
     api.log.debug(`code copied to clipboard ${e.trigger.id}`)
   })
+
+  // Delay saveData by 4 seconds to avoid minWriteInterval rate limit
+  setTimeout(() => {
+    api.saveData(true) // force a data save
+  }, 4000)
+
+  // Animate progress bar from 0 to 100 over 20 seconds
+  const duration = 20000 // 20 seconds
+  const startTime = Date.now()
+
+  const updateProgress = () => {
+    const elapsed = Date.now() - startTime
+    const progress = Math.min(elapsed / duration, 1)
+    // Ease-out curve: 1 - (1 - t)^2
+    const eased = 1 - Math.pow(1 - progress, 2)
+    uploadProgress.value = Math.round(eased * 100)
+
+    if (progress < 1) {
+      requestAnimationFrame(updateProgress)
+    } else {
+      // Hide upload screen and show thanks content
+      isUploading.value = false
+    }
+  }
+
+  requestAnimationFrame(updateProgress)
 })
 </script>
 
 <template>
+  <!-- Upload progress screen -->
+  <div v-if="isUploading" class="w-full h-screen flex flex-col items-center mt-30">
+    <div class="w-4/5 max-w-md text-center">
+      <h1 class="text-3xl font-bold mb-4">Uploading Your Data</h1>
+      <p class="text-lg text-muted-foreground mb-8">Do not close your browser window yet!</p>
+      <Progress :model-value="uploadProgress" class="h-3 mb-4" />
+      <p class="text-sm text-muted-foreground">{{ uploadProgress }}%</p>
+    </div>
+  </div>
+
   <!-- Main container with responsive padding and centering -->
-  <div class="w-full mx-auto py-10">
+  <div v-else class="w-full mx-auto py-10">
     <div class="w-4/5 mx-auto text-left">
       <!-- Prolific recruitment service completion -->
       <div v-if="api.getRecruitmentService() == 'prolific'">

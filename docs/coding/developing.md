@@ -1,22 +1,22 @@
 # Developing your experiments
 
-When developing and debugging your experiment it is useful to interact with a
+When developing and debugging your experiment, it is useful to interact with a
 web server running on your local computer (i.e., your laptop or desktop). This
-is much faster than waiting for the changes to be uploaded to the cloud and then
-having your browser download the files again.
+is much faster than waiting for changes to upload to the cloud and then having
+your browser download the files again.
 
-In <SmileText/> this is all handled by [Vite](https://vitejs.dev). Vite is a
+In <SmileText/>, this is all handled by [Vite](https://vitejs.dev). Vite is a
 development tool that is heavily optimized for developer experience (DX). There
-is a lot to say about the features of Vite but more directly to test your
-application locally simple type:
+is a lot to say about the features of Vite, but more directly, to test your
+application locally simply type:
 
-```
+```sh
 npm run dev
 ```
 
 in the project folder. You should see something like this:
 
-```
+```sh
   vite v2.9.9 dev server running at:
 
   > Local: http://localhost:3000/
@@ -26,40 +26,57 @@ in the project folder. You should see something like this:
 ```
 
 If you open the link shown after `Local:` (in this case,
-`http://localhost:3000/`) in your browser[^mac] it will show you a live demo of
+`http://localhost:3000/`) in your browser[^mac], it will show you a live demo of
 your web experiment. This website will automatically refresh and change as you
 make modifications to your code. That's all you need to get started.
 
 [^mac]:
-    On Mac if you press the Command (⌘) key while clicking the link it will open
-    in a new tab.
+    On Mac, if you press the Command (⌘) key while clicking the link, it will
+    open in a new tab.
 
-## Smile developer bar
+## Smile developer tools
 
-When you are viewing your website on the development server there is a special
-bar visible along the top of the page. This provides some useful links as well
-as the ability to jump between different stages/routes of your experiment. This
-bar will not be rendered when the website is deployed (so participants won't be
-able to see it!).
+When you are viewing your website in developer mode, there are special UI
+elements that help you debug and develop your experiments. Here's an example
+video from a recent build (v0.1.0):
 
-On pages that have forms that have to be filled out you as the developer can
-make a new button appear in the developer bar called "Autofill Form" which will
-automatically fill in the form with some preset values making it easier to
-advance to the next stage of debugging.
+<video controls autoplay loop muted poster="https://todd.gureckislab.org/images/blog/smile-0.1.0-devmode.png" style="max-width:100%;width:700px;">
+  <source src="https://todd.gureckislab.org/videos/blog/smile-0.1.0-devmode.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+The developer tools let you:
+
+- Inspect the state of your running experiment, including configuration settings
+  and your current data
+- Jump between sections of your experiment (i.e., [Views](/coding/views))
+- Pin certain Views/pages so that you can focus on them without restarting the
+  entire task
+- View errors and warning messages
+- Autofill forms and experiment data to generate simulated data for testing your
+  analysis scripts
+- Simulate how your task will appear on different size monitors and devices like
+  phones
+- Toggle between light/dark mode
+  ([if you choose to support it](/styling/darkmode))
+- Debug the step-by-step operation of your experiment
+- Perform "brain surgery" by forcing particular settings or events to happen to
+  see how your experiment responds.
 
 ## Testing the build process
 
-You can also test the build process locally. Simply type
+You can also test the build process locally. Simply type:
 
 ```
 npm run build
 ```
 
 If the build is successful, the files will be bundled exactly as they will be on
-your final deployed website. (Files go into the `dist/` folder which is not
+your final deployed website. (Files go into the `dist/` folder, which is not
 tracked by git).
 
-Next, you can view the website almost exactly as it will appear online by typing
+Next, you can view the website almost exactly as it will appear online by
+typing:
 
 ```
 npm run preview
@@ -78,32 +95,32 @@ anytime a file changes.
 
 However, the downside of reloading the site page each time there is a change is
 that the "state" of the page is reset. For example, if you were testing your
-experiment and were on trial 10 of the experiment, paused, and then changed the
-color of one of the fonts, most live-reloaders will completely reload the page
-taking you back to the first trial of the experiment (i.e., the state is reset).
+experiment and were on trial 10, paused, and then changed the color of one of
+the fonts, most live-reloaders will completely reload the page, taking you back
+to the first trial of the experiment (i.e., the state is reset).
 
 Instead, Vite can reload modules for parts of a page without reloading the
 _entire_ page. This can be **very powerful** for developing experiments because
 it can prevent a lot of mindless clicking just to get back to a particular state
-and trigger an error, etc... Once you understand this difference you'll wonder
+and trigger an error, etc. Once you understand this difference, you'll wonder
 how you ever programmed for the web without it. This feature is known as
 [Hot Module Replacement](https://vitejs.dev/guide/features.html#hot-module-replacement).
 
-## Bundling, Tree-Shaking, and Code-spliting
+## Bundling, Tree-Shaking, and Code-splitting
 
 A second key feature of Vite is that it acts as a bundler. When you use complex
-libraries in your project there may be lots of dependencies both within and
+libraries in your project, there may be lots of dependencies both within and
 between packages. As one example, the popular [lodash](https://lodash.com)
-library organizes all the functions into individual modules so importing the
+library organizes all the functions into individual modules, so importing the
 lodash library in Node.js technically may load as many as 600 other files at
-once. If this was running on a real webserver the number of separate requests
+once. If this was running on a real webserver, the number of separate requests
 might overload the server. As a result, modern websites "bundle" the required
 code into a single, optimized file so that only one file is imported. Vite does
-this behind the scenes for you both in development and building mode.
+this behind the scenes for you both in development and build mode.
 
-There are several other features of Vite including a process called
+There are several other features of Vite, including a process called
 [Tree-Shaking](https://developer.mozilla.org/en-US/docs/Glossary/Tree_shaking),
-which removes functions from the bundle which are not used in the current app to
+which removes functions from the bundle that are not used in the current app to
 reduce the file size, and
 [Code Splitting](https://developer.mozilla.org/en-US/docs/Glossary/Code_splitting),
 which organizes files into "chunks" that reflect common dependencies across
@@ -127,69 +144,89 @@ the base Smile repo for your lab as a new remote. For example, if your lab
 organization is called `NYUCCL` on Github and the template repo is called
 `smile`, you'd type the following command:
 
-```
+```bash
 git remote add smile https://github.com/NYUCCL/smile.git
 ```
 
 You only need to do this once. Next time, the Smile template will already be
 added as a remote.
 
-Next, fetch the current template from the Smile repo:
+Next, create a new branch for the update:
 
-```
-git fetch smile
-```
-
-If this is your first time merging changes from the template, create a branch
-called smile-template in your project, and switch to that branch
-
-```
-git checkout -b smile_template
+```bash
+git checkout -b update-template
 ```
 
-If you've done this before, the branch already exists, so just switch to the
-branch:
+Fetch only the current state of the template (without its full git history):
 
-```
-git checkout smile_template
-```
-
-Then, merge the main branch of the current smile template into the
-smile_template branch, and push the changes in smile_template to origin
-
-```
-git merge smile/main --allow-unrelated-histories -X theirs
-git push
+```bash
+git fetch smile main --depth=1
 ```
 
-Make a new branch called update, based off the current branch your study is
-being developed on
+Create a patch file showing all differences between your project and the
+template:
 
-```
-git checkout -b update
-```
-
-Merge the smile_template branch into update, and resolve conflicts:
-
-```
-git merge smile_template
+```bash
+git diff HEAD smile/main > template_changes.patch
 ```
 
-Merge update into your experiment's branch, for example called main:
+Apply the patch to your branch:
 
+```bash
+git apply template_changes.patch
 ```
+
+### Handling merge conflicts
+
+If the patch applies cleanly, skip to the commit step below. If you see
+conflicts, git will report which files failed. To resolve them:
+
+1. Open each conflicted file in your editor
+2. Look for conflict markers that git inserted (they look like `<<<<<<<`,
+   `=======`, `>>>>>>>`)
+3. Manually edit the file to keep the changes you want
+4. Save the file
+5. Continue with any remaining conflicted files
+
+Alternatively, you can apply the patch with a 3-way merge strategy which can
+handle some conflicts automatically:
+
+```bash
+git apply --3way template_changes.patch
+```
+
+This will apply what it can and mark conflicts in files using standard git
+conflict markers, which you can then resolve using your normal merge conflict
+workflow.
+
+After resolving all conflicts, stage your changes:
+
+```bash
+git add .
+```
+
+Commit the template updates with a descriptive message:
+
+```bash
+git commit -m "Update from Smile template
+
+Applied latest changes from the Smile template repository.
+This update brings in new features and bug fixes without
+importing the template's full git history.
+
+Resolved conflicts in: [list any files where you manually resolved conflicts]"
+```
+
+Finally, merge the update branch into your main development branch:
+
+```bash
 git checkout main
-git merge update
+git merge update-template
 ```
 
-Voila, your smile has been updated to be even bigger! The extra step (creating
-another additional update branch) prevented the entire commit history of the
-NYUCCL/smile repository from being added to your project, which helps keeps
-things nice and clean.
+You should re-run node's package installer in case any of the required packages
+changed:
 
-Finally, you should re-run node's package installer incase any of the required
-packages changed:
-
-```
+```bash
 npm i
 ```

@@ -16,7 +16,7 @@ details on adding new configuration options specific for your project.
 ## Getting started quickly
 
 Configuration options in <SmileText /> are either stored in the `env/` folder or
-or can be configured at runtime using the `api.setRuntimeConfig()` function (see
+can be configured at runtime using the `api.setRuntimeConfig()` function (see
 the full API docs [here](/api)).
 
 [Dotenv](https://dotenv.org) files are simply plain text files that define
@@ -37,26 +37,9 @@ ANOTHER_OPTION    = 33
 MY_CONFIG         = '${MY_CONFIG_OPTION}1234'
 ```
 
-If you have set up a [base repo](/labconfig) it will contain encrypted versions
-of your lab's configuration files. As described in the
-[starting a new project](/starting) guide, you will want to simply decrypt the
-files provided in the repository.
-
-::: danger Warning!
-
-This will only work if you have signed and encrypted your lab's configurations.
-See instructions [here](/adduser).
-
-:::
-
-To do this simply type:
-
-```
-git secret reveal
-```
-
-this should create several `.env.*.local` files in your `env/` directory (the
-`*` means anything fills in there).
+As described in the [starting a new project](/starting) guide, you will want to
+add the env files to your project from your lab. You either will have created
+them yourself or you will have received them from your lab.
 
 After all the necessary files are in the `env` folder run:
 
@@ -401,6 +384,7 @@ EXP_DEPLOY_USER        = user
 EXP_DEPLOY_MODE        = production
 SLACK_WEBHOOK_URL      = https://hooks.slack.com/workflows/something
 SLACK_WEBHOOK_ERROR_URL= https://hooks.slack.com/workflows/somethingelse
+SLACK_DOCS_WEBHOOK_URL = https://hooks.slack.com/workflows/docswebhook
 EXP_DEPLOY_KEY         = "-----BEGIN RSA PRIVATE KEY-----\n-----END RSA PRIVATE KEY-----"
 
 ```
@@ -415,11 +399,12 @@ EXP_DEPLOY_KEY         = "-----BEGIN RSA PRIVATE KEY-----\n-----END RSA PRIVATE 
   messages
 - `SLACK_WEBHOOK_ERROR_URL` is the url for the Slack Webhook for posting error
   messages
+- `SLACK_DOCS_WEBHOOK_URL` is the url for the Slack Webhook for posting
+  documentation deployment messages (only needed on the base Smile repo)
 - `EXP_DEPLOY_KEY` is the RSA private key used to access your server via
   passwordless ssh[^rsakey]
 
-[^rsakey]:
-    The key needs to be all on one line with `\n` character coding new lines.
+[^rsakey]: The key needs to be all on one line with `\n` character coding new lines.
 
 ## Configuring your deployment settings on GitHub
 

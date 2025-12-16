@@ -4,14 +4,14 @@
 
 ### Creating a new project
 
-Called `my_cool_project` for GitHub user `ghuser`:
+Called `my_cool_project` for GitHub user `ghuser` (assumes you already have the
+.env files for your lab or configuration):
 
 ```
 gh repo create my_cool_project --private --template nyuccl/smile
 gh repo clone ghuser/my_cool_project
 gh repo edit ghuser/my_cool_project --description "my new project description"
 cd my_cool_project
-git secret reveal
 npm run config:upload
 npm run setup_project
 ```

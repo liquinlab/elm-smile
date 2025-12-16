@@ -244,14 +244,14 @@ onKeyDown((e) => {
         <div class="hidden sm:block">
           <div class="flex items-center text-xs font-normal">
             <BugPlay class="size-4 mr-1" />
-            <b>DEVELOPER MODE</b>
+            <b>DEVELOPER MODE</b> &nbsp;({{ api.config.smileVersion }})
           </div>
         </div>
         <!-- Mobile version -->
         <div class="block sm:hidden">
           <div class="flex items-center text-xs font-normal">
             <BugPlay class="size-4 mr-1" />
-            <b>DEV</b>
+            <b>DEV</b> &nbsp;({{ api.config.smileVersion }})
           </div>
         </div>
       </div>

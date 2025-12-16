@@ -24,6 +24,9 @@
     "test:gui": "vitest --ui --coverage.enabled=true",
     "coverage": "vitest run --coverage",
     "test:ui": "cypress open --project tests",
+    "test:python": "cd analysis && uv run pytest",
+    "test:python:cov": "cd analysis && uv run pytest --cov=smiledata --cov-report=term-missing",
+    "test:all": "vitest run && cd analysis && uv run pytest",
     "dashboard": "vite --mode dashboard",
     "dev": "vite",
     "dev:live": "vite --mode production",
@@ -42,7 +45,8 @@
     "setup_project": "sh scripts/setup_project.sh",
     "force_deploy": "sh scripts/force_deploy.sh",
     "upload_config": "sh scripts/update_config.sh",
-    "release": "bumpp package.json"
+    "release": "bumpp package.json",
+    "prettier": "npx prettier --write ."
   },
   "dependencies": {
     "@codenamize/codenamize": "1.1.1",
@@ -69,7 +73,7 @@
     "lucide-vue-next": "^0.517.0",
     "motion": "^12.3.1",
     "pinia": "^2.3.1",
-    "reka-ui": "^2.3.2",
+    "reka-ui": "^2.6.1",
     "rimraf": "^6.0.1",
     "seedrandom": "^3.0.5",
     "split-type": "^0.3.4",

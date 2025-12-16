@@ -70,6 +70,29 @@ if (seed) {
   )
 }
 
+/**
+ * Returns the current local time as an ISO-like string in the user's timezone
+ * @returns {string} Local time string (e.g., "2024-12-03T16:04:00.000-05:00")
+ */
+function getLocalTimeString() {
+  const now = new Date()
+  const offset = -now.getTimezoneOffset()
+  const sign = offset >= 0 ? '+' : '-'
+  const pad = (n) => String(Math.abs(n)).padStart(2, '0')
+  const offsetHours = pad(Math.floor(Math.abs(offset) / 60))
+  const offsetMins = pad(Math.abs(offset) % 60)
+
+  const year = now.getFullYear()
+  const month = pad(now.getMonth() + 1)
+  const day = pad(now.getDate())
+  const hours = pad(now.getHours())
+  const minutes = pad(now.getMinutes())
+  const seconds = pad(now.getSeconds())
+  const ms = String(now.getMilliseconds()).padStart(3, '0')
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${ms}${sign}${offsetHours}:${offsetMins}`
+}
+
 /////// continue with setting up smilestore ///////
 /**
  * Determines the initial route based on application mode
@@ -228,8 +251,12 @@ export default defineStore('smilestore', {
       consented: false,
       verifiedVisibility: false,
       done: false,
-      starttime: null, // time consented
-      endtime: null, // time finished or withdrew
+      starttime: null, // time consented (server timestamp)
+      endtime: null, // time finished or withdrew (server timestamp)
+      starttimeLocal: null, // time consented in user's local time (ISO string)
+      endtimeLocal: null, // time finished or withdrew in user's local time (ISO string)
+      userTimezone: null, // user's timezone (e.g., "America/New_York")
+      userTimezoneOffset: null, // user's UTC offset in minutes (e.g., -300 for EST)
       recruitmentService: 'web', // fake
       browserData: [], // empty
       withdrawn: false, // false
@@ -259,6 +286,19 @@ export default defineStore('smilestore', {
     getConditions: (state) => state.browserPersisted.conditions,
     getRandomizedRoutes: (state) => state.browserPersisted.randomizedRoutes,
     verifiedVisibility: (state) => state.data.verifiedVisibility,
+    /**
+     * Gets all pageData fields from the data store
+     * @returns {Object} Object containing all pageData_* fields
+     */
+    getAllPageData: (state) => {
+      const pageDataFields = {}
+      for (const key in state.data) {
+        if (key.startsWith('pageData_')) {
+          pageDataFields[key] = state.data[key]
+        }
+      }
+      return pageDataFields
+    },
     getShortId: (state) => {
       if (!state.browserPersisted.docRef || typeof state.browserPersisted.docRef !== 'string') return 'N/A'
       //const lastDashIndex = state.browserPersisted.docRef.lastIndexOf('-')
@@ -314,6 +354,9 @@ export default defineStore('smilestore', {
       this.browserPersisted.consented = true
       this.data.consented = true
       this.data.starttime = fsnow()
+      this.data.starttimeLocal = getLocalTimeString()
+      this.data.userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      this.data.userTimezoneOffset = new Date().getTimezoneOffset()
     },
 
     /**
@@ -336,6 +379,7 @@ export default defineStore('smilestore', {
       this.data.withdrawn = true
       this.private.withdrawData = forminfo
       this.data.endtime = fsnow()
+      this.data.endtimeLocal = getLocalTimeString()
     },
 
     verifyVisibility(value) {
@@ -352,6 +396,7 @@ export default defineStore('smilestore', {
       this.browserPersisted.done = true
       this.data.done = true
       this.data.endtime = fsnow()
+      this.data.endtimeLocal = getLocalTimeString()
     },
 
     /**

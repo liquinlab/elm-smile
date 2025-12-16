@@ -97,6 +97,10 @@ export default defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/NYUCCL/smile' },
       { icon: 'twitter', link: 'https://twitter.com/todd_gureckis' },
+      {
+        icon: 'youtube',
+        link: 'https://youtube.com/playlist?list=PLZmnZklqQaZxiGff7pq9dDU4ifoHcVL9w&si=EgbHNiw7K5gD2Ipx',
+      },
     ],
     sidebar: [
       {
@@ -140,9 +144,9 @@ export default defineConfig({
           { text: 'Tailwind CSS', link: '/styling/tailwind' },
           { text: 'Dark Mode', link: '/styling/darkmode' },
           { text: 'Layouts', link: '/styling/layouts' },
-          { text: 'Components', link: '/styling/uikit' },
+          { text: 'UI Components', link: '/styling/uikit' },
           { text: 'Icons', link: '/styling/icons' },
-          { text: 'Forms and Quizes', link: '/styling/forms' },
+          { text: 'Forms and Quizzes', link: '/styling/forms' },
           { text: 'Images and Videos', link: '/styling/imagesvideo.md' },
           //{ text: 'Animations', link: '/styling/animations' },
         ],

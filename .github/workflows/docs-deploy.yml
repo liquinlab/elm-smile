@@ -1,18 +1,15 @@
 # This is the workflow for deploying the smile docs
 
-name: Build Docs
+name: docs-deploy
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches:
       - main
     paths:
       - 'docs/**'
       - '.github/workflows/docs-deploy.yml'
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
@@ -24,7 +21,7 @@ concurrency:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "deploy"
-  deploy:
+  docs-deploy:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -162,6 +159,19 @@ jobs:
       - name: Rebuild docs
         run: npm run docs:build
 
+      # Validate deploy variables before rsync --delete (safety check)
+      - name: Validate deploy path variables
+        run: |
+          if [ -z "${{ secrets.DOCS_DEPLOY_PATH }}" ]; then
+            echo "::error::DOCS_DEPLOY_PATH secret is not set. Aborting to prevent rsync --delete in wrong directory."
+            exit 1
+          fi
+          if [ "${{ secrets.DOCS_DEPLOY_PATH }}" = "/" ]; then
+            echo "::error::DOCS_DEPLOY_PATH is root. Aborting to prevent rsync --delete in wrong directory."
+            exit 1
+          fi
+          echo "Deploy path validated: ${{ secrets.DOCS_DEPLOY_PATH }}"
+
       # Deploy files to web server
       - name: rsync to server
         uses: burnett01/rsync-deployments@5.2
@@ -175,10 +185,10 @@ jobs:
           remote_key: ${{ secrets.DOCS_DEPLOY_KEY  }}
 
       # send a notification at the end
-      - name: Send notification to lab slack
+      - name: Send notification about docs deploy to lab slack
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        if: ${{ env.SLACK_WEBHOOK_URL != '' }} # this should only run if SLACK_WEBHOOK exists
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DOCS_WEBHOOK_URL }}
+        if: ${{ env.SLACK_WEBHOOK_URL != '' }} # this should only run if SLACK_DOCS_WEBHOOK_URL exists
         id: slack
         uses: slackapi/slack-github-action@v1.25.0
         with:
@@ -186,6 +196,5 @@ jobs:
           payload: |
             { 
               "github_username": "${{ github.actor }}",
-              "deploy_url": "Docs were updated at https://smile.gureckislab.org/",
               "github_hash": "https://github.com/${{ steps.dotenv_github.outputs.VITE_GIT_OWNER }}/${{ steps.dotenv_github.outputs.VITE_GIT_REPO_NAME }}/commit/${{ steps.dotenv_github.outputs.VITE_GIT_HASH }}"
             }

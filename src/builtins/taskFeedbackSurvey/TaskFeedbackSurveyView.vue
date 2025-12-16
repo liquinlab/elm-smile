@@ -26,15 +26,11 @@ if (!api.persist.isDefined('forminfo')) {
 }
 
 /**
- * Computed property to check if all form fields are completed
+ * Computed property to check if required form fields are completed
  * @returns {boolean} True if all required fields have values
  */
 const complete = computed(
-  () =>
-    api.persist.forminfo.difficulty_rating !== '' &&
-    api.persist.forminfo.enjoyment_rating !== '' &&
-    api.persist.forminfo.feedback !== '' &&
-    api.persist.forminfo.issues !== ''
+  () => api.persist.forminfo.difficulty_rating !== '' && api.persist.forminfo.enjoyment_rating !== ''
 )
 
 /**
@@ -56,8 +52,8 @@ api.setAutofill(autofill)
  * Records form data and saves to database before proceeding
  */
 function finish() {
-  api.recordForm('feedbackForm', api.persist.forminfo)
-  api.saveData(true) // Force a data save
+  api.recordPageData(api.persist.forminfo)
+  api.saveData()
   api.goNextView()
 }
 </script>
@@ -140,10 +136,10 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">Select your rating</p>
           </div>
 
-          <!-- General feedback textarea -->
+          <!-- General feedback textarea (optional) -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2">
-              Any general feedback for the study team?
+              Any general feedback for the study team? <span class="font-normal text-muted-foreground">(optional)</span>
             </label>
             <Textarea
               v-model="api.persist.forminfo.feedback"
@@ -154,10 +150,11 @@ function finish() {
             <p class="text-xs text-muted-foreground mt-1">Share your general thoughts and reactions</p>
           </div>
 
-          <!-- Issues reporting textarea -->
+          <!-- Issues reporting textarea (optional) -->
           <div class="mb-3">
             <label class="block text-md font-semibold text-foreground mb-2">
               Any specific issues to report that might improve the study?
+              <span class="font-normal text-muted-foreground">(optional)</span>
             </label>
             <Textarea
               v-model="api.persist.forminfo.issues"
@@ -171,7 +168,7 @@ function finish() {
           <!-- Form submission section -->
           <hr class="border-border my-6" />
           <div class="flex justify-end">
-            <Button variant="default" :disabled="!complete" @click="finish()"> I'm finished </Button>
+            <Button variant="default" :disabled="!complete" @click="finish()"> Upload my complete data </Button>
           </div>
         </div>
       </template>

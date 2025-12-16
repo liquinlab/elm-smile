@@ -1,6 +1,6 @@
 # This is a basic workflow to deploy your smile experiment
 
-name: Build Smile
+name: deploy
 
 on:
   workflow_dispatch:
@@ -11,13 +11,18 @@ on:
         type: string
   push:
     branches-ignore:
-      - analysis # want this to be all branches eventually
-      - models
-      - docs
+      - 'feat-*'
+      - 'fix-*'
+      - 'refactor-*'
+      - 'test-*'
+      - 'chore-*'
+      - 'style-*'
+      - 'docs-*'
+      - 'ci-*'
     paths-ignore: # ignore any changes to the docs for this workflow or unimportant files
       - 'docs/**'
       - '.github/workflows/docs-deploy.yml'
-      - 'README.md'
+      - '**/*.md'
       - 'LICENSE'
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
@@ -209,6 +214,24 @@ jobs:
           port: ${{ secrets.EXP_DEPLOY_PORT }}
           script: rm ${{ secrets.EXP_DEPLOY_PATH }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }}; ln -sf ../${{ steps.dotenv_github.outputs.VITE_GIT_OWNER }}/${{ steps.dotenv_github.outputs.VITE_GIT_REPO_NAME }}/${{ steps.dotenv_github.outputs.VITE_GIT_BRANCH_NAME }} ${{ secrets.EXP_DEPLOY_PATH }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }}
 
+      # Validate deploy variables before rsync --delete (safety check)
+      - name: Validate deploy path variables
+        run: |
+          if [ -z "${{ secrets.EXP_DEPLOY_PATH }}" ]; then
+            echo "::error::EXP_DEPLOY_PATH secret is not set. Aborting to prevent rsync --delete in wrong directory."
+            exit 1
+          fi
+          if [ -z "${{ steps.dotenv_github.outputs.VITE_DEPLOY_BASE_PATH }}" ]; then
+            echo "::error::VITE_DEPLOY_BASE_PATH is not set. Aborting to prevent rsync --delete in wrong directory."
+            exit 1
+          fi
+          FULL_PATH="${{ secrets.EXP_DEPLOY_PATH }}/${{ steps.dotenv_github.outputs.VITE_DEPLOY_BASE_PATH }}"
+          if [ -z "$FULL_PATH" ] || [ "$FULL_PATH" = "/" ]; then
+            echo "::error::Computed deploy path is empty or root. Aborting to prevent rsync --delete in wrong directory."
+            exit 1
+          fi
+          echo "Deploy path validated: $FULL_PATH"
+
       # Deploy files to web server
       - name: rsync to server
         uses: burnett01/rsync-deployments@5.2
@@ -233,7 +256,13 @@ jobs:
           # This data can be any valid JSON from a previous step in the GitHub Action
           payload: |
             { 
+              "deploy_base": "https://${{ secrets.EXP_DEPLOY_HOST }}${{ steps.dotenv_github.outputs.VITE_DEPLOY_BASE_PATH }}",
+              "deploy_base_codename": "https://${{ secrets.EXP_DEPLOY_HOST }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }}",
               "github_username": "${{ github.actor }}",
-              "deploy_url": "https://${{ secrets.EXP_DEPLOY_HOST }}${{ steps.dotenv_github.outputs.VITE_DEPLOY_BASE_PATH }} although you should tell people https://${{ secrets.EXP_DEPLOY_HOST }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }} .  Your QR Code is to the site is here: https://${{ secrets.EXP_DEPLOY_HOST }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }}/qr.svg",
-              "github_hash": "https://github.com/${{ steps.dotenv_github.outputs.VITE_GIT_OWNER }}/${{ steps.dotenv_github.outputs.VITE_GIT_REPO_NAME }}/commit/${{ steps.dotenv_github.outputs.VITE_GIT_HASH }}"
+              "github_hash": "https://github.com/${{ steps.dotenv_github.outputs.VITE_GIT_OWNER }}/${{ steps.dotenv_github.outputs.VITE_GIT_REPO_NAME }}/commit/${{ steps.dotenv_github.outputs.VITE_GIT_HASH }}",
+              "qr_code": "https://${{ secrets.EXP_DEPLOY_HOST }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }}/qr.svg",
+              "prolific_url": "https://${{ secrets.EXP_DEPLOY_HOST }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }}/#/welcome/prolific/",
+              "cloudresearch_url": "https://${{ secrets.EXP_DEPLOY_HOST }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }}/#/welcome/cloudresearch/",
+              "mturk_url": "https://${{ secrets.EXP_DEPLOY_HOST }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }}/#/welcome/mturk/",
+              "citizen_url": "https://${{ secrets.EXP_DEPLOY_HOST }}/e/${{ steps.dotenv_github.outputs.VITE_CODE_NAME }}/#/welcome/citizen/"            
             }
